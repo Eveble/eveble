@@ -1,0 +1,6 @@
+--reporter spec
+--ui bdd
+--recursive
+--colors
+--timeout 6000
+--slow 100
