@@ -4,7 +4,7 @@ import { getTypeName, TypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
 import { types } from '../types';
 import { kernel } from '../core/kernel';
-import { toPlainObject, isRecord } from '../utils/helpers';
+import { toPlainObject, isPlainRecord } from '../utils/helpers';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
 export class DefinableMixin implements types.Definable {
@@ -64,7 +64,7 @@ export class DefinableMixin implements types.Definable {
     const instanceInitializers = this.getInstanceInitializers();
 
     const defaults = merge(parentInitializers, instanceInitializers, {
-      isMergeableObject: isRecord,
+      isMergeableObject: isPlainRecord,
     });
     return defaults;
   }

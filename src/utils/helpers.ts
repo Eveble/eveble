@@ -70,7 +70,7 @@ export function toPlainObject(
     const value = arg[key.toString()];
     if (typeof value?.toPlainObject === 'function') {
       plainObj[key] = value.toPlainObject();
-    } else if (isRecord(value)) {
+    } else if (isPlainRecord(value)) {
       plainObj[key] = toPlainObject(value);
     } else {
       plainObj[key] = value;

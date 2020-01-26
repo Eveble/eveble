@@ -4,7 +4,7 @@ import { DefinableMixin } from '../mixins/definable-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';
 import { types } from '../types';
 import { DEFAULT_PROPS_KEY, DELEGATED_KEY } from '../constants/metadata-keys';
-import { isRecord } from '../utils/helpers';
+import { isPlainRecord } from '../utils/helpers';
 
 export class Struct extends classes(DefinableMixin, HookableMixin) {
   /**
@@ -93,7 +93,7 @@ export class Struct extends classes(DefinableMixin, HookableMixin) {
   protected onConstruction(props: types.Props): types.Props {
     const propertyInitializers = this.getPropertyInitializers();
     const processedProps: types.Props = merge(propertyInitializers, props, {
-      isMergeableObject: isRecord,
+      isMergeableObject: isPlainRecord,
     });
 
     const hooks: types.hooks.Mappings = this.getHooks('onConstruction');
