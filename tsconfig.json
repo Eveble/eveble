@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "lib": ["esnext"],
+    "sourceMap": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "noResolve": false,
+    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "plugins": [
+      {
+        "transform": "tsruntime/dist/transform/transformer.js",
+        "type": "program"
+      }
+    ]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
