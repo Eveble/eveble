@@ -1,0 +1,18 @@
+export const BINDINGS = {
+  Injector: Symbol.for('Injector'),
+  Converter: Symbol.for('Converter'),
+  Library: Symbol.for('Library'),
+  Config: Symbol.for('Config'),
+  Validator: Symbol.for('Validator'),
+  Describer: Symbol.for('Describer'),
+  log: Symbol.for('Logger'),
+  winston: Symbol.for('winston'),
+  LogConverter: Symbol.for('LogConverter'),
+  SimpleLogFormatter: Symbol.for('SimpleLogFormatter'),
+  DetailedLogFormatter: Symbol.for('DetailedLogFormatter'),
+  console: 'console',
+  CommandBus: Symbol.for('CommandBus'),
+  EventBus: Symbol.for('EventBus'),
+  EJSON: Symbol.for('EJSON'),
+  Serializer: Symbol.for('Serializer'),
+};
