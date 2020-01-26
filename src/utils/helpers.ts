@@ -27,12 +27,21 @@ export function isSerializable(arg: any): boolean {
 /**
  * Evaluates if provided argument is a record.
  * @param arg - Evaluated argument.
- * @returns Returns `true` if argument is an record(literal object, class instance or `Collection` ), else `false`.
+ * @returns Returns `true` if argument is an record(literal object, class instance or `Collection` instance), else `false`.
  */
 export function isRecord(arg: any): boolean {
   return (
     isPlainObject(arg) || isClassInstance(arg) || arg instanceof Collection
   );
+}
+
+/**
+ * Evaluates if provided argument is a plain record(plain object or `Collection`).
+ * @param arg - Evaluated argument.
+ * @returns Returns `true` if argument is an record(literal object or `Collection` instance), else `false`.
+ */
+export function isPlainRecord(arg: any): boolean {
+  return isPlainObject(arg) || arg instanceof Collection;
 }
 
 /**

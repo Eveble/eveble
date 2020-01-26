@@ -7,9 +7,10 @@ import {
   isRecord,
   hasPostConstruct,
   toPlainObject,
- convertObjectToCollection } from '../../../src/utils/helpers';
+  convertObjectToCollection,
+  isPlainRecord,
+} from '../../../src/utils/helpers';
 import { define } from '../../../src/decorators/define';
-
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
@@ -173,6 +174,34 @@ describe('helpers', function() {
     it('returns false for other arguments', () => {
       expect(isRecord('my-string')).to.be.false;
       expect(isRecord(1234)).to.be.false;
+    });
+  });
+
+  describe('isPlainRecord', () => {
+    it('returns true for plain objects', () => {
+      expect(isPlainRecord({})).to.be.true;
+      expect(isPlainRecord({ key: 'string' })).to.be.true;
+    });
+
+    it('returns true for Collection instances', () => {
+      expect(isPlainRecord(new Collection())).to.be.true;
+    });
+
+    it('returns false for class instances', () => {
+      class MyClass {
+        key: string;
+
+        constructor(key: string) {
+          this.key = key;
+        }
+      }
+
+      expect(isPlainRecord(new MyClass('my-string'))).to.be.false;
+    });
+
+    it('returns false for other arguments', () => {
+      expect(isPlainRecord('my-string')).to.be.false;
+      expect(isPlainRecord(1234)).to.be.false;
     });
   });
 
