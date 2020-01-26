@@ -1,8 +1,8 @@
 import { interfaces as inversifyTypes } from '@parisholley/inversify-async';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
-import { Command } from './domain/command';
-import { Event } from './domain/event';
+import { Command } from './components/command';
+import { Event } from './components/event';
 
 /*
 Any type or interface exported in 'root' level of declaration is considered
