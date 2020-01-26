@@ -1,0 +1,18 @@
+{
+  "mode": "modules",
+  "out": "docs",
+  "ignoreCompilerErrors": "true",
+  "experimentalDecorators": "true",
+  "emitDecoratorMetadata": "true",
+  "target": "es2018",
+  "moduleResolution": "node",
+  "preserveConstEnums": "true",
+  "stripInternal": "false",
+  "suppressExcessPropertyErrors": "true",
+  "suppressImplicitAnyIndexErrors": "true",
+  "module": "ESNext",
+  "version": true,
+  "excludePrivate": false,
+  "excludeNotExported": false,
+  "excludeProtected": false
+}
