@@ -34,7 +34,14 @@ export abstract class SerializableError
    * Creates an instance of SerializableError.
    * @param props - Optional properties for error.
    */
-  constructor(props: types.Props = {}) {
+  constructor(propsOrMessage?: types.Props | string) {
+    let props: types.Props = {};
+    if (typeof propsOrMessage === 'string') {
+      props.message = propsOrMessage as string;
+    } else if (propsOrMessage !== undefined) {
+      props = propsOrMessage;
+    }
+
     const errorProps: types.ErrorProps = pick(props, [
       'message',
       'name',

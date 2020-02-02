@@ -122,7 +122,13 @@ describe('SerializableError', function() {
       expect(error.message).to.be.equal('');
     });
 
-    it('takes optional message as a string during construction', () => {
+    it('takes message as a string during construction', () => {
+      const message = 'This is a custom message';
+      const error = new MySerializableError(message);
+      expect(error.message).to.be.equal(message);
+    });
+
+    it('takes optional message property as a string during construction', () => {
       const message = 'This is a custom message';
       const error = new MySerializableError({ message });
       expect(error.message).to.be.equal(message);
