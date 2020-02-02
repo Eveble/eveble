@@ -1,7 +1,7 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { Message } from '../../../src/components/message';
-import { Command, Appointment } from '../../../src/components/command';
+import { Command, Assignment } from '../../../src/components/command';
 import { define } from '../../../src/decorators/define';
 import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -96,14 +96,14 @@ describe('Command', function() {
     describe('getters', () => {
       context('scheduling', () => {
         it('returns true if command is scheduled', () => {
-          const appointment = new Appointment({
+          const assignment = new Assignment({
             id: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: now,
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
-          command.schedule(appointment);
+          command.schedule(assignment);
           expect(command.isScheduled()).to.be.true;
         });
 
@@ -113,38 +113,38 @@ describe('Command', function() {
         });
 
         it('returns true if command can be delivered(deliver at date is in past now)', () => {
-          const appointment = new Appointment({
+          const assignment = new Assignment({
             id: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: now,
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
-          command.schedule(appointment);
+          command.schedule(assignment);
           expect(command.isDeliverable()).to.be.true;
         });
 
         it(`returns true if command can be delivered(deliver at date is in past)`, () => {
-          const appointment = new Appointment({
+          const assignment = new Assignment({
             id: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: new Date(new Date().getTime() - 1000),
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
-          command.schedule(appointment);
+          command.schedule(assignment);
           expect(command.isDeliverable()).to.be.true;
         });
 
         it(`returns false if command is not deliverable(deliver at date is in future)`, () => {
-          const appointment = new Appointment({
+          const assignment = new Assignment({
             id: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: new Date(new Date().getTime() + 1000),
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
-          command.schedule(appointment);
+          command.schedule(assignment);
           expect(command.isScheduled()).to.be.true;
         });
       });
@@ -158,7 +158,7 @@ describe('Command', function() {
           const sourceTypeName = 'MyEventSourceable';
           const deliverAt = now;
 
-          const appointment = new Appointment({
+          const assignment = new Assignment({
             id,
             deliverAt,
             sourceId,
@@ -166,7 +166,7 @@ describe('Command', function() {
           });
 
           const command = new MyCommand({ targetId: 'my-id' });
-          command.schedule(appointment);
+          command.schedule(assignment);
           const metadata = command.getMetadata();
           expect(metadata?.scheduling?.id).to.be.equal(id);
           expect(metadata?.scheduling?.sourceId).to.be.equal(sourceId);

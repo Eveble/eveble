@@ -3,11 +3,11 @@ import { Message } from './message';
 import { define } from '../decorators/define';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
-import { Struct } from './struct';
+import { Serializable } from './serializable';
 
-@define('Appointment')
-export class Appointment extends Struct {
-  id: Guid | string; // Appointment id
+@define('Assignment')
+export class Assignment extends Serializable {
+  id: Guid | string; // Assignment id
 
   deliverAt: Date;
 
@@ -32,7 +32,7 @@ export abstract class Command extends Message {
    * Schedules command for delivery at specific time.
    * @param appointment - Scheduling appointment information.
    */
-  schedule(appointment: Appointment): void {
+  schedule(appointment: Assignment): void {
     this.assignMetadata({
       scheduling: appointment,
     });
