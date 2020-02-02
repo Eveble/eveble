@@ -17,7 +17,8 @@ export class Assignment extends Serializable {
 }
 
 @define('Command')
-export abstract class Command extends Message {
+export abstract class Command extends Message
+  implements types.Sendable, types.Identifiable {
   targetId: Guid | string;
 
   /**
