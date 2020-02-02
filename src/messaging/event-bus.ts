@@ -20,7 +20,7 @@ export class EventBus extends classes(HookableMixin, OneToManyHandlingMixin)
    * @param handler - Handler function that will executed upon handling type.
    * @param shouldOverride - Flag indicating that handler should be overridden if exist.
    * @throws {UnhandleableTypeError}
-   * Thrown if the type argument is not sublcass of `Event` type.
+   * Thrown if the type argument is not subclass of `Event` type.
    * @throws {InvalidHandlerError}
    * Thrown if the handler argument is not a function.
    */
