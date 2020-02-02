@@ -57,6 +57,43 @@ describe('Serializable', function() {
       const person = new Person(props);
       expect(person).to.be.eql(props);
     });
+
+    describe('static constructor', () => {
+      it('constructs from properties picked from source', () => {
+        const props = {
+          firstName: 'Jane',
+          lastName: 'Doe',
+          age: 28,
+        };
+        const person = Person.from(props);
+        expect(person).to.be.instanceof(Person);
+        expect(person).to.be.eql({
+          firstName: 'Jane',
+          lastName: 'Doe',
+        });
+        expect(person.age).to.be.undefined;
+      });
+
+      it('constructs from properties picked from multiple source', () => {
+        const props1 = {
+          firstName: 'Jane',
+          age: 28,
+        };
+        const props2 = {
+          lastName: 'Doe',
+          favoriteColor: 'black',
+        };
+        const props3 = {
+          hobby: 'martial arts',
+        };
+        const person = Person.from(props1, props2, props3);
+        expect(person).to.be.instanceof(Person);
+        expect(person).to.be.eql({
+          firstName: 'Jane',
+          lastName: 'Doe',
+        });
+      });
+    });
   });
 
   describe('prop types', () => {
