@@ -10,7 +10,7 @@ import { kernel } from '../core/kernel';
 import { Command } from '../components/command';
 import {
   HANDLER_KEY,
-  HANDLERS_CONTAINER_KEY,
+  COMMAND_HANDLERS_CONTAINER_KEY,
 } from '../constants/metadata-keys';
 
 /**
@@ -55,13 +55,13 @@ export function handle(): any {
     }
 
     const params = Reflect.getMetadata('design:paramtypes', target, key);
-    const type = params[0];
+    const command = params[0];
 
-    if (!(type?.prototype instanceof Command)) {
+    if (!(command?.prototype instanceof Command)) {
       throw new UnhandleableTypeError(
         getTypeName(target.constructor) as types.TypeName,
         kernel.describer.describe([Command]),
-        kernel.describer.describe(type)
+        kernel.describer.describe(command)
       );
     }
 
@@ -72,18 +72,18 @@ export function handle(): any {
       Reflect.getMetadata(HANDLER_KEY, target.constructor) === typeName;
     if (!isHandling) {
       Reflect.defineMetadata(
-        HANDLERS_CONTAINER_KEY,
+        COMMAND_HANDLERS_CONTAINER_KEY,
         new Map(),
         target.constructor.prototype
       );
       // Flag that target is versionable for further reference
       Reflect.defineMetadata(HANDLER_KEY, typeName, target.constructor);
     }
-
-    const handlers = Reflect.getOwnMetadata(
-      HANDLERS_CONTAINER_KEY,
+    // Set the command handler
+    const handlers = Reflect.getMetadata(
+      COMMAND_HANDLERS_CONTAINER_KEY,
       target.constructor.prototype
     );
-    handlers.set(type, target[key]);
+    handlers.set(command, target[key]);
   };
 }

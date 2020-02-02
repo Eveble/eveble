@@ -9,6 +9,7 @@ import { define } from '../../../src/decorators/define';
 import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 import { handle } from '../../../src/annotations/handle';
 import { subscribe } from '../../../src/annotations/subscribe';
+import { HANDLERS } from '../../../src/constants/literal-keys';
 
 chai.use(sinonChai);
 
@@ -184,7 +185,7 @@ describe('HandlingMixing', function() {
       class MyController extends HandlingMixin {
         constructor() {
           super();
-          this.handlers = originalHandlers;
+          this[HANDLERS] = originalHandlers;
         }
 
         initialize(): void {
@@ -276,7 +277,7 @@ describe('HandlingMixing', function() {
         class MyController extends HandlingMixin {
           constructor() {
             super();
-            this.handlers = handlers;
+            this[HANDLERS] = handlers;
           }
         }
         const controller = new MyController();
@@ -296,7 +297,7 @@ describe('HandlingMixing', function() {
         class MyController extends HandlingMixin {
           constructor() {
             super();
-            this.handlers = handlers;
+            this[HANDLERS] = handlers;
           }
         }
         const controller = new MyController();
@@ -407,7 +408,7 @@ describe('HandlingMixing', function() {
       class MyController extends HandlingMixin {
         constructor() {
           super();
-          this.handlers = handlers;
+          this[HANDLERS] = handlers;
         }
       }
       const controller = new MyController();
@@ -422,7 +423,7 @@ describe('HandlingMixing', function() {
       class MyController extends HandlingMixin {
         constructor() {
           super();
-          this.handlers = handlers;
+          this[HANDLERS] = handlers;
         }
       }
 
@@ -438,7 +439,7 @@ describe('HandlingMixing', function() {
       class MyController extends HandlingMixin {
         constructor() {
           super();
-          this.handlers = handlers;
+          this[HANDLERS] = handlers;
         }
       }
 
@@ -458,7 +459,7 @@ describe('HandlingMixing', function() {
         class MyController extends HandlingMixin {
           constructor() {
             super();
-            this.handlers = handlers;
+            this[HANDLERS] = handlers;
           }
         }
 
@@ -475,7 +476,7 @@ describe('HandlingMixing', function() {
         class MyController extends HandlingMixin {
           constructor() {
             super();
-            this.handlers = handlers;
+            this[HANDLERS] = handlers;
           }
         }
 
@@ -492,7 +493,7 @@ describe('HandlingMixing', function() {
         class MyController extends HandlingMixin {
           constructor() {
             super();
-            this.handlers = handlers;
+            this[HANDLERS] = handlers;
           }
         }
 

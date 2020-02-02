@@ -13,10 +13,11 @@ import {
 } from '../messaging/messaging-errors';
 import { kernel } from '../core/kernel';
 import { Event } from '../components/event';
+import { HANDLERS } from '../constants/literal-keys';
 
 export class OneToManyHandlingMixin extends HandlingMixin
   implements types.Controller {
-  protected handlers: Map<types.MessageableType, types.Handler[]>;
+  protected [HANDLERS]: Map<types.MessageableType, types.Handler[]>;
 
   /**
    * Initializes OneToManyHandlingMixin.
@@ -89,9 +90,9 @@ export class OneToManyHandlingMixin extends HandlingMixin
     }
 
     if (!this.hasHandler(messageType) || shouldOverride) {
-      this.handlers.set(messageType, [handler]);
+      this[HANDLERS].set(messageType, [handler]);
     } else {
-      (this.handlers.get(messageType) as Function[]).push(handler);
+      (this[HANDLERS].get(messageType) as Function[]).push(handler);
     }
   }
 
@@ -109,7 +110,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
       throw new InvalidMessageableType(kernel.describer.describe(messageType));
     }
     return this.hasHandler(messageType)
-      ? this.handlers.get(messageType)
+      ? this[HANDLERS].get(messageType)
       : undefined;
   }
 
@@ -140,7 +141,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * @returns Message type if handler is matching one of handlers on class, else `undefined`.
    */
   public getTypeByHandler(handlerReference: types.Handler): any | undefined {
-    for (const [messageType, handlers] of this.handlers.entries()) {
+    for (const [messageType, handlers] of this[HANDLERS].entries()) {
       const unboundHandlers = handlers.map(handler => {
         return (handler as any).original || handler;
       });

@@ -14,10 +14,11 @@ import {
 import { types } from '../types';
 import { Command } from '../components/command';
 import { Event } from '../components/event';
+import { HANDLERS } from '../constants/literal-keys';
 
 export class OneToOneHandlingMixin extends HandlingMixin
   implements types.Controller {
-  protected handlers: Map<types.MessageableType, types.Handler>;
+  protected [HANDLERS]: Map<types.MessageableType, types.Handler>;
 
   /**
    * Initializes OneToOneHandlingMixin.
@@ -103,7 +104,7 @@ export class OneToOneHandlingMixin extends HandlingMixin
       );
     }
 
-    this.handlers.set(messageType, handler);
+    this[HANDLERS].set(messageType, handler);
   }
 
   /**
@@ -120,7 +121,7 @@ export class OneToOneHandlingMixin extends HandlingMixin
       throw new InvalidMessageableType(kernel.describer.describe(messageType));
     }
     return this.hasHandler(messageType)
-      ? this.handlers.get(messageType)
+      ? this[HANDLERS].get(messageType)
       : undefined;
   }
 
@@ -149,7 +150,7 @@ export class OneToOneHandlingMixin extends HandlingMixin
    * @returns Message type if handler is matching one of handlers on class, else `undefined`.
    */
   public getTypeByHandler(handlerReference: types.Handler): any | undefined {
-    for (const [messageType, handler] of this.handlers.entries()) {
+    for (const [messageType, handler] of this[HANDLERS].entries()) {
       const unboundHandler = (handler as any).original;
       // Compare original function and bound ones as a fallback
       if (handlerReference === unboundHandler || handlerReference === handler) {

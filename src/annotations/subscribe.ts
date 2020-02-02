@@ -10,7 +10,7 @@ import { kernel } from '../core/kernel';
 import { Event } from '../components/event';
 import {
   SUBSCRIBER_KEY,
-  SUBSCRIBING_HANDLERS_CONTAINER_KEY,
+  EVENT_HANDLERS_CONTAINER_KEY,
 } from '../constants/metadata-keys';
 
 /**
@@ -55,13 +55,13 @@ export function subscribe(): any {
     }
 
     const params = Reflect.getMetadata('design:paramtypes', target, key);
-    const type = params[0];
+    const event = params[0];
 
-    if (!(type?.prototype instanceof Event)) {
+    if (!(event?.prototype instanceof Event)) {
       throw new UnhandleableTypeError(
         getTypeName(target.constructor) as types.TypeName,
         kernel.describer.describe([Event]),
-        kernel.describer.describe(type)
+        kernel.describer.describe(event)
       );
     }
 
@@ -72,7 +72,7 @@ export function subscribe(): any {
       Reflect.getMetadata(SUBSCRIBER_KEY, target.constructor) === typeName;
     if (!isSubscribing) {
       Reflect.defineMetadata(
-        SUBSCRIBING_HANDLERS_CONTAINER_KEY,
+        EVENT_HANDLERS_CONTAINER_KEY,
         new Map(),
         target.constructor.prototype
       );
@@ -80,10 +80,10 @@ export function subscribe(): any {
       Reflect.defineMetadata(SUBSCRIBER_KEY, typeName, target.constructor);
     }
 
-    const handlers = Reflect.getOwnMetadata(
-      SUBSCRIBING_HANDLERS_CONTAINER_KEY,
+    const handlers = Reflect.getMetadata(
+      EVENT_HANDLERS_CONTAINER_KEY,
       target.constructor.prototype
     );
-    handlers.set(type, target[key]);
+    handlers.set(event, target[key]);
   };
 }

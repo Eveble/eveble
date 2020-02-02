@@ -7,29 +7,30 @@ import { Message } from '../components/message';
 import { Command } from '../components/command';
 import { Event } from '../components/event';
 import { UnhandleableTypeError } from '../messaging/messaging-errors';
+import { HANDLERS, HANDLEABLE_TYPES } from '../constants/literal-keys';
 import {
-  HANDLERS_CONTAINER_KEY,
-  SUBSCRIBING_HANDLERS_CONTAINER_KEY,
+  COMMAND_HANDLERS_CONTAINER_KEY,
+  EVENT_HANDLERS_CONTAINER_KEY,
 } from '../constants/metadata-keys';
 
 export abstract class HandlingMixin {
-  protected handlers: Map<
+  protected [HANDLERS]: Map<
     types.MessageableType,
     types.Handler | types.Handler[]
   >;
 
-  protected handleableTypes: types.MessageableType[];
+  protected [HANDLEABLE_TYPES]: types.MessageableType[];
 
   /**
    * Creates an instance of HandlingMixin.
    */
   constructor() {
-    Object.defineProperty(this, 'handlers', {
+    Object.defineProperty(this, HANDLERS, {
       value: new Map(),
       enumerable: false,
       writable: true,
     });
-    Object.defineProperty(this, 'handleableTypes', {
+    Object.defineProperty(this, HANDLEABLE_TYPES, {
       value: [],
       enumerable: false,
       writable: true,
@@ -125,7 +126,7 @@ export abstract class HandlingMixin {
   handles(): Map<types.MessageableType, types.Handler> {
     return (
       Reflect.getOwnMetadata(
-        HANDLERS_CONTAINER_KEY,
+        COMMAND_HANDLERS_CONTAINER_KEY,
         this.constructor.prototype
       ) || new Map()
     );
@@ -163,7 +164,7 @@ export abstract class HandlingMixin {
   subscribes(): Map<types.MessageableType, types.Handler> {
     return (
       Reflect.getOwnMetadata(
-        SUBSCRIBING_HANDLERS_CONTAINER_KEY,
+        EVENT_HANDLERS_CONTAINER_KEY,
         this.constructor.prototype
       ) || new Map()
     );
@@ -201,7 +202,7 @@ export abstract class HandlingMixin {
    * @returns Returns `true` if handler for message type is registered, else `false`.
    */
   public hasHandler(messageType: types.MessageableType): boolean {
-    return this.handlers.has(messageType);
+    return this[HANDLERS].has(messageType);
   }
 
   /**
@@ -209,7 +210,7 @@ export abstract class HandlingMixin {
    * @param messageType - Type implementing `MessageableType` interface.
    */
   public removeHandler(messageType: types.MessageableType): void {
-    this.handlers.delete(messageType);
+    this[HANDLERS].delete(messageType);
   }
 
   /**
@@ -220,7 +221,7 @@ export abstract class HandlingMixin {
     types.MessageableType,
     types.Handler | types.Handler[]
   > {
-    return this.handlers;
+    return this[HANDLERS];
   }
 
   /**
@@ -233,13 +234,13 @@ export abstract class HandlingMixin {
     const normalizedTypes = Array.isArray(handleableTypes)
       ? handleableTypes
       : [handleableTypes];
-    if (this.handleableTypes === undefined) {
+    if (this[HANDLEABLE_TYPES] === undefined) {
       Object.defineProperty(this, 'handleableTypes', {
         value: [],
         enumerable: false,
       });
     }
-    this.handleableTypes.push(...normalizedTypes);
+    this[HANDLEABLE_TYPES].push(...normalizedTypes);
   }
 
   /**
@@ -247,7 +248,7 @@ export abstract class HandlingMixin {
    * @returns Returns handleable message types as a list with message types.
    */
   public getHandleableTypes(): types.MessageableType[] {
-    return isEmpty(this.handleableTypes) ? [Message] : this.handleableTypes;
+    return isEmpty(this[HANDLEABLE_TYPES]) ? [Message] : this[HANDLEABLE_TYPES];
   }
 
   /**
@@ -310,7 +311,7 @@ export abstract class HandlingMixin {
    */
   public getHandledTypes(): types.MessageableType[] {
     const handledTypes: any[] = [];
-    for (const type of this.handlers.keys()) {
+    for (const type of this[HANDLERS].keys()) {
       handledTypes.push(type);
     }
     return handledTypes;
@@ -326,7 +327,7 @@ export abstract class HandlingMixin {
   ): types.MessageableType[] {
     const handledTypes: types.MessageableType[] = [];
 
-    for (const handledType of this.handlers.keys()) {
+    for (const handledType of this[HANDLERS].keys()) {
       if (kernel.validator.isValid(handledType.prototype, messageType)) {
         handledTypes.push(handledType);
       }
