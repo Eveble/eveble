@@ -67,7 +67,7 @@ export abstract class Message extends Serializable
 
   /**
    * Assigns metadata to message via reflection.
-   * @param props - Metadata properties object with all information related ot message.
+   * @param props - Metadata properties object with all information related to `Message`.
    */
   public assignMetadata(props: Record<string, any>): void {
     let metadata: Record<string, any>;
@@ -112,7 +112,7 @@ export abstract class Message extends Serializable
    * can be used we utilize lodash'es 'set' method to construct nested object from
    * such notation.
    */
-  public setCorrelationId(key: string, id: string): void {
+  public setCorrelationId(key: string, id: types.Stringifiable): void {
     let metadata: Record<string, any>;
     if (!this.hasMetadata()) {
       metadata = {};
