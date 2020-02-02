@@ -39,7 +39,7 @@ export class StatefulMixin implements types.Stateful {
    * Thrown if the instance does not have any states assigned.
    */
   public setState(state: types.State): void {
-    const selectableStates: types.States = this.getSelectableStates();
+    const selectableStates = this.getSelectableStates();
     if (isEmpty(selectableStates)) {
       const typeName: TypeName = getTypeName(this.constructor) as TypeName;
       throw new UndefinedStatesError(typeName);
@@ -131,7 +131,7 @@ export class StatefulMixin implements types.Stateful {
    * Returns all selectable states.
    * @returns Collection of available states.
    */
-  public getSelectableStates(): types.States {
+  public getSelectableStates(): Record<string, types.State> {
     return (this.constructor as any).STATES;
   }
 }
