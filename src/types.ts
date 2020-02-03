@@ -82,6 +82,7 @@ export namespace types {
   }
 
   export type TypeName = string;
+
   /*
   CORE
   */
@@ -177,6 +178,7 @@ export namespace types {
 
     export type Actions = Record<string, Mappings>;
   }
+
   /*
   NODE
   */
@@ -205,6 +207,7 @@ export namespace types {
     include(config: Configurable): void;
     merge(config: Configurable): void;
   }
+
   /*
   STATEFUL
   */
@@ -238,6 +241,7 @@ export namespace types {
   }
 
   export type LegacyTransformers = Map<number, Hook>;
+
   /*
   LOGGING
   */
@@ -377,7 +381,6 @@ export namespace types {
   /*
   MESSAGING
   */
-
   export interface Serializable extends Definable, Versionable {
     getTypeName(): TypeName;
     toString(): TypeName | string;
@@ -476,6 +479,21 @@ export namespace types {
   }
 
   /*
+  STATUSFUL
+  */
+  export type Status = string | number | null;
+
+  export interface Statusful {
+    isInStatus(status: Status | Status[]): boolean;
+    isInOneOfStatuses(status: Status | Status[]): boolean;
+    getStatus(): Status;
+    setStatus(status: Status): void;
+    hasStatus(): boolean;
+    validateStatus(statusOrStatuses: Status | Status[], error?: Error): boolean;
+    getSelectableStatuses(): Record<string, types.Status>;
+  }
+
+  /*
   DOMAIN
   */
   export interface Identifiable extends Serializable {
@@ -500,4 +518,3 @@ export namespace types {
     first(): T | undefined;
     last(): T | undefined;
   }
-}
