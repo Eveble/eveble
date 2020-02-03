@@ -1,6 +1,7 @@
 import { define } from '../decorators/define';
 import { DomainError } from './domain-error';
 import { types } from '../types';
+import { SerializableError } from '../components/serializable-error';
 
 /*
 LIST ERRORS
@@ -69,3 +70,7 @@ export class InvalidListError extends ListError {
     );
   }
 }
+/*
+VALUE OBJECT ERRORS
+*/
+export class ValueObjectError extends SerializableError {}
