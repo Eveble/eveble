@@ -56,6 +56,29 @@ export class List<T extends types.Serializable> extends Array {
    * @returns Instance of newly created and added `Serializable`.
    * @throws {ValidationError}
    * Thrown if the properties does not match property types on `Serializable`.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   *
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * source.in<Item>('items').create({
+   *   name: 'my-item-name',
+   * });
+   * expect(source.items[0]).to.be.instanceof(Item);
+   * expect(source.items[0]).to.be.be.eql(
+   *   new Item({
+   *     name: 'my-item-name',
+   *   })
+   * );
+   *```
    */
   public create(...sources: Record<string, any>[]): T {
     const element = (this[SERIALIZABLE_TYPE] as any).from(...sources);
@@ -72,6 +95,28 @@ export class List<T extends types.Serializable> extends Array {
    * Thrown if the `Identifiable` with same identifier already exists on list.
    * @throws {ElementAlreadyExistError}
    * Thrown if the same `Serializable` already exists on list(use `List.prototype.push` instead).
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const element = new Item({ name: 'my-item-name' });
+   *
+   * source.in<Item>('items').add(element);
+   * expect(source.items[0]).to.be.instanceof(Item);
+   * expect(source.items[0]).to.be.eql(
+   *   new Item({
+   *     name: 'my-item-name',
+   *   })
+   * );
+   *```
    */
   public add(element: T): void {
     kernel.validator.validate(element, this[SERIALIZABLE_TYPE]);
@@ -107,6 +152,28 @@ export class List<T extends types.Serializable> extends Array {
    * @param key - Property name(key) from `Serializable`.
    * @param value - Property value that should be matched.
    * @param element - `Serializable` instance.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const firstElement = new Item({ name: 'my-first-name' });
+   * const secondElement = new Item({ name: 'my-second-name' });
+   *
+   * source.in<Item>('items').add(firstElement);
+   * expect(source.items[0]).to.be.equal(firstElement);
+   * source
+   *   .in<Item>('items')
+   *   .overrideBy('name', 'my-first-name', secondElement);
+   * expect(source.items[0]).to.be.equal(secondElement);
+   *```
    */
   public overrideBy(key: string, value: any, element: T): void {
     const foundSerializable = this.getBy(key, value);
@@ -123,6 +190,24 @@ export class List<T extends types.Serializable> extends Array {
    * @param key - Property name(key) from `Serializable`.
    * @param value - Property value that should be matched.
    * @return Returns `Serializable` instance if found, else `undefined`.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const element = new Item({ name: 'my-item-name' });
+   * source.in<Item>('items').add(element);
+   * expect(
+   *   source.in<Item>('items').getBy('name', 'my-item-name')
+   * ).to.be.equal(element);
+   *```
    */
   public getBy(key: string, value: any): T | undefined {
     let foundSerializable: T | undefined;
@@ -149,6 +234,7 @@ export class List<T extends types.Serializable> extends Array {
    * @return Returns `Serializable` instance if found, else throws.
    * @throws {ElementNotFoundError}
    * Thrown if the `Serializable` with key and value can't be matched on list.
+   * @example
    */
   public getByOrThrow(key: string, value: any): T {
     const foundSerializable = this.getBy(key, value);
@@ -169,6 +255,31 @@ export class List<T extends types.Serializable> extends Array {
    * Returns `Serializable` instance from list by its identifier.
    * @param id - Identifier of `Serializable`.
    * @return Returns `Serializable` instance if found, else `undefined`.
+   * @example
+   *```ts
+   * @define('Employee')
+   * class Employee extends Serializable implements types.Identifiable {
+   *   id: string;
+   *
+   *   getId(): string {
+   *     return this.id;
+   *   }
+   * }
+   *
+   * @define('Company')
+   * class Company extends Serializable {
+   *   id: string;
+   *
+   *   employees: Employee[];
+   * }
+   *
+   * const source = new Company({ id: 'my-company-id', employees: [] });
+   * const element = new Employee({ id: 'my-employee-id' });
+   * source.in<Employee>('employees').add(element);
+   * expect(
+   *   source.in<Employee>('employees').getById('my-employee-id')
+   * ).to.be.
+   *```
    */
   public getById(id: string | types.Stringifiable): T | undefined {
     return this.getBy('id', id);
@@ -180,6 +291,7 @@ export class List<T extends types.Serializable> extends Array {
    * @return Returns `Serializable` instance if found, else throws.
    * @throws {ElementNotFoundError}
    * Thrown if the `Serializable` with identifier can't be found on list.
+   * @example
    */
   public getByIdOrThrow(id: string | types.Stringifiable): T {
     const foundSerializable = this.getById(id);
@@ -215,6 +327,23 @@ export class List<T extends types.Serializable> extends Array {
    * @param key - Property name(key) from `Serializable`.
    * @param value - Property value that should be matched.
    * @return Returns `Serializable` instance if found, else `undefined`.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const element = new Item({ name: 'my-first-name' });
+   * source.in<Item>('items').add(element);
+   * expect(source.in<Item>('items').hasBy('name', 'my-first-name')).to.be
+   *   .true;
+   *```
    */
   public hasBy(key: string, value: any): boolean {
     return this.getBy(key, value) !== undefined;
@@ -224,6 +353,22 @@ export class List<T extends types.Serializable> extends Array {
    * Evaluates if list contains same `Serializable` by values.
    * @param element - `Serializable` instance.
    * @returns Returns `true` if `Serializable` exists on list, else `false`.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const element = new Item({ name: 'my-first-name' });
+   * source.in<Item>('items').add(element);
+   * expect(source.in<Item>('items').hasSame(element)).to.be.true;
+   *```
    */
   public hasSame(element: T): boolean {
     return this.some(serializable => {
@@ -235,6 +380,30 @@ export class List<T extends types.Serializable> extends Array {
    * Evaluates if list contains `Serializable` by its identifier.
    * @param id - `Serializable` identifier.
    * @returns Returns `true` if `Serializable` exists on list, else `false`.
+   * @example
+   *```ts
+   * @define('Employee')
+   * class Employee extends Serializable {
+   *   id: string;
+   *
+   *   getId(): string {
+   *     return this.id;
+   *   }
+   * }
+   *
+   * @define('Company')
+   * class Company extends Serializable {
+   *   id: string;
+   *
+   *   employees: Employee[];
+   * }
+   *
+   * const source = new Company({ id: 'my-company-id', employees: [] });
+   * const element = new Employee({ id: 'my-first-id' });
+   * source.in<Employee>('employees').add(element);
+   * expect(source.in<Employee>('employees').hasById('my-first-id')).to.be
+   *   .true;
+   *```
    */
   public hasById(id: string | types.Stringifiable): boolean {
     return this.getById(id) !== undefined;
@@ -243,6 +412,32 @@ export class List<T extends types.Serializable> extends Array {
   /**
    * Removes `Serializable` from list by its identifier.
    * @param id - Identifier of `Serializable`.
+   * @example
+   *```ts
+   * @define('Employee')
+   * class Employee extends Serializable {
+   *   id: string;
+   *
+   *   getId(): string {
+   *     return this.id;
+   *   }
+   * }
+   *
+   * @define('Company')
+   * class Company extends Serializable {
+   *   id: string;
+   *
+   *   employees: Employee[];
+   * }
+   *
+   * const source = new Company({ id: 'my-company-id', employees: [] });
+   * const element = new Employee({ id: 'my-employee-id' });
+   *
+   * source.in<Employee>('employees').add(element);
+   * expect(source.employees).to.have.length(1);
+   * source.in<Employee>('employees').removeById('my-employee-id');
+   * expect(source.employees).to.have.length(0);
+   *```
    */
   public removeById(id: string | types.Stringifiable): void {
     const foundSerializable = this.getById(id);
@@ -255,6 +450,24 @@ export class List<T extends types.Serializable> extends Array {
    * Removes `Serializable` from list by key and value.
    * @param key - Property name(key) from `Serializable`.
    * @param value - Property value that should be matched.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const element = new Item({ name: 'my-item-name' });
+   * source.in<Item>('items').add(element);
+   * expect(source.items).to.have.length(1);
+   * source.in<Item>('items').removeBy('name', 'my-item-name');
+   * expect(source.items).to.have.length(0);
+   *```
    */
   public removeBy(key: string, value: any): void {
     const foundSerializable = this.getBy(key, value);
@@ -266,6 +479,24 @@ export class List<T extends types.Serializable> extends Array {
   /**
    * Returns first `Serializable` in list.
    * @return Returns `Serializable` instance.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const firstElement = new Item({ name: 'my-first-name' });
+   * const secondElement = new Item({ name: 'my-second-name' });
+   * source.in<Item>('items').add(firstElement);
+   * source.in<Item>('items').add(secondElement);
+   * expect(source.in<Item>('items').first()).to.be.equal(firstElement);
+   *```
    */
   public first(): T | undefined {
     return this[0];
@@ -274,6 +505,24 @@ export class List<T extends types.Serializable> extends Array {
   /**
    * Returns last `Serializable` in list.
    * @return Returns `Serializable` instance.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const firstElement = new Item({ name: 'my-first-name' });
+   * const secondElement = new Item({ name: 'my-second-name' });
+   * source.in<Item>('items').add(firstElement);
+   * source.in<Item>('items').add(secondElement);
+   * expect(source.in<Item>('items').last()).to.be.equal(secondElement);
+   *```
    */
   public last(): T | undefined {
     return last(this);
