@@ -9,6 +9,8 @@ import { define } from '../../../src/decorators/define';
 import { isDefinable } from '../../../src/utils/helpers';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
+import { List } from '../../../src/domain/list';
+import { InvalidListError } from '../../../src/domain/domain-errors';
 
 chai.use(sinonChai);
 
@@ -18,6 +20,16 @@ describe('Serializable', function() {
     firstName: string;
 
     lastName: string;
+  }
+
+  @define('Employee')
+  class Employee extends Serializable {
+    id: string;
+  }
+
+  @define('Company')
+  class Company extends Serializable {
+    employees: Employee[];
   }
 
   it(`extends Struct`, () => {
@@ -56,6 +68,17 @@ describe('Serializable', function() {
       };
       const person = new Person(props);
       expect(person).to.be.eql(props);
+    });
+
+    it('processes lists with serializables to List instances', () => {
+      const employees = [
+        new Employee({ id: 'first' }),
+        new Employee({ id: 'second' }),
+      ];
+      const company = new Company({ employees });
+      expect(company.employees).to.be.instanceof(List);
+      expect(company.employees).to.have.length(2);
+      expect(company.employees).to.have.members(employees);
     });
 
     describe('static constructor', () => {
@@ -100,6 +123,40 @@ describe('Serializable', function() {
     it('takes optional schemaVersion property as a number', () => {
       expect(Serializable.getPropTypes()).to.be.eql({
         schemaVersion: PropTypes.instanceOf(Number).isOptional,
+      });
+    });
+  });
+
+  describe('hooks', () => {
+    it('has convert-serializable-list hook applied', () => {
+      expect(
+        Serializable.prototype.hasHook(
+          'onConstruction',
+          'convert-serializable-list'
+        )
+      ).to.be.true;
+    });
+  });
+
+  describe('accessors', () => {
+    describe('in - serializable lists', () => {
+      it('returns serializable list by its property key', () => {
+        const employees = [
+          new Employee({ id: 'first' }),
+          new Employee({ id: 'second' }),
+        ];
+        const company = new Company({ employees });
+        expect(company.in<Employee>('employees')).to.be.instanceof(List);
+        expect(company.in<Employee>('employees')).to.have.length(2);
+        expect(company.in<Employee>('employees')).to.have.members(employees);
+      });
+
+      it('throws InvalidListError upon accessing non-list property', () => {
+        const company = new Company({ employees: [] });
+        expect(() => company.in<Person>('not-existing-person-list')).to.throw(
+          InvalidListError,
+          `Company: list 'not-existing-person-list' is not a serializable list property type`
+        );
       });
     });
   });

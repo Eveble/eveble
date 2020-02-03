@@ -8,7 +8,10 @@ import { Serializable } from '../../../src/components/serializable';
 import { kernel } from '../../../src/core/kernel';
 import { types } from '../../../src/types';
 import { Struct } from '../../../src/components/struct';
-import { DEFAULT_PROPS_KEY } from '../../../src/constants/metadata-keys';
+import {
+  DEFAULT_PROPS_KEY,
+  SERIALIZABLE_LIST_PROPS_KEY,
+} from '../../../src/constants/metadata-keys';
 
 chai.use(sinonChai);
 
@@ -66,12 +69,14 @@ describe(`define`, function() {
           MySerializable
         );
       });
+
       it('omits registration of serializable type if isRegistrable options is set to false', () => {
         @define('MySerializable', { isRegistrable: false })
         class MySerializable extends Serializable {}
         new MySerializable();
         expect(library.registerType).to.not.be.called;
       });
+
       it('skips registration on non-serializable types', () => {
         @define('MyStruct', { isRegistrable: false })
         class MyStruct extends Struct {}
@@ -89,6 +94,31 @@ describe(`define`, function() {
         expect(Reflect.getOwnMetadata(DEFAULT_PROPS_KEY, MyClass)).to.be.eql({
           stringKey: 'my-string',
           numberKey: 1337,
+        });
+      });
+
+      it(`sets the serializable lists for later use for performance reasons`, () => {
+        @define('Employee')
+        class Employee extends Serializable {
+          id: string;
+        }
+
+        @define('Car')
+        class Car extends Serializable {
+          plate: string;
+        }
+
+        @define('Company')
+        class Company extends Serializable {
+          employee: Employee[];
+
+          fleet: Car[];
+        }
+        expect(
+          Reflect.getOwnMetadata(SERIALIZABLE_LIST_PROPS_KEY, Company)
+        ).to.be.eql({
+          employee: Employee,
+          fleet: Car,
         });
       });
     });

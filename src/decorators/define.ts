@@ -5,8 +5,12 @@ import { isString, isEmpty } from 'lodash';
 import { Types as tsruntimeTypes } from 'tsruntime';
 import { ExtendableError } from '../components/extendable-error';
 import { kernel } from '../core/kernel';
-import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
+import {
+  DEFAULT_PROPS_KEY,
+  SERIALIZABLE_LIST_PROPS_KEY,
+} from '../constants/metadata-keys';
 import { types } from '../types';
+import { resolveSerializableFromPropType } from '../utils/helpers';
 
 export class InvalidTypeNameError extends ExtendableError {
   constructor(invalidTypeName: any) {
@@ -82,6 +86,9 @@ define.afterDefine = function(
   // handling property initializers is not reliable
   const defaults = {};
   const classPattern = kernel.converter.convert(reflectedType);
+  if (classPattern === undefined && classPattern.properties === undefined) {
+    return;
+  }
   const propTypes = classPattern.properties as Collection;
   for (const [key, propType] of Object.entries(propTypes)) {
     if (
@@ -94,6 +101,19 @@ define.afterDefine = function(
   if (!isEmpty(defaults)) {
     Reflect.defineMetadata(DEFAULT_PROPS_KEY, defaults, target);
   }
+
+  // Define lists(arrays) of serializable types for later processing to Eveble's
+  // `List` instances - special arrays with extended methods
+  const serializableListProps = {};
+  for (const key of Object.keys(propTypes)) {
+    const serializable = resolveSerializableFromPropType(propTypes[key]);
+    if (serializable !== undefined) serializableListProps[key] = serializable;
+  }
+  Reflect.defineMetadata(
+    SERIALIZABLE_LIST_PROPS_KEY,
+    serializableListProps,
+    target
+  );
 };
 
 export { define };

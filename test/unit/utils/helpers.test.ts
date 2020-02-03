@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Collection } from 'typend';
+import { Collection, PropTypes } from 'typend';
 import { postConstruct } from '@parisholley/inversify-async';
 import {
   isDefinable,
@@ -9,12 +9,48 @@ import {
   toPlainObject,
   convertObjectToCollection,
   isPlainRecord,
+  resolveSerializableFromPropType,
 } from '../../../src/utils/helpers';
 import { define } from '../../../src/decorators/define';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 describe('helpers', function() {
+  @define('SerializableStub')
+  class SerializableStub {
+    getPropTypes(): void {}
+
+    toPlainObject(): void {}
+
+    validateProps(): void {}
+
+    getPropertyInitializers(): void {}
+
+    equals(): void {}
+
+    getTypeName(): void {}
+
+    toString(): void {}
+
+    typeName(): void {}
+
+    toJSONValue(): void {}
+
+    schemaVersion: number | undefined;
+
+    transformLegacyProps(): void {}
+
+    registerLegacyTransformer(): void {}
+
+    overrideLegacyTransformer(): void {}
+
+    hasLegacyTransformer(): void {}
+
+    getLegacyTransformers(): void {}
+
+    getLegacyTransformer(): void {}
+  }
+
   describe('isDefinable', () => {
     it('returns true for defined(@define) instances of class implementing Definable interface', () => {
       @define()
@@ -63,77 +99,13 @@ describe('helpers', function() {
   describe('isSerializable', () => {
     it('returns true for defined(@define) class instances implementing Serializable interface', () => {
       @define('MySerialziable')
-      class MySerializable {
-        getPropTypes(): void {}
-
-        toPlainObject(): void {}
-
-        validateProps(): void {}
-
-        getPropertyInitializers(): void {}
-
-        equals(): void {}
-
-        getTypeName(): void {}
-
-        toString(): void {}
-
-        typeName(): void {}
-
-        toJSONValue(): void {}
-
-        schemaVersion: number | undefined;
-
-        transformLegacyProps(): void {}
-
-        registerLegacyTransformer(): void {}
-
-        overrideLegacyTransformer(): void {}
-
-        hasLegacyTransformer(): void {}
-
-        getLegacyTransformers(): void {}
-
-        getLegacyTransformer(): void {}
-      }
+      class MySerializable extends SerializableStub {}
 
       expect(isSerializable(new MySerializable())).to.be.true;
     });
 
     it('returns false for not defined(@define) class instances that implementing Serializable interface', () => {
-      class MySerializable {
-        getPropTypes(): void {}
-
-        toPlainObject(): void {}
-
-        validateProps(): void {}
-
-        getPropertyInitializers(): void {}
-
-        equals(): void {}
-
-        getTypeName(): void {}
-
-        toString(): void {}
-
-        typeName(): void {}
-
-        toJSONValue(): void {}
-
-        schemaVersion: number | undefined;
-
-        transformLegacyProps(): void {}
-
-        registerLegacyTransformer(): void {}
-
-        overrideLegacyTransformer(): void {}
-
-        hasLegacyTransformer(): void {}
-
-        getLegacyTransformers(): void {}
-
-        getLegacyTransformer(): void {}
-      }
+      class MySerializable extends SerializableStub {}
 
       expect(isSerializable(new MySerializable())).to.be.false;
     });
@@ -275,6 +247,42 @@ describe('helpers', function() {
         }),
       });
       expect(converted.nested).to.be.instanceof(Collection);
+    });
+  });
+
+  describe('resolveSerializableFromPropType', () => {
+    it('resolves serializable type from root-level list', () => {
+      const propType = PropTypes.arrayOf(SerializableStub);
+      expect(resolveSerializableFromPropType(propType)).to.be.equal(
+        SerializableStub
+      );
+    });
+
+    it('resolves serializable type from root-level list with nested instance of', () => {
+      const propType = PropTypes.arrayOf(
+        PropTypes.instanceOf(SerializableStub)
+      );
+      expect(resolveSerializableFromPropType(propType)).to.be.equal(
+        SerializableStub
+      );
+    });
+
+    it('resolves serializable type from root-level optional list with nested instance of', () => {
+      const propType = PropTypes.arrayOf(PropTypes.instanceOf(SerializableStub))
+        .isOptional;
+      expect(resolveSerializableFromPropType(propType)).to.be.equal(
+        SerializableStub
+      );
+    });
+
+    it('returns undefined for non-list serializable types', () => {
+      const propType = PropTypes.instanceOf(SerializableStub);
+      expect(resolveSerializableFromPropType(propType)).to.be.undefined;
+    });
+
+    it('returns undefined for nil prop type', () => {
+      expect(resolveSerializableFromPropType(null)).to.be.undefined;
+      expect(resolveSerializableFromPropType(undefined)).to.be.undefined;
     });
   });
 });

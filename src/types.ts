@@ -1,8 +1,6 @@
 import { interfaces as inversifyTypes } from '@parisholley/inversify-async';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
-import { Command } from './components/command';
-import { Event } from './components/event';
 
 /*
 Any type or interface exported in 'root' level of declaration is considered
@@ -20,6 +18,10 @@ export namespace types {
   export type Class<T = unknown, Arguments extends any[] = any[]> = new (
     ...arguments_: Arguments
   ) => T;
+
+  export interface Constructor<T> {
+    new (...args: any[]): T;
+  }
 
   export type AnyFunction = (...args: any[]) => any;
 
@@ -52,8 +54,6 @@ export namespace types {
   };
 
   export type State = string | number | null;
-
-  export type States = Record<string, State>;
 
   // Decorators
   export type ClassDecorator = <TFunction extends Function>(
@@ -425,11 +425,20 @@ export namespace types {
     handle(message: Messageable, execution?: Execution): Promise<any>;
   }
 
+  export interface Sendable extends Messageable {
+    getId(): string | Stringifiable;
+    isDeliverable(): boolean;
+  }
+
+  export interface Publishable extends Messageable {
+    getId(): string | Stringifiable;
+  }
+
   export interface Sender extends Controller {
-    send(commandInstance: Command): Promise<any>;
+    send(commandInstance: Sendable): Promise<any>;
   }
   export interface Publisher extends Controller {
-    publish(eventInstance: Event): Promise<void>;
+    publish(eventInstance: Publishable): Promise<void>;
     subscribeTo(event: any, handler: Handler, shouldOverride: boolean): void;
   }
 
@@ -469,4 +478,26 @@ export namespace types {
   /*
   DOMAIN
   */
+  export interface Identifiable extends Serializable {
+    getId(): string | Stringifiable;
+  }
+
+  export interface List<T> {
+    create(...sources: Record<string, any>[]): T;
+    add(element: T): void;
+    overrideBy(key: string, value: any, element: T): void;
+    getBy(key: string, value: any): T | undefined;
+    getByOrThrow(key: string, value: any): T;
+    getById(id: string | types.Stringifiable): T | undefined;
+    getByIdOrThrow(id: string | types.Stringifiable): T;
+    findById(id: string | types.Stringifiable): T;
+    findBy(key: string, value: any): T;
+    hasBy(key: string, value: any): boolean;
+    hasSame(element: T): boolean;
+    hasById(id: string | types.Stringifiable): boolean;
+    removeById(id: string | types.Stringifiable): void;
+    removeBy(key: string, value: any): void;
+    first(): T | undefined;
+    last(): T | undefined;
+  }
 }
