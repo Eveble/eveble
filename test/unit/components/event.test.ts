@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
+import { PropTypes } from 'typend';
 import { Message } from '../../../src/components/message';
 import { Event } from '../../../src/components/event';
 import { define } from '../../../src/decorators/define';
@@ -36,6 +37,22 @@ describe('Event', function() {
   it('defines the type name correctly', () => {
     expect(Event.getTypeName()).to.equal('Event');
     expect(Event.prototype.getTypeName()).to.equal('Event');
+  });
+
+  describe('prop types', () => {
+    it('takes required sourceId property as a string or Guid', () => {
+      expect(Event.getPropTypes().sourceId).to.be.eql(
+        PropTypes.oneOf(
+          PropTypes.instanceOf(String),
+          PropTypes.instanceOf(Guid)
+        )
+      );
+    });
+    it('takes optional version property as a Number', () => {
+      expect(Event.getPropTypes().version).to.be.eql(
+        PropTypes.instanceOf(Number).isOptional
+      );
+    });
   });
 
   describe(`construction`, () => {
