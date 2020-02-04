@@ -1,6 +1,10 @@
 import { interfaces as inversifyTypes } from '@parisholley/inversify-async';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
+import {
+  SAVE_STATE_METHOD_KEY,
+  ROLLBACK_STATE_METHOD_KEY,
+} from './constants/literal-keys';
 
 /*
 Any type or interface exported in 'root' level of declaration is considered
@@ -518,3 +522,35 @@ export namespace types {
     first(): T | undefined;
     last(): T | undefined;
   }
+
+  export interface Assertion {
+    getApi(): Map<string, Function>;
+  }
+
+  export interface Asserter {
+    setAction(action: Stringifiable | MessageableType): void;
+
+    getAction(): Stringifiable | MessageableType;
+
+    setEntity(entity: Entity): void;
+
+    getEntity(): Entity;
+
+    assert(): Asserter;
+
+    registerAssertion(assertion: Assertion): void;
+
+    getAssertions(): types.Assertion[];
+
+    getApi(): Map<string, Function>;
+  }
+
+  export interface Entity
+    extends Serializable,
+      Stateful,
+      Statusful,
+      Identifiable {
+    [SAVE_STATE_METHOD_KEY](): void;
+    [ROLLBACK_STATE_METHOD_KEY](): void;
+  }
+}
