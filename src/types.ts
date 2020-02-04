@@ -544,4 +544,15 @@ export namespace types {
 
     getApi(): Map<string, Function>;
   }
+
+  export interface Entity
+    extends Serializable,
+      Stateful,
+      Statusful,
+      Identifiable {
+    clone(): Record<string, any>;
+    on(action: string | types.Stringifiable): any;
+    [SAVE_STATE_METHOD_KEY](): void;
+    [ROLLBACK_STATE_METHOD_KEY](): void;
+  }
 }
