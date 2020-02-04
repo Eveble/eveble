@@ -57,7 +57,7 @@ export namespace types {
     [path: string]: any;
   };
 
-  export type State = string | number | null;
+  export type State = string | number | undefined;
 
   // Decorators
   export type ClassDecorator = <TFunction extends Function>(
@@ -222,7 +222,7 @@ export namespace types {
     setState(state: State): void;
     hasState(): boolean;
     validateState(stateOrStates: State | State[], error?: Error): boolean;
-    getSelectableStates(): States;
+    getSelectableStates(): Record<string, types.State>;
   }
   /*
   VERSIONABLE
@@ -485,7 +485,7 @@ export namespace types {
   /*
   STATUSFUL
   */
-  export type Status = string | number | null;
+  export type Status = string | number | undefined;
 
   export interface Statusful {
     isInStatus(status: Status | Status[]): boolean;
@@ -543,14 +543,5 @@ export namespace types {
     getAssertions(): types.Assertion[];
 
     getApi(): Map<string, Function>;
-  }
-
-  export interface Entity
-    extends Serializable,
-      Stateful,
-      Statusful,
-      Identifiable {
-    [SAVE_STATE_METHOD_KEY](): void;
-    [ROLLBACK_STATE_METHOD_KEY](): void;
   }
 }
