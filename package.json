@@ -51,6 +51,7 @@
     "@parisholley/inversify-async": "^1.1.7",
     "chalk": "^3.0.0",
     "deepmerge": "^4.2.2",
+    "deepcopy": "2.0.0",
     "decache": "^4.5.1",
     "getenv": "^1.0.0",
     "has-ansi": "^4.0.0",
