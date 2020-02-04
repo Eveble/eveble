@@ -13,12 +13,12 @@ import {
 chai.use(sinonChai);
 
 describe('List', function() {
-  @define('Item')
+  @define('Item', { isRegistrable: false })
   class Item extends Serializable {
     name: string;
   }
 
-  @define('Order')
+  @define('Order', { isRegistrable: false })
   class Order extends Serializable {
     id: string;
 
@@ -29,7 +29,7 @@ describe('List', function() {
     }
   }
 
-  @define('Employee')
+  @define('Employee', { isRegistrable: false })
   class Employee extends Serializable {
     id: string;
 
@@ -40,7 +40,7 @@ describe('List', function() {
     }
   }
 
-  @define('Company')
+  @define('Company', { isRegistrable: false })
   class Company extends Serializable {
     id: string;
 
