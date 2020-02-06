@@ -1,4 +1,3 @@
-import { PropTypes } from 'typend';
 import { isEmpty } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
 import { kernel } from '../core/kernel';
@@ -292,17 +291,16 @@ export abstract class HandlingMixin {
       ? handleableTypes
       : [handleableTypes];
 
-    const equalOneOfType = PropTypes.oneOf(
-      ...normalizedHandleableTypes.map(handleableType =>
-        PropTypes.equal(handleableType)
-      )
-    );
-    const subclassOneOfType = PropTypes.oneOf(...normalizedHandleableTypes);
-    return (
-      // Ensure that for example: type MyCommand is equal to MyCommand handleabe type
-      kernel.validator.isValid(messageType, equalOneOfType) ||
-      kernel.validator.isValid(messageType.prototype, subclassOneOfType)
-    );
+    let isHandleabe = false;
+    for (const handleableType of normalizedHandleableTypes) {
+      if (
+        messageType.prototype instanceof handleableType ||
+        messageType === handleableType
+      ) {
+        isHandleabe = true;
+      }
+    }
+    return isHandleabe;
   }
 
   /**
