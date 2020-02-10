@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define, PropTypes, ValidationError } from 'typend';
+import { PropTypes, ValidationError } from 'typend';
 import { pull } from 'lodash';
 import { Entity } from '../../../src/domain/entity';
 import { Serializable } from '../../../src/components/serializable';
@@ -16,7 +16,9 @@ import { ValueObject } from '../../../src/domain/value-object';
 import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
+  SAVED_STATE_KEY,
 } from '../../../src/constants/literal-keys';
+import { define } from '../../../src/decorators/define';
 
 chai.use(sinonChai);
 
@@ -78,6 +80,15 @@ describe('Entity', function() {
   });
 
   describe('prop types', () => {
+    it('have prop types set for: id, version, state, status', () => {
+      expect(Entity.getPropTypes()).to.contain.all.keys([
+        'id',
+        'version',
+        'state',
+        'status',
+      ]);
+    });
+
     it('takes required id property as a string or Guid', () => {
       expect(Entity.getPropTypes().id).to.be.eql(
         PropTypes.oneOf(
@@ -87,18 +98,50 @@ describe('Entity', function() {
       );
     });
 
-    it('takes optional version property as a Number', () => {
+    it('takes optional version property as a number', () => {
       expect(Entity.getPropTypes().version).to.be.eql(
         PropTypes.instanceOf(Number).isOptional
       );
+    });
+
+    it('takes optional schemaVersion property as a number', () => {
+      expect(Entity.getPropTypes().schemaVersion).to.be.eql(
+        PropTypes.instanceOf(Number).isOptional
+      );
+    });
+
+    it('takes optional state property as a string', () => {
+      expect(Entity.getPropTypes().state).to.be.eql(
+        PropTypes.oneOf(
+          undefined,
+          PropTypes.instanceOf(String),
+          PropTypes.instanceOf(Number)
+        )
+      );
+    });
+
+    it('takes optional status property as a string', () => {
+      expect(Entity.getPropTypes().status).to.be.eql(
+        PropTypes.oneOf(
+          undefined,
+          PropTypes.instanceOf(String),
+          PropTypes.instanceOf(Number)
+        )
+      );
+    });
+
+    it('has optional SAVED_STATE_KEY property as a symbol', () => {
+      // https://github.com/microsoft/TypeScript/issues/1863
+      const propTypes: any = Entity.getPropTypes();
+      expect(propTypes[SAVED_STATE_KEY]).to.be.eql(PropTypes.object.isOptional);
     });
   });
 
   describe(`construction`, () => {
     it(`throws ValidationError if id is missing on properties`, () => {
-      expect(() => new Person({})).to.throw(
+      expect(() => new Entity({})).to.throw(
         ValidationError,
-        `Person: (Key 'id': Expected undefined to be one of: [[String], [Guid]] in {})`
+        `Entity: (Key 'id': Expected undefined to be one of: [[String], [Guid]] in {})`
       );
     });
 
@@ -106,9 +149,9 @@ describe('Entity', function() {
       const props = {
         name: 'value',
       };
-      expect(() => new Person(props)).to.throw(
+      expect(() => new Entity(props)).to.throw(
         ValidationError,
-        `Person: (Key 'id': Expected undefined to be one of: [[String], [Guid]] in {"name":String("value")})`
+        `Entity: (Key 'id': Expected undefined to be one of: [[String], [Guid]] in {"name":String("value")})`
       );
     });
 
@@ -338,6 +381,23 @@ describe('Entity', function() {
         new Item({ id: 'first', price: new Price({ value: 1.29 }) }),
         new Item({ id: 'second', price: new Price({ value: 6.99 }) }),
       ]);
+    });
+
+    it('ensures that save is deleted after issuing rollback', () => {
+      const entity = new Person({ id: 'my-id', name: 'initial-name' });
+      entity[SAVE_STATE_METHOD_KEY]();
+      expect(entity.isStateSaved()).to.be.true;
+      entity.changeName('changed-name');
+      entity[ROLLBACK_STATE_METHOD_KEY]();
+      expect(entity.isStateSaved()).to.be.false;
+    });
+  });
+
+  describe('hooks', () => {
+    it('has convert-serializable-list hook applied', () => {
+      expect(
+        Entity.prototype.hasHook('onConstruction', 'convert-serializable-list')
+      ).to.be.true;
     });
   });
 });

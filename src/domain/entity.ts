@@ -24,11 +24,15 @@ export class Entity extends classes(
 
   public id: string | Guid;
 
-  protected version?: number;
+  public version?: number;
 
-  protected state: types.State;
+  public state: types.State;
 
-  protected status: types.Status;
+  public status: types.Status;
+
+  public schemaVersion?: number;
+
+  protected [SAVED_STATE_KEY]?: Record<keyof any, any>;
 
   /**
    * Creates an instance of `Entity`.
@@ -133,13 +137,22 @@ export class Entity extends classes(
    * Thrown if rollback is done on `Entity` without prior saved state.
    */
   public [ROLLBACK_STATE_METHOD_KEY](): void {
-    if (this[SAVED_STATE_KEY] === undefined) {
+    if (!this.isStateSaved()) {
       throw new StateSaveNotFoundError(
         this.getTypeName(),
         this.getId().toString()
       );
     }
     Object.assign(this, this[SAVED_STATE_KEY]);
+    delete this[SAVED_STATE_KEY];
+  }
+
+  /**
+   * Evaluates if state of entity is saved.
+   * @returns Returns `true` if state of entity is saved, else `false`.
+   */
+  public isStateSaved(): boolean {
+    return this[SAVED_STATE_KEY] !== undefined;
   }
 
   /**
@@ -161,3 +174,5 @@ export class Entity extends classes(
     return this.asserter;
   }
 }
+// Enable conversion of serializable list by default
+Entity.enableSerializableLists();
