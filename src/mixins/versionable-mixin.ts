@@ -51,6 +51,8 @@ export class NotVersionableError extends VersionableError {
 }
 
 export class VersionableMixin {
+  public schemaVersion?: number;
+
   /**
    * Registrable hook for transforming legacy schema.
    * @param props - Properties object to be transformed.
@@ -216,5 +218,13 @@ export class VersionableMixin {
     }
 
     return transformers.get(schemaVersion) as types.Hook;
+  }
+
+  /**
+   * Returns current instance schema version.
+   * @returns Schema version as a number, else `undefined`.
+   */
+  public getSchemaVersion(): number | undefined {
+    return this.schemaVersion;
   }
 }

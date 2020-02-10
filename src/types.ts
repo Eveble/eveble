@@ -229,20 +229,17 @@ export namespace types {
   VERSIONABLE
   */
   export interface Versionable {
-    schemaVersion: number | undefined;
-    transformLegacyProps(props: types.Props): types.Props;
+    getSchemaVersion(): number | undefined;
+    transformLegacyProps(props: Props): Props;
     registerLegacyTransformer(
       schemaVersion: number,
-      transformer: types.Hook,
+      transformer: Hook,
       shouldOverride: boolean
     ): void;
-    overrideLegacyTransformer(
-      schemaVersion: number,
-      transformer: types.Hook
-    ): void;
+    overrideLegacyTransformer(schemaVersion: number, transformer: Hook): void;
     hasLegacyTransformer(schemaVersion: number): boolean;
-    getLegacyTransformers(): types.LegacyTransformers;
-    getLegacyTransformer(schemaVersion: number): types.Hook;
+    getLegacyTransformers(): LegacyTransformers;
+    getLegacyTransformer(schemaVersion: number): Hook;
   }
 
   export type LegacyTransformers = Map<number, Hook>;
