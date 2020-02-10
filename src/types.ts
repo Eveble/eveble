@@ -492,7 +492,7 @@ export namespace types {
     setStatus(status: Status): void;
     hasStatus(): boolean;
     validateStatus(statusOrStatuses: Status | Status[], error?: Error): boolean;
-    getSelectableStatuses(): Record<string, types.Status>;
+    getSelectableStatuses(): Record<string, Status>;
   }
 
   /*
