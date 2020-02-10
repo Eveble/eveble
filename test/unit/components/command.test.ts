@@ -97,7 +97,7 @@ describe('Command', function() {
       context('scheduling', () => {
         it('returns true if command is scheduled', () => {
           const assignment = new Assignment({
-            id: 'my-custom-id-to-identify-scheduled-task',
+            assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: now,
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
@@ -114,7 +114,7 @@ describe('Command', function() {
 
         it('returns true if command can be delivered(deliver at date is in past now)', () => {
           const assignment = new Assignment({
-            id: 'my-custom-id-to-identify-scheduled-task',
+            assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: now,
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
@@ -126,7 +126,7 @@ describe('Command', function() {
 
         it(`returns true if command can be delivered(deliver at date is in past)`, () => {
           const assignment = new Assignment({
-            id: 'my-custom-id-to-identify-scheduled-task',
+            assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: new Date(new Date().getTime() - 1000),
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
@@ -138,7 +138,7 @@ describe('Command', function() {
 
         it(`returns false if command is not deliverable(deliver at date is in future)`, () => {
           const assignment = new Assignment({
-            id: 'my-custom-id-to-identify-scheduled-task',
+            assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: new Date(new Date().getTime() + 1000),
             sourceId: new Guid(),
             sourceTypeName: 'MyEventSourceable',
@@ -153,13 +153,13 @@ describe('Command', function() {
     describe('mutators', () => {
       context('scheduling', () => {
         it('schedules command to be delivered at specific date with task id', () => {
-          const id = 'my-custom-id-to-identify-scheduled-task';
+          const assignmentId = 'my-custom-id-to-identify-scheduled-task';
           const sourceId = new Guid();
           const sourceTypeName = 'MyEventSourceable';
           const deliverAt = now;
 
           const assignment = new Assignment({
-            id,
+            assignmentId,
             deliverAt,
             sourceId,
             sourceTypeName,
@@ -168,7 +168,7 @@ describe('Command', function() {
           const command = new MyCommand({ targetId: 'my-id' });
           command.schedule(assignment);
           const metadata = command.getMetadata();
-          expect(metadata?.scheduling?.id).to.be.equal(id);
+          expect(metadata?.scheduling?.assignmentId).to.be.equal(assignmentId);
           expect(metadata?.scheduling?.sourceId).to.be.equal(sourceId);
           expect(metadata?.scheduling?.sourceTypeName).to.be.equal(
             sourceTypeName

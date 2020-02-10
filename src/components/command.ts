@@ -7,7 +7,7 @@ import { Serializable } from './serializable';
 
 @define('Assignment')
 export class Assignment extends Serializable {
-  id: Guid | string; // Assignment id
+  assignmentId: Guid | string; // Assignment id
 
   deliverAt: Date;
 
