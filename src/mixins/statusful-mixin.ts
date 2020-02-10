@@ -28,7 +28,7 @@ export class InvalidStatusError extends StatusError {
 }
 
 export class StatusfulMixin implements types.Statusful {
-  protected status: types.Status;
+  public status: types.Status;
 
   /**
    * Sets instance status.
