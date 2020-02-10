@@ -57,8 +57,6 @@ export namespace types {
     [path: string]: any;
   };
 
-  export type State = string | number | undefined;
-
   // Decorators
   export type ClassDecorator = <TFunction extends Function>(
     target: TFunction
@@ -215,6 +213,8 @@ export namespace types {
   /*
   STATEFUL
   */
+  export type State = string | number | undefined;
+
   export interface Stateful {
     isInState(state: State | State[]): boolean;
     isInOneOfStates(states: State | State[]): boolean;
@@ -222,8 +222,9 @@ export namespace types {
     setState(state: State): void;
     hasState(): boolean;
     validateState(stateOrStates: State | State[], error?: Error): boolean;
-    getSelectableStates(): Record<string, types.State>;
+    getSelectableStates(): Record<string, State>;
   }
+
   /*
   VERSIONABLE
   */

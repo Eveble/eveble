@@ -28,7 +28,7 @@ export class InvalidStateError extends StateError {
 }
 
 export class StatefulMixin implements types.Stateful {
-  protected state: types.State;
+  public state: types.State;
 
   /**
    * Sets instance state.
