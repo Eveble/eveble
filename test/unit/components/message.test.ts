@@ -51,7 +51,7 @@ describe('Message', function() {
     it('returns property types as an object', () => {
       expect(Message.getPropTypes()).to.be.eql({
         timestamp: PropTypes.instanceOf(Date),
-        metadata: PropTypes.object.isOptional,
+        metadata: PropTypes.object,
         schemaVersion: PropTypes.instanceOf(Number).isOptional,
       });
     });
@@ -103,6 +103,7 @@ describe('Message', function() {
         expect(message).to.be.eql({
           key: 'my-key',
           default: 'default',
+          metadata: {},
           timestamp: now,
         });
       });

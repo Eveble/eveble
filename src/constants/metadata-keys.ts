@@ -33,8 +33,6 @@ export const EVENT_HANDLERS_CONTAINER_KEY = Symbol(
 /*
 SERIALIZABLE
 */
-export const MESSAGE_METADATA_KEY = Symbol('eveble:container:metadata');
-
 export const SERIALIZABLE_LIST_PROPS_KEY = Symbol(
   'eveble:container:serializable-list-props'
 );

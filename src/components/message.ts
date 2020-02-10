@@ -1,21 +1,18 @@
-import { has, set, get } from 'lodash';
+import 'reflect-metadata';
+import { has, set, get, isEmpty } from 'lodash';
 import merge from 'deepmerge';
 import { Serializable } from './serializable';
 import { isPlainRecord } from '../utils/helpers';
 import { define } from '../decorators/define';
 import { types } from '../types';
-import {
-  DEFAULT_PROPS_KEY,
-  MESSAGE_METADATA_KEY,
-} from '../constants/metadata-keys';
-import 'reflect-metadata';
+import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
 @define('Message')
 export abstract class Message extends Serializable
   implements types.Messageable {
-  timestamp: Date;
+  public timestamp: Date;
 
-  metadata?: Record<keyof any, any>;
+  public metadata: Record<string, any>;
 
   /**
    * Creates an instance of Message.
@@ -54,6 +51,9 @@ export abstract class Message extends Serializable
     if (!processedProps.timestamp) {
       processedProps.timestamp = new Date();
     }
+    if (!processedProps.metadata) {
+      processedProps.metadata = {};
+    }
     return super.processProps(processedProps);
   }
 
@@ -70,17 +70,9 @@ export abstract class Message extends Serializable
    * @param props - Metadata properties object with all information related to `Message`.
    */
   public assignMetadata(props: Record<string, any>): void {
-    let metadata: Record<string, any>;
-    if (!this.hasMetadata()) {
-      metadata = {};
-      Reflect.defineMetadata(MESSAGE_METADATA_KEY, metadata, this);
-    } else {
-      metadata = this.getMetadata();
-    }
-
     Object.assign(
-      metadata,
-      merge(metadata, props, {
+      this.metadata,
+      merge(this.metadata as Record<string, any>, props, {
         isMergeableObject: isPlainRecord,
       })
     );
@@ -91,7 +83,7 @@ export abstract class Message extends Serializable
    * @returns Returns true if `message` has assigned metadata, else `false`.
    */
   public hasMetadata(): boolean {
-    return Reflect.hasOwnMetadata(MESSAGE_METADATA_KEY, this);
+    return !isEmpty(this.metadata);
   }
 
   /**
@@ -99,7 +91,7 @@ export abstract class Message extends Serializable
    * @returns  Returns metadata assigned to the message as an object.
    */
   public getMetadata(): Record<string, any> {
-    return Reflect.getOwnMetadata(MESSAGE_METADATA_KEY, this) || {};
+    return this.metadata;
   }
 
   /**
@@ -113,14 +105,11 @@ export abstract class Message extends Serializable
    * such notation.
    */
   public setCorrelationId(key: string, id: types.Stringifiable): void {
-    let metadata: Record<string, any>;
-    if (!this.hasMetadata()) {
-      metadata = {};
-      Reflect.defineMetadata(MESSAGE_METADATA_KEY, metadata, this);
-    } else {
-      metadata = this.getMetadata();
-    }
-    set(metadata, `correlation.${key}`, id.toString());
+    set(
+      this.metadata as Record<string, any>,
+      `correlation.${key}`,
+      id.toString()
+    );
   }
 
   /**
@@ -132,8 +121,7 @@ export abstract class Message extends Serializable
     if (!this.hasMetadata()) {
       return undefined;
     }
-    const metadata = this.getMetadata();
-    return get(metadata, `correlation.${key}`);
+    return get(this.metadata, `correlation.${key}`);
   }
 
   /**
@@ -145,7 +133,6 @@ export abstract class Message extends Serializable
     if (!this.hasMetadata()) {
       return false;
     }
-    const metadata = this.getMetadata();
-    return has(metadata, `correlation.${key}`);
+    return has(this.metadata, `correlation.${key}`);
   }
 }
