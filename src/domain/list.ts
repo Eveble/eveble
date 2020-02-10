@@ -6,14 +6,18 @@ import {
   ElementNotFoundError,
   IdentifiableAlreadyExistsError,
 } from './domain-errors';
-import { SOURCE, LIST_KEY, SERIALIZABLE_TYPE } from '../constants/literal-keys';
+import {
+  SOURCE_KEY,
+  LIST_KEY,
+  SERIALIZABLE_TYPE_KEY,
+} from '../constants/literal-keys';
 
 export class List<T extends types.Serializable> extends Array {
-  protected [SOURCE]: types.Serializable;
+  protected [SOURCE_KEY]: types.Serializable;
 
   protected [LIST_KEY]: string;
 
-  protected [SERIALIZABLE_TYPE]: T;
+  protected [SERIALIZABLE_TYPE_KEY]: T;
 
   /**
    * Creates an instance of `List` that behaves like instance of `Array`.
@@ -33,7 +37,7 @@ export class List<T extends types.Serializable> extends Array {
       super(source as any);
     } else {
       super();
-      Object.defineProperty(this, SOURCE, {
+      Object.defineProperty(this, SOURCE_KEY, {
         enumerable: false,
         value: source,
       });
@@ -41,7 +45,7 @@ export class List<T extends types.Serializable> extends Array {
         enumerable: false,
         value: listKey,
       });
-      Object.defineProperty(this, SERIALIZABLE_TYPE, {
+      Object.defineProperty(this, SERIALIZABLE_TYPE_KEY, {
         enumerable: false,
         value: serializableType,
       });
@@ -81,7 +85,7 @@ export class List<T extends types.Serializable> extends Array {
    *```
    */
   public create(...sources: Record<string, any>[]): T {
-    const element = (this[SERIALIZABLE_TYPE] as any).from(...sources);
+    const element = (this[SERIALIZABLE_TYPE_KEY] as any).from(...sources);
     this.add(element);
     return element;
   }
@@ -119,26 +123,26 @@ export class List<T extends types.Serializable> extends Array {
    *```
    */
   public add(element: T): void {
-    kernel.validator.validate(element, this[SERIALIZABLE_TYPE]);
+    kernel.validator.validate(element, this[SERIALIZABLE_TYPE_KEY]);
 
     if (typeof (element as any).getId === 'function') {
       const identifiable = (element as any) as types.Identifiable;
       if (this.hasById(identifiable.getId())) {
         throw new IdentifiableAlreadyExistsError({
-          sourceName: this[SOURCE].getTypeName(),
+          sourceName: this[SOURCE_KEY].getTypeName(),
           sourceId: this.getSourceIdAsString(),
           listKey: this[LIST_KEY],
-          identifiableName: this[SERIALIZABLE_TYPE].getTypeName(),
+          identifiableName: this[SERIALIZABLE_TYPE_KEY].getTypeName(),
           key: 'id',
           value: identifiable.getId().toString(),
         });
       }
     } else if (this.hasSame(element)) {
       throw new ElementAlreadyExistsError({
-        sourceName: this[SOURCE].getTypeName(),
+        sourceName: this[SOURCE_KEY].getTypeName(),
         sourceId: this.getSourceIdAsString(),
         listKey: this[LIST_KEY],
-        serializableName: this[SERIALIZABLE_TYPE].getTypeName(),
+        serializableName: this[SERIALIZABLE_TYPE_KEY].getTypeName(),
         // Element is added as property to error for further reference
         element,
       });
@@ -240,10 +244,10 @@ export class List<T extends types.Serializable> extends Array {
     const foundSerializable = this.getBy(key, value);
     if (foundSerializable === undefined) {
       throw new ElementNotFoundError({
-        sourceName: this[SOURCE].getTypeName(),
+        sourceName: this[SOURCE_KEY].getTypeName(),
         sourceId: this.getSourceIdAsString(),
         listKey: this[LIST_KEY],
-        serializableName: this[SERIALIZABLE_TYPE].getTypeName(),
+        serializableName: this[SERIALIZABLE_TYPE_KEY].getTypeName(),
         key,
         value: kernel.describer.describe(value),
       });
@@ -297,10 +301,10 @@ export class List<T extends types.Serializable> extends Array {
     const foundSerializable = this.getById(id);
     if (foundSerializable === undefined) {
       throw new ElementNotFoundError({
-        sourceName: this[SOURCE].getTypeName(),
+        sourceName: this[SOURCE_KEY].getTypeName(),
         sourceId: this.getSourceIdAsString(),
         listKey: this[LIST_KEY],
-        serializableName: this[SERIALIZABLE_TYPE].getTypeName(),
+        serializableName: this[SERIALIZABLE_TYPE_KEY].getTypeName(),
         key: 'id',
         value: id.toString(),
       });
@@ -533,8 +537,8 @@ export class List<T extends types.Serializable> extends Array {
    * @returns Return source's identifier as string, else if `Identifiable` interface is not implemented - `undefined`.
    */
   protected getSourceIdAsString(): string | undefined {
-    if (typeof (this[SOURCE] as any).getId === 'function') {
-      const identifiable = (this[SOURCE] as any) as types.Identifiable;
+    if (typeof (this[SOURCE_KEY] as any).getId === 'function') {
+      const identifiable = (this[SOURCE_KEY] as any) as types.Identifiable;
       return identifiable.getId().toString();
     }
     return undefined;
@@ -545,7 +549,7 @@ export class List<T extends types.Serializable> extends Array {
    * @returns Instance of `Serializable`.
    */
   public getSource(): types.Serializable {
-    return this[SOURCE];
+    return this[SOURCE_KEY];
   }
 
   /**
@@ -561,6 +565,6 @@ export class List<T extends types.Serializable> extends Array {
    * @returns `Serializable` type constructor.
    */
   public getSerializableType(): types.Type {
-    return this[SERIALIZABLE_TYPE];
+    return this[SERIALIZABLE_TYPE_KEY];
   }
 }

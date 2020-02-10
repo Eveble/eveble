@@ -4,11 +4,11 @@ export const HANDLERS = Symbol('eveble:handlers');
 
 export const HANDLEABLE_TYPES = Symbol('eveble:handleable-types');
 
-export const SOURCE = Symbol('eveble:source');
+export const SOURCE_KEY = Symbol('eveble:source');
 
 export const LIST_KEY = Symbol('eveble:list-key');
 
-export const SERIALIZABLE_TYPE = Symbol('eveble:serializable-type');
+export const SERIALIZABLE_TYPE_KEY = Symbol('eveble:serializable-type');
 
 export const SAVE_STATE_METHOD_KEY = Symbol('eveble:save-state');
 
