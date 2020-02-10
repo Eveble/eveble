@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { DomainException } from '../../../src/domain/doman-exception';
-import { isDefinable } from '../../../src/utils/helpers';
 import { PropTypes } from 'typend';
+import { DomainException } from '../../../src/domain/domain-exception';
+import { isDefinable } from '../../../src/utils/helpers';
 import { DomainError } from '../../../src/domain/domain-error';
 import { Event } from '../../../src/components/event';
 
