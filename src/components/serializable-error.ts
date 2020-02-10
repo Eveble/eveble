@@ -20,15 +20,15 @@ export abstract class SerializableError
     VersionableMixin
   )
   implements types.Versionable, types.Ejsonable {
-  name: string;
+  public name: string;
 
-  message: string;
+  public message: string;
 
-  stack?: string;
+  public stack?: string;
 
-  code?: number;
+  public code?: number;
 
-  schemaVersion: number | undefined;
+  public schemaVersion?: number;
 
   /**
    * Creates an instance of SerializableError.
