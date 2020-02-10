@@ -36,8 +36,6 @@ export class Asserter implements types.Asserter {
    * @param assertion - Instance implementing `Assertion` interface.
    */
   public registerAssertion(assertion: types.Assertion): void {
-    this.assertions.push(assertion);
-
     for (const [path, method] of assertion.getApi()) {
       const boundMethod = method.bind(assertion);
       this.api.set(path, method);
@@ -53,6 +51,7 @@ export class Asserter implements types.Asserter {
       // sinon `expect` implementation
       set(this, path, boundMethod);
     }
+    this.assertions.push(assertion);
   }
 
   /**

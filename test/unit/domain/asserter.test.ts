@@ -1,12 +1,12 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
+import { stubInterface } from 'ts-sinon';
 import {
   Asserter,
   AssertionApiAlreadyExistsError,
 } from '../../../src/domain/asserter';
-import sinon from 'sinon';
 import { types } from '../../../src/types';
 import { Command } from '../../../src/components/command';
-import { stubInterface } from 'ts-sinon';
 
 describe(`Asserter`, () => {
   describe('construction', () => {
