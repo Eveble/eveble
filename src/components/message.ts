@@ -6,6 +6,7 @@ import { isPlainRecord } from '../utils/helpers';
 import { define } from '../decorators/define';
 import { types } from '../types';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
+import { PickableProperties } from './pickable-properties';
 
 @define('Message')
 export abstract class Message extends Serializable
@@ -47,7 +48,12 @@ export abstract class Message extends Serializable
    * validates them against prop types.
    */
   protected processProps(props: types.Props = {}): types.Props {
-    const processedProps: types.Props = { ...props };
+    let processedProps: types.Props;
+    if (props instanceof PickableProperties) {
+      processedProps = props.pickProps(this.getPropTypes());
+    } else {
+      processedProps = { ...props };
+    }
     if (!processedProps.timestamp) {
       processedProps.timestamp = new Date();
     }
