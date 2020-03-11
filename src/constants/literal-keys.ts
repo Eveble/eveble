@@ -25,3 +25,17 @@ export const ROLLBACK_STATE_METHOD_KEY: unique symbol = Symbol(
 export const COMMANDS_KEY: unique symbol = Symbol('eveble:commands');
 
 export const EVENTS_KEY: unique symbol = Symbol('eveble:events');
+
+export const LITERAL_KEYS = {
+  TYPE_KEY,
+  HANDLERS,
+  HANDLEABLE_TYPES,
+  SOURCE_KEY,
+  LIST_KEY,
+  SERIALIZABLE_TYPE_KEY,
+  SAVE_STATE_METHOD_KEY,
+  SAVED_STATE_KEY,
+  ROLLBACK_STATE_METHOD_KEY,
+  COMMANDS_KEY,
+  EVENTS_KEY,
+};
