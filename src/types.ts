@@ -725,5 +725,86 @@ export namespace types {
     getAllEvents(): Promise<Event[]>;
     getCommitById(commitId: string): Promise<Commit | undefined>;
   }
+
+  export interface CommitStorage {
+    addCommit(commit: Commit): Promise<string>;
+    getLastCommitVersionById(
+      eventSourceableId: string | Stringifiable
+    ): Promise<number | undefined>;
+    generateCommitId(): Promise<string>;
+    getCommitById(commitId: string): Promise<Commit | undefined>;
+    getCommits(
+      eventSourceableId: string | Stringifiable,
+      versionOffset: number
+    ): Promise<Commit[]>;
+    getAllCommits(): Promise<Commit[]>;
+    flagCommitAsPublished(
+      commitId: string,
+      appId: string,
+      workerId: string,
+      publishedAt: Date
+    ): Promise<boolean>;
+    flagCommitAsFailed(
+      commitId: string,
+      appId: string,
+      workerId: string,
+      failedAt: Date
+    ): Promise<boolean>;
+    flagAndResolveCommitAsTimeouted(
+      commitId: string,
+      appId: string,
+      workerId: string,
+      failedAt: Date
+    ): Promise<Commit | undefined>;
+    lockCommit(
+      commitId: string,
+      appId: string,
+      workerId: string,
+      registeredAndNotReceivedYetFilter: Record<string, any>
+    ): Promise<Commit | undefined>;
+  }
+
+  export interface CommitPublisher {
+    startPublishing(): Promise<void>;
+    stopPublishing(): Promise<void>;
+    publishChanges(commit: Commit): Promise<void>;
+    getHandledEventTypes(): TypeName[];
+    getHandledCommandTypes(): TypeName[];
+    isInProgress(commitId: string): boolean;
+  }
+
+  export interface CommitObserver {
+    startObserving(commitPublisher: CommitPublisher): Promise<void>;
+    pauseObserving(): Promise<void>;
+    stopObserving(): Promise<void>;
+    isObserving(): boolean;
+  }
+  export interface CommitSerializer {
+    serialize(commit: Commit): Record<string, any>;
+    deserialize(serializedCommit: Record<string, any>): Commit;
+  }
+  export type SerializedTypeForMongoDB = {
+    type: string;
+    data: {
+      _type: string;
+      [key: string]: any;
+    };
+  };
+
+  export interface SerializedCommitForMongoDB {
+    _id: string;
+    id: string;
+    sourceId: string;
+    version: number;
+    changes: {
+      eventSourceableType: string;
+      events: SerializedTypeForMongoDB[];
+      commands: SerializedTypeForMongoDB[];
+    };
+    insertedAt: Date;
+    eventTypes: string[];
+    commandTypes: string[];
+    sentBy: string;
+    receivers: Partial<CommitReceiver>[];
   }
 }

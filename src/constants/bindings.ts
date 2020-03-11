@@ -19,4 +19,8 @@ export const BINDINGS = {
   Router: Symbol.for('Router'),
   EventSourceableRepository: Symbol.for('EventSourceableRepository'),
   CommitStore: Symbol.for('CommitStore'),
+  CommitStorage: Symbol.for('CommitStorage'),
+  CommitPublisher: Symbol.for('CommitPublisher'),
+  CommitObserver: Symbol.for('CommitObserver'),
+  CommitSerializer: Symbol.for('CommitSerializer'),
 };
