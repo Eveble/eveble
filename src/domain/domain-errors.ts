@@ -91,5 +91,33 @@ export class SavedStateNotFoundError extends EntityError {
   }
 }
 
+/*
+EVENT SOURCEABLE ERRORS
+*/
+@define('EventSourceableError')
+export class EventSourceableError extends DomainError {}
+
+@define('InvalidEventError')
+export class InvalidEventError extends EventSourceableError {
+  constructor(esTypeName: string, got: string) {
+    super(`${esTypeName}: event must be instance of Event, got ${got}`);
+  }
+}
+
+@define('EventIdMismatchError')
+export class EventIdMismatchError extends EventSourceableError {
+  constructor(esTypeName: string, expectedId: string, got: string) {
+    super(
+      `${esTypeName}: the given event has mismatching source id. Expected id '${expectedId}', got '${got}'`
+    );
+  }
+}
+
+@define('InvalidInitializingMessageError')
+export class InvalidInitializingMessageError extends EventSourceableError {
+  constructor(esTypeName: string, expected: string, got: string) {
+    super(
+      `${esTypeName}: the given initializing message is not one of allowed types. Expected ${expected}, got ${got}`
+    );
   }
 }

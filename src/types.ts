@@ -603,5 +603,39 @@ export namespace types {
     [ROLLBACK_STATE_METHOD_KEY](): void;
     isStateSaved(): boolean;
   }
+
+  export interface EventSourceable extends Entity, Controller {
+    getVersion(): number;
+    getEvents(): Event[];
+    getCommands(): Command[];
+    handle(message: Message): any;
+    schedule(
+      command: Command,
+      deliverAt: Date,
+      assignmentId?: string | Stringifiable
+    ): void;
+    unschedule(
+      assignmentId: string | Stringifiable,
+      commandType: MessageType<Command>
+    ): void;
+    record(event: Event): void;
+    replay(event: Event): void;
+    replayHistory(history: Event[]): void;
+    assignMetadata(metadata: Record<string, any>): void;
+    eventProps(): Record<keyof any, any>;
+    pickEventProps(...sources: Record<string, any>[]): Record<keyof any, any>[];
+    incrementVersion(): void;
+  }
+
+  export interface EventSourceableType {
+    new (props: Props): EventSourceable;
+    resolveInitializingMessage(): MessageType<Command | Event> | undefined;
+    resolveRoutedCommands(): MessageType<Command>[];
+    resolveRoutedEvents(): MessageType<Event>[];
+    resolveRoutedMessages(): MessageType<Command | Event>[];
+    getTypeName(): TypeName;
+    from(...sources: Record<string, any>[]): EventSourceable;
+  }
+
   }
 }
