@@ -1,9 +1,14 @@
-import { postConstruct, inject } from '@parisholley/inversify-async';
+import {
+  postConstruct,
+  inject,
+  injectable,
+} from '@parisholley/inversify-async';
 import { OneToManyHandlingMixin } from './one-to-many-handling-mixin';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { Event } from '../components/event';
 
+@injectable()
 export class EventHandlingMixin extends OneToManyHandlingMixin
   implements types.Publisher {
   @inject(BINDINGS.EventBus)
