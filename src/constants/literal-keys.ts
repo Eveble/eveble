@@ -1,17 +1,23 @@
 export const TYPE_KEY = '_type'; // Must be string, will be serializaed
 
-export const HANDLERS = Symbol('eveble:handlers');
+export const HANDLERS: unique symbol = Symbol('eveble:handlers');
 
-export const HANDLEABLE_TYPES = Symbol('eveble:handleable-types');
+export const HANDLEABLE_TYPES: unique symbol = Symbol(
+  'eveble:handleable-types'
+);
 
-export const SOURCE_KEY = Symbol('eveble:source');
+export const SOURCE_KEY: unique symbol = Symbol('eveble:source');
 
-export const LIST_KEY = Symbol('eveble:list-key');
+export const LIST_KEY: unique symbol = Symbol('eveble:list-key');
 
-export const SERIALIZABLE_TYPE_KEY = Symbol('eveble:serializable-type');
+export const SERIALIZABLE_TYPE_KEY: unique symbol = Symbol(
+  'eveble:serializable-type'
+);
 
-export const SAVE_STATE_METHOD_KEY = Symbol('eveble:save-state');
+export const SAVE_STATE_METHOD_KEY: unique symbol = Symbol('eveble:save-state');
 
-export const SAVED_STATE_KEY = Symbol('eveble:saved-state');
+export const SAVED_STATE_KEY: unique symbol = Symbol('eveble:saved-state');
 
-export const ROLLBACK_STATE_METHOD_KEY = Symbol('eveble:rollback-state');
+export const ROLLBACK_STATE_METHOD_KEY: unique symbol = Symbol(
+  'eveble:rollback-state'
+);
