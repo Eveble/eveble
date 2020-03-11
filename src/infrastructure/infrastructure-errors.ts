@@ -73,6 +73,15 @@ export class UpdatingSnapshotError extends InfrastructureError {
   }
 }
 
+@define('StorageNotFoundError')
+export class StorageNotFoundError extends InfrastructureError {
+  constructor(storageName: string, clientType: string) {
+    super(
+      `${storageName}: storage for client type '${clientType}' was not found`
+    );
+  }
+}
+
 /*
 ROUTER ERRORS
 */
@@ -159,6 +168,20 @@ export class ProjectionNotRebuildingError extends ProjectionRebuildingError {
   }
 }
 
+/*
+CLIENT ERRORS
+*/
+@define('ClientError')
+export class ClientError extends InfrastructureError {}
+
+@define('InactiveClientError')
+export class InactiveClientError extends ClientError {
+  constructor(targetName: string, clientId: string) {
+    super(
+      `${targetName}: can't be initialized since underlying client with id '${clientId}' is inactive`
+    );
+  }
+}
 
 /*
 SCHEDULER ERRORS
