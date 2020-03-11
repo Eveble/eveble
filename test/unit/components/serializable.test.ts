@@ -22,12 +22,12 @@ describe('Serializable', function() {
     lastName: string;
   }
 
-  @define('Employee')
+  @define('Employee', { isRegistrable: false })
   class Employee extends Serializable {
     id: string;
   }
 
-  @define('Company')
+  @define('Company', { isRegistrable: false })
   class Company extends Serializable {
     employees: Employee[];
   }
@@ -36,17 +36,17 @@ describe('Serializable', function() {
     expect(Serializable.prototype).to.instanceof(Struct);
   });
 
-  it('implements Versionable interface ', () => {
+  it('implements Versionable interface', () => {
     expect(Serializable.prototype).to.instanceof(VersionableMixin);
     expect(instanceOf<types.Versionable>(Serializable.prototype)).to.be.true;
   });
 
-  it('implements Serializable interface ', () => {
+  it('implements Serializable interface', () => {
     expect(Serializable.prototype).to.instanceof(SerializableMixin);
     expect(instanceOf<types.Serializable>(Serializable.prototype)).to.be.true;
   });
 
-  it('implements Ejesonable interface ', () => {
+  it('implements Ejesonable interface', () => {
     expect(Serializable.prototype).to.instanceof(EjsonableMixin);
     expect(instanceOf<types.Ejsonable>(Serializable.prototype)).to.be.true;
   });
