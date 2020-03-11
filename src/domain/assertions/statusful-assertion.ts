@@ -22,7 +22,7 @@ export class InvalidStatusTransitionError extends DomainError {
     expected: string,
     action: string
   ) {
-    const message = `${entityName}@${entityId}: cannot '${action}' when in '${currentStatus}' status(expected statuses: '${expected}')`;
+    const message = `${entityName}: cannot '${action}' when in '${currentStatus}' status(expected statuses: '${expected}')`;
     const expectedStatuses = expected.split(', ');
     super({
       message,
