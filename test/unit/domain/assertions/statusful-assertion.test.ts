@@ -10,7 +10,7 @@ import { DomainError } from '../../../../src/domain/domain-error';
 
 chai.use(sinonChai);
 
-describe(`Asserter`, () => {
+describe(`StatusfulAssertion`, () => {
   let entity: any;
   let asserter: any;
 
@@ -50,9 +50,9 @@ describe(`Asserter`, () => {
 
     it('ensure.is.not.inOneOfStatuses', () => {
       const assertion = new StatusfulAssertion(asserter);
-      expect(assertion.getApi().get('ensure.is.not.inOneOfStatuses')).to.be.equal(
-        assertion.ensureIsNotInOneOfStatuses
-      );
+      expect(
+        assertion.getApi().get('ensure.is.not.inOneOfStatuses')
+      ).to.be.equal(assertion.ensureIsNotInOneOfStatuses);
     });
   });
 
@@ -62,7 +62,9 @@ describe(`Asserter`, () => {
         const assertion = new StatusfulAssertion(asserter);
         entity.isInStatus.returns(true);
         const expectedStatus = 'expected-status';
-        expect(assertion.ensureIsInStatus(expectedStatus)).to.be.equal(asserter);
+        expect(assertion.ensureIsInStatus(expectedStatus)).to.be.equal(
+          asserter
+        );
         expect(entity.isInStatus).to.be.calledOnce;
         expect(entity.isInStatus).to.be.calledWithExactly(expectedStatus);
       });
@@ -76,7 +78,7 @@ describe(`Asserter`, () => {
         const expectedStatus = 'expected-status';
         expect(() => assertion.ensureIsInStatus(expectedStatus)).to.throw(
           InvalidStatusTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-status' status(expected statuses: 'expected-status')`
+          `MyTypeName: cannot 'my-action' when in 'current-status' status(expected statuses: 'expected-status')`
         );
         expect(entity.isInStatus).to.be.calledOnce;
         expect(entity.isInStatus).to.be.calledWithExactly(expectedStatus);
@@ -90,9 +92,9 @@ describe(`Asserter`, () => {
 
         const error = new MyError('my-error');
         const expectedStatus = 'expected-status';
-        expect(() => assertion.ensureIsInStatus(expectedStatus, error)).to.throw(
-          error
-        );
+        expect(() =>
+          assertion.ensureIsInStatus(expectedStatus, error)
+        ).to.throw(error);
         expect(entity.isInStatus).to.be.calledOnce;
         expect(entity.isInStatus).to.be.calledWithExactly(expectedStatus);
       });
@@ -119,7 +121,7 @@ describe(`Asserter`, () => {
         const expectedStatus = 'expected-status';
         expect(() => assertion.ensureIsNotInStatus(expectedStatus)).to.throw(
           InvalidStatusTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-status' status(expected statuses: 'expected-status')`
+          `MyTypeName: cannot 'my-action' when in 'current-status' status(expected statuses: 'expected-status')`
         );
         expect(entity.isInStatus).to.be.calledOnce;
         expect(entity.isInStatus).to.be.calledWithExactly(expectedStatus);
@@ -150,7 +152,9 @@ describe(`Asserter`, () => {
           asserter
         );
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
-        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(expectedStatuses);
+        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
+          expectedStatuses
+        );
       });
 
       it('throws InvalidStatusTransitionError if entity is not in one of statuses', () => {
@@ -160,12 +164,16 @@ describe(`Asserter`, () => {
         entity.getStatus.returns(currentStatus);
 
         const expectedStatuses = ['first', 'second'];
-        expect(() => assertion.ensureIsInOneOfStatuses(expectedStatuses)).to.throw(
+        expect(() =>
+          assertion.ensureIsInOneOfStatuses(expectedStatuses)
+        ).to.throw(
           InvalidStatusTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-status' status(expected statuses: 'first, second')`
+          `MyTypeName: cannot 'my-action' when in 'current-status' status(expected statuses: 'first, second')`
         );
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
-        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(expectedStatuses);
+        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
+          expectedStatuses
+        );
       });
 
       it('allows to pass custom error if entity is not in one of statuses', () => {
@@ -180,7 +188,9 @@ describe(`Asserter`, () => {
           assertion.ensureIsInOneOfStatuses(expectedStatuses, error)
         ).to.throw(error);
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
-        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(expectedStatuses);
+        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
+          expectedStatuses
+        );
       });
     });
 
@@ -189,11 +199,13 @@ describe(`Asserter`, () => {
         const assertion = new StatusfulAssertion(asserter);
         entity.isInOneOfStatuses.returns(false);
         const expectedStatuses = ['first', 'second'];
-        expect(assertion.ensureIsNotInOneOfStatuses(expectedStatuses)).to.be.equal(
-          asserter
-        );
+        expect(
+          assertion.ensureIsNotInOneOfStatuses(expectedStatuses)
+        ).to.be.equal(asserter);
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
-        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(expectedStatuses);
+        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
+          expectedStatuses
+        );
       });
 
       it('throws InvalidStatusTransitionError if entity is in one of statuses', () => {
@@ -207,10 +219,12 @@ describe(`Asserter`, () => {
           assertion.ensureIsNotInOneOfStatuses(expectedStatuses)
         ).to.throw(
           InvalidStatusTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-status' status(expected statuses: 'first, second')`
+          `MyTypeName: cannot 'my-action' when in 'current-status' status(expected statuses: 'first, second')`
         );
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
-        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(expectedStatuses);
+        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
+          expectedStatuses
+        );
       });
 
       it('allows to pass custom error if entity is in one of statuses', () => {
@@ -225,7 +239,9 @@ describe(`Asserter`, () => {
           assertion.ensureIsNotInOneOfStatuses(expectedStatuses, error)
         ).to.throw(error);
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
-        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(expectedStatuses);
+        expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
+          expectedStatuses
+        );
       });
     });
   });

@@ -10,7 +10,7 @@ import { DomainError } from '../../../../src/domain/domain-error';
 
 chai.use(sinonChai);
 
-describe(`Asserter`, () => {
+describe(`StatefulAssertion`, () => {
   let entity: any;
   let asserter: any;
 
@@ -76,7 +76,7 @@ describe(`Asserter`, () => {
         const expectedState = 'expected-state';
         expect(() => assertion.ensureIsInState(expectedState)).to.throw(
           InvalidStateTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-state' state(expected states: 'expected-state')`
+          `MyTypeName: cannot 'my-action' when in 'current-state' state(expected states: 'expected-state')`
         );
         expect(entity.isInState).to.be.calledOnce;
         expect(entity.isInState).to.be.calledWithExactly(expectedState);
@@ -119,7 +119,7 @@ describe(`Asserter`, () => {
         const expectedState = 'expected-state';
         expect(() => assertion.ensureIsNotInState(expectedState)).to.throw(
           InvalidStateTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-state' state(expected states: 'expected-state')`
+          `MyTypeName: cannot 'my-action' when in 'current-state' state(expected states: 'expected-state')`
         );
         expect(entity.isInState).to.be.calledOnce;
         expect(entity.isInState).to.be.calledWithExactly(expectedState);
@@ -162,7 +162,7 @@ describe(`Asserter`, () => {
         const expectedStates = ['first', 'second'];
         expect(() => assertion.ensureIsInOneOfStates(expectedStates)).to.throw(
           InvalidStateTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-state' state(expected states: 'first, second')`
+          `MyTypeName: cannot 'my-action' when in 'current-state' state(expected states: 'first, second')`
         );
         expect(entity.isInOneOfStates).to.be.calledOnce;
         expect(entity.isInOneOfStates).to.be.calledWithExactly(expectedStates);
@@ -207,7 +207,7 @@ describe(`Asserter`, () => {
           assertion.ensureIsNotInOneOfStates(expectedStates)
         ).to.throw(
           InvalidStateTransitionError,
-          `MyTypeName@my-id: cannot 'my-action' when in 'current-state' state(expected states: 'first, second')`
+          `MyTypeName: cannot 'my-action' when in 'current-state' state(expected states: 'first, second')`
         );
         expect(entity.isInOneOfStates).to.be.calledOnce;
         expect(entity.isInOneOfStates).to.be.calledWithExactly(expectedStates);

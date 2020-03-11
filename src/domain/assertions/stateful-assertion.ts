@@ -22,7 +22,7 @@ export class InvalidStateTransitionError extends DomainError {
     expected: string,
     action: string
   ) {
-    const message = `${entityName}@${entityId}: cannot '${action}' when in '${currentState}' state(expected states: '${expected}')`;
+    const message = `${entityName}: cannot '${action}' when in '${currentState}' state(expected states: '${expected}')`;
     const expectedStates = expected.split(', ');
     super({
       message,
