@@ -558,7 +558,7 @@ export namespace types {
     getId(): string | Stringifiable;
   }
 
-  export interface List<T> {
+  export interface List<T> extends Array<T> {
     create(...sources: Record<string, any>[]): T;
     add(element: T): void;
     overrideBy(key: string, value: any, element: T): void;
@@ -598,7 +598,6 @@ export namespace types {
       Stateful,
       Statusful,
       Identifiable {
-    clone(): Record<string, any>;
     on(action: string | Stringifiable): any;
     [SAVE_STATE_METHOD_KEY](): void;
     [ROLLBACK_STATE_METHOD_KEY](): void;
