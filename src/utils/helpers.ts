@@ -10,6 +10,7 @@ import {
 import { METADATA_KEY } from '@parisholley/inversify-async';
 import { isClassInstance } from '@eveble/helpers';
 import decache from 'decache';
+import dotenv from 'dotenv-extended';
 import { types } from '../types';
 
 /**
@@ -154,3 +155,35 @@ export const createEJSON = function(): any {
   // eslint-disable-next-line global-require
   return require('@eveble/ejson');
 };
+
+/**
+ * Evaluates if provided argument is a `EventSourceable` type constructor implementation.
+ * @param arg - **Constructor** of evaluated argument.
+ * @returns Returns `true` if provided argument is implementing `EventSourceableType` interface, else `false`.
+ */
+export function isEventSourceableType(arg: any): boolean {
+  if (arg == null) return false;
+  return (
+    typeof arg.resolveInitializingMessage === 'function' &&
+    typeof arg.resolveRoutedCommands === 'function' &&
+    typeof arg.resolveRoutedEvents === 'function' &&
+    typeof arg.resolveRoutedMessages === 'function' &&
+    typeof arg.getTypeName === 'function' &&
+    typeof arg.from === 'function'
+  );
+}
+
+/**
+ * Assigns environment variables based on environment.
+ * @param envFilePath - Path to env file.
+ */
+export function loadENV(envFilePath: string): void {
+  dotenv.load({
+    silent: false,
+    defaults: '.env.defaults',
+    schema: '.env.schema',
+    errorOnMissing: true,
+    errorOnExtra: true,
+    path: envFilePath,
+  });
+}
