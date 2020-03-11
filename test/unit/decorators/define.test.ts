@@ -35,7 +35,7 @@ describe(`define`, function() {
   describe('hooks', () => {
     describe('beforeDefine', () => {
       it('throws InvalidTypeNameError if invalid type name is passed', () => {
-        const fn = () => {
+        const fn = (): void => {
           @define(1234)
           class MyType {}
           new MyType();
@@ -85,7 +85,7 @@ describe(`define`, function() {
       });
 
       it(`sets the property initializers on type's metadata`, () => {
-        @define('MyClass')
+        @define('MyClass', { isRegistrable: false })
         class MyClass extends Serializable {
           stringKey = 'my-string';
 
@@ -98,17 +98,17 @@ describe(`define`, function() {
       });
 
       it(`sets the serializable lists for later use for performance reasons`, () => {
-        @define('Employee')
+        @define('Employee', { isRegistrable: false })
         class Employee extends Serializable {
           id: string;
         }
 
-        @define('Car')
+        @define('Car', { isRegistrable: false })
         class Car extends Serializable {
           plate: string;
         }
 
-        @define('Company')
+        @define('Company', { isRegistrable: false })
         class Company extends Serializable {
           employee: Employee[];
 
