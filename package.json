@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@eveble/testing-helpers": "0.2.2",
-    "@types/chai": "^4.2.4",
+    "@types/chai": "^4.2.10",
     "@types/chai-as-promised": "^7.1.2",
     "@types/lodash": "^4.14.146",
     "@types/mocha": "^5.2.7",
