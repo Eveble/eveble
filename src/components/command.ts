@@ -4,6 +4,7 @@ import { define } from '../decorators/define';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { Serializable } from './serializable';
+import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
 @define('Assignment')
 export class Assignment extends Serializable implements types.Assignment {
@@ -17,9 +18,22 @@ export class Assignment extends Serializable implements types.Assignment {
 }
 
 @define('Command')
-export abstract class Command extends Message
-  implements types.Sendable, types.Identifiable {
+export class Command extends Message
+  implements types.Command, types.Identifiable {
   targetId: Guid | string;
+
+  /**
+   * Creates an instance of Message.
+   * @param props - Properties of the type required for construction.
+   */
+  constructor(props: types.Props = {}) {
+    super(props);
+    if (
+      Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) === undefined
+    ) {
+      Object.freeze(this);
+    }
+  }
 
   /**
    * Returns command's targeted element by id.

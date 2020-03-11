@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
+import { PropTypes } from 'typend';
 import { Message } from '../../../src/components/message';
 import { Command, Assignment } from '../../../src/components/command';
 import { define } from '../../../src/decorators/define';
@@ -7,8 +8,8 @@ import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
 describe('Command', function() {
-  let now;
-  let clock;
+  let now: Date;
+  let clock: any;
 
   before(() => {
     now = new Date();
@@ -22,8 +23,13 @@ describe('Command', function() {
     clock.restore();
   });
 
-  @define('MyCommand')
+  @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command {}
+
+  @define('MyCustomCommand', { isRegistrable: false })
+  class MyCustomCommand extends Command {
+    name: string;
+  }
 
   it(`extends Message`, () => {
     expect(Command.prototype).to.be.instanceof(Message);
@@ -38,37 +44,113 @@ describe('Command', function() {
     expect(Command.prototype.getTypeName()).to.equal('Command');
   });
 
-  describe(`construction`, () => {
-    it(`takes an object with targetId property as a string`, () => {
-      const targetId = 'my-id';
-      expect(
-        new MyCommand({
-          targetId,
-        }).targetId
-      ).to.be.equal(targetId);
-    });
-
-    it(`takes an object with targetId property as a guid`, () => {
-      const targetId = new Guid();
-      expect(
-        new MyCommand({
-          targetId,
-        }).targetId
-      ).to.be.equal(targetId);
-    });
-
-    it(`takes an object with targetId property as a guid and timestamp as a date`, () => {
-      const targetId = new Guid();
-      const timestamp = new Date();
-      const command = new MyCommand({ targetId, timestamp });
-      expect(command.targetId).to.be.equal(targetId);
-      expect(command.timestamp).to.be.equal(timestamp);
-    });
-
-    it('adds current date if property timestamp is missing on construction', () => {
-      expect(new MyCommand({ targetId: 'my-id' }).timestamp).to.be.instanceof(
-        Date
+  describe('prop types', () => {
+    it('takes required targetId property as a string or Guid', () => {
+      expect(Command.getPropTypes().targetId).to.be.eql(
+        PropTypes.oneOf(
+          PropTypes.instanceOf(String),
+          PropTypes.instanceOf(Guid)
+        )
       );
+    });
+
+    it('takes timestamp property as a Date', () => {
+      clock.restore();
+
+      expect(Command.getPropTypes().timestamp).to.be.eql(
+        PropTypes.instanceOf(Date)
+      );
+    });
+
+    it('takes metadata property as an object', () => {
+      expect(Command.getPropTypes().metadata).to.be.eql(PropTypes.object);
+    });
+  });
+
+  describe(`construction`, () => {
+    context('required properties', () => {
+      it(`takes an object with targetId property as a string`, () => {
+        const targetId = 'my-id';
+        expect(
+          new MyCommand({
+            targetId,
+          }).targetId
+        ).to.be.equal(targetId);
+      });
+
+      it(`takes an object with targetId property as a guid`, () => {
+        const targetId = new Guid();
+        expect(
+          new MyCommand({
+            targetId,
+          }).targetId
+        ).to.be.equal(targetId);
+      });
+    });
+
+    context('optional properties', () => {
+      it(`takes an object with optional timestamp property as a date`, () => {
+        const targetId = new Guid();
+        const timestamp = new Date();
+        const command = new MyCommand({ targetId, timestamp });
+        expect(command.timestamp).to.be.equal(timestamp);
+      });
+
+      it('adds current date if property timestamp is missing on construction', () => {
+        expect(new MyCommand({ targetId: 'my-id' }).timestamp).to.be.instanceof(
+          Date
+        );
+      });
+
+      it(`takes an object with optional metadata property as an object`, () => {
+        const targetId = new Guid();
+        const metadata = {
+          key: 'value',
+        };
+        const command = new MyCommand({ targetId, metadata });
+        expect(command.metadata).to.be.eql(metadata);
+      });
+    });
+
+    describe('immutability', () => {
+      it('makes the message instance immutable', () => {
+        const message = new MyCustomCommand({
+          targetId: 'my-id',
+          name: 'set-durning-construction',
+        });
+        expect(Object.isFrozen(message)).to.be.true;
+        // eslint-disable-next-line no-return-assign
+        expect(() => (message.name = 'set-after')).to.throw(TypeError);
+      });
+
+      it('requires explicit constructor for messages with property initializers', () => {
+        @define('MyDefaultCommand', { isRegistrable: false })
+        class MyDefaultCommand extends Command {
+          key: string;
+
+          default = 'default';
+
+          constructor(props: Partial<MyDefaultCommand>) {
+            super();
+            Object.assign(this, this.processProps(props));
+            Object.freeze(this);
+          }
+        }
+
+        const message = new MyDefaultCommand({
+          targetId: 'my-id',
+          key: 'my-key',
+          timestamp: now,
+        });
+        expect(Object.isFrozen(message)).to.be.true;
+        expect(message).to.be.eql({
+          targetId: 'my-id',
+          key: 'my-key',
+          default: 'default',
+          metadata: {},
+          timestamp: now,
+        });
+      });
     });
   });
 
