@@ -1,5 +1,8 @@
 import { ExtendableError } from '../components/extendable-error';
 
+/**
+ * HANDLING ERRORS
+ */
 export class HandlingError extends ExtendableError {}
 
 export class UnhandleableTypeError extends HandlingError {
@@ -48,6 +51,17 @@ export class InvalidMessageableType extends HandlingError {
   }
 }
 
+export class InitializingMessageAlreadyExistsError extends HandlingError {
+  constructor(className: string, existingMsgName: string, newMsgName: string) {
+    super(
+      `${className}: trying to override already existing initializing message with '${newMsgName}'. Remove annotation '@initial' from '${existingMsgName}' beforehand`
+    );
+  }
+}
+
+/**
+ * SERIALIZATION ERRORS
+ */
 export class SerializationError extends ExtendableError {}
 
 export class UnparsableValueError extends SerializationError {
