@@ -105,15 +105,14 @@ export class HookableMixin implements types.Hookable {
       throw new HookAlreadyExistsError(typeName, action, id);
     }
 
-    const isHookable: boolean = Reflect.getOwnMetadata(
-      HOOKABLE_KEY,
-      this.constructor
-    );
-    if (!isHookable) {
+    if (!Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)) {
       Reflect.defineMetadata(HOOKS_CONTAINER_KEY, {}, this);
-      // Flag that target is hookable for further reference
+    }
+
+    if (!Reflect.hasOwnMetadata(HOOKABLE_KEY, this.constructor)) {
       Reflect.defineMetadata(HOOKABLE_KEY, true, this.constructor);
     }
+
     const actions: types.hooks.Actions = Reflect.getOwnMetadata(
       HOOKS_CONTAINER_KEY,
       this
