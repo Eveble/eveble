@@ -1,8 +1,5 @@
-import chai, { expect } from 'chai';
-import { evebleChai } from '@eveble/testing-helpers';
+import { expect } from 'chai';
 import { ExtendableError } from '../../../src/components/extendable-error';
-
-chai.use(evebleChai);
 
 describe('MyExtendableError', function() {
   class MyExtendableError extends ExtendableError {}
