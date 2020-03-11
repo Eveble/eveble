@@ -1,5 +1,6 @@
 import env from 'getenv';
 import { typend } from 'typend';
+import { isMocha, isMochaInWatchMode } from '@eveble/helpers';
 import { BINDINGS } from '../constants/bindings';
 import { Library } from './library';
 import { types } from '../types';
@@ -200,6 +201,9 @@ export class Kernel {
 }
 
 const library = new Library();
+if (isMocha(global) && isMochaInWatchMode()) {
+  library.setState(Library.STATES.override);
+}
 const config: types.KernelConfig = {
   conversion: {
     type: env.string('EVEBLE_CONVERSION_TYPE', 'runtime'),
