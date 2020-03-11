@@ -14,7 +14,7 @@ export class AssertionApiAlreadyExistsError extends ExtendableError {
 export class Asserter implements types.Asserter {
   protected assertions: types.Assertion[];
 
-  protected action: types.Stringifiable | types.MessageableType;
+  protected action: types.Stringifiable | types.MessageType<types.Command>;
 
   protected entity: types.Entity;
 
@@ -52,6 +52,20 @@ export class Asserter implements types.Asserter {
       set(this, path, boundMethod);
     }
     this.assertions.push(assertion);
+  }
+
+  /**
+   * Evaluates if assertion type is registered on asserter.
+   * @param assertion - `Assertion` type constructor.
+   * @returns Returns `true` if assertion instance is registered on asserter, else `false`.
+   */
+  hasAssertion(assertionCtor: any): boolean {
+    for (const assertion of this.assertions) {
+      if (assertion instanceof assertionCtor) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
