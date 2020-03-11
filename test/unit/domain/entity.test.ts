@@ -10,7 +10,6 @@ import { StatusfulMixin } from '../../../src/mixins/statusful-mixin';
 import { isDefinable } from '../../../src/utils/helpers';
 import { types } from '../../../src/types';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { AsserterNotFoundError } from '../../../src/domain/domain-errors';
 import { Command } from '../../../src/components/command';
 import { ValueObject } from '../../../src/domain/value-object';
 import {
@@ -19,6 +18,9 @@ import {
   SAVED_STATE_KEY,
 } from '../../../src/constants/literal-keys';
 import { define } from '../../../src/decorators/define';
+import { UnavailableAsserterError } from '../../../src/core/core-errors';
+import { kernel } from '../../../src/core/kernel';
+import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
 
 chai.use(sinonChai);
 
@@ -55,7 +57,11 @@ describe('Entity', function() {
 
   beforeEach(() => {
     asserter = stubInterface<types.Asserter>();
-    Person.setAsserter(asserter);
+    kernel.setAsserter(asserter);
+  });
+
+  afterEach(() => {
+    kernel.setAsserter(undefined as any);
   });
 
   it(`extends Serializable`, () => {
@@ -271,19 +277,15 @@ describe('Entity', function() {
   });
 
   describe('asserting', () => {
-    it('throws AsserterNotFoundError if assertion is not set', () => {
-      expect(() => Entity.getAsserter()).to.throw(
-        AsserterNotFoundError,
-        `Entity: asserter not found on class constructor`
+    it('throws UnavailableAsserterError if assertion is not set', () => {
+      kernel.setAsserter(undefined as any);
+
+      const entity = new Person({ id: 'my-id', name: 'my-name' });
+
+      expect(() => entity.on('my-action')).to.throw(
+        UnavailableAsserterError,
+        `Assertion is unavailable outside on application environment. Define application before using any features related to assertion on entities or set asserter on kernel by using <kernel.setAsserter()>`
       );
-    });
-
-    it('sets the asserter on Entity class as static property', () => {
-      @define('MyEntity', { isRRegistrable: true })
-      class MyEntity extends Entity {}
-
-      MyEntity.setAsserter(asserter);
-      expect(MyEntity.getAsserter()).to.be.equal(asserter);
     });
 
     it('sets the entity on asserter', () => {
@@ -352,6 +354,7 @@ describe('Entity', function() {
       ];
       const entity = new Order({ id: 'my-id', items });
       expect(entity.items).to.be.eql(items);
+
       entity[SAVE_STATE_METHOD_KEY]();
       entity.removeItem(items[0]);
       entity.items[0].price = new Price({ value: 9000 });
@@ -369,6 +372,14 @@ describe('Entity', function() {
       entity.changeName('changed-name');
       entity[ROLLBACK_STATE_METHOD_KEY]();
       expect(entity.isStateSaved()).to.be.false;
+    });
+
+    it('does not allow to rollback unavailable previous state', () => {
+      const entity = new Person({ id: 'my-id', name: 'initial-name' });
+      expect(() => entity[ROLLBACK_STATE_METHOD_KEY]()).to.throw(
+        SavedStateNotFoundError,
+        `Person@my-id: expected entity to be have state saved before rollbacking it`
+      );
     });
   });
 
