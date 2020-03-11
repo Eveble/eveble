@@ -2,9 +2,11 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import { stubInterface } from 'ts-sinon';
 import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';
 import { types } from '../../../src/types';
+import { BINDINGS } from '../../../src/constants/bindings';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -178,7 +180,7 @@ describe('app lifecycle hooks', function() {
 
   let firstModule: any;
   let secondModule: any;
-  let app: any;
+  let app: MyApp;
 
   beforeEach(() => {
     firstModule = new FirstModule({});
@@ -187,6 +189,8 @@ describe('app lifecycle hooks', function() {
     });
 
     app = new MyApp({ modules: [secondModule] });
+    const log = stubInterface<types.Logger>();
+    app.injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
   });
 
   // Readability and 'understanding' is archived by writing expectations manually with use of few letter helpers to not clutter tests with full blown expectation statements.
