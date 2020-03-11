@@ -95,6 +95,16 @@ SNAPSHOOTING ERRORS
 */
 @define('SnapshotterError')
 class SnapshotterError extends InfrastructureError {}
+
+@define('UndefinedSnapshotterFrequencyError')
+export class UndefinedSnapshotterFrequencyError extends SnapshotterError {
+  constructor() {
+    super(
+      `Missing snapshotting frequency on configuration with path: 'eveble.Snapshotter.frequency'`
+    );
+  }
+}
+
 @define('UndefinedSnapshotterError')
 export class UndefinedSnapshotterError extends InfrastructureError {
   constructor() {
