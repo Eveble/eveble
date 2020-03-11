@@ -1,7 +1,7 @@
 import { getTypeName } from '@eveble/helpers';
 import { isFunction } from 'lodash';
 import { instanceOf } from 'typend';
-import { postConstruct } from '@parisholley/inversify-async';
+import { postConstruct, injectable } from '@parisholley/inversify-async';
 import { HandlingMixin } from './handling-mixin';
 import { kernel } from '../core/kernel';
 import {
@@ -16,6 +16,7 @@ import { Command } from '../components/command';
 import { Event } from '../components/event';
 import { HANDLERS } from '../constants/literal-keys';
 
+@injectable()
 export class OneToOneHandlingMixin extends HandlingMixin
   implements types.Controller {
   protected [HANDLERS]: Map<types.MessageableType, types.Handler>;
