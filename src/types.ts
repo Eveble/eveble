@@ -842,6 +842,10 @@ export namespace types {
     failedAt?: Date;
   }
 
+  export interface AgendaJobTransformer {
+    transform(job: Agenda.Job): ScheduledJob;
+  }
+
   export interface CommitSerializer {
     serialize(commit: Commit): Record<string, any>;
     deserialize(serializedCommit: Record<string, any>): Commit;
