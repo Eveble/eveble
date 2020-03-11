@@ -97,7 +97,7 @@ describe('LogTransportConfig', function() {
     it('has default values assigned via property initializers', () => {
       expect(new LogTransportConfig()).to.be.eql({
         isEnabled: true,
-        level: 'emerg',
+        level: 'info',
         logColors: {
           emerg: 'bold redBG',
           alert: 'bold yellow',
