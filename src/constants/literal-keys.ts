@@ -21,3 +21,7 @@ export const SAVED_STATE_KEY: unique symbol = Symbol('eveble:saved-state');
 export const ROLLBACK_STATE_METHOD_KEY: unique symbol = Symbol(
   'eveble:rollback-state'
 );
+
+export const COMMANDS_KEY: unique symbol = Symbol('eveble:commands');
+
+export const EVENTS_KEY: unique symbol = Symbol('eveble:events');
