@@ -8,8 +8,9 @@ import {
   interfaces as inversifyTypes,
 } from '@parisholley/inversify-async';
 import * as winston from 'winston';
+import getenv from 'getenv';
 import { BaseApp } from '../../../src/core/base-app';
-import { BaseModule } from '../../../src/core/base-module';
+import { Module } from '../../../src/core/module';
 import { Log } from '../../../src/components/log-entry';
 import { kernel } from '../../../src/core/kernel';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -24,43 +25,72 @@ import { define } from '../../../src/decorators/define';
 import { LoggingConfig } from '../../../src/configs/logging-config';
 import { Logger } from '../../../src/core/logger';
 import { ConsoleTransport } from '../../../src/core/logging-transports/console-transport';
+import { EvebleConfig } from '../../../src/configs/eveble-config';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe('BaseApp', function() {
   class MyApp extends BaseApp {
-    beforeInitialize(): any {}
+    beforeInitialize(): any {
+      return undefined;
+    }
 
-    onInitialize(): any {}
+    onInitialize(): any {
+      return undefined;
+    }
 
-    afterInitialize(): any {}
+    afterInitialize(): any {
+      return undefined;
+    }
 
-    beforeStart(): any {}
+    beforeStart(): any {
+      return undefined;
+    }
 
-    onStart(): any {}
+    onStart(): any {
+      return undefined;
+    }
 
-    afterStart(): any {}
+    afterStart(): any {
+      return undefined;
+    }
 
-    beforeStop(): any {}
+    beforeStop(): any {
+      return undefined;
+    }
 
-    onStop(): any {}
+    onStop(): any {
+      return undefined;
+    }
 
-    afterStop(): any {}
+    afterStop(): any {
+      return undefined;
+    }
 
-    beforeReset(): any {}
+    beforeReset(): any {
+      return undefined;
+    }
 
-    onReset(): any {}
+    onReset(): any {
+      return undefined;
+    }
 
-    afterReset(): any {}
+    afterReset(): any {
+      return undefined;
+    }
 
-    beforeShutdown(): any {}
+    beforeShutdown(): any {
+      return undefined;
+    }
 
-    onShutdown(): any {}
+    onShutdown(): any {
+      return undefined;
+    }
 
     // afterShutdown is set on BaseApp
   }
-  class MyModule extends BaseModule {}
+  class MyModule extends Module {}
 
   const lifeCycleHooks = [
     'beforeInitialize',
@@ -84,6 +114,8 @@ describe('BaseApp', function() {
   let generatedId: string;
   let injector: any;
   let binding: any;
+  let originalAppId: any;
+  let originalWorkerId: any;
 
   before(() => {
     for (const method of lifeCycleHooks) {
@@ -92,7 +124,13 @@ describe('BaseApp', function() {
   });
 
   beforeEach(() => {
-    kernel.injector = undefined;
+    // Remove env if present
+    originalAppId = getenv.string('APP_ID', '');
+    originalWorkerId = getenv.string('WORKER_ID', '');
+    delete process.env.APP_ID;
+    delete process.env.WORKER_ID;
+
+    kernel.setInjector(undefined as any);
 
     log = stubInterface<types.Logger>();
     injector = stubInterface<types.Injector>();
@@ -100,7 +138,7 @@ describe('BaseApp', function() {
     injector.bind.returns(binding);
 
     generateId = sinon.stub(AppConfig, 'generateId');
-    generatedId = 'my-app-id';
+    generatedId = 'my-generated-id';
     generateId.returns(generatedId);
   });
 
@@ -110,10 +148,23 @@ describe('BaseApp', function() {
     for (const method of lifeCycleHooks) {
       (MyApp.prototype as any)[method].reset();
     }
+    kernel.setInjector(undefined as any);
+
+    // Restore env if present
+    if (originalAppId.length > 0) {
+      process.env.APP_ID = originalAppId;
+    } else {
+      process.env.APP_ID = undefined;
+    }
+    if (originalWorkerId.length > 0) {
+      process.env.WORKER_ID = originalWorkerId;
+    } else {
+      process.env.WORKER_ID = undefined;
+    }
   });
 
-  it('extends BaseModule', () => {
-    expect(BaseApp.prototype).to.be.instanceof(BaseModule);
+  it('extends Module', () => {
+    expect(BaseApp.prototype).to.be.instanceof(Module);
   });
 
   describe('construction', () => {
@@ -168,6 +219,11 @@ describe('BaseApp', function() {
         expect((app.config as AppConfig).appId).to.be.equal(generatedId);
       });
 
+      it(`generates by default identifier for worker as uuid`, () => {
+        const app = new MyApp({});
+        expect((app.config as AppConfig).workerId).to.be.equal(generatedId);
+      });
+
       it(`throws InvalidAppConfigError error if provided configuration does not inherit from AppConfig`, () => {
         class InvalidAppConfig {}
         expect(() => {
@@ -210,16 +266,18 @@ describe('BaseApp', function() {
       // initialized
       await app.initialize();
       expect(app.isInState(MyApp.STATES.initialized)).to.be.true;
-      const setStateSpy = sinon.stub(BaseApp.prototype, 'setState');
+      app.setState = sinon.stub();
       // Initialize app for second time
       await app.initialize();
-      expect(setStateSpy).to.not.be.called;
+      expect(app.setState).to.not.be.called;
     });
 
     it('initializes modules of application', async () => {
       const module1 = stubInterface<types.Module>();
+      module1.state = Module.STATES.constructed;
       module1.config = stubInterface<types.Configurable>();
       const module2 = stubInterface<types.Module>();
+      module2.state = Module.STATES.constructed;
       module2.config = stubInterface<types.Configurable>();
 
       const app = new MyApp({
@@ -327,14 +385,16 @@ describe('BaseApp', function() {
               injector,
             });
             await app.initialize();
-            expect(injector.bind).to.have.been.calledWithExactly(BINDINGS.Library);
+            expect(injector.bind).to.have.been.calledWithExactly(
+              BINDINGS.Library
+            );
             expect(binding.toConstantValue).to.have.been.calledWithExactly(
               kernel.library
             );
           });
         });
 
-        context('binding app dependencies ', () => {
+        context('binding app dependencies', () => {
           it('binds injector instance with itself(as constant value)', async () => {
             const app = new MyApp({
               injector,
@@ -357,14 +417,16 @@ describe('BaseApp', function() {
               config,
             });
             await app.initialize();
-            expect(injector.bind).to.have.been.calledWithExactly(BINDINGS.Config);
+            expect(injector.bind).to.have.been.calledWithExactly(
+              BINDINGS.Config
+            );
             expect(binding.toConstantValue).to.have.been.calledWithExactly(
               config
             );
           });
         });
 
-        context('binding external dependencies ', () => {
+        context('binding external dependencies', () => {
           context('winston', () => {
             it('binds winston to constant value', async () => {
               const app = new MyApp({
@@ -440,6 +502,7 @@ describe('BaseApp', function() {
       injector.get.withArgs(BINDINGS.log).returns(log);
 
       const module = stubInterface<types.Module>();
+      module.state = Module.STATES.constructed;
       module.config = stubInterface<types.Configurable>();
 
       const app = new MyApp({
@@ -470,9 +533,7 @@ describe('BaseApp', function() {
       });
 
       await app.initialize();
-      expect(consoleTransport.info).to.be.calledWithMatch(
-        new Log('start').format({ isSimple: true })
-      );
+      expect(consoleTransport.info).to.be.calledWithMatch(new Log('start'));
       expect(consoleTransport.info).to.be.calledBefore(log.debug);
     });
 
@@ -592,9 +653,7 @@ describe('BaseApp', function() {
       expect(log.debug).to.be.calledWithMatch(
         new Log(`shutdown`).on(app).in('shutdown')
       );
-      expect(consoleTransport.info).to.be.calledWithMatch(
-        new Log(`exit`).format({ isSimple: true })
-      );
+      expect(consoleTransport.info).to.be.calledWithMatch(new Log(`exit`));
       expect(consoleTransport.info).to.be.calledAfter(log.debug);
     });
   });
@@ -666,7 +725,7 @@ describe('BaseApp', function() {
       },
     });
 
-    class GrandchildModule extends BaseModule {
+    class GrandchildModule extends Module {
       constructor() {
         super({
           config: grandchildConfig,
@@ -674,7 +733,7 @@ describe('BaseApp', function() {
       }
     }
 
-    class ChildModule extends BaseModule {
+    class ChildModule extends Module {
       constructor() {
         super({
           modules: [new GrandchildModule()],
@@ -687,15 +746,15 @@ describe('BaseApp', function() {
       constructor(props: types.Props) {
         super({
           ...props,
-          ...{
-            modules: [new ChildModule()],
-            config: new MyAppConfig({
-              appId: 'my-app-id',
-              root: 'app-root',
-              change: 'app-change',
-              keep: 'app-keep',
-            }),
-          },
+          modules: [new ChildModule()],
+          config: new MyAppConfig({
+            appId: 'my-app-id',
+            workerId: 'my-worker-id',
+            root: 'app-root',
+            change: 'app-change',
+            keep: 'app-keep',
+            eveble: new EvebleConfig(),
+          }),
         });
       }
     }
@@ -712,10 +771,24 @@ describe('BaseApp', function() {
           GrandchildModuleConfig: grandchildConfig,
         },
         appId: 'my-app-id',
+        workerId: 'my-worker-id',
         logging: new LoggingConfig(),
         conversion: { type: 'runtime' },
         validation: { type: 'runtime' },
         description: { formatting: 'default' },
+        clients: {
+          MongoDB: {
+            CommitStore: AppConfig.defaultMongoDBOptions,
+            Snapshotter: AppConfig.defaultMongoDBOptions,
+            CommandScheduler: AppConfig.defaultMongoDBOptions,
+          },
+          Agenda: {
+            CommandScheduler: {
+              processEvery: 180000,
+            },
+          },
+        },
+        eveble: new EvebleConfig(),
         change: 'app-change',
         keep: 'app-keep',
         root: 'app-root',
@@ -751,10 +824,24 @@ describe('BaseApp', function() {
           GrandchildModuleConfig: grandchildConfig,
         },
         appId: 'my-app-id',
+        workerId: 'my-worker-id',
         logging: new LoggingConfig(),
         conversion: { type: 'runtime' },
         validation: { type: 'runtime' },
         description: { formatting: 'default' },
+        clients: {
+          MongoDB: {
+            CommitStore: AppConfig.defaultMongoDBOptions,
+            Snapshotter: AppConfig.defaultMongoDBOptions,
+            CommandScheduler: AppConfig.defaultMongoDBOptions,
+          },
+          Agenda: {
+            CommandScheduler: {
+              processEvery: 180000,
+            },
+          },
+        },
+        eveble: new EvebleConfig(),
         change: 'configured-change',
         keep: 'app-keep',
         root: 'app-root',
