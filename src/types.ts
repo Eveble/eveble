@@ -7,6 +7,8 @@ import {
 } from './constants/literal-keys';
 
 /*
+https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines
+
 Any type or interface exported in 'root' level of declaration is considered
 'first-class' building block.
 
@@ -121,6 +123,8 @@ export namespace types {
     getTypes(): Map<string, Serializable>;
     hasType(typeName: TypeName): boolean;
     removeType(typeName: TypeName): void;
+    isInState(state: State | State[]): boolean;
+    setState(state: State): void;
   }
 
   export type KernelConfig = {

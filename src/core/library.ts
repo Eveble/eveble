@@ -4,20 +4,28 @@ import { getTypeName } from '@eveble/helpers';
 import { types } from '../types';
 import {
   TypeExistsError,
-  InvalidTypeError,
+  UnregistrableTypeError,
   TypeNotFoundError,
 } from './core-errors';
 import { isSerializable } from '../utils/helpers';
 
 @injectable()
 export class Library {
-  private types: Map<string, any>;
+  public static STATES = {
+    default: 'default',
+    override: 'override',
+  };
+
+  protected state: types.State;
+
+  protected types: Map<string, any>;
 
   /**
    * Creates an instance of Library.
    */
   constructor() {
     this.types = new Map();
+    this.setState(Library.STATES.default);
   }
 
   /**
@@ -25,6 +33,8 @@ export class Library {
    * @param typeName - Type's name for which mapping will be created.
    * @param type - Type constructor implementing `Serializable` interface for registration.
    * @param shouldOverride - Flag indicating that mapping should be overridden if exist.
+   * @throws {UnregistrableTypeError}
+   * Thrown if type does not implement `Serializable` interface.
    * @throws {TypeExistsError}
    * Thrown if type would overridden on library without explicit call.
    */
@@ -34,13 +44,15 @@ export class Library {
     shouldOverride = false
   ): void {
     if (!isSerializable(type.prototype)) {
-      throw new InvalidTypeError(typeName);
+      throw new UnregistrableTypeError(typeName);
     }
-    if (this.hasType(typeName) && !shouldOverride) {
-      throw new TypeExistsError(
-        getTypeName(this.constructor) as types.TypeName,
-        typeName
-      );
+    if (this.hasType(typeName)) {
+      if (!shouldOverride && !this.isInState(Library.STATES.override)) {
+        throw new TypeExistsError(
+          getTypeName(this.constructor) as types.TypeName,
+          typeName
+        );
+      }
     }
     this.types.set(typeName, type);
   }
@@ -104,5 +116,22 @@ export class Library {
    */
   public removeType(typeName: types.TypeName): void {
     this.types.delete(typeName);
+  }
+
+  /**
+   * Evaluates if target is in expected state.
+   * @param state - Expected state in which instance should be.
+   * @returns Returns `true` if instance is in state, else `false`.
+   */
+  public isInState(state: types.State): boolean {
+    return this.state === state;
+  }
+
+  /**
+   * Sets instance state.
+   * @param state - State to which instance should be set.
+   */
+  public setState(state: types.State): void {
+    this.state = state;
   }
 }

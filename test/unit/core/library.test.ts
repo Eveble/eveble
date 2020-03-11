@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { Library } from '../../../src/core/library';
 import {
-  InvalidTypeError,
+  UnregistrableTypeError,
   TypeExistsError,
   TypeNotFoundError,
 } from '../../../src/core/core-errors';
@@ -28,10 +28,15 @@ describe(`Library`, () => {
       expect(lib.getTypes()).to.be.instanceof(Map);
       expect(lib.getTypes()).to.be.empty;
     });
+
+    it('initializes with default state', () => {
+      const lib = new Library();
+      expect(lib.isInState(Library.STATES.default)).to.be.true;
+    });
   });
 
   describe('registration', () => {
-    it('throws InvalidTypeError if provided type is not implementing Serializable interface', () => {
+    it('throws UnregistrableTypeError if provided type is not implementing Serializable interface', () => {
       class MyInvalidType {}
 
       const lib = new Library();
@@ -39,7 +44,7 @@ describe(`Library`, () => {
       expect(() =>
         lib.registerType('MyInvalidType', MyInvalidType as any)
       ).to.throw(
-        InvalidTypeError,
+        UnregistrableTypeError,
         `Type 'MyInvalidType' must implement Serializable interface`
       );
     });
@@ -53,7 +58,7 @@ describe(`Library`, () => {
       );
     });
 
-    it('registers type ', () => {
+    it('registers type', () => {
       const lib = new Library();
       lib.registerType('MyType', MyType);
       expect(lib.getType('MyType')).to.be.equal(MyType);
@@ -64,6 +69,17 @@ describe(`Library`, () => {
       lib.registerType('MyType', MyType);
       expect(lib.getType('MyType')).to.be.equal(MyType);
       expect(() => lib.overrideType('MyType', MyOtherType)).to.not.throw(
+        TypeExistsError
+      );
+      expect(lib.getType('MyType')).to.be.equal(MyOtherType);
+    });
+
+    it('always override existing types while in override state', () => {
+      const lib = new Library();
+      lib.setState(Library.STATES.override);
+      lib.registerType('MyType', MyType);
+      expect(lib.getType('MyType')).to.be.equal(MyType);
+      expect(() => lib.registerType('MyType', MyOtherType)).to.not.throw(
         TypeExistsError
       );
       expect(lib.getType('MyType')).to.be.equal(MyOtherType);
