@@ -80,12 +80,13 @@ describe('Entity', function() {
   });
 
   describe('prop types', () => {
-    it('have prop types set for: id, version, state, status', () => {
+    it('have prop types set for: id, schemaVersion, state, status, SAVED_STATE_KEY', () => {
       expect(Entity.getPropTypes()).to.contain.all.keys([
         'id',
-        'version',
+        'schemaVersion',
         'state',
         'status',
+        SAVED_STATE_KEY,
       ]);
     });
 
@@ -95,12 +96,6 @@ describe('Entity', function() {
           PropTypes.instanceOf(String),
           PropTypes.instanceOf(Guid)
         )
-      );
-    });
-
-    it('takes optional version property as a number', () => {
-      expect(Entity.getPropTypes().version).to.be.eql(
-        PropTypes.instanceOf(Number).isOptional
       );
     });
 

@@ -24,8 +24,6 @@ export class Entity extends classes(
 
   public id: string | Guid;
 
-  public version?: number;
-
   public state: types.State;
 
   public status: types.Status;
