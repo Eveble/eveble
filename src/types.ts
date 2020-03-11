@@ -220,6 +220,7 @@ export namespace types {
   export type State = string | number | undefined;
 
   export interface Stateful {
+    state: State;
     isInState(state: State | State[]): boolean;
     isInOneOfStates(states: State | State[]): boolean;
     getState(): State;
