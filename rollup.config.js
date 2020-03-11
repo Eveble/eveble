@@ -1,8 +1,9 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import filesize from 'rollup-plugin-filesize';
-import typescript from 'rollup-plugin-typescript2';
+import tsPlugin from 'rollup-plugin-typescript2';
 import json from 'rollup-plugin-json';
+import ttypescript from 'ttypescript';
 
 import sourceMaps from 'rollup-plugin-sourcemaps';
 
@@ -27,8 +28,8 @@ export default {
     json(),
     commonjs(),
     filesize(),
-    typescript({
-      typescript: require('typescript'),
+    tsPlugin({
+      typescript: ttypescript,
     }),
     sourceMaps(),
   ],
