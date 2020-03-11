@@ -9,3 +9,7 @@ export const RFC5424 = {
   info: 6, // Informational: informational messages
   debug: 7, // Debug: debug-level messages
 };
+
+export const SPECIFICATIONS = {
+  RFC5424,
+};
