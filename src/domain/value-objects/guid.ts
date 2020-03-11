@@ -1,13 +1,14 @@
 import { isString, isPlainObject } from 'lodash';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { ValueObject } from '../value-object';
 import { types } from '../../types';
 import { kernel } from '../../core/kernel';
 import { define } from '../../decorators/define';
 import { ValueObjectError } from '../domain-errors';
 
+@define('InvalidGuidValueError')
 export class InvalidGuidValueError extends ValueObjectError {
-  constructor(got) {
+  constructor(got: string) {
     super(`Guid: Expected string as a valid guid, got ${got}`);
   }
 }
@@ -69,7 +70,7 @@ export class Guid extends ValueObject implements types.Stringifiable {
    * @return Returns Guid instance with self generated uuid.
    */
   static generate(): Guid {
-    return new Guid(uuid.v4().toString());
+    return new Guid(uuidv4().toString());
   }
 
   // Checks valid 128-bit UUIDs version 4
