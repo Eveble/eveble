@@ -28,7 +28,7 @@ describe(`Asserter`, () => {
     const ensureIsFalse = sinon.stub();
 
     class MyAssertion implements types.Assertion {
-      getApi() {
+      getApi(): Map<string, Function> {
         return new Map([
           ['ensure.is.true', ensureIsTrue],
           ['ensure.is.false', ensureIsFalse],
@@ -42,6 +42,13 @@ describe(`Asserter`, () => {
       expect(asserter.getAssertions()).to.be.instanceof(Array);
       expect(asserter.getAssertions()).to.have.length(1);
       expect(asserter.getAssertions()).to.have.members([assertion]);
+    });
+
+    it('returns true if  assertion is registered on asserter', () => {
+      const asserter = new Asserter();
+      const assertion = new MyAssertion();
+      asserter.registerAssertion(assertion);
+      expect(asserter.hasAssertion(MyAssertion)).to.be.true;
     });
 
     it('extends asserter api with the one from assertion', () => {
