@@ -49,9 +49,10 @@ export class EventBus extends classes(HookableMixin, OneToManyHandlingMixin)
    * Registers `onPublish` callback hook.
    * @param id - Identifier under which `onPublish` hook will be defined.
    * @param hook - Function that will be executed upon publishing `Event`.
+   * @param shouldOverride - Flag indicating that hook should be overridden if exist.
    */
-  onPublish(id: string, hook: types.Hook): void {
-    this.registerHook('onPublish', id, hook);
+  onPublish(id: string, hook: types.Hook, shouldOverride = false): void {
+    this.registerHook('onPublish', id, hook, shouldOverride);
   }
 
   /**
