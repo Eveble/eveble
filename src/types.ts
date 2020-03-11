@@ -532,21 +532,15 @@ export namespace types {
   }
 
   export interface Asserter {
-    setAction(action: Stringifiable | MessageableType): void;
-
-    getAction(): Stringifiable | MessageableType;
-
+    setAction(action: Stringifiable | MessageType<Message>): void;
+    getAction(): Stringifiable | MessageType<Message>;
     setEntity(entity: Entity): void;
-
     getEntity(): Entity;
-
     assert(): Asserter;
-
     registerAssertion(assertion: Assertion): void;
-
     getAssertions(): Assertion[];
-
     getApi(): Map<string, Function>;
+    hasAssertion(assertionCtor: any): boolean;
   }
 
   export interface Entity

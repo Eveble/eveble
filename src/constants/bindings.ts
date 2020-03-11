@@ -15,4 +15,5 @@ export const BINDINGS = {
   EventBus: Symbol.for('EventBus'),
   EJSON: Symbol.for('EJSON'),
   Serializer: Symbol.for('Serializer'),
+  Asserter: Symbol.for('Asserter'),
 };
