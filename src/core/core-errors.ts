@@ -13,6 +13,14 @@ export class UnavailableSerializerError extends KernelError {
     );
   }
 }
+export class UnavailableAsserterError extends KernelError {
+  constructor() {
+    super(
+      `Assertion is unavailable outside on application environment. Define application before using any features related to assertion on entities or set asserter on kernel by using <kernel.setAsserter()>`
+    );
+  }
+}
+
 /*
 TYPE ERRORS
 */
