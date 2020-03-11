@@ -7,7 +7,7 @@ require('dotenv-extended').load({
   silent: false,
   defaults: '.env.defaults',
   schema: '.env.schema',
-  errorOnMissing: true,
+  errorOnMissing: false,
   errorOnExtra: true,
   path: envFile,
 });
