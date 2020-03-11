@@ -75,6 +75,7 @@
     "@eveble/testing-helpers": "0.2.2",
     "@types/chai": "^4.2.10",
     "@types/chai-as-promised": "^7.1.2",
+    "@types/getenv": "^1.0.0",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^7.0.2",
     "@types/node": "^13.9.0",
