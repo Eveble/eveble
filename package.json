@@ -63,6 +63,8 @@
     "typend": "^0.1.0",
     "uuid": "^7.0.2",
     "winston": "^3.2.1",
+    "mongodb": "^3.5.4",
+    "saslprep": "^1.0.3",
     "@jsbits/deep-clone": "^1.1.1",
     "abbreviate": "^0.0.3"
   },
@@ -73,6 +75,7 @@
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^7.0.2",
     "@types/node": "^13.9.0",
+    "@types/mongodb": "^3.5.2",
     "@types/sinon": "^7.5.2",
     "@types/sinon-chai": "^3.2.3",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
