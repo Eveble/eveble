@@ -24,12 +24,12 @@ export class CommandBus extends classes(HookableMixin, OneToOneHandlingMixin)
    * @throws {UnhandleableTypeError}
    * Thrown if the type argument is not subclass of `Command` type.
    * @throws {InvalidHandlerError}
-   * Thrown if the handler argument is not a function.
+   * Thrown if the handler argument is not a function.r
    * @throws {HandlerExistError}
    * Thrown if handler would overridden without explicit call.
    */
   registerHandler(
-    commandType: types.MessageableType,
+    commandType: types.MessageType<types.Command>,
     handler: types.Handler,
     shouldOverride = false
   ): void {
@@ -48,16 +48,16 @@ export class CommandBus extends classes(HookableMixin, OneToOneHandlingMixin)
   /**
    * Handles command instance.
    * @async
-   * @param commandInstance - An instance of `Command` type.
+   * @param command - An instance of `Command` type.
    * @return Any value returned as a `Promise` from handler.
    */
-  async handle(commandInstance: Command): Promise<any> {
+  async handle(command: types.Command): Promise<any> {
     const hooks = this.getHooks('onSend');
     for (const [, hook] of Object.entries(hooks)) {
-      await hook(commandInstance);
+      await hook(command);
     }
 
-    const result = await super.handle(commandInstance);
+    const result = await super.handle(command);
     return result;
   }
 
@@ -65,8 +65,8 @@ export class CommandBus extends classes(HookableMixin, OneToOneHandlingMixin)
    * @alias handle
    * @async
    */
-  async send(commandInstance: Command): Promise<any> {
-    const result = await this.handle(commandInstance);
+  async send(command: types.Command): Promise<any> {
+    const result = await this.handle(command);
     return result;
   }
 }

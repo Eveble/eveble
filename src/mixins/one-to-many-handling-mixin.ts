@@ -1,6 +1,5 @@
 import { getTypeName } from '@eveble/helpers';
 import { isFunction } from 'lodash';
-import { instanceOf } from 'typend';
 import { postConstruct, injectable } from '@parisholley/inversify-async';
 import { HandlingMixin } from './handling-mixin';
 import { types } from '../types';
@@ -14,11 +13,12 @@ import {
 import { kernel } from '../core/kernel';
 import { Event } from '../components/event';
 import { HANDLERS } from '../constants/literal-keys';
+import { Message } from '../components/message';
 
 @injectable()
 export class OneToManyHandlingMixin extends HandlingMixin
   implements types.Controller {
-  protected [HANDLERS]: Map<types.MessageableType, types.Handler[]>;
+  protected [HANDLERS]: Map<types.MessageType<types.Message>, types.Handler[]>;
 
   /**
    * Initializes OneToManyHandlingMixin.
@@ -32,6 +32,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
     this.setupHandlers({
       handlers: this.subscribes(),
       handleableTypes: [Event],
+      isBoundable: true,
     });
   }
 
@@ -70,7 +71,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * ```
    */
   public registerHandler(
-    messageType: types.MessageableType,
+    messageType: types.MessageType<types.Message>,
     handler: types.Handler,
     shouldOverride = false
   ): void {
@@ -101,13 +102,13 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * Returns handlers for message type.
    * @param messageType - Type implementing `MessageableType` interface.
    * @returns List with handlers as a functions if found, else `undefined`.
-   * @throws {InvalidTypeError}
+   * @throws {InvalidMessageableType}
    * Thrown if the message type argument is not implementing `Messageable` interface.
    */
   public getHandler(
-    messageType: types.MessageableType
+    messageType: types.MessageType<types.Message>
   ): types.Handler[] | undefined {
-    if (!instanceOf<types.Serializable>(messageType.prototype)) {
+    if (!(messageType.prototype instanceof Message)) {
       throw new InvalidMessageableType(kernel.describer.describe(messageType));
     }
     return this.hasHandler(messageType)
@@ -123,7 +124,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * Thrown if handler for message type is not found.
    */
   public getHandlerOrThrow(
-    messageType: types.MessageableType
+    messageType: types.MessageType<types.Message>
   ): types.Handler[] {
     const handlers = this.getHandler(messageType);
 
@@ -163,7 +164,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * @param message - Type implementing `Messageable` interface.
    */
   public async handle(
-    message: types.Messageable,
+    message: types.Message,
     execution: types.Execution = 'sequential'
   ): Promise<void> {
     switch (execution) {
@@ -186,8 +187,11 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * @async
    * @param message - Type implementing `Messageable` interface.
    */
-  protected async handleSequential(message: types.Messageable): Promise<void> {
-    const handlers = this.getHandler(message.constructor) || [];
+  protected async handleSequential(message: types.Message): Promise<void> {
+    const handlers =
+      this.getHandler(
+        message.constructor as types.MessageType<types.Message>
+      ) || [];
     for (const handler of handlers) {
       await handler(message);
     }
@@ -198,8 +202,11 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * @async
    * @param message - Type implementing `Messageable` interface.
    */
-  protected async handleConcurrent(message: types.Messageable): Promise<any> {
-    const handlers = this.getHandler(message.constructor) || [];
+  protected async handleConcurrent(message: types.Message): Promise<any> {
+    const handlers =
+      this.getHandler(
+        message.constructor as types.MessageType<types.Message>
+      ) || [];
     const promises = handlers.map(handler => {
       return handler(message);
     });

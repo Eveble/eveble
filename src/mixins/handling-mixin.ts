@@ -1,6 +1,7 @@
 import { isEmpty } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
 import { injectable } from '@parisholley/inversify-async';
+import getenv from 'getenv';
 import { kernel } from '../core/kernel';
 import { types } from '../types';
 import { Message } from '../components/message';
@@ -16,11 +17,11 @@ import {
 @injectable()
 export abstract class HandlingMixin {
   protected [HANDLERS]: Map<
-    types.MessageableType,
+    types.MessageType<types.Message>,
     types.Handler | types.Handler[]
   >;
 
-  protected [HANDLEABLE_TYPES]: types.MessageableType[];
+  protected [HANDLEABLE_TYPES]: types.MessageType<types.Message>[];
 
   /**
    * Creates an instance of HandlingMixin.
@@ -28,12 +29,12 @@ export abstract class HandlingMixin {
   constructor() {
     Object.defineProperty(this, HANDLERS, {
       value: new Map(),
-      enumerable: false,
+      enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
       writable: true,
     });
     Object.defineProperty(this, HANDLEABLE_TYPES, {
       value: [],
-      enumerable: false,
+      enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
       writable: true,
     });
   }
@@ -44,7 +45,7 @@ export abstract class HandlingMixin {
    * @example
    *```ts
    * class MyController extends HandlingMixin {
-   *   myHandlers(): Map<types.MessageableType, types.Handler> {
+   *   myHandlers(): Map<types.MessageType<types.Message>, types.Handler | types.Handler[]> {
    *     return new Map([
    *       [MyCommand, sinon.stub()],
    *       [MyEvent, sinon.stub()],
@@ -63,10 +64,10 @@ export abstract class HandlingMixin {
    * ```
    */
   protected setupHandlers(props: {
-    handlers: Map<types.MessageableType, types.Handler>;
+    handlers: Map<types.MessageType<types.Message>, types.Handler>;
     registrator?: Function;
     isBoundable?: boolean;
-    handleableTypes?: types.MessageableType[];
+    handleableTypes?: types.MessageType<types.Message>[];
   }): void {
     const { handlers, registrator, isBoundable, handleableTypes } = {
       isBoundable: false,
@@ -108,8 +109,7 @@ export abstract class HandlingMixin {
    *     });
    *   }
    *   // ...
-   *   @handle()
-   *   MyCommandHandlerMethod(command: MyCommand): boolean {
+   *   MyCommandHandlerMethod(@handle command: MyCommand): boolean {
    *     return command.key === 'my-string';
    *   }
    * }
@@ -124,7 +124,7 @@ export abstract class HandlingMixin {
    * );
    * ```
    */
-  handles(): Map<types.MessageableType, types.Handler> {
+  public handles(): Map<types.MessageType<types.Command>, types.Handler> {
     return (
       Reflect.getOwnMetadata(
         COMMAND_HANDLERS_CONTAINER_KEY,
@@ -146,9 +146,8 @@ export abstract class HandlingMixin {
    *     });
    *   }
    *   // ...
-   *   @subscribe()
-   *   MyEventHandlerMethod(command: MyEvent): boolean {
-   *     return command.key === 'my-string';
+   *   MyEventHandlerMethod(@subscribe event: MyEvent): boolean {
+   *     return event.key === 'my-string';
    *   }
    * }
    * const controller = new MyController();
@@ -162,7 +161,7 @@ export abstract class HandlingMixin {
    * );
    * ```
    */
-  subscribes(): Map<types.MessageableType, types.Handler> {
+  public subscribes(): Map<types.MessageType<types.Event>, types.Handler> {
     return (
       Reflect.getOwnMetadata(
         EVENT_HANDLERS_CONTAINER_KEY,
@@ -178,9 +177,9 @@ export abstract class HandlingMixin {
    * @param shouldOverride - Flag indicating that handler should be overridden if exist.
    */
   public registerHandler(
-    messageType: types.MessageableType,
-    handler: types.Handler,
-    shouldOverride = false
+    _messageType: types.MessageType<types.Message>,
+    _handler: types.Handler,
+    _shouldOverride = false
   ): void {
     // Placeholder for concrete implementation
   }
@@ -191,7 +190,7 @@ export abstract class HandlingMixin {
    * @param handler - Handler function that will executed upon handling message type.
    */
   public overrideHandler(
-    messageType: types.MessageableType,
+    messageType: types.MessageType<types.Message>,
     handler: types.Handler
   ): void {
     this.registerHandler(messageType, handler, true);
@@ -202,7 +201,7 @@ export abstract class HandlingMixin {
    * @param messageType - Type implementing `MessageableType` interface.
    * @returns Returns `true` if handler for message type is registered, else `false`.
    */
-  public hasHandler(messageType: types.MessageableType): boolean {
+  public hasHandler(messageType: types.MessageType<types.Message>): boolean {
     return this[HANDLERS].has(messageType);
   }
 
@@ -210,7 +209,7 @@ export abstract class HandlingMixin {
    * Removes handler by type.
    * @param messageType - Type implementing `MessageableType` interface.
    */
-  public removeHandler(messageType: types.MessageableType): void {
+  public removeHandler(messageType: types.MessageType<types.Message>): void {
     this[HANDLERS].delete(messageType);
   }
 
@@ -219,7 +218,7 @@ export abstract class HandlingMixin {
    * @returns Returns mappings of all available handlers by message type: handler(s) relation.
    */
   public getHandlers(): Map<
-    types.MessageableType,
+    types.MessageType<types.Message>,
     types.Handler | types.Handler[]
   > {
     return this[HANDLERS];
@@ -230,7 +229,9 @@ export abstract class HandlingMixin {
    * @param handleableTypes - List of allowed types for handling.
    */
   public setHandleableTypes(
-    handleableTypes: types.MessageableType | types.MessageableType[]
+    handleableTypes:
+      | types.MessageType<types.Message>
+      | types.MessageType<types.Message>[]
   ): void {
     const normalizedTypes = Array.isArray(handleableTypes)
       ? handleableTypes
@@ -248,7 +249,7 @@ export abstract class HandlingMixin {
    * Returns handleable message types.
    * @returns Returns handleable message types as a list with message types.
    */
-  public getHandleableTypes(): types.MessageableType[] {
+  public getHandleableTypes(): types.MessageType<types.Message>[] {
     return isEmpty(this[HANDLEABLE_TYPES]) ? [Message] : this[HANDLEABLE_TYPES];
   }
 
@@ -261,10 +262,10 @@ export abstract class HandlingMixin {
    * Thrown if message type is not one of handleable types.
    */
   public ensureHandleability(
-    messageType: types.MessageableType,
+    messageType: types.MessageType<types.Message>,
     handleableTypes:
-      | types.MessageableType
-      | types.MessageableType[] = this.getHandleableTypes()
+      | types.MessageType<types.Message>
+      | types.MessageType<types.Message>[] = this.getHandleableTypes()
   ): boolean {
     if (!this.isHandleabe(messageType, handleableTypes)) {
       throw new UnhandleableTypeError(
@@ -284,10 +285,10 @@ export abstract class HandlingMixin {
    * @returns Returns `true` if message type can be handled, else `false`.
    */
   public isHandleabe(
-    messageType: types.MessageableType,
+    messageType: types.MessageType<types.Message>,
     handleableTypes:
-      | types.MessageableType
-      | types.MessageableType[] = this.getHandleableTypes()
+      | types.MessageType<types.Message>
+      | types.MessageType<types.Message>[] = this.getHandleableTypes()
   ): boolean {
     const normalizedHandleableTypes = Array.isArray(handleableTypes)
       ? handleableTypes
@@ -309,7 +310,7 @@ export abstract class HandlingMixin {
    * Returns all handled message types.
    * @returns List of all handled message types.
    */
-  public getHandledTypes(): types.MessageableType[] {
+  public getHandledTypes(): types.MessageType<types.Message>[] {
     const handledTypes: any[] = [];
     for (const type of this[HANDLERS].keys()) {
       handledTypes.push(type);
@@ -323,9 +324,9 @@ export abstract class HandlingMixin {
    * @returns List of all handled types matching evaluated one.
    */
   public getHandled(
-    messageType: types.MessageableType
-  ): types.MessageableType[] {
-    const handledTypes: types.MessageableType[] = [];
+    messageType: types.MessageType<types.Message>
+  ): types.MessageType<types.Message>[] {
+    const handledTypes: types.MessageType<types.Message>[] = [];
 
     for (const handledType of this[HANDLERS].keys()) {
       if (kernel.validator.isValid(handledType.prototype, messageType)) {
@@ -339,24 +340,24 @@ export abstract class HandlingMixin {
    * Returns all messages that can be handled.
    * @returns List of all handled types matching `Message`.
    */
-  public getHandledMessages(): Message[] {
-    return this.getHandled(Message) as Message[];
+  public getHandledMessages(): types.MessageType<types.Message>[] {
+    return this.getHandled(Message) as types.MessageType<types.Message>[];
   }
 
   /**
    * Returns all commands that can be handled.
    * @returns List of all handled types matching `Command`.
    */
-  public getHandledCommands(): Command[] {
-    return this.getHandled(Command) as Command[];
+  public getHandledCommands(): types.MessageType<types.Command>[] {
+    return this.getHandled(Command) as types.MessageType<types.Command>[];
   }
 
   /**
    * Returns all commands that can be handled.
    * @returns List of all handled types matching `Event`.
    */
-  public getHandledEvents(): Event[] {
-    return this.getHandled(Event) as Event[];
+  public getHandledEvents(): types.MessageType<types.Event>[] {
+    return this.getHandled(Event) as types.MessageType<types.Event>[];
   }
 
   /**

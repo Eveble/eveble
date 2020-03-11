@@ -12,7 +12,7 @@ import { BINDINGS } from '../constants/bindings';
 export class CommandHandlingMixin extends OneToOneHandlingMixin
   implements types.Sender {
   @inject(BINDINGS.CommandBus)
-  public commandBus: types.Sender;
+  public commandBus: types.CommandBus;
 
   /**
    * Initializes CommandHandlingMixin.
@@ -46,7 +46,7 @@ export class CommandHandlingMixin extends OneToOneHandlingMixin
    * Thrown if handler would overridden without explicit call.
    */
   public registerCommandHandler(
-    commandType: types.MessageableType,
+    commandType: types.MessageType<types.Command>,
     handler: types.Handler,
     shouldOverride = false
   ): void {
@@ -61,11 +61,11 @@ export class CommandHandlingMixin extends OneToOneHandlingMixin
   /**
    * Sends(handles) command instance through command bus.
    * @async
-   * @param commandInstance - Instance of a `Command` type.
+   * @param command - Instance of a `Command` type.
    * @returns Any value that is returned from handler after handling command instance.
    */
-  public async send(commandInstance: Command): Promise<any> {
-    const result = await this.commandBus.send(commandInstance);
+  public async send(command: types.Command): Promise<any> {
+    const result = await this.commandBus.send(command);
     return result;
   }
 }

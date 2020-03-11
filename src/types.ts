@@ -423,66 +423,94 @@ export namespace types {
 
   export type Execution = 'sequential' | 'concurrent';
 
-  export interface Messageable extends Serializable {
+  export interface Message extends Serializable {
+    timestamp: Date;
+    metadata?: Record<string, any>;
     getTimestamp(): Date;
+    assignMetadata(props: Record<string, any>): void;
+    hasMetadata(): boolean;
+    getMetadata(): Record<string, any>;
+    setCorrelationId(key: string, id: Stringifiable): void;
+    getCorrelationId(key: string): string | undefined;
+    hasCorrelationId(key: string): boolean;
   }
 
-  export type MessageableType = any;
+  export interface MessageType<T extends Message> {
+    new (props: Props): T;
+    getTypeName(): TypeName;
+  }
 
-  export type Handler = (message: Messageable) => any;
+  export type Handler = (message: Message) => any;
 
   export interface Controller {
+    initialize(): void;
+    handles(): Map<MessageType<Command>, Handler>;
+    subscribes(): Map<MessageType<Event>, Handler>;
     registerHandler(
-      messageType: MessageableType,
+      messageType: MessageType<Message>,
       handler: Handler,
-      shouldOverride: boolean
+      shouldOverride?: boolean
     ): void;
-    overrideHandler(messageType: MessageableType, handler: Handler): void;
-    hasHandler(messageType: MessageableType): boolean;
-    getHandler(messageType: MessageableType): Handler | Handler[] | undefined;
-    getHandlerOrThrow(messageType: MessageableType): Handler | Handler[];
-    removeHandler(messageType: MessageableType): void;
-    getHandlers(): Map<MessageableType, Handler | Handler[]>;
+    overrideHandler(messageType: MessageType<Message>, handler: Handler): void;
+    hasHandler(messageType: MessageType<Message>): boolean;
+    getHandler(
+      messageType: MessageType<Message>
+    ): Handler | Handler[] | undefined;
+    getHandlerOrThrow(messageType: MessageType<Message>): Handler | Handler[];
+    removeHandler(messageType: MessageType<Message>): void;
+    getHandlers(): Map<MessageType<Message>, Handler | Handler[]>;
     setHandleableTypes(
-      handleableTypes: MessageableType | MessageableType[]
+      handleableTypes: MessageType<Message> | MessageType<Message>[]
     ): void;
-    getHandleableTypes(): MessageableType[];
+    getHandleableTypes(): MessageType<Message>[];
     ensureHandleability(
-      messageType: MessageableType,
-      handleableTypes: MessageableType | MessageableType[]
+      messageType: MessageType<Message>,
+      handleableTypes: MessageType<Message> | MessageType<Message>[]
     ): boolean;
-    isHandleabe(messageType: MessageableType): boolean;
-    getHandledTypes(): MessageableType[];
-    getHandled(messageType: MessageableType): MessageableType[];
-    handle(message: Messageable, execution?: Execution): Promise<any>;
+    isHandleabe(messageType: MessageType<Message>): boolean;
+    getHandledTypes(): MessageType<Message>[];
+    getHandled(messageType: MessageType<Message>): MessageType<Message>[];
+    handle(message: Message, execution?: Execution): Promise<any>;
   }
 
-  export interface Sendable extends Messageable {
+  export interface Command extends Message {
+    targetId: string | Stringifiable;
     getId(): string | Stringifiable;
     isDeliverable(): boolean;
+    isScheduled(): boolean;
+    schedule(assignment: Assignment): void;
+    getAssignment(): Assignment | undefined;
   }
 
-  export interface Publishable extends Messageable {
+  export interface Event extends Message {
+    sourceId: string | Stringifiable;
+    version?: number;
     getId(): string | Stringifiable;
   }
 
   export interface Sender extends Controller {
-    send(commandInstance: Sendable): Promise<any>;
+    send(command: Command): Promise<any>;
   }
   export interface Publisher extends Controller {
-    publish(eventInstance: Publishable): Promise<void>;
-    subscribeTo(event: any, handler: Handler, shouldOverride: boolean): void;
+    publish(event: Event): Promise<void>;
+    subscribeTo(event: any, handler: Handler, shouldOverride?: boolean): void;
   }
 
   export interface CommandBus extends Sender {
-    onSend(id: string, hook: Hook): void;
+    onSend(id: string, hook: Hook, shouldOverride?: boolean): void;
+    getHandledTypesNames(): TypeName[];
   }
   export interface EventBus extends Publisher {
-    onPublish(id: string, hook: Hook): void;
+    onPublish(id: string, hook: Hook, shouldOverride?: boolean): void;
+    getHandledTypesNames(): TypeName[];
   }
 
   export interface Serializer {
-    registerType(typeName: TypeName, type: Type, shouldOverride: boolean): void;
+    registerType(
+      typeName: TypeName,
+      type: Type,
+      shouldOverride?: boolean
+    ): void;
     overrideType(typeName: TypeName, type: Type): void;
     hasType(typeName: TypeName): boolean;
     getTypes(): Map<TypeName, Type>;

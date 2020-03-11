@@ -61,17 +61,32 @@ describe('OneToManyHandlingMixin', function() {
   describe('initialization', () => {
     it('setups all handlers from subscribes mapping method on initialization', () => {
       class MyController extends OneToManyHandlingMixin {
-        @subscribe()
-        MyEventHandlerMethod(event: MyEvent): boolean {
+        MyEventHandlerMethod(@subscribe event: MyEvent): boolean {
           return event.key === 'my-string';
         }
       }
       const controller = new MyController();
       controller.initialize();
       expect(controller.getHandlers()).to.be.instanceof(Map);
-      expect(controller.getHandlers()).to.be.eql(
-        new Map([[MyEvent, [controller.MyEventHandlerMethod]]])
-      );
+      const boundHandlers = controller.getHandlers().get(MyEvent) as Function[];
+      expect(boundHandlers).to.be.instanceof(Array);
+      expect(boundHandlers).to.have.length(1);
+      expect(boundHandlers[0]).to.be.instanceof(Function);
+    });
+
+    it('ensure that handlers from subscribes mapping are bound to the instance', () => {
+      class MyController extends OneToManyHandlingMixin {
+        MyEventHandlerMethod(@subscribe event: MyEvent): boolean {
+          return event.key === 'my-string';
+        }
+      }
+      const controller = new MyController();
+      controller.initialize();
+      expect(controller.getHandlers()).to.be.instanceof(Map);
+      const boundHandlers = controller.getHandlers().get(MyEvent) as Function[];
+      expect(
+        controller.MyEventHandlerMethod === (boundHandlers[0] as any).original
+      ).to.be.true; // Compare bound function to handler function
     });
 
     it('annotates initializes as post construction method for Inversify', () => {
@@ -88,7 +103,7 @@ describe('OneToManyHandlingMixin', function() {
 
       class InvalidType {}
       expect(() =>
-        controller.registerHandler(InvalidType, sinon.stub())
+        controller.registerHandler(InvalidType as any, sinon.stub())
       ).to.throw(
         UnhandleableTypeError,
         'MyController: type must be one of: [Message]; got InvalidType'
@@ -181,7 +196,7 @@ describe('OneToManyHandlingMixin', function() {
         const controller = new MyController();
 
         class InvalidType {}
-        expect(() => controller.getHandler(InvalidType)).to.throw(
+        expect(() => controller.getHandler(InvalidType as any)).to.throw(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
         );
@@ -233,7 +248,7 @@ describe('OneToManyHandlingMixin', function() {
         const controller = new MyController();
 
         class InvalidType {}
-        expect(() => controller.getHandlerOrThrow(InvalidType)).to.throw(
+        expect(() => controller.getHandlerOrThrow(InvalidType as any)).to.throw(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
         );

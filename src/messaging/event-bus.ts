@@ -27,7 +27,7 @@ export class EventBus extends classes(HookableMixin, OneToManyHandlingMixin)
    * Thrown if the handler argument is not a function.
    */
   registerHandler(
-    eventType: types.MessageableType,
+    eventType: types.MessageType<types.Event>,
     handler: types.Handler,
     shouldOverride = false
   ): void {
@@ -38,7 +38,10 @@ export class EventBus extends classes(HookableMixin, OneToManyHandlingMixin)
    * Subscribes to event with handler.
    * @alias registerHandler
    */
-  subscribeTo(eventType: types.MessageableType, handler: types.Handler): void {
+  subscribeTo(
+    eventType: types.MessageType<types.Event>,
+    handler: types.Handler
+  ): void {
     this.registerHandler(eventType, handler);
   }
 
@@ -54,24 +57,24 @@ export class EventBus extends classes(HookableMixin, OneToManyHandlingMixin)
   /**
    * Handles event instance concurrently.
    * @async
-   * @param eventInstance - An instance of `Event` type.
+   * @param event - An instance of `Event` type.
    */
-  async handle(eventInstance: Event): Promise<void> {
+  async handle(event: types.Event): Promise<void> {
     // onPublish hooks always must run even in case when handler is not registered(for BDD testing api on Eveble)
     const hooks = this.getHooks('onPublish');
     for (const [, hook] of Object.entries(hooks)) {
-      await hook(eventInstance);
+      await hook(event);
     }
 
-    return super.handle(eventInstance, 'concurrent');
+    return super.handle(event, 'concurrent');
   }
 
   /**
    * @alias handle
    * @async
    */
-  async publish(eventInstance: Event): Promise<void> {
-    const result = await this.handle(eventInstance);
+  async publish(event: types.Event): Promise<void> {
+    const result = await this.handle(event);
     return result;
   }
 }

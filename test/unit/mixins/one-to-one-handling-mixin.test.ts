@@ -67,32 +67,57 @@ describe('OneToOneHandlingMixin', function() {
   describe('initialization', () => {
     it('setups all handlers from handlers mapping method on initialization', () => {
       class MyController extends OneToOneHandlingMixin {
-        @handle()
-        MyCommandHandlerMethod(command: MyCommand): boolean {
+        MyCommandHandlerMethod(@handle command: MyCommand): boolean {
           return command.key === 'my-string';
         }
       }
       const controller = new MyController();
       controller.initialize();
       expect(controller.getHandlers()).to.be.instanceof(Map);
-      expect(controller.getHandlers()).to.be.eql(
-        new Map([[MyCommand, controller.MyCommandHandlerMethod]])
-      );
+      const boundHandler = controller.getHandlers().get(MyCommand);
+      expect(boundHandler).to.be.a('function');
+    });
+
+    it('ensure that handlers from handlers mapping are bound to the instance', () => {
+      class MyController extends OneToOneHandlingMixin {
+        MyCommandHandlerMethod(@handle command: MyCommand): boolean {
+          return command.key === 'my-string';
+        }
+      }
+      const controller = new MyController();
+      controller.initialize();
+      expect(controller.getHandlers()).to.be.instanceof(Map);
+      const boundHandler = controller.getHandlers().get(MyCommand);
+      expect(
+        controller.MyCommandHandlerMethod === (boundHandler as any).original
+      ).to.be.true; // Compare bound function to handler function
     });
 
     it('setups all handlers from subscribes mapping method on initialization', () => {
       class MyController extends OneToOneHandlingMixin {
-        @subscribe()
-        MyEventHandlerMethod(event: MyEvent): boolean {
+        MyEventHandlerMethod(@subscribe event: MyEvent): boolean {
           return event.key === 'my-string';
         }
       }
       const controller = new MyController();
       controller.initialize();
       expect(controller.getHandlers()).to.be.instanceof(Map);
-      expect(controller.getHandlers()).to.be.eql(
-        new Map([[MyEvent, controller.MyEventHandlerMethod]])
-      );
+      const boundHandler = controller.getHandlers().get(MyEvent);
+      expect(boundHandler).to.be.a('function');
+    });
+
+    it('ensure that handlers from subscribes mapping are bound to the instance', () => {
+      class MyController extends OneToOneHandlingMixin {
+        MyEventHandlerMethod(@subscribe event: MyEvent): boolean {
+          return event.key === 'my-string';
+        }
+      }
+      const controller = new MyController();
+      controller.initialize();
+      expect(controller.getHandlers()).to.be.instanceof(Map);
+      const boundHandler = controller.getHandlers().get(MyEvent);
+      expect(controller.MyEventHandlerMethod === (boundHandler as any).original)
+        .to.be.true; // Compare bound function to handler function
     });
 
     it('annotates initializes as post construction method for Inversify', () => {
@@ -109,7 +134,7 @@ describe('OneToOneHandlingMixin', function() {
 
       class InvalidType {}
       expect(() =>
-        controller.registerHandler(InvalidType, sinon.stub())
+        controller.registerHandler(InvalidType as any, sinon.stub())
       ).to.throw(
         UnhandleableTypeError,
         'MyController: type must be one of: [Message]; got InvalidType'
@@ -201,7 +226,7 @@ describe('OneToOneHandlingMixin', function() {
         const controller = new MyController();
 
         class InvalidType {}
-        expect(() => controller.getHandler(InvalidType)).to.throw(
+        expect(() => controller.getHandler(InvalidType as any)).to.throw(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
         );
@@ -239,7 +264,7 @@ describe('OneToOneHandlingMixin', function() {
         const controller = new MyController();
 
         class InvalidType {}
-        expect(() => controller.getHandlerOrThrow(InvalidType)).to.throw(
+        expect(() => controller.getHandlerOrThrow(InvalidType as any)).to.throw(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
         );
