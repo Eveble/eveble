@@ -810,6 +810,16 @@ export namespace types {
     getProjectionName(): string;
   }
 
+  export interface ProjectionRebuilder {
+    rebuild(
+      projections: Projection[]
+    ): {
+      projectionsNames: string[];
+      duration: number;
+      message: string;
+    };
+  }
+
   export interface Client extends Definable, Stateful {
     getId(): string | Stringifiable;
     initialize(): Promise<void>;
