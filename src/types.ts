@@ -491,6 +491,7 @@ export namespace types {
   export type Status = string | number | undefined;
 
   export interface Statusful {
+    status: Status;
     isInStatus(status: Status | Status[]): boolean;
     isInOneOfStatuses(status: Status | Status[]): boolean;
     getStatus(): Status;
