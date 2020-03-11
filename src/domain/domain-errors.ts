@@ -79,7 +79,7 @@ export class ValueObjectError extends SerializableError {}
 ENTITY ERRORS
 */
 @define('EntityError')
-class EntityError extends DomainError {}
+export class EntityError extends DomainError {}
 
   }
 }
