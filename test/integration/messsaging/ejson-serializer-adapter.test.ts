@@ -15,24 +15,11 @@ import { Serializable } from '../../../src/components/serializable';
 import { kernel } from '../../../src/core/kernel';
 import { UnparsableValueError } from '../../../src/messaging/messaging-errors';
 import { TYPE_KEY } from '../../../src/constants/literal-keys';
+import { createEJSON } from '../../../src/utils/helpers';
 
 chai.use(sinonChai);
 
 describe(`EJSONSerializerAdapter`, function() {
-/**
- * Creates instance of EJSON.
- * @returns De-cached version of EJSON module.
- * @remarks
- * By default, EJSON module stores types in variable that is not
- * referenced on object itself. This creates issue when running
- * tests in watch modes(like Mocha's --watch).
- */
-const createEJSON = function() {
-  decache('@eveble/ejson');
-  // eslint-disable-next-line global-require
-  return require('@eveble/ejson');
-};
-
   let container: types.Injector;
   let serializer: EJSONSerializerAdapter;
 
