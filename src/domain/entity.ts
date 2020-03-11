@@ -1,25 +1,23 @@
 import { classes } from 'polytype';
 import { pick } from 'lodash';
-import deepcopy from 'deepcopy';
+import deepClone from '@jsbits/deep-clone';
 import { StatefulMixin } from '../mixins/stateful-mixin';
 import { Serializable } from '../components/serializable';
 import { define } from '../decorators/define';
 import { Guid } from './value-objects/guid';
 import { types } from '../types';
 import { StatusfulMixin } from '../mixins/statusful-mixin';
-import { StateSaveNotFoundError, AsserterNotFoundError } from './domain-errors';
+import { SavedStateNotFoundError } from './domain-errors';
 import {
   SAVED_STATE_KEY,
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
 } from '../constants/literal-keys';
+import { kernel } from '../core/kernel';
 
 @define('Entity')
-export class Entity extends classes(
-  Serializable,
-  StatefulMixin,
-  StatusfulMixin
-) {
+export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
+  implements types.Entity {
   protected static asserter: types.Asserter;
 
   public id: string | Guid;
@@ -103,28 +101,33 @@ export class Entity extends classes(
    * @return Instance implementing `Asserter` interface.
    */
   public on(action: string | types.Stringifiable): any {
-    const asserter: types.Asserter = (this.constructor as any).getAsserter();
-    asserter.setAction(action);
-    asserter.setEntity(this);
+    kernel.asserter.setAction(action);
+    kernel.asserter.setEntity(this);
     // Return as any so assertion extensions can be accessed without TypeScript errors
-    return asserter as types.Asserter;
+    return kernel.asserter as any;
   }
 
   /**
    * Saves current entity state.
    */
   public [SAVE_STATE_METHOD_KEY](): void {
-    this[SAVED_STATE_KEY] = deepcopy(this);
+    this[SAVED_STATE_KEY] = {};
+    const propTypes = this.getPropTypes();
+    for (const key of Object.keys(propTypes)) {
+      if (this[key] !== undefined) {
+        (this as any)[SAVED_STATE_KEY][key] = deepClone(this[key]);
+      }
+    }
   }
 
   /**
    * Rollbacks entity to previous state.
-   * @throws {StateSaveNotFoundError}
+   * @throws {SavedStateNotFoundError}
    * Thrown if rollback is done on `Entity` without prior saved state.
    */
   public [ROLLBACK_STATE_METHOD_KEY](): void {
     if (!this.isStateSaved()) {
-      throw new StateSaveNotFoundError(
+      throw new SavedStateNotFoundError(
         this.getTypeName(),
         this.getId().toString()
       );

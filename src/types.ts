@@ -601,5 +601,7 @@ export namespace types {
     on(action: string | Stringifiable): any;
     [SAVE_STATE_METHOD_KEY](): void;
     [ROLLBACK_STATE_METHOD_KEY](): void;
+    isStateSaved(): boolean;
+  }
   }
 }
