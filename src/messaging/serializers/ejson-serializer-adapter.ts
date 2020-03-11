@@ -4,7 +4,7 @@ import { instanceOf } from 'typend';
 import {
   TypeNotFoundError,
   TypeExistsError,
-  InvalidTypeError,
+  UnregistrableTypeError,
 } from '../../core/core-errors';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
@@ -35,6 +35,8 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * registration. Must contain typeName - a tag for your custom type that
    * must be unique among other data types defined in your project.
    * @param shouldOverride - Flag indicating that type should be overridden if exist.
+   * @throws {UnregistrableTypeError}
+   * Thrown if type does not implement `Serializable` interface.
    * @throws {TypeExistsError}
    * Thrown if type would overridden on EJSON without explicit call.
    */
@@ -44,7 +46,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
     shouldOverride = false
   ): void {
     if (!isSerializable(type.prototype)) {
-      throw new InvalidTypeError(typeName);
+      throw new UnregistrableTypeError(typeName);
     }
 
     const factory = this.createFactory(type);
@@ -532,7 +534,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * Converts `Serializable` to plain-object data.
    * @param serializable - `Serializable` instance.
    * @returns Converted `Serializable` to plain-object data.
-   * @throws {InvalidTypeError}
+   * @throws {UnregistrableTypeError}
    * Thrown if provided argument is not a type implementing `Serializable` interface.
    * @example
    *```ts

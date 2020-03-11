@@ -1,10 +1,9 @@
 import chai, { expect } from 'chai';
-import decache from 'decache';
 import sinonChai from 'sinon-chai';
 import {
   TypeNotFoundError,
   TypeExistsError,
-  InvalidTypeError,
+  UnregistrableTypeError,
   UnavailableSerializerError,
 } from '../../../src/core/core-errors';
 import { define } from '../../../src/decorators/define';
@@ -13,13 +12,13 @@ import { Container } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
 import { Serializable } from '../../../src/components/serializable';
-
 import { kernel } from '../../../src/core/kernel';
 import { UnparsableValueError } from '../../../src/messaging/messaging-errors';
 import { TYPE_KEY } from '../../../src/constants/literal-keys';
 
 chai.use(sinonChai);
 
+describe(`EJSONSerializerAdapter`, function() {
 /**
  * Creates instance of EJSON.
  * @returns De-cached version of EJSON module.
@@ -34,7 +33,6 @@ const createEJSON = function() {
   return require('@eveble/ejson');
 };
 
-describe(`EJSONSerializerAdapter`, function() {
   let container: types.Injector;
   let serializer: EJSONSerializerAdapter;
 
@@ -91,12 +89,12 @@ describe(`EJSONSerializerAdapter`, function() {
   });
 
   describe('type registration', () => {
-    it('throws InvalidTypeError if provided type does not implement Serializable interface', () => {
+    it('throws UnregistrableTypeError if provided type does not implement Serializable interface', () => {
       class InvalidType {}
       expect(() =>
         serializer.registerType('InvalidType', InvalidType)
       ).to.throw(
-        InvalidTypeError,
+        UnregistrableTypeError,
         `Type 'InvalidType' must implement Serializable interface`
       );
     });
@@ -602,11 +600,11 @@ describe(`EJSONSerializerAdapter`, function() {
     });
 
     describe('toData', () => {
-      it('throws InvalidTypeError if provided argument is not instance of Serializable', () => {
+      it('throws UnregistrableTypeError if provided argument is not instance of Serializable', () => {
         const obj = {};
 
         expect(() => serializer.toData(obj as any)).to.throw(
-          InvalidTypeError,
+          UnregistrableTypeError,
           `Type '{}' must implement Serializable interface`
         );
       });
