@@ -7,7 +7,10 @@ import {
 } from '@parisholley/inversify-async';
 import sinon from 'sinon';
 import delay from 'delay';
+import { stubInterface } from 'ts-sinon';
 import { Container } from '../../../src/core/injector';
+import { types } from '../../../src/types';
+import { BINDINGS } from '../../../src/constants/bindings';
 
 chai.use(sinonChai);
 
@@ -16,6 +19,137 @@ describe(`Injector`, () => {
 
   beforeEach(() => {
     initialize = sinon.stub();
+  });
+
+  describe('routing event sourceables', () => {
+    let initializingMessageType: any;
+    let commands: any;
+    let events: any;
+    let MyEventSourceable: any;
+
+    beforeEach(() => {
+      initializingMessageType = sinon.stub();
+      commands = sinon.stub();
+      events = sinon.stub();
+
+      MyEventSourceable = stubInterface<types.EventSourceableType>();
+      MyEventSourceable.resolveInitializingMessage.returns(
+        initializingMessageType
+      );
+      MyEventSourceable.resolveRoutedCommands.returns(commands as any);
+      MyEventSourceable.resolveRoutedEvents.returns(events as any);
+    });
+
+    it('allows to route event sourceable', () => {
+      const routerCnstrSpy = sinon.spy();
+
+      class Router implements types.Router {
+        EventSourceableType: types.EventSourceableType;
+
+        InitializingMessageType: types.MessageType<types.Command | types.Event>;
+
+        routedCommands: types.MessageType<types.Command>[];
+
+        routedEvents: types.MessageType<types.Event>[];
+
+        constructor(
+          EventSourceableType?: types.EventSourceableType,
+          InitializingMessageType?: types.MessageType<
+            types.Command | types.Event
+          >,
+          routedCommands?: types.MessageType<types.Command>[],
+          routedEvents?: types.MessageType<types.Event>[]
+        ) {
+          routerCnstrSpy(
+            EventSourceableType,
+            InitializingMessageType,
+            routedCommands,
+            routedEvents
+          );
+        }
+
+        @postConstruct()
+        initialize(): void {
+          return undefined;
+        }
+      }
+
+      const container = new Container();
+      container.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
+
+      container
+        .bind<types.Router>('MyEventSourceable')
+        .toRoute(MyEventSourceable);
+      expect(routerCnstrSpy).to.be.calledOnce;
+      expect(routerCnstrSpy).to.be.calledWithExactly(
+        MyEventSourceable,
+        initializingMessageType,
+        commands,
+        events
+      );
+    });
+
+    it('ensures that router is initialized', () => {
+      const initializeSpy = sinon.spy();
+      class Router implements types.Router {
+        @inject(BINDINGS.log)
+        protected log: types.Logger;
+
+        EventSourceableType: types.EventSourceableType;
+
+        InitializingMessageType: types.MessageType<types.Command | types.Event>;
+
+        routedCommands: types.MessageType<types.Command>[];
+
+        routedEvents: types.MessageType<types.Event>[];
+
+        @postConstruct()
+        initialize(): void {
+          initializeSpy();
+        }
+      }
+
+      const container = new Container();
+      const log = stubInterface<types.Logger>();
+      container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+      container.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
+
+      container
+        .bind<types.Router>('MyEventSourceable')
+        .toRoute(MyEventSourceable);
+      expect(initializeSpy).to.be.calledOnce;
+    });
+
+    it('ensures that dependencies are injected to router', () => {
+      class Router implements types.Router {
+        @inject(BINDINGS.log)
+        protected log: types.Logger;
+
+        EventSourceableType: types.EventSourceableType;
+
+        InitializingMessageType: types.MessageType<types.Command | types.Event>;
+
+        routedCommands: types.MessageType<types.Command>[];
+
+        routedEvents: types.MessageType<types.Event>[];
+
+        @postConstruct()
+        initialize(): void {
+          this.log.debug('my-message');
+        }
+      }
+
+      const container = new Container();
+      const log = stubInterface<types.Logger>();
+      container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+      container.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
+
+      container
+        .bind<types.Router>('MyEventSourceable')
+        .toRoute(MyEventSourceable);
+      expect(log.debug).to.be.calledOnce;
+      expect(log.debug).to.be.calledWithExactly('my-message');
+    });
   });
 
   it(`injects synchronously dependencies from IoC container to existing value`, () => {
@@ -34,29 +168,29 @@ describe(`Injector`, () => {
 
     @injectable()
     class Katana implements Katana {
-      public hit() {
+      public hit(): string {
         return 'cut!';
       }
     }
 
     @injectable()
     class Shuriken implements Shuriken {
-      public throw() {
+      public throw(): string {
         return 'hit!';
       }
     }
 
-    const BINDINGS = {
+    const NINJA_BINDINGS = {
       Katana: Symbol.for('Katana'),
       Shuriken: Symbol.for('Shuriken'),
     };
 
     @injectable()
     class Ninja implements Ninja {
-      @inject(BINDINGS.Katana)
+      @inject(NINJA_BINDINGS.Katana)
       public katana: Katana;
 
-      @inject(BINDINGS.Shuriken)
+      @inject(NINJA_BINDINGS.Shuriken)
       public shuriken: Shuriken;
 
       public name: string;
@@ -80,8 +214,8 @@ describe(`Injector`, () => {
     }
     const container = new Container();
     container.bind<Ninja>('Ninja').to(Ninja);
-    container.bind<Katana>(BINDINGS.Katana).to(Katana);
-    container.bind<Shuriken>(BINDINGS.Shuriken).to(Shuriken);
+    container.bind<Katana>(NINJA_BINDINGS.Katana).to(Katana);
+    container.bind<Shuriken>(NINJA_BINDINGS.Shuriken).to(Shuriken);
 
     const name = 'Naruto Uzumaki';
     const ninja = new Ninja(name);
@@ -117,7 +251,7 @@ describe(`Injector`, () => {
 
       public id: string;
 
-      constructor(id) {
+      constructor(id: string) {
         this.id = id;
       }
     }
@@ -135,5 +269,33 @@ describe(`Injector`, () => {
     expect(initialize).to.be.calledWithExactly('transport');
     expect(before).to.be.calledBefore(after);
     expect(after).to.be.calledAfter(before);
+  });
+
+  it('ensures that synchronous post construct method is executed even if there value is not dependent on other dependencies', () => {
+    const initializeSpy = sinon.spy();
+    class MyClass {
+      @postConstruct()
+      initialize(): void {
+        initializeSpy();
+      }
+    }
+    const instance = new MyClass();
+    const container = new Container();
+    container.injectInto(instance);
+    expect(initializeSpy).to.be.calledOnce;
+  });
+
+  it('ensures that asynchronous post construct method is executed even if there value is not dependent on other dependencies', async () => {
+    const initializeSpy = sinon.spy();
+    class MyClass {
+      @postConstruct()
+      initailize(): void {
+        initializeSpy();
+      }
+    }
+    const instance = new MyClass();
+    const container = new Container();
+    await container.injectIntoAsync(instance);
+    expect(initializeSpy).to.be.calledOnce;
   });
 });
