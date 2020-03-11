@@ -1,5 +1,10 @@
 import { classes } from 'polytype';
 import merge from 'deepmerge';
+import {
+  METADATA_KEY,
+  interfaces as inversifyTypes,
+} from '@parisholley/inversify-async';
+import { omit } from 'lodash';
 import { DefinableMixin } from '../mixins/definable-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';
 import { types } from '../types';
@@ -111,6 +116,9 @@ export class Struct extends classes(DefinableMixin, HookableMixin) {
    * Thrown if the provided properties does not match the prop types.
    */
   protected onValidation(props: types.Props): boolean {
-    return this.validateProps(props, this.getPropTypes(), true);
+    const mappings: Record<keyof any, inversifyTypes.Metadata[]> =
+      Reflect.getMetadata(METADATA_KEY.TAGGED_PROP, this.constructor) || {};
+    const propTypes = omit(this.getPropTypes(), Object.keys(mappings));
+    return this.validateProps(props, propTypes, true);
   }
 }

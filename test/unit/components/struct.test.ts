@@ -1,6 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { Integer, PropTypes, ValidationError } from 'typend';
+import { inject } from '@parisholley/inversify-async';
 import { Struct } from '../../../src/components/struct';
 import { define } from '../../../src/decorators/define';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
@@ -161,6 +162,25 @@ describe('Struct', function() {
           key: 'set',
         });
       });
+    });
+  });
+
+  describe('validation', () => {
+    it('skips validating properties defined with @inject decorator', () => {
+      class MyDependency {}
+
+      @define()
+      class MyStruct extends Struct {
+        key: string;
+
+        @inject('my-dependency')
+        dependency: MyDependency;
+      }
+
+      expect(() => new MyStruct({ key: 'my-value' })).to.not.throw(
+        ValidationError
+      );
+      expect(() => new MyStruct({})).to.throw(ValidationError);
     });
   });
 
