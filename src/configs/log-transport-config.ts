@@ -7,7 +7,7 @@ import { types } from '../types';
 export class LogTransportConfig extends Config {
   public isEnabled? = true;
 
-  public level?: types.LogLevel = 'emerg';
+  public level?: types.LogLevel = 'info';
 
   // use winston styling notation
   public logColors?: {
