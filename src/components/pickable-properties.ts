@@ -1,15 +1,14 @@
 import { pick } from 'lodash';
 import { types } from '../types';
 
-export class PickableProperties {
-  public sources: Record<keyof any, any>[];
-
+export class PickableProperties extends Array {
   /**
    * Creates an instance of `Pickable`.
    * @param sources - List of sources for properties.
    */
-  constructor(sources: Record<keyof any, any>[]) {
-    this.sources = sources;
+  constructor(...sources: Record<keyof any, any>[]) {
+    super();
+    this.push(...sources);
   }
 
   /**
@@ -21,7 +20,7 @@ export class PickableProperties {
     const propKeys = Object.keys(propTypes);
 
     const pickedProps = {};
-    for (const source of this.sources) {
+    for (const source of this) {
       Object.assign(pickedProps, pick(source, propKeys));
     }
     return pickedProps;

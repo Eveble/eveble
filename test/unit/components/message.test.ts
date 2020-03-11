@@ -8,8 +8,8 @@ import { isDefinable } from '../../../src/utils/helpers';
 import { PickableProperties } from '../../../src/components/pickable-properties';
 
 describe('Message', function() {
-  let now;
-  let clock;
+  let now: Date;
+  let clock: any;
 
   before(() => {
     now = new Date();
@@ -75,7 +75,7 @@ describe('Message', function() {
       expect(message.metadata).to.be.eql(metadata);
     });
 
-    it('takes PickableProperties instance as properties and picks only required ', () => {
+    it('takes PickableProperties instance as properties and picks only required', () => {
       @define('Employee', { isRegistrable: false })
       class Employee extends Serializable {
         id: string;
@@ -110,14 +110,14 @@ describe('Message', function() {
         isActive: true,
         employees,
       });
-      const pickableProps = new PickableProperties([
+      const pickableProps = new PickableProperties(
         company,
         { address: 'my-address' },
         {
           firstPropertyThatIsNotPartOfCompanyCreated: true,
           secondropertyThatIsNotPartOfCompanyCreated: true,
-        },
-      ]);
+        }
+      );
       expect(new CompanyCreated(pickableProps)).to.be.eql({
         id: 'my-id',
         address: 'my-address',
@@ -128,38 +128,25 @@ describe('Message', function() {
       });
     });
 
-    describe('immutability', () => {
-      it('makes the message instance immutable', () => {
-        const message = new MyCustomMessage({
-          name: 'set-durning-construction',
-        });
-        expect(Object.isFrozen(message)).to.be.true;
-        // eslint-disable-next-line no-return-assign
-        expect(() => (message.name = 'set-after')).to.throw(TypeError);
-      });
+    it('requires explicit constructor for messages with property initializers', () => {
+      @define('MyDefaultMessage', { isRegistrable: false })
+      class MyDefaultMessage extends Message {
+        key: string;
 
-      it('requires explicit constructor for messages with property initializers', () => {
-        @define('MyDefaultMessage', { isRegistrable: false })
-        class MyDefaultMessage extends Message {
-          key: string;
+        default = 'default';
 
-          default = 'default';
-
-          constructor(props: Partial<MyDefaultMessage>) {
-            super();
-            Object.assign(this, this.processProps(props));
-            Object.freeze(this);
-          }
+        constructor(props: Partial<MyDefaultMessage>) {
+          super();
+          Object.assign(this, this.processProps(props));
         }
+      }
 
-        const message = new MyDefaultMessage({ key: 'my-key', timestamp: now });
-        expect(Object.isFrozen(message)).to.be.true;
-        expect(message).to.be.eql({
-          key: 'my-key',
-          default: 'default',
-          metadata: {},
-          timestamp: now,
-        });
+      const message = new MyDefaultMessage({ key: 'my-key', timestamp: now });
+      expect(message).to.be.eql({
+        key: 'my-key',
+        default: 'default',
+        metadata: {},
+        timestamp: now,
       });
     });
   });

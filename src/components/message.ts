@@ -5,41 +5,17 @@ import { Serializable } from './serializable';
 import { isPlainRecord } from '../utils/helpers';
 import { define } from '../decorators/define';
 import { types } from '../types';
-import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 import { PickableProperties } from './pickable-properties';
 
 @define('Message')
-export abstract class Message extends Serializable
-  implements types.Messageable {
+export class Message extends Serializable implements types.Message {
   public timestamp: Date;
 
+  /*
+  Since Command & Event are frozen after construction, metadata property must be assigning on construction. This ensures that content of message is immutable; however metadata as an object will be unaffected by Object.freeze - thus allowing for additional data;
+  to be assigned later on
+  */
   public metadata: Record<string, any>;
-
-  /**
-   * Creates an instance of Message.
-   * @param props - Properties of the type required for construction.
-   */
-  constructor(props: types.Props = {}) {
-    super(props);
-    if (
-      Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) === undefined
-    ) {
-      Object.freeze(this);
-    }
-  }
-
-  /**
-   * Constructs Message.
-   * @param props - Properties of the type required for construction.
-   * @remarks
-   * Since Messages by default should always be immutable, we use this hook to freeze the
-   * message instance.
-   * However, if there are initializing properties involved, construction and
-   * freezing object is required to be done manually.
-   */
-  protected construct(props: types.Props = {}): void {
-    Object.assign(this, this.processProps(props));
-  }
 
   /**
    * Processes properties for Message.
@@ -72,7 +48,7 @@ export abstract class Message extends Serializable
   }
 
   /**
-   * Assigns metadata to message via reflection.
+   * Assigns metadata to message.
    * @param props - Metadata properties object with all information related to `Message`.
    */
   public assignMetadata(props: Record<string, any>): void {
@@ -97,7 +73,7 @@ export abstract class Message extends Serializable
    * @returns  Returns metadata assigned to the message as an object.
    */
   public getMetadata(): Record<string, any> {
-    return this.metadata;
+    return this.metadata || {};
   }
 
   /**
