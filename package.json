@@ -90,7 +90,7 @@
     "gulp": "^4.0.2",
     "gulp-connect": "^5.7.0",
     "gulp-typedoc": "^2.2.4",
-    "husky": "^3.0.9",
+    "husky": "^4.2.3",
     "lint-staged": "^9.5.0",
     "mocha": "^7.1.0",
     "prettier": "^1.19.1",
