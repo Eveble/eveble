@@ -98,18 +98,6 @@ export class Entity extends classes(
   }
 
   /**
-   * Clones entity state while preserving any other nested types.
-   * @return Cloned state as an object.
-   * @remarks
-   * Use with precaution, for internal use case only. Used to make simplified DSL validation.
-   */
-  public clone(): Record<string, any> {
-    const propKeys = Object.keys(this.getPropTypes());
-    const copy = deepcopy(this);
-    return { ...pick(copy, propKeys) } as Record<string, any>;
-  }
-
-  /**
    * Sets current action for asserting state of `Entity`.
    * @param action - Name of action to be taken or `Command` that is handled.
    * @return Instance implementing `Asserter` interface.
