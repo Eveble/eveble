@@ -14,7 +14,12 @@ import {
 } from '../constants/metadata-keys';
 
 /**
- * Annotates method as a handler for type(`Command` or other) - type that is used as first method paramter(i.e. for example below `MyCommand`).
+ * Annotates method parameter as a handler for `Command` type(or other) - type that is
+ * used as first method paramter(i.e. for example below `MyCommandHandlingMethod` with
+ *  paramter `MyCommand`).
+ * @param target - Target which method parameter is being decorated.
+ * @param methodName - Method name which parameter is being decorated.
+ * @param index - Index number of the parameter that is being decorated.
  * @remarks
  * Since decorator is **executed before class instance is ever created**, we need to
  * solve the issue of registered handlers **leaking** in between multiple classes
@@ -35,55 +40,56 @@ import {
  * }
  *
  * class MyClass extends OneToOneHandlingMixin {
- *  @handle()
- *  MyCommandHandlingMethod(command: MyCommand) {
+ *  MyCommandHandlingMethod(@handle command: MyCommand) {
  *    return true;
  *  }
  * }
  * const instance = new MyClass();
  * expect(instance.getHandlers()).to.be.eql(
- * new Map([['MyCommand', instance.MyCommandHandlingMethod]])
+ * new Map([[MyCommand, instance.MyCommandHandlingMethod]])
  * );
  *```
  */
-export function handle(): any {
-  return function(target: any, key: string) {
-    if (!instanceOf<types.Controller>(target)) {
-      throw new InvalidControllerError(
-        getTypeName(target.constructor) as types.TypeName
-      );
-    }
+export function handle(
+  target: Record<string, any>,
+  methodName: string,
+  index: number
+): void {
+  if (!instanceOf<types.Controller>(target)) {
+    throw new InvalidControllerError(
+      getTypeName(target.constructor) as types.TypeName
+    );
+  }
 
-    const params = Reflect.getMetadata('design:paramtypes', target, key);
-    const command = params[0];
+  const params = Reflect.getMetadata('design:paramtypes', target, methodName);
+  const command = params[index];
 
-    if (!(command?.prototype instanceof Command)) {
-      throw new UnhandleableTypeError(
-        getTypeName(target.constructor) as types.TypeName,
-        kernel.describer.describe([Command]),
-        kernel.describer.describe(command)
-      );
-    }
+  if (!(command?.prototype instanceof Command)) {
+    throw new UnhandleableTypeError(
+      getTypeName(target.constructor) as types.TypeName,
+      kernel.describer.describe([Command]),
+      kernel.describer.describe(command)
+    );
+  }
 
-    const typeName = getTypeName(target.constructor);
-    // Ensure that container is only assigned per class and there is no
-    // reference leakage.
-    const isHandling: boolean =
-      Reflect.getMetadata(HANDLER_KEY, target.constructor) === typeName;
-    if (!isHandling) {
-      Reflect.defineMetadata(
-        COMMAND_HANDLERS_CONTAINER_KEY,
-        new Map(),
-        target.constructor.prototype
-      );
-      // Flag that target is versionable for further reference
-      Reflect.defineMetadata(HANDLER_KEY, typeName, target.constructor);
-    }
-    // Set the command handler
-    const handlers = Reflect.getMetadata(
+  const typeName = getTypeName(target.constructor);
+  // Ensure that container is only assigned per class and there is no
+  // reference leakage.
+  const isHandling: boolean =
+    Reflect.getMetadata(HANDLER_KEY, target.constructor) === typeName;
+  if (!isHandling) {
+    Reflect.defineMetadata(
       COMMAND_HANDLERS_CONTAINER_KEY,
+      new Map(),
       target.constructor.prototype
     );
-    handlers.set(command, target[key]);
-  };
+    // Flag that target is versionable for further reference
+    Reflect.defineMetadata(HANDLER_KEY, typeName, target.constructor);
+  }
+  // Set the command handler
+  const handlers = Reflect.getMetadata(
+    COMMAND_HANDLERS_CONTAINER_KEY,
+    target.constructor.prototype
+  );
+  handlers.set(command, target[methodName]);
 }
