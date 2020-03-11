@@ -89,7 +89,7 @@ export class ExtendableError extends Error {
    * @param props - Provided properties durning construction of error.
    * @returns Filled properties Object for ExtendableError instance.
    */
-  protected fillErrorProps(props: types.ErrorProps): types.ErrorProps {
+  public fillErrorProps(props: types.ErrorProps): types.ErrorProps {
     const errorProps = props;
     errorProps.message = props.message;
     errorProps.name = this.constructor.name;
