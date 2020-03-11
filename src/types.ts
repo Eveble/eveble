@@ -780,6 +780,27 @@ export namespace types {
     isObserving(): boolean;
   }
 
+  export interface Snapshotter {
+    makeSnapshotOf(
+      eventSourceable: EventSourceable
+    ): Promise<string | undefined>;
+    getSnapshotOf(
+      EventSourceableType: EventSourceableType,
+      eventSourceableId: string | Stringifiable
+    ): Promise<EventSourceable | undefined>;
+  }
+
+  export interface SnapshotStorage {
+    addSnapshot(eventSourceable: EventSourceable): Promise<string | undefined>;
+    getSnapshotById(
+      EventSourceableType: EventSourceableType,
+      eventSourceableId: string | Stringifiable
+    ): Promise<EventSourceable | undefined>;
+    updateSnapshot(
+      eventSourceable: EventSourceable,
+      lastSnapshot?: EventSourceable
+    ): Promise<boolean>;
+  }
   export interface Client extends Definable, Stateful {
     getId(): string | Stringifiable;
     initialize(): Promise<void>;
@@ -792,6 +813,15 @@ export namespace types {
     serialize(commit: Commit): Record<string, any>;
     deserialize(serializedCommit: Record<string, any>): Commit;
   }
+
+  export interface SnapshotSerializer {
+    serialize(eventSourceable: EventSourceable): string;
+    deserialize(
+      EventSourceableType: EventSourceableType,
+      serializedEventSourceable: string
+    ): EventSourceable;
+  }
+
   export type SerializedTypeForMongoDB = {
     type: string;
     data: {
