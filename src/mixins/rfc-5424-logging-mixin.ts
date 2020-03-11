@@ -1,5 +1,7 @@
+import { injectable } from '@parisholley/inversify-async';
 import { types } from '../types';
 
+@injectable()
 export class RFC5424LoggingMixin {
   /**
    * Logs emergency system is unusable.
