@@ -103,7 +103,7 @@
     "rollup-plugin-sourcemaps": "^0.5.0",
     "rollup-plugin-typescript2": "^0.26.0",
     "sinon": "^9.0.1",
-    "sinon-chai": "^3.3.0",
+    "sinon-chai": "^3.5.0",
     "ts-node": "^8.5.0",
     "ts-sinon": "^1.0.24",
     "typedoc": "^0.15.6",
