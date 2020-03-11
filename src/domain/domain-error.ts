@@ -2,4 +2,4 @@ import { SerializableError } from '../components/serializable-error';
 import { define } from '../decorators/define';
 
 @define('DomainError')
-export class DomainError extends SerializableError {}
+export abstract class DomainError extends SerializableError {}
