@@ -1,6 +1,7 @@
 import { isEmpty } from 'lodash';
 import { OneOf } from 'typend';
 import { getTypeName, TypeName } from '@eveble/helpers';
+import { injectable } from '@parisholley/inversify-async';
 import { ExtendableError } from '../components/extendable-error';
 import { kernel } from '../core/kernel';
 import { types } from '../types';
@@ -27,6 +28,7 @@ export class InvalidStateError extends StateError {
   }
 }
 
+@injectable()
 export class StatefulMixin implements types.Stateful {
   public state: types.State;
 
