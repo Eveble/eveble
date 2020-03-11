@@ -9,3 +9,7 @@ export const LOGGING_LEVELS = {
   info: 6, // Informational: informational messages
   debug: 7, // Debug: debug-level messages
 };
+
+export const DEFAULTS = {
+  LOGGING_LEVELS,
+};
