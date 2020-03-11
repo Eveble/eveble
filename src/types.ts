@@ -637,5 +637,24 @@ export namespace types {
     from(...sources: Record<string, any>[]): EventSourceable;
   }
 
+  /*
+  INFRASTRUCTURE
+  */
+  export interface Router {
+    EventSourceableType: EventSourceableType;
+    InitializingMessageType: MessageType<Command | Event>;
+    routedCommands: MessageType<Command>[];
+    routedEvents: MessageType<Event>[];
+    initialize(): void;
+  }
+
+  export interface RouterType {
+    new (
+      EventSourceableType?: EventSourceableType,
+      InitializingMessageType?: MessageType<Command | Event>,
+      routedCommands?: MessageType<Command>[],
+      routedEvents?: MessageType<Event>[]
+    ): Router;
+  }
   }
 }
