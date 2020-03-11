@@ -169,5 +169,22 @@ describe('EventBus', function() {
       expect(firstHook).to.have.been.calledWithExactly(event);
       expect(secondHook).to.have.been.calledWithExactly(event);
     });
+    it('allows for overriding onPublish hook', async () => {
+      const firstHook = sinon.spy();
+      const secondHook = sinon.spy();
+
+      const eventBus = new EventBus();
+      eventBus.onPublish('my-id', firstHook);
+      eventBus.onPublish('my-id', secondHook, true);
+      eventBus.subscribeTo(MyEvent, sinon.stub());
+
+      const event = new MyEvent({
+        sourceId: 'my-target-id',
+        key: 'my-string',
+      });
+      await eventBus.publish(event);
+      expect(firstHook).to.have.not.been.called;
+      expect(secondHook).to.have.been.calledWithExactly(event);
+    });
   });
 });
