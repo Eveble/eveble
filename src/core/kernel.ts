@@ -1,10 +1,13 @@
-import env from 'getenv';
+import getenv from 'getenv';
 import { typend } from 'typend';
 import { isMocha, isMochaInWatchMode } from '@eveble/helpers';
 import { BINDINGS } from '../constants/bindings';
 import { Library } from './library';
 import { types } from '../types';
-import { UnavailableSerializerError } from './core-errors';
+import {
+  UnavailableSerializerError,
+  UnavailableAsserterError,
+} from './core-errors';
 
 export class Kernel {
   public injector?: types.Injector;
@@ -18,6 +21,8 @@ export class Kernel {
   private _library: types.Library;
 
   private _serializer?: types.Serializer;
+
+  private _asserter?: types.Asserter;
 
   private _config: types.KernelConfig;
 
@@ -104,6 +109,22 @@ export class Kernel {
   }
 
   /**
+   * Returns asserter assigned to Kernel or one from IoC container(if container is assigned to Kernel).
+   * @returns Instance implementing `types.Asserter` interface.
+   */
+  public get asserter(): types.Asserter {
+    if (this.injector?.isBound(BINDINGS.Asserter)) {
+      return this.injector?.get<types.Asserter>(BINDINGS.Asserter);
+    }
+
+    if (this._asserter !== undefined) {
+      return this._asserter;
+    }
+
+    throw new UnavailableAsserterError();
+  }
+
+  /**
    * Sets converter on Kernel and IoC container(if container is assigned to Kernel).
    * @param converter - Instance implementing `Converter` interface.
    */
@@ -162,6 +183,20 @@ export class Kernel {
   }
 
   /**
+   * Sets asserter on Kernel and IoC container(if container is assigned to Kernel).
+   * @param asserter - Instance implementing `Asserter` interface.
+   */
+  public setAsserter(asserter: types.Asserter): void {
+    this._asserter = asserter;
+    // Undefined as testing helper
+    if (this.injector?.isBound(BINDINGS.Asserter)) {
+      this.injector
+        ?.rebind<types.Asserter>(BINDINGS.Asserter)
+        ?.toConstantValue(asserter);
+    }
+  }
+
+  /**
    * Sets the IoC container on Kernel.
    * @param injector - IoC container implementing `Container` interface.
    */
@@ -206,13 +241,20 @@ if (isMocha(global) && isMochaInWatchMode()) {
 }
 const config: types.KernelConfig = {
   conversion: {
-    type: env.string('EVEBLE_CONVERSION_TYPE', 'runtime'),
+    type: getenv.string('EVEBLE_CONVERSION_TYPE', 'runtime') as
+      | 'runtime'
+      | 'manual',
   },
   validation: {
-    type: env.string('EVEBLE_VALIDATION_TYPE', 'runtime'),
+    type: getenv.string('EVEBLE_VALIDATION_TYPE', 'runtime') as
+      | 'runtime'
+      | 'manual',
   },
   describer: {
-    formatting: env.string('EVEBLE_DESCRIBER_FORMATTING', 'default'),
+    formatting: getenv.string('EVEBLE_DESCRIBER_FORMATTING', 'default') as
+      | 'default'
+      | 'compact'
+      | 'debug',
   },
 };
 

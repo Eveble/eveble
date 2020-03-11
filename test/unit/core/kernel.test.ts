@@ -20,6 +20,7 @@ describe(`Kernel`, () => {
   let describer: any;
   let library: any;
   let serializer: any;
+  let asserter: any;
   let config: any;
   let injector: any;
 
@@ -31,6 +32,7 @@ describe(`Kernel`, () => {
     describer = stubInterface<types.Describer>();
     library = stubInterface<types.Library>();
     serializer = stubInterface<types.Serializer>();
+    asserter = stubInterface<types.Asserter>();
     config = stubInterface<types.KernelConfig>();
     injector = stubInterface<types.Injector>();
   });
@@ -263,6 +265,26 @@ describe(`Kernel`, () => {
         instance.setSerializer(otherSerializer);
         expect(instance.serializer).to.be.equal(otherSerializer);
         expect(container.get(BINDINGS.Serializer)).to.be.equal(otherSerializer);
+      });
+    });
+
+    describe('asserter', () => {
+      it('allows to set asserter', () => {
+        const otherAsserter = stubInterface<types.Asserter>();
+        instance.setAsserter(otherAsserter);
+        expect(instance.asserter).to.be.equal(otherAsserter);
+      });
+
+      it('sets asserter on IoC', () => {
+        const container = new Container();
+        instance.setInjector(container);
+
+        const otherAsserter = stubInterface<types.Asserter>();
+        container.bind(BINDINGS.Asserter).toConstantValue(asserter);
+
+        instance.setAsserter(otherAsserter);
+        expect(instance.asserter).to.be.equal(otherAsserter);
+        expect(container.get(BINDINGS.Asserter)).to.be.equal(otherAsserter);
       });
     });
   });
