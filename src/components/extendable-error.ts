@@ -1,4 +1,5 @@
 import { isObject } from 'lodash';
+import getenv from 'getenv';
 import { types } from '../types';
 
 export class ExtendableError extends Error {
@@ -59,14 +60,14 @@ export class ExtendableError extends Error {
     // Extending Error does not propagate `message`
     Object.defineProperty(this, 'message', {
       configurable: true,
-      enumerable: false,
+      enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
       value: message,
       writable: true,
     });
 
     Object.defineProperty(this, 'name', {
       configurable: true,
-      enumerable: false,
+      enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
       value: this.constructor.name,
       writable: true,
     });
@@ -78,7 +79,7 @@ export class ExtendableError extends Error {
 
     Object.defineProperty(this, 'stack', {
       configurable: true,
-      enumerable: false,
+      enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
       value: new Error(message).stack,
       writable: true,
     });
