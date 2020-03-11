@@ -14,7 +14,7 @@ class MyConfig extends Config {
 So property initializers are ALWAYS supported by default in such way.
 */
 export function delegate() {
-  return (target: Object) => {
+  return (target: Record<string, any>): void => {
     Reflect.defineMetadata(DELEGATED_KEY, true, target);
   };
 }
