@@ -1,9 +1,14 @@
-import { postConstruct, inject } from '@parisholley/inversify-async';
+import {
+  postConstruct,
+  inject,
+  injectable,
+} from '@parisholley/inversify-async';
 import { OneToOneHandlingMixin } from './one-to-one-handling-mixin';
 import { types } from '../types';
 import { Command } from '../components/command';
 import { BINDINGS } from '../constants/bindings';
 
+@injectable()
 export class CommandHandlingMixin extends OneToOneHandlingMixin
   implements types.Sender {
   @inject(BINDINGS.CommandBus)
