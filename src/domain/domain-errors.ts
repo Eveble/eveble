@@ -73,6 +73,7 @@ export class InvalidListError extends ListError {
 /*
 VALUE OBJECT ERRORS
 */
+@define('ValueObjectError')
 export class ValueObjectError extends SerializableError {}
 
 /*
