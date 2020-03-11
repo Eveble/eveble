@@ -1,9 +1,11 @@
 import { classes } from 'polytype';
+import { injectable } from '@parisholley/inversify-async';
 import { types } from '../types';
 import { Event } from '../components/event';
 import { OneToManyHandlingMixin } from '../mixins/one-to-many-handling-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';
 
+@injectable()
 export class EventBus extends classes(HookableMixin, OneToManyHandlingMixin)
   implements types.EventBus {
   /**
