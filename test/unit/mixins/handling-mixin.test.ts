@@ -217,14 +217,19 @@ describe('HandlingMixing', function() {
         }
 
         // Stub methods required by Controller interface
-        getHandler(): void {}
+        getHandler(): void {
+          return undefined;
+        }
 
-        getHandlerOrThrow(): void {}
+        getHandlerOrThrow(): void {
+          return undefined;
+        }
 
-        handle(): void {}
+        handle(): void {
+          return undefined;
+        }
 
-        @handle()
-        MyCommandHandlerMethod(command: MyCommand): boolean {
+        MyCommandHandlerMethod(@handle command: MyCommand): boolean {
           return command.key === 'my-string';
         }
       }
@@ -247,14 +252,19 @@ describe('HandlingMixing', function() {
         }
 
         // Stub methods required by Controller interface
-        getHandler(): void {}
+        getHandler(): void {
+          return undefined;
+        }
 
-        getHandlerOrThrow(): void {}
+        getHandlerOrThrow(): void {
+          return undefined;
+        }
 
-        handle(): void {}
+        handle(): void {
+          return undefined;
+        }
 
-        @subscribe()
-        MyEventHandlerMethod(command: MyEvent): boolean {
+        MyEventHandlerMethod(@subscribe command: MyEvent): boolean {
           return command.key === 'my-string';
         }
       }

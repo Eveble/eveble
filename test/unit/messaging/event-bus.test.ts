@@ -1,8 +1,10 @@
 import chai, { expect } from 'chai';
+import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
+import delay from 'delay';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { OneToManyHandlingMixin } from '../../../src/mixins/one-to-many-handling-mixin';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
-import sinon from 'sinon';
 import {
   HandlerExistError,
   UnhandleableTypeError,
@@ -10,8 +12,6 @@ import {
 import { define } from '../../../src/decorators/define';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
-import sinonChai from 'sinon-chai';
-import delay from 'delay';
 
 chai.use(sinonChai);
 
@@ -51,7 +51,9 @@ describe('EventBus', function() {
   describe('handlers registration', () => {
     it('throws UnhandleabeTypeError when provided type is not handleable', () => {
       const eventBus = new EventBus();
-      expect(() => eventBus.registerHandler(MyCommand, sinon.stub())).to.throw(
+      expect(() =>
+        eventBus.registerHandler(MyCommand as any, sinon.stub())
+      ).to.throw(
         UnhandleableTypeError,
         `EventBus: type must be one of: [Event]; got MyCommand`
       );
@@ -107,7 +109,9 @@ describe('EventBus', function() {
 
     it('ensures that events are handled concurrently', async () => {
       const firstSpy = sinon.spy();
-      const delayedFirstHandler = async function(eventInstance) {
+      const delayedFirstHandler = async function(
+        eventInstance: MyEvent
+      ): Promise<void> {
         await delay(5);
         firstSpy(eventInstance);
       };

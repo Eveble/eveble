@@ -12,7 +12,7 @@ import { Event } from '../components/event';
 export class EventHandlingMixin extends OneToManyHandlingMixin
   implements types.Publisher {
   @inject(BINDINGS.EventBus)
-  public eventBus: types.Publisher;
+  public eventBus: types.EventBus;
 
   /**
    * Initializes EventHandlingMixin.
@@ -41,7 +41,7 @@ export class EventHandlingMixin extends OneToManyHandlingMixin
    * Thrown if the handler argument is not a function.
    */
   public registerEventHandler(
-    eventType: types.MessageableType,
+    eventType: types.MessageType<types.Event>,
     handler: types.Handler,
     shouldOverride = false
   ): void {
@@ -58,34 +58,35 @@ export class EventHandlingMixin extends OneToManyHandlingMixin
    * @alias registerEventHandler
    */
   public subscribeTo(
-    event: any,
+    eventType: types.MessageType<types.Event>,
     handler: types.Handler,
     shouldOverride?: boolean
   ): void {
-    this.registerEventHandler(event, handler, shouldOverride);
+    this.registerEventHandler(eventType, handler, shouldOverride);
   }
 
   /**
    * @alias getHandledEvents
    */
-  public getSubscribedEvents(): any[] {
+  public getSubscribedEvents(): types.MessageType<types.Event>[] {
     return this.getHandledEvents();
   }
 
   /**
    * @alias handle
    * @async
+   * @param event - Instance implementing `Event` interface.
    */
-  public async on(eventInstance: Event): Promise<void> {
-    await this.handle(eventInstance);
+  public async on(event: types.Event): Promise<void> {
+    await this.handle(event);
   }
 
   /**
    * Publishes(handles) event instance on event bus.
    * @async
-   * @param {Event} eventInstance
+   * @param event - Instance implementing `Event` interface.
    */
-  public async publish(eventInstance: Event): Promise<void> {
-    await this.eventBus.publish(eventInstance);
+  public async publish(event: types.Event): Promise<void> {
+    await this.eventBus.publish(event);
   }
 }

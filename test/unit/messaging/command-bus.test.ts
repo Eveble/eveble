@@ -43,7 +43,9 @@ describe('CommandBus', function() {
   describe('handlers registration', () => {
     it('throws UnhandleabeTypeError when provided type is not handleable', () => {
       const commandBus = new CommandBus();
-      expect(() => commandBus.registerHandler(MyEvent, sinon.stub())).to.throw(
+      expect(() =>
+        commandBus.registerHandler(MyEvent as any, sinon.stub())
+      ).to.throw(
         UnhandleableTypeError,
         `CommandBus: type must be one of: [Command]; got MyEvent`
       );

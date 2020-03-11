@@ -65,13 +65,11 @@ describe(`EventHandlingMixin`, function() {
   describe('initialization', () => {
     it('sets handler for events with dedicated registration method on initialization', () => {
       class MyController extends EventHandlingMixin {
-        @subscribe()
-        MyEvent(event: MyEvent): boolean {
+        MyEvent(@subscribe event: MyEvent): boolean {
           return event.key === 'my-string';
         }
 
-        @subscribe()
-        MyOtherEvent(event: MyOtherEvent): boolean {
+        MyOtherEvent(@subscribe event: MyOtherEvent): boolean {
           return event.key === 'my-string';
         }
       }
@@ -92,8 +90,7 @@ describe(`EventHandlingMixin`, function() {
 
     it('overrides initialize method from OneToOneHandlingMixin thus not initializing command handlers mappings', () => {
       class MyController extends EventHandlingMixin {
-        @handle()
-        MyCommand(event: MyCommand): boolean {
+        MyCommand(@handle event: MyCommand): boolean {
           return event.key === 'my-string';
         }
       }
@@ -105,7 +102,7 @@ describe(`EventHandlingMixin`, function() {
 
     it(`throws UnhandleableTypeError upon types not subclassing from Command defined as handlers`, () => {
       class MyController extends EventHandlingMixin {
-        subscribes(): Map<types.MessageableType, types.Handler> {
+        subscribes(): Map<types.MessageType<any>, types.Handler> {
           return new Map([[MyCommand, sinon.stub()]]);
         }
       }
@@ -122,7 +119,7 @@ describe(`EventHandlingMixin`, function() {
       class MyController extends EventHandlingMixin {}
       const controller = new MyController();
       expect(() => {
-        controller.registerEventHandler(MyCommand, sinon.stub());
+        controller.registerEventHandler(MyCommand as any, sinon.stub());
       }).to.throw(
         UnhandleableTypeError,
         'MyController: type must be one of: [Event]; got MyCommand'

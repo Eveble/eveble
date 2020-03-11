@@ -1,6 +1,5 @@
 import { getTypeName } from '@eveble/helpers';
 import { isFunction } from 'lodash';
-import { instanceOf } from 'typend';
 import { postConstruct, injectable } from '@parisholley/inversify-async';
 import { HandlingMixin } from './handling-mixin';
 import { kernel } from '../core/kernel';
@@ -15,11 +14,12 @@ import { types } from '../types';
 import { Command } from '../components/command';
 import { Event } from '../components/event';
 import { HANDLERS } from '../constants/literal-keys';
+import { Message } from '../components/message';
 
 @injectable()
 export class OneToOneHandlingMixin extends HandlingMixin
   implements types.Controller {
-  protected [HANDLERS]: Map<types.MessageableType, types.Handler>;
+  protected [HANDLERS]: Map<types.MessageType<types.Message>, types.Handler>;
 
   /**
    * Initializes OneToOneHandlingMixin.
@@ -33,10 +33,12 @@ export class OneToOneHandlingMixin extends HandlingMixin
     this.setupHandlers({
       handlers: this.handles(),
       handleableTypes: [Command],
+      isBoundable: true,
     });
     this.setupHandlers({
       handlers: this.subscribes(),
       handleableTypes: [Event],
+      isBoundable: true,
     });
   }
 
@@ -78,7 +80,7 @@ export class OneToOneHandlingMixin extends HandlingMixin
    * ```
    */
   public registerHandler(
-    messageType: types.MessageableType,
+    messageType: types.MessageType<types.Message>,
     handler: types.Handler,
     shouldOverride = false
   ): void {
@@ -116,9 +118,9 @@ export class OneToOneHandlingMixin extends HandlingMixin
    * Thrown if the message type argument is not implementing `Messageable` interface.
    */
   public getHandler(
-    messageType: types.MessageableType
+    messageType: types.MessageType<types.Message>
   ): types.Handler | undefined {
-    if (!instanceOf<types.Messageable>(messageType.prototype)) {
+    if (!(messageType.prototype instanceof Message)) {
       throw new InvalidMessageableType(kernel.describer.describe(messageType));
     }
     return this.hasHandler(messageType)
@@ -133,7 +135,9 @@ export class OneToOneHandlingMixin extends HandlingMixin
    * @throws {HandlerNotFoundError}
    * Thrown if handler for message type is not found.
    */
-  public getHandlerOrThrow(messageType: types.MessageableType): types.Handler {
+  public getHandlerOrThrow(
+    messageType: types.MessageType<types.Message>
+  ): types.Handler {
     const handler = this.getHandler(messageType);
 
     if (handler === undefined) {
@@ -169,8 +173,10 @@ export class OneToOneHandlingMixin extends HandlingMixin
    * @throws {HandlerNotFoundError}
    * Thrown if handler for type is not found.
    */
-  public async handle(message: types.Messageable): Promise<any> {
-    const handler = this.getHandlerOrThrow(message.constructor);
+  public async handle(message: types.Message): Promise<any> {
+    const handler = this.getHandlerOrThrow(
+      message.constructor as types.MessageType<types.Message>
+    );
     const result = await handler(message);
     return result;
   }
