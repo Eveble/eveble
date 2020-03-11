@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import abbreviate from 'abbreviate';
 import { inject, injectable } from '@parisholley/inversify-async';
 import winston from 'winston';
 import { types } from '../../../types';
@@ -44,7 +45,9 @@ export class DetailedLogFormatter implements types.LogFormatter {
         ? chalk`{${colors.timestamp} ${(entry as any).timestamp}}${separator}`
         : '';
     const label =
-      config.get('flags.isLabeled') && config.get('parts.label') !== undefined
+      config.get('flags.isLabeled') &&
+      config.get('parts.label') !== undefined &&
+      config.get('parts.label').length > 0
         ? chalk`{${colors.label} ${config.get('parts.label')}}${separator}`
         : '';
 
@@ -53,14 +56,26 @@ export class DetailedLogFormatter implements types.LogFormatter {
     let details = '';
 
     if (entry.metadata) {
+      let entryTypeName = entry.typeName;
+      if (config.get('flags.isAbbreviatingSources')) {
+        entryTypeName = this.abbreviate(entry.typeName, config);
+      }
       targetName = config.get('flags.showTarget')
-        ? chalk`${separator}{${colors.target} ${entry.typeName}}`
+        ? chalk`${separator}{${colors.target} ${entryTypeName}}`
         : '';
 
-      if (config.get('flags.showMethod') && entry.methodName !== undefined) {
+      if (
+        config.get('flags.showMethod') &&
+        entry.methodName !== undefined &&
+        entry.methodName.length > 0
+      ) {
         const methodNotation = entry.isStaticMethod() ? '.' : '::';
         const methodType = chalk`{${colors.separator} ${methodNotation}}`;
-        methodName = chalk`${methodType}{${colors.method} ${entry.methodName}}`;
+        let entryMethodName = entry.methodName;
+        if (config.get('flags.isAbbreviatingSources')) {
+          entryMethodName = this.abbreviate(entry.methodName, config);
+        }
+        methodName = chalk`${methodType}{${colors.method} ${entryMethodName}}`;
       }
 
       for (const metadata of entry.metadata.values()) {
@@ -87,5 +102,17 @@ export class DetailedLogFormatter implements types.LogFormatter {
       processed[part] = color.replace(' ', '.');
     }
     return processed;
+  }
+
+  /**
+   * Abbreviates part of log entry.
+   * @param str - Part of log entry.
+   * @param config - `LogTransportConfig` instance.
+   * @returns abbreviate
+   */
+  protected abbreviate(str, config): string {
+    return abbreviate(str, {
+      length: config.get('abbreviationLength'),
+    });
   }
 }

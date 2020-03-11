@@ -93,9 +93,11 @@ describe('ConsoleTransport', function() {
         isColored: true,
         isWholeLineColored: true,
         includeStackTrace: true,
+        isAbbreviatingSources: false,
       },
       timestampFormat: 'YYYY-MM-DDTHH:mm:ss',
       inspectDepth: 0,
+      abbreviationLength: 15,
     });
   });
 
@@ -120,7 +122,7 @@ describe('ConsoleTransport', function() {
         );
       });
 
-      it('does not show label if its not enabled on configuration ', () => {
+      it('does not show label if its not enabled on configuration', () => {
         const winstonLogObj = {
           message: '\u001b[32mmy-message\u001b[39m',
           level: '\u001b[32minfo\u001b[39m',
@@ -135,7 +137,7 @@ describe('ConsoleTransport', function() {
         );
       });
 
-      it('does not show initial if its not set on configuration ', () => {
+      it('does not show initial if its not set on configuration', () => {
         const winstonLogObj = {
           message: '\u001b[32mmy-message\u001b[39m',
           level: '\u001b[32minfo\u001b[39m',
@@ -150,7 +152,7 @@ describe('ConsoleTransport', function() {
         );
       });
 
-      it('does not show timestamp if timestamped is disabled on configuration ', () => {
+      it('does not show timestamp if timestamped is disabled on configuration', () => {
         const winstonLogObj = {
           message: '\u001b[32mmy-message\u001b[39m',
           level: '\u001b[32minfo\u001b[39m',
@@ -165,7 +167,7 @@ describe('ConsoleTransport', function() {
         );
       });
 
-      it('shows label if labeled is enabled and label is set on configuration ', () => {
+      it('shows label if labeled is enabled and label is set on configuration', () => {
         const winstonLogObj = {
           message: '\u001b[32mmy-message\u001b[39m',
           level: '\u001b[32minfo\u001b[39m',
@@ -315,7 +317,7 @@ describe('ConsoleTransport', function() {
       });
 
       describe('formatting configuration', () => {
-        it('omits all log details on simple message with additional simple formatting context ', () => {
+        it('omits all log details on simple message with additional simple formatting context', () => {
           logEntry.options.isSimple = true;
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal('\u001b[32mmy-message\u001b[39m ');
@@ -432,6 +434,25 @@ describe('ConsoleTransport', function() {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m '
+          );
+        });
+      });
+
+      describe('abbreviating sources', () => {
+        it('it allows to abbreviate sources to trim long-named type names', () => {
+          config.set('flags.isAbbreviatingSources', true);
+          config.set('abbreviationLength', 3);
+
+          const str = transport.formatEntry(logEntry);
+          expect(str).to.be.equal(
+            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyC\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyM\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+              'function arguments:\n' +
+              "  first: 'first-value',\n" +
+              "  second: 'second-value',\n" +
+              "  third: 'third-value',\n" +
+              "  fourth: 'fourth-value'\n" +
+              'class properties:\n' +
+              "  first: 'first-value', second: [Object]"
           );
         });
       });

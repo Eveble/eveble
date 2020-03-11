@@ -31,7 +31,7 @@ export class ConsoleTransport extends LogTransport
 
   /**
    * Creates a ConsoleTransport.
-   * @param level - Level for which priority logging will only be don(less than or equal to this level).
+   * @param level - Level for which priority logging will only be done(less than or equal to this level).
    * @param config - `LogTransportConfig` instance.
    * @param format - Optional Winston's formatting.
    */
@@ -123,7 +123,7 @@ export class ConsoleTransport extends LogTransport
    */
   public formatEntry(entry: winston.LogEntry | types.LogEntry): string {
     const isSimple = entry instanceof Log && entry?.options?.isSimple === true;
-    let str;
+    let str: string;
     if (isSimple) {
       str = this.simpleFormatter.format(entry);
     } else {
