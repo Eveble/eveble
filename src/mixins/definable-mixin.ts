@@ -1,8 +1,9 @@
-import { pick, cloneDeep, isEqual } from 'lodash';
+import { pick, isEqual } from 'lodash';
 import { types as typendTypes, Class, getMatchingParentProto } from 'typend';
 import { getTypeName, TypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
 import { injectable } from '@parisholley/inversify-async';
+import deepClone from '@jsbits/deep-clone';
 import { types } from '../types';
 import { kernel } from '../core/kernel';
 import { toPlainObject, isPlainRecord } from '../utils/helpers';
@@ -118,7 +119,8 @@ export class DefinableMixin implements types.Definable {
    */
   public toPlainObject(): types.Props {
     const propsKeys: string[] = Object.keys(this.getPropTypes());
-    return cloneDeep(pick(toPlainObject(this), propsKeys));
+    const plainObj = deepClone(toPlainObject(this));
+    return pick(plainObj, propsKeys);
   }
 
   /**
