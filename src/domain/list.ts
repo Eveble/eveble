@@ -1,4 +1,5 @@
 import { isFunction, pull, last } from 'lodash';
+import getenv from 'getenv';
 import { types } from '../types';
 import { kernel } from '../core/kernel';
 import {
@@ -38,15 +39,15 @@ export class List<T extends types.Serializable> extends Array {
     } else {
       super();
       Object.defineProperty(this, SOURCE_KEY, {
-        enumerable: false,
+        enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
         value: source,
       });
       Object.defineProperty(this, LIST_KEY, {
-        enumerable: false,
+        enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
         value: listKey,
       });
       Object.defineProperty(this, SERIALIZABLE_TYPE_KEY, {
-        enumerable: false,
+        enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
         value: serializableType,
       });
 
@@ -147,7 +148,6 @@ export class List<T extends types.Serializable> extends Array {
         element,
       });
     }
-
     this.push(element);
   }
 
@@ -219,7 +219,6 @@ export class List<T extends types.Serializable> extends Array {
       if (serializable[key] === undefined) {
         continue;
       }
-
       if (isFunction(serializable[key].equals)) {
         if (serializable[key].equals(value)) {
           foundSerializable = serializable;
