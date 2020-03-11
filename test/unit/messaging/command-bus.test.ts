@@ -144,5 +144,23 @@ describe('CommandBus', function() {
       expect(firstHook).to.have.been.calledWithExactly(command);
       expect(secondHook).to.have.been.calledWithExactly(command);
     });
+
+    it('allows for overriding onSend hook', async () => {
+      const firstHook = sinon.spy();
+      const secondHook = sinon.spy();
+
+      const commandBus = new CommandBus();
+      commandBus.onSend('my-id', firstHook);
+      commandBus.onSend('my-id', secondHook, true);
+      commandBus.registerHandler(MyCommand, sinon.stub());
+
+      const command = new MyCommand({
+        targetId: 'my-target-id',
+        key: 'my-string',
+      });
+      await commandBus.send(command);
+      expect(firstHook).to.have.not.been.called;
+      expect(secondHook).to.have.been.calledWithExactly(command);
+    });
   });
 });

@@ -40,9 +40,10 @@ export class CommandBus extends classes(HookableMixin, OneToOneHandlingMixin)
    * Registers `onSend` callback hook.
    * @param id - Identifier under which `onSend` hook will be defined.
    * @param hook - Function that will be executed upon sending `Command`.
+   * @param shouldOverride - Flag indicating that hook should be overridden if exist.
    */
-  onSend(id: string, hook: types.Hook): void {
-    this.registerHook('onSend', id, hook);
+  onSend(id: string, hook: types.Hook, shouldOverride = false): void {
+    this.registerHook('onSend', id, hook, shouldOverride);
   }
 
   /**
