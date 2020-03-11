@@ -351,13 +351,10 @@ export namespace types {
   /*
   MODULAR
   */
-  export interface App extends Module {
+  export interface BaseApp extends Stateful {
+    injector: Injector;
     config: Configurable;
-  }
-
-  export interface Module extends Stateful {
-    config: Configurable;
-    initialize(app: App, injector: Injector): void;
+    initialize(): Promise<void>;
     start(): Promise<void>;
     stop(): Promise<void>;
     reset(): Promise<void>;
@@ -366,6 +363,32 @@ export namespace types {
       actionName: string,
       options: ActionInvokingOptions
     ): Promise<void>;
+  }
+
+  export interface App extends BaseApp {
+    send(command: Command): Promise<any>;
+    publish(event: Event): Promise<void>;
+  }
+
+  export interface AppType {
+    new (props?: ModuleProps): App;
+  }
+
+  export interface Module extends Stateful {
+    config: Configurable;
+    initialize(app: BaseApp, injector: Injector): Promise<void>;
+    start(): Promise<void>;
+    stop(): Promise<void>;
+    reset(): Promise<void>;
+    shutdown(): Promise<void>;
+    invokeAction(
+      actionName: string,
+      options: ActionInvokingOptions
+    ): Promise<void>;
+  }
+
+  export interface ModuleType {
+    new (props?: ModuleProps): Module;
   }
 
   export type ActionInvokingOptions = {
@@ -381,7 +404,6 @@ export namespace types {
       | any
       | {
           modules?: Module[];
-          config?: Configurable;
         };
   };
 

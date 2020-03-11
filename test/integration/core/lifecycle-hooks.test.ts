@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { BaseModule } from '../../../src/core/base-module';
+import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';
 import { types } from '../../../src/types';
 
@@ -37,36 +37,66 @@ describe('app lifecycle hooks', function() {
     return hooks;
   };
 
-  class StubbedModule extends BaseModule {
-    beforeInitialize(): any {}
+  class StubbedModule extends Module {
+    beforeInitialize(): any {
+      return undefined;
+    }
 
-    onInitialize(): any {}
+    onInitialize(): any {
+      return undefined;
+    }
 
-    afterInitialize(): any {}
+    afterInitialize(): any {
+      return undefined;
+    }
 
-    beforeStart(): any {}
+    beforeStart(): any {
+      return undefined;
+    }
 
-    onStart(): any {}
+    onStart(): any {
+      return undefined;
+    }
 
-    afterStart(): any {}
+    afterStart(): any {
+      return undefined;
+    }
 
-    beforeStop(): any {}
+    beforeStop(): any {
+      return undefined;
+    }
 
-    onStop(): any {}
+    onStop(): any {
+      return undefined;
+    }
 
-    afterStop(): any {}
+    afterStop(): any {
+      return undefined;
+    }
 
-    beforeReset(): any {}
+    beforeReset(): any {
+      return undefined;
+    }
 
-    onReset(): any {}
+    onReset(): any {
+      return undefined;
+    }
 
-    afterReset(): any {}
+    afterReset(): any {
+      return undefined;
+    }
 
-    beforeShutdown(): any {}
+    beforeShutdown(): any {
+      return undefined;
+    }
 
-    onShutdown(): any {}
+    onShutdown(): any {
+      return undefined;
+    }
 
-    afterShutdown(): any {}
+    afterShutdown(): any {
+      return undefined;
+    }
   }
 
   class FirstModule extends StubbedModule {
@@ -85,35 +115,65 @@ describe('app lifecycle hooks', function() {
       super({ ...props, ...createLifeCycleHookSpies() });
     }
 
-    beforeInitialize(): any {}
+    beforeInitialize(): any {
+      return undefined;
+    }
 
-    onInitialize(): any {}
+    onInitialize(): any {
+      return undefined;
+    }
 
-    afterInitialize(): any {}
+    afterInitialize(): any {
+      return undefined;
+    }
 
-    beforeStart(): any {}
+    beforeStart(): any {
+      return undefined;
+    }
 
-    onStart(): any {}
+    onStart(): any {
+      return undefined;
+    }
 
-    afterStart(): any {}
+    afterStart(): any {
+      return undefined;
+    }
 
-    beforeStop(): any {}
+    beforeStop(): any {
+      return undefined;
+    }
 
-    onStop(): any {}
+    onStop(): any {
+      return undefined;
+    }
 
-    afterStop(): any {}
+    afterStop(): any {
+      return undefined;
+    }
 
-    beforeReset(): any {}
+    beforeReset(): any {
+      return undefined;
+    }
 
-    onReset(): any {}
+    onReset(): any {
+      return undefined;
+    }
 
-    afterReset(): any {}
+    afterReset(): any {
+      return undefined;
+    }
 
-    beforeShutdown(): any {}
+    beforeShutdown(): any {
+      return undefined;
+    }
 
-    onShutdown(): any {}
+    onShutdown(): any {
+      return undefined;
+    }
 
-    afterShutdown(): any {}
+    afterShutdown(): any {
+      return undefined;
+    }
   }
 
   let firstModule: any;

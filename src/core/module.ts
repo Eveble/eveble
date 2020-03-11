@@ -2,7 +2,7 @@ import { isFunction, capitalize } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
 import { instanceOf } from 'typend';
 import { classes } from 'polytype';
-import env from 'getenv';
+import getenv from 'getenv';
 import { StatefulMixin } from '../mixins/stateful-mixin';
 import {
   AppMissingError,
@@ -29,7 +29,7 @@ enum STATES {
   shutdown = 'shutdown',
 }
 
-export abstract class BaseModule extends classes(StatefulMixin)
+export abstract class Module extends classes(StatefulMixin)
   implements types.Stateful, types.Module {
   static STATES = STATES;
 
@@ -37,7 +37,7 @@ export abstract class BaseModule extends classes(StatefulMixin)
 
   public modules: types.Module[];
 
-  public app?: types.App;
+  public app?: types.BaseApp;
 
   public injector: types.Injector;
 
@@ -62,7 +62,7 @@ export abstract class BaseModule extends classes(StatefulMixin)
       this.modules = [];
     }
     this.isResetting = false;
-    this.setState(BaseModule.STATES.constructed);
+    this.setState(Module.STATES.constructed);
   }
 
   /**
@@ -76,7 +76,7 @@ export abstract class BaseModule extends classes(StatefulMixin)
    * Thrown if the injector argument is missing.
    */
   public async initialize(
-    app: types.App,
+    app: types.BaseApp,
     injector: types.Injector
   ): Promise<void> {
     if (app == null) {
@@ -88,10 +88,10 @@ export abstract class BaseModule extends classes(StatefulMixin)
     this.app = app;
     this.injector = injector;
     // Only initialize once
-    if (!this.isInState(BaseModule.STATES.constructed)) {
+    if (!this.isInState(Module.STATES.constructed)) {
       return;
     }
-    this.setState(BaseModule.STATES.configuring);
+    this.setState(Module.STATES.configuring);
 
     await this.initializeLogger();
 
@@ -117,17 +117,17 @@ export abstract class BaseModule extends classes(StatefulMixin)
    */
   public async start(): Promise<void> {
     this.validateState([
-      BaseModule.STATES.initialized,
-      BaseModule.STATES.stopped,
-      BaseModule.STATES.running,
+      Module.STATES.initialized,
+      Module.STATES.stopped,
+      Module.STATES.running,
     ]);
 
-    if (this.isInState(BaseModule.STATES.running)) {
+    if (this.isInState(Module.STATES.running)) {
       return;
     }
 
     await this.runLifeCycleAction('start');
-    this.setState(BaseModule.STATES.running);
+    this.setState(Module.STATES.running);
     this.isResetting = false;
   }
 
@@ -139,17 +139,17 @@ export abstract class BaseModule extends classes(StatefulMixin)
    */
   public async stop(): Promise<void> {
     this.validateState([
-      BaseModule.STATES.initialized,
-      BaseModule.STATES.stopped,
-      BaseModule.STATES.running,
+      Module.STATES.initialized,
+      Module.STATES.stopped,
+      Module.STATES.running,
     ]);
 
-    if (this.isInState(BaseModule.STATES.stopped)) {
+    if (this.isInState(Module.STATES.stopped)) {
       return;
     }
 
     await this.runLifeCycleAction('stop');
-    this.setState(BaseModule.STATES.stopped);
+    this.setState(Module.STATES.stopped);
   }
 
   /**
@@ -162,20 +162,20 @@ export abstract class BaseModule extends classes(StatefulMixin)
    */
   public async reset(): Promise<void> {
     this.validateState([
-      BaseModule.STATES.initialized,
-      BaseModule.STATES.stopped,
-      BaseModule.STATES.running,
+      Module.STATES.initialized,
+      Module.STATES.stopped,
+      Module.STATES.running,
     ]);
 
     if (!this.isAllowedToResetOnProduction()) {
-      throw new InvalidEnvironmentError('reset', env.string('NODE_ENV'));
+      throw new InvalidEnvironmentError('reset', getenv.string('NODE_ENV'));
     }
     if (this.isResetting) {
       return;
     }
 
     this.isResetting = true;
-    const restartRequired = this.isInState(BaseModule.STATES.running);
+    const restartRequired = this.isInState(Module.STATES.running);
     if (restartRequired) {
       await this.stop();
     }
@@ -193,24 +193,28 @@ export abstract class BaseModule extends classes(StatefulMixin)
    */
   public async shutdown(): Promise<void> {
     this.validateState([
-      BaseModule.STATES.initialized,
-      BaseModule.STATES.stopped,
-      BaseModule.STATES.running,
-      BaseModule.STATES.shutdown,
+      Module.STATES.constructed,
+      Module.STATES.initialized,
+      Module.STATES.stopped,
+      Module.STATES.running,
+      Module.STATES.shutdown,
     ]);
 
-    if (this.isInState(BaseModule.STATES.shutdown)) {
+    if (this.isInState(Module.STATES.constructed)) {
+      return;
+    }
+    if (this.isInState(Module.STATES.shutdown)) {
       return;
     }
     if (
-      !this.isInState(BaseModule.STATES.constructed) &&
-      !this.isInState(BaseModule.STATES.stopped)
+      !this.isInState(Module.STATES.constructed) &&
+      !this.isInState(Module.STATES.stopped)
     ) {
       await this.stop();
     }
 
     await this.runLifeCycleAction('shutdown');
-    this.setState(BaseModule.STATES.shutdown);
+    this.setState(Module.STATES.shutdown);
     this.log?.debug(new Log(`shutdown`).on(this).in(this.shutdown));
   }
 
@@ -280,7 +284,7 @@ export abstract class BaseModule extends classes(StatefulMixin)
    * Merge app configuration with module configuration to give the chance for overwriting settings.
    * @param app - Application that requires(depends) module.
    */
-  protected mergeConfigWithApp(app: types.App): void {
+  protected mergeConfigWithApp(app: types.BaseApp): void {
     if (!this.isAppConfig(app.config)) {
       throw new InvalidAppConfigError(kernel.describer.describe(app.config));
     }
@@ -313,7 +317,7 @@ export abstract class BaseModule extends classes(StatefulMixin)
    */
   protected async initializeModules(
     modules: types.Module[],
-    app: types.App,
+    app: types.BaseApp,
     injector: types.Injector
   ): Promise<void> {
     for (const module of modules) {
@@ -356,14 +360,14 @@ export abstract class BaseModule extends classes(StatefulMixin)
   ): Promise<void> {
     await this.invokeActionOnDependentModules('runOnInitializeHooks');
     // Never run this hook twice
-    if (!this.isInState(BaseModule.STATES.configuring)) {
+    if (!this.isInState(Module.STATES.configuring)) {
       return;
     }
 
     this.log?.debug(
       new Log(`onInitialize`).on(this).in(this.runOnInitializeHooks)
     );
-    this.setState(BaseModule.STATES.initializing);
+    this.setState(Module.STATES.initializing);
     // Inject required dependencies into this module
     injector.injectIntoAsync(this);
     // Call custom lifecycle hook if existent
@@ -380,13 +384,13 @@ export abstract class BaseModule extends classes(StatefulMixin)
   protected async runAfterInitializeHooks(): Promise<void> {
     await this.invokeActionOnDependentModules('runAfterInitializeHooks');
     // Never run this hook twice
-    if (!this.isInState(BaseModule.STATES.initializing)) {
+    if (!this.isInState(Module.STATES.initializing)) {
       return;
     }
     this.log?.debug(
       new Log(`afterInitialize`).on(this).in(this.runAfterInitializeHooks)
     );
-    this.setState(BaseModule.STATES.initialized);
+    this.setState(Module.STATES.initialized);
     // Call custom lifecycle hook if existent
     const options: types.ActionInvokingOptions = {
       isLoggable: false,
@@ -439,15 +443,23 @@ export abstract class BaseModule extends classes(StatefulMixin)
    * @returns Returns `true` if is allowed to reset on production, else `false`.
    */
   protected isAllowedToResetOnProduction(): boolean {
-    return !this.isOnProduction();
+    return !this.isInProduction();
   }
 
   /**
    * Evaluates if current environment is on production.
    * @returns Returns `true` if is on production environment, else `false`.
    */
-  public isOnProduction(): boolean {
-    return this.isOnEnv('production');
+  public isInProduction(): boolean {
+    return this.isInEnv('production');
+  }
+
+  /**
+   * Evaluates if current environment is on development.
+   * @returns Returns `true` if is on development environment, else `false`.
+   */
+  public isInDevelopment(): boolean {
+    return this.isInEnv('dev');
   }
 
   /**
@@ -455,7 +467,7 @@ export abstract class BaseModule extends classes(StatefulMixin)
    * @param env - Environment name.
    * @returns Returns `true` if is in environment, else `false`.
    */
-  protected isOnEnv(env: string): boolean {
-    return process.env.NODE_ENV === env;
+  protected isInEnv(env: string): boolean {
+    return getenv.string('NODE_ENV') === env;
   }
 }

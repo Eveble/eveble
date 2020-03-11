@@ -1,11 +1,20 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { inject } from '@parisholley/inversify-async';
-import { BaseModule } from '../../../src/core/base-module';
+import { stubInterface } from 'ts-sinon';
+import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';
+import { types } from '../../../src/types';
+import { BINDINGS } from '../../../src/constants/bindings';
 
 describe('building applications based on modules', () => {
-  const BINDINGS = {
+  let log: any;
+
+  beforeEach(() => {
+    log = stubInterface<types.Logger>();
+  });
+
+  const MY_BINDINGS = {
     Dependency: Symbol.for('Dependency'),
   };
 
@@ -13,19 +22,22 @@ describe('building applications based on modules', () => {
     const dependencyValue = sinon.spy();
 
     class MyApp extends BaseApp {
-      @inject(BINDINGS.Dependency)
+      @inject(MY_BINDINGS.Dependency)
       dependency: any;
     }
 
-    class MyModule extends BaseModule {
+    class MyModule extends Module {
       async onInitialize(): Promise<void> {
-        this.injector.bind(BINDINGS.Dependency).toConstantValue(dependencyValue);
+        this.injector
+          .bind(MY_BINDINGS.Dependency)
+          .toConstantValue(dependencyValue);
       }
     }
 
     const app = new MyApp({
       modules: [new MyModule()],
     });
+    app.injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     await app.initialize();
     expect(app.dependency).to.equal(dependencyValue);
   });
@@ -36,28 +48,28 @@ describe('building applications based on modules', () => {
     let testResult = null;
 
     class MyApp extends BaseApp {
-      @inject(BINDINGS.Dependency)
+      @inject(MY_BINDINGS.Dependency)
       dependency: any;
 
       async onInitialize(): Promise<void> {
-        this.injector.rebind(BINDINGS.Dependency).toConstantValue(appValue);
+        this.injector.rebind(MY_BINDINGS.Dependency).toConstantValue(appValue);
       }
     }
 
-    class FirstModule extends BaseModule {
+    class FirstModule extends Module {
       async onInitialize(): Promise<void> {
-        this.injector.bind(BINDINGS.Dependency).toConstantValue(moduleValue);
+        this.injector.bind(MY_BINDINGS.Dependency).toConstantValue(moduleValue);
       }
 
       async onStart(): Promise<void> {
-        testResult = await this.injector.get(BINDINGS.Dependency);
+        testResult = await this.injector.get(MY_BINDINGS.Dependency);
       }
     }
 
     const app = new MyApp({
       modules: [new FirstModule()],
     });
-
+    app.injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     await app.initialize();
     await app.start();
 

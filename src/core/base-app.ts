@@ -1,6 +1,6 @@
 import * as winston from 'winston';
 import { Container } from './injector';
-import { BaseModule } from './base-module';
+import { Module } from './module';
 import { AppConfig } from '../configs/app-config';
 import { types } from '../types';
 import { Log } from '../components/log-entry';
@@ -14,8 +14,9 @@ import { kernel } from './kernel';
 import { StringifingConverter } from './logging-transports/formatters/converters/stringifing-converter';
 import { SimpleLogFormatter } from './logging-transports/formatters/simple-log-entry-formatter';
 import { DetailedLogFormatter } from './logging-transports/formatters/detailed-log-entry-formatter';
+import { LoggingConfig } from '../configs/logging-config';
 
-export abstract class BaseApp extends BaseModule implements types.App {
+export abstract class BaseApp extends Module implements types.BaseApp {
   public config: types.Configurable;
 
   public injector: types.Injector;
@@ -25,7 +26,7 @@ export abstract class BaseApp extends BaseModule implements types.App {
   public modules: types.Module[];
 
   /**
-   * Creates an instance of Module.
+   * Creates an instance of BaseApp.
    * @param props - Properties for BaseApp.
    * @param props.modules - Optional dependent list of modules.
    * @param props.config - Optional configuration for BaseApp.
@@ -44,6 +45,29 @@ export abstract class BaseApp extends BaseModule implements types.App {
     }
     super(processedProps);
     this.injector = processedProps.injector ?? new Container();
+  }
+
+  /**
+   * Enables debug mode logging on application app.
+   * **Must be enabled prior to initialization**.
+   */
+  public debug(): void {
+    this.config.assign({
+      logging: new LoggingConfig({
+        isEnabled: true,
+        transports: {
+          console: new LogTransportConfig({
+            level: 'debug',
+            timestampFormat: 'mm:ss',
+            flags: {
+              isLabeled: false,
+              isAbbreviatingSources: true,
+            },
+            abbreviationLength: 15,
+          }),
+        },
+      }),
+    });
   }
 
   /**
@@ -98,7 +122,7 @@ export abstract class BaseApp extends BaseModule implements types.App {
    */
   public async afterShutdown(): Promise<void> {
     if (this.config.get('logging.isEnabled')) {
-      await this.log?.stop();
+      this.log?.stop();
     }
   }
 
@@ -202,7 +226,7 @@ export abstract class BaseApp extends BaseModule implements types.App {
     }
     this.log = logger;
 
-    const transportId = 'console';
+    const transportId = BINDINGS.console;
     if (this.config.get(`logging.transports.${transportId}.isEnabled`)) {
       const consoleTransport = await this.createConsoleTransport();
       logger.registerTransport(transportId, consoleTransport);
@@ -221,7 +245,7 @@ export abstract class BaseApp extends BaseModule implements types.App {
       ...RFC5424,
       ...this.config.get('logging.levels'),
     };
-    return new Logger({ levels });
+    return new Logger(levels);
   }
 
   /**
@@ -248,8 +272,8 @@ export abstract class BaseApp extends BaseModule implements types.App {
    * implementation of logging library requires async support.
    */
   protected async startLogging(): Promise<void> {
-    await this.log?.start();
-    if (this.log?.hasTransport(BINDINGS.console)) {
+    this.log?.start();
+    if (this.log?.hasTransport('console')) {
       const consoleTransport = this.log.getTransport(
         BINDINGS.console
       ) as types.LogTransport;
@@ -263,9 +287,7 @@ export abstract class BaseApp extends BaseModule implements types.App {
    */
   protected logStartingMessage(consoleTransport: types.LogTransport): void {
     consoleTransport.info(
-      new Log(
-        this.config.get(`logging.transports.console.messages.start`)
-      ).format({ isSimple: true })
+      new Log(this.config.get(`logging.transports.console.messages.start`))
     );
   }
 
@@ -275,9 +297,7 @@ export abstract class BaseApp extends BaseModule implements types.App {
    */
   protected logExitingMessage(consoleTransport: types.LogTransport): void {
     consoleTransport.info(
-      new Log(
-        this.config.get(`logging.transports.console.messages.exit`)
-      ).format({ isSimple: true })
+      new Log(this.config.get(`logging.transports.console.messages.exit`))
     );
   }
 }
