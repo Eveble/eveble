@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { Collection, PropTypes } from 'typend';
 import { postConstruct } from '@parisholley/inversify-async';
+import { stubInterface } from 'ts-sinon';
 import {
   isDefinable,
   isSerializable,
@@ -10,8 +11,10 @@ import {
   convertObjectToCollection,
   isPlainRecord,
   resolveSerializableFromPropType,
+  isEventSourceableType,
 } from '../../../src/utils/helpers';
 import { define } from '../../../src/decorators/define';
+import { types } from '../../../src/types';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
@@ -36,7 +39,7 @@ describe('helpers', function() {
 
     toJSONValue(): void {}
 
-    schemaVersion: number | undefined;
+    getSchemaVersion(): void {}
 
     transformLegacyProps(): void {}
 
@@ -98,7 +101,7 @@ describe('helpers', function() {
 
   describe('isSerializable', () => {
     it('returns true for defined(@define) class instances implementing Serializable interface', () => {
-      @define('MySerialziable')
+      @define('MySerialziable', { isRegistrable: false })
       class MySerializable extends SerializableStub {}
 
       expect(isSerializable(new MySerializable())).to.be.true;
@@ -220,7 +223,7 @@ describe('helpers', function() {
       });
     });
 
-    it('returns converted Collection to plain object ', () => {
+    it('returns converted Collection to plain object', () => {
       expect(
         toPlainObject(
           new Collection({
@@ -283,6 +286,27 @@ describe('helpers', function() {
     it('returns undefined for nil prop type', () => {
       expect(resolveSerializableFromPropType(null)).to.be.undefined;
       expect(resolveSerializableFromPropType(undefined)).to.be.undefined;
+    });
+  });
+
+  describe('isEventSourceableType', () => {
+    it('returns false for nil', () => {
+      expect(isEventSourceableType(null)).to.be.false;
+      expect(isEventSourceableType(undefined)).to.be.false;
+    });
+
+    it('returns true for value implementing EventSourceableType interface', () => {
+      const EventSourceableType = stubInterface<types.EventSourceableType>();
+      expect(isEventSourceableType(EventSourceableType)).to.be.true;
+    });
+
+    it('returns false for value not implementing EventSourceableType interface', () => {
+      class MyInvalidEventSourceableType {
+        static getTypeName(): string {
+          return 'my-type-name';
+        }
+      }
+      expect(isEventSourceableType(MyInvalidEventSourceableType)).to.be.false;
     });
   });
 });

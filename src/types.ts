@@ -93,6 +93,11 @@ export namespace types {
   export interface Injector extends inversifyTypes.Container {
     injectInto(value: any): void;
     injectIntoAsync(value: any): Promise<void>;
+    bind<T>(
+      serviceIdentifier: inversifyTypes.ServiceIdentifier<T>
+    ): inversifyTypes.BindingToSyntax<T> & {
+      toRoute(EventSourceableType: EventSourceableType): void;
+    };
   }
 
   export type Validator = {

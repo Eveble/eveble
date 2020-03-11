@@ -83,6 +83,19 @@ export class InvalidEnvironmentError extends ModuleError {
 }
 
 /*
+INJECTOR ERRORS
+*/
+export class InjectorError extends ExtendableError {}
+
+export class InvalidEventSourceableError extends InjectorError {
+  constructor(got) {
+    super(
+      `Injector: expected EventSourceableType to be constructor type of EventSourceable, got ${got}`
+    );
+  }
+}
+
+/*
 APP ERRORS
 */
 export class AppError extends ExtendableError {}
