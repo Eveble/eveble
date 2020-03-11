@@ -154,25 +154,6 @@ export class Entity extends classes(
   public isStateSaved(): boolean {
     return this[SAVED_STATE_KEY] !== undefined;
   }
-
-  /**
-   * Sets BDD asserter for `Entity`.
-   * @param asserter - Instance implementing `Asserter` interface.
-   */
-  public static setAsserter(asserter: types.Asserter): void {
-    this.asserter = asserter;
-  }
-
-  /**
-   * Returns BDD asserter for `Entity`.
-   * @returns Instance implementing `Asserter` interface.
-   */
-  public static getAsserter(): types.Asserter {
-    if (this.asserter === undefined) {
-      throw new AsserterNotFoundError(this.getTypeName());
-    }
-    return this.asserter;
-  }
 }
 // Enable conversion of serializable list by default
 Entity.enableSerializableLists();
