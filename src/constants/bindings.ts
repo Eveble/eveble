@@ -23,4 +23,17 @@ export const BINDINGS = {
   CommitPublisher: Symbol.for('CommitPublisher'),
   CommitObserver: Symbol.for('CommitObserver'),
   CommitSerializer: Symbol.for('CommitSerializer'),
+  MongoDB: {
+    library: Symbol.for('MongoDB.library'),
+    clients: {
+      Snapshotter: Symbol.for('MongoDB.clients.Snapshotter'),
+      CommitStore: Symbol.for('MongoDB.clients.CommitStore'),
+      CommandScheduler: Symbol.for('MongoDB.clients.CommandScheduler'),
+    },
+    collections: {
+      Snapshots: Symbol.for('MongoDB.collections.Snapshots'),
+      Commits: Symbol.for('MongoDB.collections.Commits'),
+      ScheduledCommands: Symbol.for('MongoDB.collections.ScheduledCommands'),
+    },
+  },
 };
