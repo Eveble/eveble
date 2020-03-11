@@ -3,6 +3,7 @@ import { isString, has, get, isPlainObject } from 'lodash';
 import { getMatchingParentProto } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
+import { injectable } from '@parisholley/inversify-async';
 import { HOOKABLE_KEY, HOOKS_CONTAINER_KEY } from '../constants/metadata-keys';
 import { ExtendableError } from '../components/extendable-error';
 import { types } from '../types';
@@ -37,6 +38,7 @@ export class HookNotFoundError extends HookError {
   }
 }
 
+@injectable()
 export class HookableMixin implements types.Hookable {
   /**
    * Registers hook by action type and id.
