@@ -1,6 +1,8 @@
+import { injectable } from '@parisholley/inversify-async';
 import { SerializableMixin } from './serializable-mixin';
 import { types } from '../types';
 
+@injectable()
 export class EjsonableMixin extends SerializableMixin {
   /**
    * @alias getTypeName
