@@ -1,5 +1,6 @@
 import { isNumber } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
+import { injectable } from '@parisholley/inversify-async';
 import { types } from '../types';
 import {
   LEGACY_TRANSFORMERS_CONTAINER_KEY,
@@ -50,6 +51,7 @@ export class NotVersionableError extends VersionableError {
   }
 }
 
+@injectable()
 export class VersionableMixin {
   public schemaVersion?: number;
 
