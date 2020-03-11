@@ -2,11 +2,13 @@ import { pick, cloneDeep, isEqual } from 'lodash';
 import { types as typendTypes, Class, getMatchingParentProto } from 'typend';
 import { getTypeName, TypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
+import { injectable } from '@parisholley/inversify-async';
 import { types } from '../types';
 import { kernel } from '../core/kernel';
 import { toPlainObject, isPlainRecord } from '../utils/helpers';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
+@injectable()
 export class DefinableMixin implements types.Definable {
   /**
    * Returns class properties types from whole inheritance tree.
