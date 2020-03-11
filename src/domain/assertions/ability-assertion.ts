@@ -19,6 +19,7 @@ export class AbilityAssertion extends Assertion {
   ensureIsAbleTo(...args: any[]): types.Asserter {
     const action = this.asserter.getAction();
     const entity = this.asserter.getEntity();
+
     entity[SAVE_STATE_METHOD_KEY]();
     entity[action.toString()](...args);
     entity[ROLLBACK_STATE_METHOD_KEY]();
