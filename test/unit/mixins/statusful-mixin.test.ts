@@ -139,7 +139,10 @@ describe(`StatusfulMixin`, function() {
       instance.setStatus(MyClass.STATUSES.pendingPayment);
 
       expect(() =>
-        instance.validateStatus([MyClass.STATUSES.paid, MyClass.STATUSES.refunded])
+        instance.validateStatus([
+          MyClass.STATUSES.paid,
+          MyClass.STATUSES.refunded,
+        ])
       ).to.throw(
         InvalidStatusError,
         `MyClass: expected current status of 'pendingPayment' to be in one of statuses: 'paid, refunded'`

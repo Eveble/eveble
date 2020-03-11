@@ -66,7 +66,7 @@ describe(`VersionableMixin`, function() {
       );
     });
 
-    it('allows for explicit transformer overriding ', () => {
+    it('allows for explicit transformer overriding', () => {
       class MyClass extends VersionableMixin {}
 
       const schemaVersion = 1;
