@@ -232,22 +232,6 @@ describe('Entity', function() {
   });
 
   describe('recording state change', () => {
-    it(`allows to clone state of entity`, () => {
-      const entity = new Person({
-        id: 'my-id',
-        name: 'Foo',
-      });
-      entity.activate();
-      expect(entity.isInState(Person.STATES.active)).to.be.true;
-      const clonedState = entity.clone();
-      entity.setState(Person.STATES.disabled);
-      expect(clonedState).to.be.eql({
-        id: 'my-id',
-        name: 'Foo',
-        state: 'active',
-      });
-    });
-
     it(`assigns properties on entity instance`, () => {
       const entity = new Person({
         id: 'my-id',
