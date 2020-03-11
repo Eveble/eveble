@@ -1,6 +1,6 @@
 import { set, get, has, isEmpty } from 'lodash';
 import merge from 'deepmerge';
-import { InstanceOf, Collection, instanceOf } from 'typend';
+import { InstanceOf, Collection, instanceOf, Optional } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import { Struct } from './struct';
 import { types } from '../types';
@@ -438,6 +438,41 @@ export class Config extends Struct implements types.Configurable {
   }
 
   /**
+   * Create an `Config` from plain object source of properties.
+   * @param props - Properties as object that can contains other nested configurations.
+   * @returns New instance of `Config` with assigned properties.
+   * @throws {ValidationError}
+   * Thrown if the passed properties does not match config property types.
+   */
+  public static from<T>(props: Record<string, any>): T {
+    const propTypes = this.getPropTypes();
+
+    const processedProps = {};
+    for (const [key, PropType] of Object.entries(propTypes)) {
+      let UnwrapedPropType = PropType;
+      if (PropType instanceof Optional) {
+        UnwrapedPropType = PropType[0];
+      }
+      if (UnwrapedPropType instanceof InstanceOf) {
+        UnwrapedPropType = UnwrapedPropType[0];
+      }
+
+      if (props[key] === undefined) {
+        continue;
+      }
+      if (
+        UnwrapedPropType.prototype !== undefined &&
+        UnwrapedPropType.prototype instanceof Config
+      ) {
+        processedProps[key] = new UnwrapedPropType(props[key]);
+      } else {
+        processedProps[key] = props[key];
+      }
+    }
+    return new (this as any)(processedProps);
+  }
+
+  /**
    * Attaches another configuration instance to current configuration and merges
    * all properties. Parent configuration merging child will always have precedence
    * in values assigned on same paths.
@@ -507,6 +542,7 @@ export class Config extends Struct implements types.Configurable {
     delete configCopy.included;
     Object.assign(
       this,
+      // AppConfig configurations should have precedence
       merge(configCopy, this as Record<string, any>, {
         isMergeableObject: isPlainRecord,
       })
