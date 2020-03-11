@@ -9,6 +9,7 @@ import {
 } from 'typend';
 import { METADATA_KEY } from '@parisholley/inversify-async';
 import { isClassInstance } from '@eveble/helpers';
+import decache from 'decache';
 import { types } from '../types';
 
 /**
@@ -140,3 +141,16 @@ export function resolveSerializableFromPropType(
   }
   return type;
 }
+
+/**
+ * Creates instance of EJSON.
+ * @returns De-cached version of EJSON module.
+ * @remarks
+ * By default, EJSON module stores types in variable that is not referenced on the EJSON object
+ * itself. This creates issue when running tests in watch modes(like Mocha's --watch) since the state of EJSON is cached.
+ */
+export const createEJSON = function(): any {
+  decache('@eveble/ejson');
+  // eslint-disable-next-line global-require
+  return require('@eveble/ejson');
+};
