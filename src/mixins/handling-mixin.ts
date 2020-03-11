@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
+import { injectable } from '@parisholley/inversify-async';
 import { kernel } from '../core/kernel';
 import { types } from '../types';
 import { Message } from '../components/message';
@@ -12,6 +13,7 @@ import {
   EVENT_HANDLERS_CONTAINER_KEY,
 } from '../constants/metadata-keys';
 
+@injectable()
 export abstract class HandlingMixin {
   protected [HANDLERS]: Map<
     types.MessageableType,
