@@ -159,3 +159,39 @@ export class ProjectionNotRebuildingError extends ProjectionRebuildingError {
   }
 }
 
+
+/*
+SCHEDULER ERRORS
+*/
+@define('SchedulerError')
+export class SchedulerError extends InfrastructureError {}
+
+@define('CommandSchedulingError')
+export class CommandSchedulingError extends SchedulerError {
+  constructor(
+    jobName: string,
+    assignmentId: string,
+    assignerType: string,
+    assignerId: string,
+    error: string
+  ) {
+    super(
+      `${jobName}: cannot schedule command '${assignmentId}' that was scheduled by '${assignerType}@${assignerId}' do to error '${error}'`
+    );
+  }
+}
+
+@define('CommandUnschedulingError')
+export class CommandUnschedulingError extends SchedulerError {
+  constructor(
+    jobName: string,
+    assignmentId: string,
+    assignerType: string,
+    assignerId: string,
+    error: string
+  ) {
+    super(
+      `${jobName}: cannot cancel command '${assignmentId}' that was scheduled by '${assignerType}@${assignerId}' do to error '${error}'`
+    );
+  }
+}

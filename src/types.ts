@@ -1,6 +1,7 @@
 import { interfaces as inversifyTypes } from '@parisholley/inversify-async';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
+import Agenda from 'agenda';
 import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
@@ -827,6 +828,47 @@ export namespace types {
     disconnect(): Promise<void>;
     reconnect(): Promise<void>;
     isConnected(): boolean;
+  }
+
+  export interface Assignment extends Serializable {
+    assignmentId: string | Stringifiable;
+
+    deliverAt: Date;
+
+    assignerId: string | Stringifiable;
+
+    assignerType: TypeName;
+  }
+
+  export interface ScheduleCommand {
+    command: Command;
+    getAssignment(): Assignment;
+  }
+
+  export interface UnscheduleCommand {
+    assignmentId: string | Stringifiable;
+
+    commandType: TypeName;
+
+    assignerId: string | Stringifiable;
+
+    assignerType: TypeName;
+  }
+
+  export interface CommandScheduler extends Stateful {
+    initialize(): Promise<void>;
+    startScheduling(): Promise<void>;
+    stopScheduling(): Promise<void>;
+    schedule(scheduleCommand: ScheduleCommand): Promise<void>;
+    unschedule(unscheduleCommand: UnscheduleCommand): Promise<boolean>;
+    getJob(
+      commandType: string,
+      assignerId: string | Stringifiable,
+      assignerType: string,
+      assignmentId?: string | Stringifiable
+    ): Promise<ScheduledJob | undefined>;
+    unscheduleAll(): Promise<void>;
+    getInterval(): number;
   }
 
   export interface ScheduledJob extends Definable, Hookable, Stateful {

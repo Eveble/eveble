@@ -46,4 +46,5 @@ export const BINDINGS = {
     },
     jobTransformer: Symbol.for('Agenda.jobTransformer'),
   },
+  CommandScheduler: Symbol.for('CommandScheduler'),
 };
