@@ -779,6 +779,15 @@ export namespace types {
     stopObserving(): Promise<void>;
     isObserving(): boolean;
   }
+
+  export interface Client extends Definable, Stateful {
+    getId(): string | Stringifiable;
+    initialize(): Promise<void>;
+    connect(): Promise<void>;
+    disconnect(): Promise<void>;
+    reconnect(): Promise<void>;
+    isConnected(): boolean;
+  }
   export interface CommitSerializer {
     serialize(commit: Commit): Record<string, any>;
     deserialize(serializedCommit: Record<string, any>): Commit;
