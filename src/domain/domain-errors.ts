@@ -81,9 +81,5 @@ ENTITY ERRORS
 @define('EntityError')
 class EntityError extends DomainError {}
 
-@define('AsserterNotFound')
-export class AsserterNotFoundError extends EntityError {
-  constructor(sourceName: string) {
-    super(`${sourceName}: asserter not found on class constructor`);
   }
 }
