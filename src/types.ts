@@ -865,4 +865,6 @@ export namespace types {
     sentBy: string;
     receivers: Partial<CommitReceiver>[];
   }
+
+  export interface Service extends Sender, Publisher {}
 }
