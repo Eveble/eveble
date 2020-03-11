@@ -29,11 +29,12 @@ export class TypeNotFoundError extends TypeError {
   }
 }
 
-export class InvalidTypeError extends TypeError {
+export class UnregistrableTypeError extends TypeError {
   constructor(got: string) {
     super(`Type '${got}' must implement Serializable interface`);
   }
 }
+
 /*
   MODULE ERRORS
 */
