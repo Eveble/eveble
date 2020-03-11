@@ -1,9 +1,9 @@
 import { stubInterface } from 'ts-sinon';
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
+import sinon from 'sinon';
 import { types } from '../../../../src/types';
 import { AbilityAssertion } from '../../../../src/domain/assertions/ability-assertion';
-import sinon from 'sinon';
 import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
@@ -11,7 +11,7 @@ import {
 
 chai.use(sinonChai);
 
-describe(`Asserter`, () => {
+describe(`AbilityAssertion`, () => {
   let entity: any;
   let asserter: any;
 
@@ -45,6 +45,7 @@ describe(`Asserter`, () => {
 
       entity.myAction = sinon.stub();
       asserter.getAction.returns('myAction');
+      entity[SAVE_STATE_METHOD_KEY] = sinon.stub();
 
       expect(assertion.ensureIsAbleTo(...args)).to.be.equal(asserter);
       expect(entity.myAction).to.be.calledOnce;
@@ -62,7 +63,9 @@ describe(`Asserter`, () => {
       expect(assertion.ensureIsAbleTo(...args)).to.be.equal(asserter);
       expect(entity.myAction).to.be.calledOnce;
       expect(entity.myAction).to.be.calledWithExactly(...args);
-      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(entity.myAction);
+      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(
+        entity.myAction
+      );
     });
   });
 
@@ -87,6 +90,7 @@ describe(`Asserter`, () => {
       entity.myAction = sinon.stub();
       entity.myAction.returns(true);
       asserter.getAction.returns('myAction');
+      entity[SAVE_STATE_METHOD_KEY] = sinon.stub();
 
       expect(assertion.isAbleTo(...args)).to.be.true;
       expect(entity[SAVE_STATE_METHOD_KEY]).to.be.calledBefore(entity.myAction);
@@ -101,7 +105,9 @@ describe(`Asserter`, () => {
       asserter.getAction.returns('myAction');
 
       expect(assertion.isAbleTo(...args)).to.be.true;
-      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(entity.myAction);
+      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(
+        entity.myAction
+      );
     });
 
     it('returns false for failed evaluation', () => {
@@ -126,7 +132,9 @@ describe(`Asserter`, () => {
       asserter.getAction.returns('myAction');
 
       expect(assertion.isAbleTo(...args)).to.be.false;
-      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(entity.myAction);
+      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(
+        entity.myAction
+      );
     });
   });
 });
