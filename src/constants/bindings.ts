@@ -16,4 +16,5 @@ export const BINDINGS = {
   EJSON: Symbol.for('EJSON'),
   Serializer: Symbol.for('Serializer'),
   Asserter: Symbol.for('Asserter'),
+  Router: Symbol.for('Router'),
 };
