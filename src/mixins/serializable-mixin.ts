@@ -76,6 +76,6 @@ export class SerializableMixin {
    * });
    */
   public toJSONValue(): Record<string, any> {
-    return kernel.serializer.toJSONValue(this);
+    return kernel.serializer?.toJSONValue(this);
   }
 }
