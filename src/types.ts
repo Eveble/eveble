@@ -801,6 +801,15 @@ export namespace types {
       lastSnapshot?: EventSourceable
     ): Promise<boolean>;
   }
+
+  export interface Projection {
+    on(event: Event, isRebuildEvent?: boolean): Promise<void>;
+    enterRebuildMode(): Promise<void>;
+    exitRebuildMode(): Promise<void>;
+    invokeAction(actionName: string): Promise<void>;
+    getProjectionName(): string;
+  }
+
   export interface Client extends Definable, Stateful {
     getId(): string | Stringifiable;
     initialize(): Promise<void>;

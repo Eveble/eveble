@@ -136,3 +136,26 @@ export class UndefinedSnapshotterError extends InfrastructureError {
     super(`Snapshotter is not defined on EventSourceableRepository`);
   }
 }
+
+/*
+PROJECTION ERRORS
+*/
+@define('ProjectionRebuildingError')
+export class ProjectionRebuildingError extends InfrastructureError {}
+
+@define('ProjectionAlreadyRebuildingError')
+export class ProjectionAlreadyRebuildingError extends ProjectionRebuildingError {
+  constructor(projectionName: string) {
+    super(`Projection '${projectionName}' is already being rebuilt`);
+  }
+}
+
+@define('ProjectionNotRebuildingError')
+export class ProjectionNotRebuildingError extends ProjectionRebuildingError {
+  constructor(projectionName: string) {
+    super(
+      `Expected projection '${projectionName}' to be in a state of rebuilding`
+    );
+  }
+}
+
