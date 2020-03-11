@@ -553,8 +553,8 @@ export class EJSONSerializerAdapter implements types.Serializer {
    *```
    */
   public toData(serializable: types.Serializable): Record<string, any> {
-    if (!instanceOf<types.Serializable>(serializable)) {
-      throw new InvalidTypeError(kernel.describer.describe(serializable));
+    if (!isSerializable(serializable)) {
+      throw new UnregistrableTypeError(kernel.describer.describe(serializable));
     }
 
     const data: Record<string, any> = {
@@ -565,16 +565,16 @@ export class EJSONSerializerAdapter implements types.Serializer {
       if (serializable[key] === undefined) continue;
 
       const value = serializable[key];
-      if (instanceOf<types.Serializable>(value)) {
-        // This is another type
-        data[key] = this.toData(value);
-      } else if (Array.isArray(value)) {
+      if (Array.isArray(value)) {
         // This is an array of sub values / Serializable
         data[key] = value.map(item => {
           return instanceOf<types.Serializable>(item)
             ? this.toData(item)
             : item;
         });
+      } else if (instanceOf<types.Serializable>(value)) {
+        // This is another type
+        data[key] = this.toData(value);
       } else {
         data[key] = value;
       }
@@ -615,7 +615,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
       if (data[key] === undefined) continue;
 
       const value = data[key];
-      if (value !== null && value[this.getTypeKey()] !== undefined) {
+      if (value !== undefined && value[this.getTypeKey()] !== undefined) {
         // This is a sub-serializable
         props[key] = this.fromData(data[key]);
       } else if (Array.isArray(value)) {
