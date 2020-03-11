@@ -64,7 +64,8 @@
     "typend": "^0.1.0",
     "uuid": "^7.0.2",
     "winston": "^3.2.1",
-    "@jsbits/deep-clone": "^1.1.1"
+    "@jsbits/deep-clone": "^1.1.1",
+    "abbreviate": "^0.0.3"
   },
   "devDependencies": {
     "@eveble/testing-helpers": "0.2.2",
