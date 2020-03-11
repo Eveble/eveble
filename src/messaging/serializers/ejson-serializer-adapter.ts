@@ -1,4 +1,4 @@
-import { inject } from '@parisholley/inversify-async';
+import { inject, injectable } from '@parisholley/inversify-async';
 import { isFunction, partial, isEmpty } from 'lodash';
 import { instanceOf } from 'typend';
 import {
@@ -13,6 +13,7 @@ import { UnparsableValueError } from '../messaging-errors';
 import { TYPE_KEY } from '../../constants/literal-keys';
 import { kernel } from '../../core/kernel';
 
+@injectable()
 export class EJSONSerializerAdapter implements types.Serializer {
   @inject(BINDINGS.EJSON)
   protected ejson: any;
