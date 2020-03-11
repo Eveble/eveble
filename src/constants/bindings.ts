@@ -39,4 +39,11 @@ export const BINDINGS = {
       ScheduledCommands: Symbol.for('MongoDB.collections.ScheduledCommands'),
     },
   },
+  Agenda: {
+    library: Symbol.for('Agenda.library'),
+    clients: {
+      CommandScheduler: Symbol.for('Agenda.clients.CommandScheduler'),
+    },
+    jobTransformer: Symbol.for('Agenda.jobTransformer'),
+  },
 };
