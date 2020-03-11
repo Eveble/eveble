@@ -33,8 +33,8 @@ export class InvalidTypeNameError extends ExtendableError {
  * class MyType {}
  */
 define.beforeDefine = function(
-  target: any,
-  reflectedType: tsruntimeTypes.ReflectedType,
+  _target: any,
+  _reflectedType: tsruntimeTypes.ReflectedType,
   ...args: any[]
 ): void {
   const name = args[0];
