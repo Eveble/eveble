@@ -174,6 +174,56 @@ describe(`Config`, function() {
     });
   });
 
+  describe('static constructor', () => {
+    @define('Config.LoggingConfig')
+    class LoggingConfig extends Config {
+      isEnabled: boolean;
+
+      level: string;
+
+      constructor(props: Partial<LoggingConfig>) {
+        super();
+        Object.assign(this, this.processProps(props));
+      }
+    }
+
+    @define('Config.AppConfig')
+    class AppConfig extends Config {
+      appId: string;
+
+      logging?: LoggingConfig;
+
+      constructor(props: Partial<AppConfig>) {
+        super();
+        Object.assign(this, this.processProps(props));
+      }
+    }
+
+    it('constructs from non-nested configuration properties', () => {
+      const props = {
+        appId: 'my-id',
+      };
+      const appConfig = AppConfig.from<AppConfig>(props);
+      expect(appConfig.appId).to.be.equal('my-id');
+      expect(appConfig.logging).to.be.undefined;
+    });
+
+    it('constructs from nested configuration properties', () => {
+      const props = {
+        appId: 'my-id',
+        logging: {
+          isEnabled: true,
+          level: 'emerg',
+        },
+      };
+      const appConfig = AppConfig.from<AppConfig>(props);
+      expect(appConfig.appId).to.be.equal('my-id');
+      expect(appConfig.logging).to.be.instanceof(LoggingConfig);
+      expect(appConfig.logging?.isEnabled).to.be.equal(true);
+      expect(appConfig.logging?.level).to.be.equal('emerg');
+    });
+  });
+
   describe(`accessors`, () => {
     describe('get', () => {
       it(`returns value from configuration`, () => {
@@ -457,7 +507,7 @@ describe(`Config`, function() {
       );
     });
 
-    it('includes other configurable implementations ', () => {
+    it('includes other configurable implementations', () => {
       @define('Config.First')
       class First extends Config {
         firstKey: string;
