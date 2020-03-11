@@ -28,12 +28,24 @@ export const COMMAND_HANDLERS_CONTAINER_KEY: unique symbol = Symbol(
   'eveble:container:command-handlers'
 );
 
+export const ROUTED_COMMANDS_CONTAINER_KEY: unique symbol = Symbol(
+  'eveble:container:routed-commands'
+);
+
 export const SUBSCRIBER_KEY: unique symbol = Symbol(
   'eveble:controller:subscriber'
 );
 
 export const EVENT_HANDLERS_CONTAINER_KEY: unique symbol = Symbol(
   'eveble:container:event-handlers'
+);
+
+export const ROUTED_EVENTS_CONTAINER_KEY: unique symbol = Symbol(
+  'eveble:container:routed-events'
+);
+
+export const INITIALIZING_MESSAGE_KEY: unique symbol = Symbol(
+  'eveble:controller:initializing-message'
 );
 
 /*
