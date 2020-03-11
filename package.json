@@ -63,6 +63,7 @@
     "typend": "^0.1.0",
     "uuid": "^7.0.2",
     "winston": "^3.2.1",
+    "agenda": "^3.0.0",
     "mongodb": "^3.5.4",
     "saslprep": "^1.0.3",
     "dotenv": "^8.2.0",
@@ -72,6 +73,7 @@
     "abbreviate": "^0.0.3"
   },
   "devDependencies": {
+    "@types/agenda": "^2.0.6",
     "@types/chai": "^4.2.10",
     "@types/chai-as-promised": "^7.1.2",
     "@types/getenv": "^1.0.0",
