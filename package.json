@@ -91,7 +91,7 @@
     "gulp-connect": "^5.7.0",
     "gulp-typedoc": "^2.2.4",
     "husky": "^4.2.3",
-    "lint-staged": "^9.5.0",
+    "lint-staged": "^10.0.8",
     "mocha": "^7.1.0",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
