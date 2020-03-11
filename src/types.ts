@@ -661,5 +661,69 @@ export namespace types {
       routedEvents?: MessageType<Event>[]
     ): Router;
   }
+
+  export interface CommitReceiver extends Serializable, Stateful {
+    state: State;
+    appId: string;
+    workerId?: string;
+    receivedAt: Date;
+    publishedAt?: Date;
+    failedAt?: Date;
+    flagAsReceived(workerId: string | Stringifiable): void;
+    flagAsPublished(workerId: string | Stringifiable): void;
+    flagAsTimeouted(workerId: string | Stringifiable): void;
+    flagAsFailed(workerId: string | Stringifiable): void;
+  }
+
+  export interface Commit extends Serializable {
+    id: string;
+    sourceId: string;
+    version: number;
+    changes: {
+      eventSourceableType: string;
+      commands: Command[];
+      events: Event[];
+    };
+    insertedAt: Date;
+    sentBy: string;
+    receivers: CommitReceiver[];
+    getEventTypeNames(): TypeName[];
+    getCommandTypeNames(): TypeName[];
+    addReceiver(receiver: CommitReceiver): void;
+    getReceiver(appId: string): CommitReceiver | undefined;
+  }
+
+  export type StorageIdentifiers = {
+    commitId?: string;
+    snapshotId?: string;
+  };
+
+  export interface EventSourceableRepository {
+    save(eventSourceable: EventSourceable): Promise<StorageIdentifiers>;
+    find(
+      EventSourceableType: EventSourceableType,
+      eventSourceableId: string | Stringifiable
+    ): Promise<EventSourceable | undefined>;
+    makeSnapshotOf(
+      eventSourceable: EventSourceable
+    ): Promise<string | undefined>;
+    getSnapshotOf(
+      EventSourceableType: EventSourceableType,
+      eventSourceableId: string | Stringifiable
+    ): Promise<EventSourceable | undefined>;
+    isSnapshotting(): boolean;
+  }
+
+  export interface CommitStore {
+    createCommit(eventSourceable: EventSourceable): Promise<Commit>;
+    generateCommitId(): Promise<string>;
+    addCommit(commit: Commit): Promise<string>;
+    getEvents(
+      eventSourceableId: string | Stringifiable,
+      versionOffset?: number
+    ): Promise<Event[] | undefined>;
+    getAllEvents(): Promise<Event[]>;
+    getCommitById(commitId: string): Promise<Commit | undefined>;
+  }
   }
 }
