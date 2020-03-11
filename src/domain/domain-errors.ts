@@ -82,5 +82,14 @@ ENTITY ERRORS
 @define('EntityError')
 export class EntityError extends DomainError {}
 
+@define('SavedStateNotFoundError')
+export class SavedStateNotFoundError extends EntityError {
+  constructor(esTypeName: string, id: string) {
+    super(
+      `${esTypeName}@${id}: expected entity to be have state saved before rollbacking it`
+    );
+  }
+}
+
   }
 }
