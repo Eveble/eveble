@@ -1,4 +1,4 @@
-import { has } from 'lodash';
+import { has, get } from 'lodash';
 import { Message } from './message';
 import { define } from '../decorators/define';
 import { Guid } from '../domain/value-objects/guid';
@@ -6,14 +6,14 @@ import { types } from '../types';
 import { Serializable } from './serializable';
 
 @define('Assignment')
-export class Assignment extends Serializable {
+export class Assignment extends Serializable implements types.Assignment {
   assignmentId: Guid | string; // Assignment id
 
   deliverAt: Date;
 
-  sourceId: Guid | string; // Source of entity that scheduled command
+  assignerId: Guid | string; // Source of entity that scheduled command
 
-  sourceTypeName: types.TypeName; // Entities type name that scheduled command
+  assignerType: types.TypeName; // Entities type name that scheduled command
 }
 
 @define('Command')
@@ -31,12 +31,20 @@ export abstract class Command extends Message
 
   /**
    * Schedules command for delivery at specific time.
-   * @param appointment - Scheduling appointment information.
+   * @param assignment - Scheduling assignment information.
    */
-  schedule(appointment: Assignment): void {
+  schedule(assignment: Assignment): void {
     this.assignMetadata({
-      scheduling: appointment,
+      scheduling: assignment,
     });
+  }
+
+  /**
+   * Returns scheduling assignment if present.
+   * @returns Instance of `Assignment`, else `undefined`.
+   */
+  getAssignment(): Assignment | undefined {
+    return get(this, 'metadata.scheduling', undefined);
   }
 
   /**

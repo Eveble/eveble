@@ -99,8 +99,8 @@ describe('Command', function() {
           const assignment = new Assignment({
             assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: now,
-            sourceId: new Guid(),
-            sourceTypeName: 'MyEventSourceable',
+            assignerId: new Guid(),
+            assignerType: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
           command.schedule(assignment);
@@ -116,8 +116,8 @@ describe('Command', function() {
           const assignment = new Assignment({
             assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: now,
-            sourceId: new Guid(),
-            sourceTypeName: 'MyEventSourceable',
+            assignerId: new Guid(),
+            assignerType: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
           command.schedule(assignment);
@@ -128,8 +128,8 @@ describe('Command', function() {
           const assignment = new Assignment({
             assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: new Date(new Date().getTime() - 1000),
-            sourceId: new Guid(),
-            sourceTypeName: 'MyEventSourceable',
+            assignerId: new Guid(),
+            assignerType: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
           command.schedule(assignment);
@@ -140,8 +140,8 @@ describe('Command', function() {
           const assignment = new Assignment({
             assignmentId: 'my-custom-id-to-identify-scheduled-task',
             deliverAt: new Date(new Date().getTime() + 1000),
-            sourceId: new Guid(),
-            sourceTypeName: 'MyEventSourceable',
+            assignerId: new Guid(),
+            assignerType: 'MyEventSourceable',
           });
           const command = new MyCommand({ targetId: 'my-id' });
           command.schedule(assignment);
@@ -154,25 +154,23 @@ describe('Command', function() {
       context('scheduling', () => {
         it('schedules command to be delivered at specific date with task id', () => {
           const assignmentId = 'my-custom-id-to-identify-scheduled-task';
-          const sourceId = new Guid();
-          const sourceTypeName = 'MyEventSourceable';
+          const assignerId = new Guid();
+          const assignerType = 'MyEventSourceable';
           const deliverAt = now;
 
           const assignment = new Assignment({
             assignmentId,
             deliverAt,
-            sourceId,
-            sourceTypeName,
+            assignerId,
+            assignerType,
           });
 
           const command = new MyCommand({ targetId: 'my-id' });
           command.schedule(assignment);
           const metadata = command.getMetadata();
           expect(metadata?.scheduling?.assignmentId).to.be.equal(assignmentId);
-          expect(metadata?.scheduling?.sourceId).to.be.equal(sourceId);
-          expect(metadata?.scheduling?.sourceTypeName).to.be.equal(
-            sourceTypeName
-          );
+          expect(metadata?.scheduling?.assignerId).to.be.equal(assignerId);
+          expect(metadata?.scheduling?.assignerType).to.be.equal(assignerType);
           expect(metadata?.scheduling?.deliverAt).to.be.equal(deliverAt);
         });
       });
