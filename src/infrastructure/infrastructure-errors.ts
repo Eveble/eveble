@@ -21,6 +21,14 @@ export class CommitConcurrencyError extends InfrastructureError {
   }
 }
 
+@define('EventsNotFoundError')
+export class EventsNotFoundError extends InfrastructureError {
+  constructor(EventSourceableTypeName: string, id: string) {
+    super(
+      `No events found for event sourceable '${EventSourceableTypeName}' with id '${id}'`
+    );
+  }
+}
 /*
 ROUTER ERRORS
 */
@@ -60,5 +68,17 @@ export class UnresolvableIdentifierFromMessageError extends RouterError {
     super(
       `${routerName}: message '${eventTypeName}' is not a valid initializing or handleable message for '${esTypeName}'`
     );
+  }
+}
+
+/*
+SNAPSHOOTING ERRORS
+*/
+@define('SnapshotterError')
+class SnapshotterError extends InfrastructureError {}
+@define('UndefinedSnapshotterError')
+export class UndefinedSnapshotterError extends InfrastructureError {
+  constructor() {
+    super(`Snapshotter is not defined on EventSourceableRepository`);
   }
 }
