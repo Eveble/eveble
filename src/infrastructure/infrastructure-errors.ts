@@ -29,6 +29,25 @@ export class EventsNotFoundError extends InfrastructureError {
     );
   }
 }
+
+@define('AddingCommitFailedError')
+export class AddingCommitFailedError extends InfrastructureError {
+  constructor(storageName: string, commitId: string, appId: string) {
+    super(
+      `${storageName}: adding commit with id '${commitId}' failed on '${appId}'`
+    );
+  }
+}
+
+@define('UpdatingCommitError')
+export class UpdatingCommitError extends InfrastructureError {
+  constructor(storageName: string, commitId: string, appId: string) {
+    super(
+      `${storageName}: updating commit with id '${commitId}' failed on '${appId}'`
+    );
+  }
+}
+
 /*
 ROUTER ERRORS
 */
