@@ -15,6 +15,9 @@ import {
 
 /**
  * Annotates method as a handler for type(`Event` or other)- type that is used as first method paramter(i.e. for example below `MyEvent`).
+ * @param target - Target which method parameter is being decorated.
+ * @param methodName - Method name which parameter is being decorated.
+ * @param index - Index number of the parameter that is being decorated.
  * @remarks
  * Since decorator is **executed before class instance is ever created**, we need to
  * solve the issue of registered handlers **leaking** in between multiple classes
@@ -35,55 +38,56 @@ import {
  * }
  *
  * class MyClass extends OneToOneHandlingMixin {
- *  @subscribe()
- *  MyEventHandlingMethod(command: MyEvent) {
+ *  MyEventHandlingMethod(@subscribe event: MyEvent) {
  *    return true;
  *  }
  * }
  * const instance = new MyClass();
  * expect(instance.getHandlers()).to.be.eql(
- * new Map([['MyEvent', instance.MyEventHandlingMethod]])
+ * new Map([[MyEvent, instance.MyEventHandlingMethod]])
  * );
  *```
  */
-export function subscribe(): any {
-  return function(target: any, key: string) {
-    if (!instanceOf<types.Controller>(target)) {
-      throw new InvalidControllerError(
-        getTypeName(target.constructor) as types.TypeName
-      );
-    }
+export function subscribe(
+  target: Record<string, any>,
+  propertyName: string,
+  index: number
+): void {
+  if (!instanceOf<types.Controller>(target)) {
+    throw new InvalidControllerError(
+      getTypeName(target.constructor) as types.TypeName
+    );
+  }
 
-    const params = Reflect.getMetadata('design:paramtypes', target, key);
-    const event = params[0];
+  const params = Reflect.getMetadata('design:paramtypes', target, propertyName);
+  const event = params[index];
 
-    if (!(event?.prototype instanceof Event)) {
-      throw new UnhandleableTypeError(
-        getTypeName(target.constructor) as types.TypeName,
-        kernel.describer.describe([Event]),
-        kernel.describer.describe(event)
-      );
-    }
+  if (!(event?.prototype instanceof Event)) {
+    throw new UnhandleableTypeError(
+      getTypeName(target.constructor) as types.TypeName,
+      kernel.describer.describe([Event]),
+      kernel.describer.describe(event)
+    );
+  }
 
-    const typeName = getTypeName(target.constructor);
-    // Ensure that container is only assigned per class and there is no
-    // reference leakage.
-    const isSubscribing: boolean =
-      Reflect.getMetadata(SUBSCRIBER_KEY, target.constructor) === typeName;
-    if (!isSubscribing) {
-      Reflect.defineMetadata(
-        EVENT_HANDLERS_CONTAINER_KEY,
-        new Map(),
-        target.constructor.prototype
-      );
-      // Flag that target is versionable for further reference
-      Reflect.defineMetadata(SUBSCRIBER_KEY, typeName, target.constructor);
-    }
-
-    const handlers = Reflect.getMetadata(
+  const typeName = getTypeName(target.constructor);
+  // Ensure that container is only assigned per class and there is no
+  // reference leakage.
+  const isSubscribing: boolean =
+    Reflect.getMetadata(SUBSCRIBER_KEY, target.constructor) === typeName;
+  if (!isSubscribing) {
+    Reflect.defineMetadata(
       EVENT_HANDLERS_CONTAINER_KEY,
+      new Map(),
       target.constructor.prototype
     );
-    handlers.set(event, target[key]);
-  };
+    // Flag that target is versionable for further reference
+    Reflect.defineMetadata(SUBSCRIBER_KEY, typeName, target.constructor);
+  }
+
+  const handlers = Reflect.getMetadata(
+    EVENT_HANDLERS_CONTAINER_KEY,
+    target.constructor.prototype
+  );
+  handlers.set(event, target[propertyName]);
 }
