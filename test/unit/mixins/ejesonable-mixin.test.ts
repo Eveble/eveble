@@ -1,10 +1,10 @@
 import chai, { expect } from 'chai';
-import { kernel } from '../../../src/core/kernel';
 import { stubInterface } from 'ts-sinon';
-import { types } from '../../../src/types';
-import { define } from '../../../src/decorators/define';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import { kernel } from '../../../src/core/kernel';
+import { types } from '../../../src/types';
+import { define } from '../../../src/decorators/define';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
 
 chai.use(sinonChai);
