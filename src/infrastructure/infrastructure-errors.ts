@@ -48,6 +48,31 @@ export class UpdatingCommitError extends InfrastructureError {
   }
 }
 
+@define('AddingSnapshotError')
+export class AddingSnapshotError extends InfrastructureError {
+  constructor(
+    storageName: string,
+    EventSourceableTypeName: string,
+    eventSourceableId: string
+  ) {
+    super(
+      `${storageName}: adding snapshot for event sourceable '${EventSourceableTypeName}' with id '${eventSourceableId}' failed`
+    );
+  }
+}
+@define('UpdatingSnapshotError')
+export class UpdatingSnapshotError extends InfrastructureError {
+  constructor(
+    storageName: string,
+    EventSourceableTypeName: string,
+    eventSourceableId: string
+  ) {
+    super(
+      `${storageName}: updating snapshot for event sourceable '${EventSourceableTypeName}' with id '${eventSourceableId}' failed`
+    );
+  }
+}
+
 /*
 ROUTER ERRORS
 */
