@@ -85,7 +85,7 @@ export class Serializable
    * @param sources - One or more source of properties.
    * @returns New instance of `Serializable` with assigned properties.
    * @throws {ValidationError}
-   * Thrown if the passed properties does not match entities property types.
+   * Thrown if the passed properties does not match serializeble's property types.
    * @example
    *```ts
    * const props1 = {
@@ -110,8 +110,8 @@ export class Serializable
   public static from(...sources: Record<string, any>[]): any {
     const propTypes = this.getPropTypes();
     const propKeys = Object.keys(propTypes);
-
     const pickedProps = {};
+
     for (const source of sources) {
       Object.assign(pickedProps, pick(source, propKeys));
     }
@@ -131,6 +131,13 @@ export class Serializable
       'convert-serializable-list',
       this.prototype.processSerializableList
     );
+  }
+
+  /**
+   * Disables conversion of serializable lists to `List` instances.
+   */
+  public static disableSerializableLists(): void {
+    this.prototype.removeHook('onConstruction', 'convert-serializable-list');
   }
 }
 // Enable conversion of serializable list by default
