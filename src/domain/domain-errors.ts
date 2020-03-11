@@ -7,7 +7,7 @@ import { SerializableError } from '../components/serializable-error';
 LIST ERRORS
 */
 @define('ListError')
-class ListError extends DomainError {}
+export class ListError extends DomainError {}
 
 @define('IdentifiableAlreadyExistsError')
 export class IdentifiableAlreadyExistsError extends ListError {
