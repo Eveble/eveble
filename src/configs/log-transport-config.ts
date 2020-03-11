@@ -64,6 +64,7 @@ export class LogTransportConfig extends Config {
     isColored?: boolean;
     isWholeLineColored?: boolean;
     includeStackTrace?: boolean;
+    isAbbreviatingSources?: boolean;
   } = {
     isTimestamped: true,
     isLabeled: false,
@@ -72,9 +73,12 @@ export class LogTransportConfig extends Config {
     isColored: true,
     isWholeLineColored: true,
     includeStackTrace: true,
+    isAbbreviatingSources: false,
   };
 
   public timestampFormat?: string = 'HH:mm:ss';
+
+  public abbreviationLength?: number = 15;
 
   public inspectDepth?: number = 0;
 

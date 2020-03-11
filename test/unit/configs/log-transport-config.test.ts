@@ -69,6 +69,7 @@ describe('LogTransportConfig', function() {
           isColored: PropTypes.instanceOf(Boolean).isOptional,
           isWholeLineColored: PropTypes.instanceOf(Boolean).isOptional,
           includeStackTrace: PropTypes.instanceOf(Boolean).isOptional,
+          isAbbreviatingSources: PropTypes.instanceOf(Boolean).isOptional,
         }).isOptional
       );
     });
@@ -81,6 +82,12 @@ describe('LogTransportConfig', function() {
 
     it('takes optional inspectDepth property as a number', () => {
       expect(LogTransportConfig.getPropTypes().inspectDepth).to.be.eql(
+        PropTypes.instanceOf(Number).isOptional
+      );
+    });
+
+    it('takes optional abbreviationLength property as a number', () => {
+      expect(LogTransportConfig.getPropTypes().abbreviationLength).to.be.eql(
         PropTypes.instanceOf(Number).isOptional
       );
     });
@@ -125,9 +132,11 @@ describe('LogTransportConfig', function() {
           isColored: true,
           isWholeLineColored: true,
           includeStackTrace: true,
+          isAbbreviatingSources: false,
         },
         timestampFormat: 'HH:mm:ss',
         inspectDepth: 0,
+        abbreviationLength: 15,
       });
     });
   });
