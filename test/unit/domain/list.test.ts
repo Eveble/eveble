@@ -56,7 +56,7 @@ describe('List', function() {
   });
 
   describe('construction', () => {
-    it('takes required: Serializable source, property key under which list is defined, Serializable type and assings them ', () => {
+    it('takes required: Serializable source, property key under which list is defined, Serializable type and assings them', () => {
       const source = new Order({ id: 'my-order-id', items: [] });
       const serializables = [
         new Item({ name: 'first' }),
@@ -143,7 +143,7 @@ describe('List', function() {
       );
     });
 
-    it('throws IdentifiableAlreadyExistsError if type that can be identified already exists ', () => {
+    it('throws IdentifiableAlreadyExistsError if type that can be identified already exists', () => {
       const source = new Company({ id: 'my-company-id', employees: [] });
       const element = new Employee({ id: 'my-employee-id' });
 
