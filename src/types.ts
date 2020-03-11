@@ -828,6 +828,20 @@ export namespace types {
     reconnect(): Promise<void>;
     isConnected(): boolean;
   }
+
+  export interface ScheduledJob extends Definable, Hookable, Stateful {
+    id: string | Stringifiable;
+    state: State;
+    name: string;
+    data: Record<string, any>;
+    priority: 'lowest' | 'low' | 'normal' | 'high' | 'highest' | number;
+    nextRunAt?: Date;
+    completedAt?: Date;
+    lockedAt?: Date;
+    lastRunAt?: Date;
+    failedAt?: Date;
+  }
+
   export interface CommitSerializer {
     serialize(commit: Commit): Record<string, any>;
     deserialize(serializedCommit: Record<string, any>): Commit;
