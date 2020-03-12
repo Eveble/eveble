@@ -16,7 +16,8 @@ Any type or interface exported in 'root' level of declaration is considered
 Types or interfaces enclosed in new dedicated namespace are considered
 contracts building blocks for replaceable parts of the system.
 
-This unclutters the availability of names for any other prioritized contracts that would made naming rea
+This unclutters the availability of names for any other prioritized contracts
+that would made naming just hard.
 */
 export namespace types {
   /*
