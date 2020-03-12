@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { OneOf } from 'typend';
-import { getTypeName, TypeName } from '@eveble/helpers';
+import { getTypeName } from '@eveble/helpers';
 import { injectable } from '@parisholley/inversify-async';
 import { ExtendableError } from '../components/extendable-error';
 import { kernel } from '../core/kernel';
@@ -9,7 +9,7 @@ import { types } from '../types';
 export class StateError extends ExtendableError {}
 
 export class UndefinedStatesError extends StateError {
-  constructor(typeName: TypeName) {
+  constructor(typeName: types.TypeName) {
     super(
       `${typeName}: states are not defined. Please define states as class(MyClass.STATES) property or define your getter as MyClass.prototype.getAvailableStates`
     );
@@ -18,7 +18,7 @@ export class UndefinedStatesError extends StateError {
 
 export class InvalidStateError extends StateError {
   constructor(
-    typeName: TypeName,
+    typeName: types.TypeName,
     currentState: types.State,
     expectedStates: types.State
   ) {
@@ -43,7 +43,9 @@ export class StatefulMixin implements types.Stateful {
   public setState(state: types.State): void {
     const selectableStates = this.getSelectableStates();
     if (isEmpty(selectableStates)) {
-      const typeName: TypeName = getTypeName(this.constructor) as TypeName;
+      const typeName: types.TypeName = getTypeName(
+        this.constructor
+      ) as types.TypeName;
       throw new UndefinedStatesError(typeName);
     }
 
@@ -119,7 +121,9 @@ export class StatefulMixin implements types.Stateful {
       if (error !== undefined) {
         throw error;
       }
-      const typeName: TypeName = getTypeName(this.constructor) as TypeName;
+      const typeName: types.TypeName = getTypeName(
+        this.constructor
+      ) as types.TypeName;
       throw new InvalidStateError(
         typeName,
         this.state,
