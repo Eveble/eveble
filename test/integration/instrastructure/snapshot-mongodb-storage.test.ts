@@ -7,7 +7,7 @@ import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
 import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { createEJSON } from '../../../src/utils/helpers';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
@@ -26,7 +26,7 @@ describe(`SnapshotMongoDBStorage`, function() {
   }
 
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -37,7 +37,7 @@ describe(`SnapshotMongoDBStorage`, function() {
   let storage: types.SnapshotStorage;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

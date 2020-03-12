@@ -18,7 +18,7 @@ import {
 } from '../../../src/infrastructure/infrastructure-errors';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
 
@@ -33,7 +33,7 @@ describe(`AgendaCommandScheduler`, function() {
 
   // Dependencies
   let log: any;
-  let container: Container;
+  let injector: Injector;
   let commandBus: any;
   let agendaClient: any;
   let serializer: any;
@@ -106,26 +106,26 @@ describe(`AgendaCommandScheduler`, function() {
     serializer.stringify.withArgs(command).returns(serializedCommand);
     serializer.parse.withArgs(serializedCommand).returns(command);
 
-    container = new Container();
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container
+    injector = new Injector();
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
       .toConstantValue(commandBus);
-    container
+    injector
       .bind<types.Serializer>(BINDINGS.Serializer)
       .toConstantValue(serializer);
-    container
+    injector
       .bind<Collection>(BINDINGS.MongoDB.collections.ScheduledCommands)
       .toConstantValue(collection);
-    container
+    injector
       .bind<types.AgendaJobTransformer>(BINDINGS.Agenda.jobTransformer)
       .toConstantValue(jobTransformer);
-    container
+    injector
       .bind<AgendaClient>(BINDINGS.Agenda.clients.CommandScheduler)
       .toConstantValue(agendaClient);
 
     scheduler = new AgendaCommandScheduler(jobName, options);
-    container.injectInto(scheduler);
+    injector.injectInto(scheduler);
   });
 
   describe(`construction`, () => {

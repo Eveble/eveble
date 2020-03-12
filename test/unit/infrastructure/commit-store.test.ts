@@ -10,7 +10,7 @@ import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import {
@@ -46,7 +46,7 @@ describe(`CommitStore`, function() {
   const workerId = 'my-worker-id';
   let now: Date;
   let clock: any;
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   let storage: any;
@@ -60,18 +60,18 @@ describe(`CommitStore`, function() {
   beforeEach(() => {
     clock = sinon.useFakeTimers(now.getTime());
 
-    container = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     storage = stubInterface<types.CommitStorage>();
     commitPublisher = stubInterface<types.CommitPublisher>();
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
-    container
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
+    injector
       .bind<types.CommitStorage>(BINDINGS.CommitStorage)
       .toConstantValue(storage);
-    container
+    injector
       .bind<types.CommitPublisher>(BINDINGS.CommitPublisher)
       .toConstantValue(commitPublisher);
   });
@@ -85,7 +85,7 @@ describe(`CommitStore`, function() {
     config.get.withArgs('workerId').returns(workerId);
 
     commitStore = new CommitStore();
-    container.injectInto(commitStore);
+    injector.injectInto(commitStore);
     storage.generateCommitId.returns(undefined);
   });
 

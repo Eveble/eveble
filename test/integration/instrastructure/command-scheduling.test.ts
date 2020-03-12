@@ -37,7 +37,7 @@ import { StatefulAssertion } from '../../../src/domain/assertions/stateful-asser
 import { StatusfulAssertion } from '../../../src/domain/assertions/statusful-assertion';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
 import { kernel } from '../../../src/core/kernel';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import {
   getDatabaseName,
@@ -73,7 +73,7 @@ describe(`Command scheduling`, function() {
   // Kernel
   let asserter: Asserter;
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -90,7 +90,7 @@ describe(`Command scheduling`, function() {
   let taskCompletionPolicy: any;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

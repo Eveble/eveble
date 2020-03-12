@@ -8,7 +8,7 @@ import { AppConfig } from '../../../src/configs/app-config';
 import { MongoDBClient } from '../../../src/infrastructure/clients/mongodb-client';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { MongoDBSnapshotStorageModule } from '../../../src/app/modules/mongodb-snapshot-storage-module';
 import { Log } from '../../../src/components/log-entry';
@@ -23,7 +23,7 @@ describe(`MongoDBSnapshotStorageModule`, function() {
     appId: 'my-app-id',
   });
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   let serializer: any;
@@ -36,7 +36,7 @@ describe(`MongoDBSnapshotStorageModule`, function() {
   let db: any;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     serializer = stubInterface<types.Configurable>();

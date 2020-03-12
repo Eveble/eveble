@@ -6,7 +6,7 @@ import { Snapshotter } from '../../../src/infrastructure/snapshotter';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { Log } from '../../../src/components/log-entry';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { UndefinedSnapshotterFrequencyError } from '../../../src/infrastructure/infrastructure-errors';
@@ -18,7 +18,7 @@ describe(`Snapshotter`, function() {
   @define('Snapshotter.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {}
 
-  let container: Container;
+  let injector: Injector;
   let config: any;
   let log: any;
   let storage: any;
@@ -26,14 +26,14 @@ describe(`Snapshotter`, function() {
   let snapshotter: any;
 
   beforeEach(() => {
-    container = new Container();
+    injector = new Injector();
     config = stubInterface<types.Configurable>();
     log = stubInterface<types.Logger>();
     storage = stubInterface<types.SnapshotStorage>();
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
-    container
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
+    injector
       .bind<types.SnapshotStorage>(BINDINGS.SnapshotStorage)
       .toConstantValue(storage);
 
@@ -44,13 +44,13 @@ describe(`Snapshotter`, function() {
       .returns(versionFrequency);
 
     snapshotter = new Snapshotter();
-    container.injectInto(snapshotter);
+    injector.injectInto(snapshotter);
   });
 
   it(`throws UndefinedSnapshotterFrequencyError when frequency for snapshotting is not set on configuration`, () => {
     const instance = new Snapshotter();
     config.has.withArgs('eveble.Snapshotter.frequency').returns(false);
-    expect(() => container.injectInto(instance)).to.throw(
+    expect(() => injector.injectInto(instance)).to.throw(
       UndefinedSnapshotterFrequencyError,
       `Missing snapshotting frequency on configuration with path: 'eveble.Snapshotter.frequency`
     );

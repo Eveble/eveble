@@ -13,7 +13,7 @@ import {
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { MongoDBCommitStorageModule } from '../../../src/app/modules/mongodb-commit-storage-module';
 import { Module } from '../../../src/core/module';
 import { Log } from '../../../src/components/log-entry';
@@ -28,7 +28,7 @@ describe(`MongoDBCommitStorageModule`, function() {
     appId: 'my-app-id',
   });
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   let serializer: any;
@@ -41,7 +41,7 @@ describe(`MongoDBCommitStorageModule`, function() {
   let db: any;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     serializer = stubInterface<types.Configurable>();

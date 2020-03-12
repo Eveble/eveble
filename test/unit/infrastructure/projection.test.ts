@@ -7,7 +7,7 @@ import { Event } from '../../../src/components/event';
 import { Projection } from '../../../src/infrastructure/projection';
 import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { Log } from '../../../src/components/log-entry';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -57,7 +57,7 @@ describe(`Projection`, function() {
   }
 
   let now: Date;
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let eventBus: any;
   let events: Record<string, Event>;
@@ -68,12 +68,12 @@ describe(`Projection`, function() {
   });
 
   beforeEach(() => {
-    container = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     eventBus = stubInterface<types.EventBus>();
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
 
     events = {
       MyEvent: new MyEvent({
@@ -83,7 +83,7 @@ describe(`Projection`, function() {
     };
 
     projection = new MyProjection();
-    container.injectInto(projection);
+    injector.injectInto(projection);
   });
 
   describe(`projection state`, () => {
@@ -129,7 +129,7 @@ describe(`Projection`, function() {
       }
 
       const instance = new MyOtherProjection();
-      container.injectInto(instance);
+      injector.injectInto(instance);
 
       await instance.on(events.MyEvent);
       expect(instance.hasHandler(MyEvent)).to.be.true;

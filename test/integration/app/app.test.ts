@@ -16,7 +16,7 @@ import { AppConfig } from '../../../src/configs/app-config';
 import { LoggingConfig } from '../../../src/configs/logging-config';
 import { Log } from '../../../src/components/log-entry';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { MongoDBCommitStorageModule } from '../../../src/app/modules/mongodb-commit-storage-module';
 import { MongoDBSnapshotStorageModule } from '../../../src/app/modules/mongodb-snapshot-storage-module';
 import { AgendaCommandSchedulerModule } from '../../../src/app/modules/agenda-command-scheduler-module';
@@ -27,12 +27,12 @@ import { kernel } from '../../../src/core/kernel';
 chai.use(sinonChai);
 
 describe(`App`, function() {
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let originalProcessOn: any;
 
   beforeEach(() => {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
 
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);

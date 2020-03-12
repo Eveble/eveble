@@ -7,7 +7,7 @@ import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { types } from '../../../src/types';
 import { ConsoleTransport } from '../../../src/core/logging-transports/console-transport';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { SimpleLogFormatter } from '../../../src/core/logging-transports/formatters/simple-log-entry-formatter';
 import { DetailedLogFormatter } from '../../../src/core/logging-transports/formatters/detailed-log-entry-formatter';
 import { StringifingConverter } from '../../../src/core/logging-transports/formatters/converters/stringifing-converter';
@@ -16,7 +16,7 @@ import { LogMetadata, Log } from '../../../src/components/log-entry';
 chai.use(sinonChai);
 
 describe('ConsoleTransport', function() {
-  let container: types.Injector;
+  let injector: types.Injector;
   let config: LogTransportConfig;
   let converter: types.LogConverter;
   let simpleFormatter: any;
@@ -46,15 +46,15 @@ describe('ConsoleTransport', function() {
     simpleFormatter = new SimpleLogFormatter(converter);
     detailedFormatter = new DetailedLogFormatter(converter);
 
-    container = new Container();
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
-    container
+    injector = new Injector();
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
+    injector
       .bind<types.LogFormatter>(BINDINGS.SimpleLogFormatter)
       .toConstantValue(simpleFormatter);
-    container
+    injector
       .bind<types.LogFormatter>(BINDINGS.DetailedLogFormatter)
       .toConstantValue(detailedFormatter);
-    container.bind(BINDINGS.winston).toConstantValue(winston);
+    injector.bind(BINDINGS.winston).toConstantValue(winston);
 
     config = new LogTransportConfig({
       isEnabled: true,
@@ -104,7 +104,7 @@ describe('ConsoleTransport', function() {
   describe('formatting logged message', () => {
     beforeEach(() => {
       transport = new ConsoleTransport('debug', config);
-      container.injectInto(transport);
+      injector.injectInto(transport);
     });
 
     context('with message only', () => {
@@ -299,7 +299,7 @@ describe('ConsoleTransport', function() {
         });
 
         transport = new ConsoleTransport('debug', config);
-        container.injectInto(transport);
+        injector.injectInto(transport);
       });
 
       it('formats a message with additional metadata', () => {

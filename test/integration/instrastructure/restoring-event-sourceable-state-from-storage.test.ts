@@ -17,7 +17,7 @@ import {
   OpenTaskList,
 } from '../../domains/task-list/task-commands';
 import { EventsNotFoundError } from '../../../src/infrastructure/infrastructure-errors';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -45,7 +45,7 @@ describe(`Restoring event sourceable state from storage`, function() {
   // Kernel
   let asserter: Asserter;
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -58,7 +58,7 @@ describe(`Restoring event sourceable state from storage`, function() {
   let repository: types.EventSourceableRepository;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

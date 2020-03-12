@@ -7,7 +7,7 @@ import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { LogTransport } from '../../../src/core/log-transport';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 
 chai.use(sinonChai);
 
@@ -25,7 +25,7 @@ describe(`LoggingTransport`, function() {
     ): void;
   }
 
-  let container: types.Injector;
+  let injector: types.Injector;
   let logger: any;
   let client: any;
   const levels = {
@@ -42,8 +42,8 @@ describe(`LoggingTransport`, function() {
   beforeEach(() => {
     logger = stubInterface<types.Logger>();
     client = stubInterface<LoggingClient>();
-    container = new Container();
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
+    injector = new Injector();
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
   });
 
   class MyTransport extends LogTransport {}
@@ -66,7 +66,7 @@ describe(`LoggingTransport`, function() {
     it('annotates logger property for property injection', () => {
       const level = 'my-level';
       const transport = new MyTransport(level);
-      container.injectInto(transport);
+      injector.injectInto(transport);
       expect(transport.logger).to.be.equal(logger);
     });
   });
@@ -79,7 +79,7 @@ describe(`LoggingTransport`, function() {
       };
       const level = 'my-level';
       const transport = new MyTransport(level);
-      container.injectInto(transport);
+      injector.injectInto(transport);
 
       expect(transport.logger).to.be.equal(logger);
       expect((transport as any).first).to.be.instanceof(Function);
@@ -99,7 +99,7 @@ describe(`LoggingTransport`, function() {
       };
       const level = 'my-level';
       const transport = new MyOtherTransport(level);
-      container.injectInto(transport);
+      injector.injectInto(transport);
 
       transport.info();
       expect(spy).to.be.calledOnce;
@@ -111,7 +111,7 @@ describe(`LoggingTransport`, function() {
       logger.levels = levels;
       const level = 'debug';
       const transport = new MyTransport(level);
-      container.injectInto(transport);
+      injector.injectInto(transport);
       expect(transport.isLoggable('emerg')).to.be.true;
       expect(transport.isLoggable('alert')).to.be.true;
       expect(transport.isLoggable('crit')).to.be.true;
@@ -126,7 +126,7 @@ describe(`LoggingTransport`, function() {
       logger.levels = levels;
       const level = 'emerg';
       const transport = new MyTransport(level);
-      container.injectInto(transport);
+      injector.injectInto(transport);
       expect(transport.isLoggable('emerg')).to.be.true;
       expect(transport.isLoggable('alert')).to.be.false;
       expect(transport.isLoggable('crit')).to.be.false;
@@ -147,7 +147,7 @@ describe(`LoggingTransport`, function() {
       logger.levels = levels;
       const level = 'debug';
       const transport = new MyOtherTransport(level);
-      container.injectInto(transport);
+      injector.injectInto(transport);
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);
@@ -163,7 +163,7 @@ describe(`LoggingTransport`, function() {
       logger.levels = levels;
       const level = 'emerg';
       const transport = new MyOtherTransport(level);
-      container.injectInto(transport);
+      injector.injectInto(transport);
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);

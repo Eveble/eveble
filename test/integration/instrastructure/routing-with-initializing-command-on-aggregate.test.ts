@@ -31,7 +31,7 @@ import { EventsNotFoundError } from '../../../src/infrastructure/infrastructure-
 import { DomainException } from '../../../src/domain/domain-exception';
 import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-task-completion-policy';
 import { Asserter } from '../../../src/domain/asserter';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { kernel } from '../../../src/core/kernel';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
@@ -64,7 +64,7 @@ describe(`Routing with initializing Command on Aggregate`, function() {
   // Kernel
   let asserter: Asserter;
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -77,7 +77,7 @@ describe(`Routing with initializing Command on Aggregate`, function() {
   let repository: types.EventSourceableRepository;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

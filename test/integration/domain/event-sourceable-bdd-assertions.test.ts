@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-task-completion-policy';
 import {
@@ -27,7 +27,7 @@ import { kernel } from '../../../src/core/kernel';
 chai.use(chaiAsPromised);
 
 describe(`EventSourceable BDD assertions`, function() {
-  let container: Container;
+  let injector: Injector;
   let asserter: Asserter;
 
   before(() => {
@@ -37,8 +37,8 @@ describe(`EventSourceable BDD assertions`, function() {
   });
 
   beforeEach(() => {
-    container = new Container();
-    container
+    injector = new Injector();
+    injector
       .bind('TaskList.TaskCompletionPolicy')
       .toConstantValue(new InfiniteTaskCompletionPolicy());
 
@@ -86,7 +86,7 @@ describe(`EventSourceable BDD assertions`, function() {
 
     it(`ensures that event sourceable is in expected state`, async () => {
       const taskList = new TaskList(createList);
-      await container.injectIntoAsync(taskList);
+      await injector.injectIntoAsync(taskList);
 
       await taskList.handle(createList);
       await taskList.handle(openList);
@@ -96,7 +96,7 @@ describe(`EventSourceable BDD assertions`, function() {
 
     it(`ensures that event sourceable is in one of expected states`, async () => {
       const taskList = new TaskList(createList);
-      await container.injectIntoAsync(taskList);
+      await injector.injectIntoAsync(taskList);
 
       await taskList.handle(createList);
       await taskList.handle(assignList);
@@ -105,7 +105,7 @@ describe(`EventSourceable BDD assertions`, function() {
 
     it(`throws InvalidStateTransitionError if event sourceable is not in expected state`, async () => {
       const taskList = new TaskList(createList);
-      await container.injectIntoAsync(taskList);
+      await injector.injectIntoAsync(taskList);
 
       await taskList.handle(createList);
       await taskList.handle(openList);
@@ -119,7 +119,7 @@ describe(`EventSourceable BDD assertions`, function() {
 
     it(`throws InvalidStateTransitionError if event sourceable is not in one of expected states`, async () => {
       const taskList = new TaskList(createList);
-      await container.injectIntoAsync(taskList);
+      await injector.injectIntoAsync(taskList);
 
       await taskList.handle(createList);
       await taskList.handle(openList);
@@ -132,7 +132,7 @@ describe(`EventSourceable BDD assertions`, function() {
 
     it(`throws custom error on unexpected state`, async () => {
       const taskList = new TaskList(createList);
-      await container.injectIntoAsync(taskList);
+      await injector.injectIntoAsync(taskList);
 
       await taskList.handle(createList);
       await taskList.handle(openList);
@@ -144,7 +144,7 @@ describe(`EventSourceable BDD assertions`, function() {
 
     it(`ensures that correct error is thrown when entity is wrong state then expected`, async () => {
       const taskList = new TaskList(createList);
-      await container.injectIntoAsync(taskList);
+      await injector.injectIntoAsync(taskList);
 
       await taskList.handle(createList);
       await taskList.handle(openList);

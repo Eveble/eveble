@@ -1,9 +1,9 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { Container } from '@parisholley/inversify-async';
 import sinon from 'sinon';
 import { TSRuntimeConverter, typend, Describer } from 'typend';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { Kernel, kernel } from '../../../src/core/kernel';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -176,15 +176,15 @@ describe(`Kernel`, () => {
       });
 
       it('sets converter on IoC', () => {
-        const container = new Container();
-        instance.setInjector(container);
+        const ioc = new Injector();
+        instance.setInjector(ioc);
 
         const otherConverter = stubInterface<types.Converter>();
-        container.bind(BINDINGS.Converter).toConstantValue(converter);
+        ioc.bind(BINDINGS.Converter).toConstantValue(converter);
 
         instance.setConverter(otherConverter);
         expect(instance.converter).to.be.equal(otherConverter);
-        expect(container.get(BINDINGS.Converter)).to.be.equal(otherConverter);
+        expect(ioc.get(BINDINGS.Converter)).to.be.equal(otherConverter);
       });
     });
 
@@ -196,15 +196,15 @@ describe(`Kernel`, () => {
       });
 
       it('sets validator on IoC', () => {
-        const container = new Container();
-        instance.setInjector(container);
+        const ioc = new Injector();
+        instance.setInjector(ioc);
 
         const otherValidator = stubInterface<types.Validator>();
-        container.bind(BINDINGS.Validator).toConstantValue(validator);
+        ioc.bind(BINDINGS.Validator).toConstantValue(validator);
 
         instance.setValidator(otherValidator);
         expect(instance.validator).to.be.equal(otherValidator);
-        expect(container.get(BINDINGS.Validator)).to.be.equal(otherValidator);
+        expect(ioc.get(BINDINGS.Validator)).to.be.equal(otherValidator);
       });
     });
 
@@ -216,15 +216,15 @@ describe(`Kernel`, () => {
       });
 
       it('sets describer on IoC', () => {
-        const container = new Container();
-        instance.setInjector(container);
+        const ioc = new Injector();
+        instance.setInjector(ioc);
 
         const otherDescriber = stubInterface<types.Describer>();
-        container.bind(BINDINGS.Describer).toConstantValue(describer);
+        ioc.bind(BINDINGS.Describer).toConstantValue(describer);
 
         instance.setDescriber(otherDescriber);
         expect(instance.describer).to.be.equal(otherDescriber);
-        expect(container.get(BINDINGS.Describer)).to.be.equal(otherDescriber);
+        expect(ioc.get(BINDINGS.Describer)).to.be.equal(otherDescriber);
       });
     });
 
@@ -236,15 +236,15 @@ describe(`Kernel`, () => {
       });
 
       it('sets library on IoC', () => {
-        const container = new Container();
-        instance.setInjector(container);
+        const ioc = new Injector();
+        instance.setInjector(ioc);
 
         const otherLibrary = stubInterface<types.Library>();
-        container.bind(BINDINGS.Library).toConstantValue(library);
+        ioc.bind(BINDINGS.Library).toConstantValue(library);
 
         instance.setLibrary(otherLibrary);
         expect(instance.library).to.be.equal(otherLibrary);
-        expect(container.get(BINDINGS.Library)).to.be.equal(otherLibrary);
+        expect(ioc.get(BINDINGS.Library)).to.be.equal(otherLibrary);
       });
     });
 
@@ -256,15 +256,15 @@ describe(`Kernel`, () => {
       });
 
       it('sets serializer on IoC', () => {
-        const container = new Container();
-        instance.setInjector(container);
+        const ioc = new Injector();
+        instance.setInjector(ioc);
 
         const otherSerializer = stubInterface<types.Serializer>();
-        container.bind(BINDINGS.Serializer).toConstantValue(serializer);
+        ioc.bind(BINDINGS.Serializer).toConstantValue(serializer);
 
         instance.setSerializer(otherSerializer);
         expect(instance.serializer).to.be.equal(otherSerializer);
-        expect(container.get(BINDINGS.Serializer)).to.be.equal(otherSerializer);
+        expect(ioc.get(BINDINGS.Serializer)).to.be.equal(otherSerializer);
       });
     });
 
@@ -276,15 +276,15 @@ describe(`Kernel`, () => {
       });
 
       it('sets asserter on IoC', () => {
-        const container = new Container();
-        instance.setInjector(container);
+        const ioc = new Injector();
+        instance.setInjector(ioc);
 
         const otherAsserter = stubInterface<types.Asserter>();
-        container.bind(BINDINGS.Asserter).toConstantValue(asserter);
+        ioc.bind(BINDINGS.Asserter).toConstantValue(asserter);
 
         instance.setAsserter(otherAsserter);
         expect(instance.asserter).to.be.equal(otherAsserter);
-        expect(container.get(BINDINGS.Asserter)).to.be.equal(otherAsserter);
+        expect(ioc.get(BINDINGS.Asserter)).to.be.equal(otherAsserter);
       });
     });
   });

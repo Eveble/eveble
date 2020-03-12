@@ -16,7 +16,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
 import { createEJSON } from '../../../src/utils/helpers';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
@@ -40,7 +40,7 @@ describe(`CommitMongoDBStorage`, function() {
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -163,7 +163,7 @@ describe(`CommitMongoDBStorage`, function() {
   SETUP
   */
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

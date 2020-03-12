@@ -16,7 +16,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import {
   UpdatingCommitError,
   AddingCommitFailedError,
@@ -40,7 +40,7 @@ describe(`CommitMongoDBStorage`, function() {
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';
   let mongoClient: MongoClient;
-  let container: Container;
+  let injector: Injector;
   let collection: Collection;
   let collectionMock: any;
   let commitSerializer: any;
@@ -101,17 +101,17 @@ describe(`CommitMongoDBStorage`, function() {
     collection = mongoClient.db(dbName).collection(collectionName);
     collectionMock = sinon.mock(collection);
 
-    container = new Container();
+    injector = new Injector();
     storage = new CommitMongoDBStorage();
     commitSerializer = stubInterface<types.CommitSerializer>();
 
-    container
+    injector
       .bind<types.CommitSerializer>(BINDINGS.CommitSerializer)
       .toConstantValue(commitSerializer);
-    container
+    injector
       .bind<Collection<any>>(BINDINGS.MongoDB.collections.Commits)
       .toConstantValue(collection);
-    container.injectInto(storage);
+    injector.injectInto(storage);
   });
 
   after(async () => {

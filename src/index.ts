@@ -65,7 +65,7 @@ export {
   InvalidTransportIdError,
   TransportExistsError,
 } from './core/core-errors';
-export { Container } from './core/injector';
+export { Injector } from './core/injector';
 export { Kernel, kernel } from './core/kernel';
 export { Library } from './core/library';
 export { LogTransport } from './core/log-transport';
@@ -235,7 +235,6 @@ export {
   injectable,
   inject,
 } from '@parisholley/inversify-async';
-export { Container as Injector } from './core/injector';
 export { bootstrapLogger } from './utils/logger-bootstrapper';
 /*
 TYPEND

@@ -7,13 +7,13 @@ import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { types } from '../../../src/types';
 import { ConsoleTransport } from '../../../src/core/logging-transports/console-transport';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { Log } from '../../../src/components/log-entry';
 
 chai.use(sinonChai);
 
 describe('ConsoleTransport', function() {
-  let container: types.Injector;
+  let injector: types.Injector;
   let combinedFormat: any;
   let config: LogTransportConfig;
   let simpleFormatter: any;
@@ -65,15 +65,15 @@ describe('ConsoleTransport', function() {
     simpleFormatter = stubInterface<types.Logger>();
     detailedFormatter = stubInterface<types.Logger>();
 
-    container = new Container();
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
-    container
+    injector = new Injector();
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
+    injector
       .bind<types.LogFormatter>(BINDINGS.SimpleLogFormatter)
       .toConstantValue(simpleFormatter);
-    container
+    injector
       .bind<types.LogFormatter>(BINDINGS.DetailedLogFormatter)
       .toConstantValue(detailedFormatter);
-    container.bind(BINDINGS.winston).toConstantValue(winston);
+    injector.bind(BINDINGS.winston).toConstantValue(winston);
 
     config = new LogTransportConfig({
       isEnabled: true,
@@ -129,7 +129,7 @@ describe('ConsoleTransport', function() {
     it('annotates winston property for property injection', () => {
       const level = 'debug';
       const transport = new ConsoleTransport(level, config);
-      container.injectInto(transport);
+      injector.injectInto(transport);
       expect(winston.createLogger).to.be.calledOnce;
     });
   });
@@ -139,7 +139,7 @@ describe('ConsoleTransport', function() {
       it(`creates with logging level assigned from instance`, () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
-        container.injectInto(transport);
+        injector.injectInto(transport);
         expect(winston.createLogger).to.be.calledOnce;
         expect(winston.createLogger.args[0][0].level).to.be.equal('debug');
         expect(transport.client).to.be.equal(winstonLogger);
@@ -148,7 +148,7 @@ describe('ConsoleTransport', function() {
       it(`creates with logging levels assigned from logger instance`, () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
-        container.injectInto(transport);
+        injector.injectInto(transport);
         expect(winston.createLogger).to.be.calledOnce;
         expect(winston.createLogger.args[0][0].levels).to.be.equal(
           logger.levels
@@ -158,7 +158,7 @@ describe('ConsoleTransport', function() {
       it(`creates with winston's console transport`, () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
-        container.injectInto(transport);
+        injector.injectInto(transport);
         expect(winston.createLogger).to.be.calledOnce;
         expect(winston.createLogger.args[0][0].transports).to.be.an('array');
         expect(winston.createLogger.args[0][0].transports).to.have.length(1);
@@ -170,7 +170,7 @@ describe('ConsoleTransport', function() {
       it(`creates with combined format with winston's formatter`, () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
-        container.injectInto(transport);
+        injector.injectInto(transport);
         expect(winston.createLogger).to.be.calledOnce;
         expect(winston.createLogger.args[0][0].format).to.be.equal(
           combinedFormat
@@ -181,7 +181,7 @@ describe('ConsoleTransport', function() {
     it('assings log colors from configuration to winston', () => {
       const level = 'debug';
       const transport = new ConsoleTransport(level, config);
-      container.injectInto(transport);
+      injector.injectInto(transport);
       expect(winston.addColors).to.be.calledOnce;
       expect(winston.addColors).to.be.calledWithExactly(config.logColors);
     });
@@ -193,7 +193,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.errors).to.be.calledWith({ stack: true });
         });
 
@@ -202,7 +202,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.errors).to.be.calledWith({
             stack: false,
           });
@@ -215,7 +215,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.timestamp).to.be.calledWith({
             format: config.get('timestampFormat'),
           });
@@ -228,7 +228,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.timestamp).to.be.calledWith({
             format: timestampFormat,
           });
@@ -239,7 +239,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.timestamp).to.not.be.called;
         });
       });
@@ -251,7 +251,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.colorize).to.be.calledWith({
             all: false,
           });
@@ -263,7 +263,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.colorize).to.be.calledWith({
             all: true,
           });
@@ -274,7 +274,7 @@ describe('ConsoleTransport', function() {
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
           expect(winston.format.colorize).to.not.be.called;
         });
       });
@@ -287,7 +287,7 @@ describe('ConsoleTransport', function() {
 
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
-        container.injectInto(transport);
+        injector.injectInto(transport);
         expect(winston.format.combine).to.be.calledOnce;
         expect(winston.format.combine).to.be.calledWith(
           'errors',
@@ -301,7 +301,7 @@ describe('ConsoleTransport', function() {
         it('uses simple formatter for log entries with simple formatting enabled', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
 
           const log = new Log('my-message').format({ isSimple: true });
           transport.formatEntry(log);
@@ -314,7 +314,7 @@ describe('ConsoleTransport', function() {
         it('uses as default detailed formatter for log entries', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
-          container.injectInto(transport);
+          injector.injectInto(transport);
 
           const log = new Log('my-message');
           transport.formatEntry(log);
@@ -330,7 +330,7 @@ describe('ConsoleTransport', function() {
       const customFormat = sinon.stub();
       const level = 'debug';
       const transport = new ConsoleTransport(level, config, customFormat);
-      container.injectInto(transport);
+      injector.injectInto(transport);
       expect(winston.createLogger).to.be.calledOnce;
       expect(winston.createLogger.args[0][0].format).to.be.equal(customFormat);
     });
@@ -340,7 +340,7 @@ describe('ConsoleTransport', function() {
     it('logs log entry with loggable level', () => {
       const level = 'debug';
       const transport = new ConsoleTransport(level, config);
-      container.injectInto(transport);
+      injector.injectInto(transport);
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);
@@ -351,7 +351,7 @@ describe('ConsoleTransport', function() {
     it(`skips logging entry on loggable level not matching transport's priority`, () => {
       const level = 'emerg';
       const transport = new ConsoleTransport(level, config);
-      container.injectInto(transport);
+      injector.injectInto(transport);
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);

@@ -47,7 +47,7 @@ import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snap
 import { StatefulAssertion } from '../../../src/domain/assertions/stateful-assertion';
 import { StatusfulAssertion } from '../../../src/domain/assertions/statusful-assertion';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { Asserter } from '../../../src/domain/asserter';
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
@@ -79,7 +79,7 @@ describe(`Routing with initializing Command on Process`, function() {
   // Kernel
   let asserter: Asserter;
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -92,7 +92,7 @@ describe(`Routing with initializing Command on Process`, function() {
   let repository: types.EventSourceableRepository;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

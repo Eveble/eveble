@@ -12,7 +12,7 @@ import { CommitSerializer } from '../../../src/infrastructure/serializers/commit
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 
 chai.use(sinonChai);
 
@@ -132,20 +132,20 @@ describe(`CommitSerializer`, function() {
     return props;
   };
 
-  let container: Container;
+  let injector: Injector;
   let serializer: any;
   let commitSerializer: CommitSerializer;
 
   beforeEach(() => {
     serializer = stubInterface<types.Serializer>();
 
-    container = new Container();
+    injector = new Injector();
     commitSerializer = new CommitSerializer();
 
-    container
+    injector
       .bind<types.Serializer>(BINDINGS.Serializer)
       .toConstantValue(serializer);
-    container.injectInto(commitSerializer);
+    injector.injectInto(commitSerializer);
   });
 
   const commitId = new Guid().toString();

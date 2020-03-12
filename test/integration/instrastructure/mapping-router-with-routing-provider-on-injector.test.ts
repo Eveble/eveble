@@ -7,7 +7,7 @@ import { Process } from '../../../src/domain/process';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { define } from '../../../src/decorators/define';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { CommandBus } from '../../../src/messaging/command-bus';
@@ -36,7 +36,7 @@ describe(`Mapping Router with routing provider on Injector`, function() {
   class MyOtherEvent extends Event {}
 
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // Dependencies
@@ -46,7 +46,7 @@ describe(`Mapping Router with routing provider on Injector`, function() {
   let repository: any;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

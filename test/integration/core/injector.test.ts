@@ -8,7 +8,7 @@ import {
 import sinon from 'sinon';
 import delay from 'delay';
 import { stubInterface } from 'ts-sinon';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 
@@ -74,10 +74,10 @@ describe(`Injector`, () => {
         }
       }
 
-      const container = new Container();
-      container.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
+      const injector = new Injector();
+      injector.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
 
-      container
+      injector
         .bind<types.Router>('MyEventSourceable')
         .toRoute(MyEventSourceable);
       expect(routerCnstrSpy).to.be.calledOnce;
@@ -109,12 +109,12 @@ describe(`Injector`, () => {
         }
       }
 
-      const container = new Container();
+      const injector = new Injector();
       const log = stubInterface<types.Logger>();
-      container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-      container.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
+      injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+      injector.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
 
-      container
+      injector
         .bind<types.Router>('MyEventSourceable')
         .toRoute(MyEventSourceable);
       expect(initializeSpy).to.be.calledOnce;
@@ -139,12 +139,12 @@ describe(`Injector`, () => {
         }
       }
 
-      const container = new Container();
+      const injector = new Injector();
       const log = stubInterface<types.Logger>();
-      container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-      container.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
+      injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+      injector.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
 
-      container
+      injector
         .bind<types.Router>('MyEventSourceable')
         .toRoute(MyEventSourceable);
       expect(log.debug).to.be.calledOnce;
@@ -212,14 +212,14 @@ describe(`Injector`, () => {
         return this.shuriken.throw();
       }
     }
-    const container = new Container();
-    container.bind<Ninja>('Ninja').to(Ninja);
-    container.bind<Katana>(NINJA_BINDINGS.Katana).to(Katana);
-    container.bind<Shuriken>(NINJA_BINDINGS.Shuriken).to(Shuriken);
+    const injector = new Injector();
+    injector.bind<Ninja>('Ninja').to(Ninja);
+    injector.bind<Katana>(NINJA_BINDINGS.Katana).to(Katana);
+    injector.bind<Shuriken>(NINJA_BINDINGS.Shuriken).to(Shuriken);
 
     const name = 'Naruto Uzumaki';
     const ninja = new Ninja(name);
-    container.injectInto(ninja);
+    injector.injectInto(ninja);
 
     expect(ninja.name).to.be.equal(name);
     expect(ninja.katana).to.be.instanceof(Katana);
@@ -256,12 +256,12 @@ describe(`Injector`, () => {
       }
     }
 
-    const container = new Container();
-    container.bind<Transport>('Transport').to(Transport);
+    const injector = new Injector();
+    injector.bind<Transport>('Transport').to(Transport);
 
     const id = 'my-id';
     const logger = new Logger(id);
-    await container.injectIntoAsync(logger);
+    await injector.injectIntoAsync(logger);
 
     expect(logger.id).to.be.equal(id);
     expect(logger.transport).to.be.instanceof(Transport);
@@ -280,8 +280,8 @@ describe(`Injector`, () => {
       }
     }
     const instance = new MyClass();
-    const container = new Container();
-    container.injectInto(instance);
+    const injector = new Injector();
+    injector.injectInto(instance);
     expect(initializeSpy).to.be.calledOnce;
   });
 
@@ -294,8 +294,8 @@ describe(`Injector`, () => {
       }
     }
     const instance = new MyClass();
-    const container = new Container();
-    await container.injectIntoAsync(instance);
+    const injector = new Injector();
+    await injector.injectIntoAsync(instance);
     expect(initializeSpy).to.be.calledOnce;
   });
 });

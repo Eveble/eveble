@@ -8,7 +8,7 @@ import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { handle } from '../../../src/annotations/handle';
 import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
@@ -16,13 +16,13 @@ import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 chai.use(sinonChai);
 
 describe(`EventHandlingMixin`, function() {
-  let container: types.Injector;
+  let injector: types.Injector;
   let eventBus: any;
 
   beforeEach(() => {
     eventBus = stubInterface<types.EventBus>();
-    container = new Container();
-    container.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
+    injector = new Injector();
+    injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
   });
 
   @define('MyEvent', { isRegistrable: false })
@@ -75,7 +75,7 @@ describe(`EventHandlingMixin`, function() {
       }
       const controller = new MyController();
       controller.registerEventHandler = sinon.stub();
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       expect(controller.registerEventHandler).to.be.calledTwice;
       expect(controller.registerEventHandler).to.be.calledWithExactly(
@@ -130,7 +130,7 @@ describe(`EventHandlingMixin`, function() {
       const handler = sinon.spy();
       class MyController extends EventHandlingMixin {}
       const controller = new MyController();
-      container.injectInto(controller);
+      injector.injectInto(controller);
       controller.registerHandler = sinon.stub();
 
       controller.registerEventHandler(MyEvent, handler);
@@ -142,7 +142,7 @@ describe(`EventHandlingMixin`, function() {
       class MyController extends EventHandlingMixin {}
       const controller = new MyController();
       const registerHandler = sinon.stub(controller, 'registerHandler');
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       controller.registerEventHandler(MyEvent, handler);
       expect(registerHandler).to.be.calledOnce;
@@ -157,7 +157,7 @@ describe(`EventHandlingMixin`, function() {
       const handler = sinon.stub();
       class MyController extends EventHandlingMixin {}
       const controller = new MyController();
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       controller.registerEventHandler(MyEvent, handler);
       expect(eventBus.subscribeTo).to.be.calledOnce;
@@ -235,7 +235,7 @@ describe(`EventHandlingMixin`, function() {
     it(`allows to publish event through event bus`, async () => {
       class MyController extends EventHandlingMixin {}
       const controller = new MyController();
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       const eventInstance = new MyEvent({
         sourceId: 'my-source-id',
