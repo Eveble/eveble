@@ -53,9 +53,7 @@ describe(`Router`, function() {
     eventBus = stubInterface<types.EventBus>();
     repository = stubInterface<types.EventSourceableRepository>();
 
-    injector
-      .bind<types.Injector>(BINDINGS.Injector)
-      .toConstantValue(injector);
+    injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
