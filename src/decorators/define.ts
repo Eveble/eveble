@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { setTypeName, TypeName } from '@eveble/helpers';
+import { setTypeName } from '@eveble/helpers';
 import { define, Collection, instanceOf } from 'typend';
 import { isString, isEmpty } from 'lodash';
 import { Types as tsruntimeTypes } from 'tsruntime';
@@ -62,7 +62,7 @@ define.afterDefine = function(
 ): void {
   const name = args[0];
 
-  let typeName: TypeName;
+  let typeName: types.TypeName;
   if (name !== undefined) {
     typeName = name;
     setTypeName(target, name);

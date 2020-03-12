@@ -1,6 +1,6 @@
 import { pick, isEqual } from 'lodash';
 import { types as typendTypes, Class, getMatchingParentProto } from 'typend';
-import { getTypeName, TypeName } from '@eveble/helpers';
+import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
 import { injectable } from '@parisholley/inversify-async';
 import deepClone from '@jsbits/deep-clone';
@@ -172,7 +172,7 @@ export class DefinableMixin implements types.Definable {
       return kernel.validator.validate(props, propTypes, isStrict);
     } catch (error) {
       const { message } = error;
-      const typeName: TypeName = getTypeName(this) as TypeName;
+      const typeName: types.TypeName = getTypeName(this) as types.TypeName;
       throw new error.constructor(`${typeName}: ${message}`);
     }
   }

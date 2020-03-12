@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { OneOf } from 'typend';
-import { getTypeName, TypeName } from '@eveble/helpers';
+import { getTypeName } from '@eveble/helpers';
 import { injectable } from '@parisholley/inversify-async';
 import { ExtendableError } from '../components/extendable-error';
 import { kernel } from '../core/kernel';
@@ -9,7 +9,7 @@ import { types } from '../types';
 export class StatusError extends ExtendableError {}
 
 export class UndefinedStatusesError extends StatusError {
-  constructor(typeName: TypeName) {
+  constructor(typeName: types.TypeName) {
     super(
       `${typeName}: statuses are not defined. Please define statuses as class(MyClass.STATUSES) property or define your getter as MyClass.prototype.getAvailableStatuses`
     );
@@ -18,7 +18,7 @@ export class UndefinedStatusesError extends StatusError {
 
 export class InvalidStatusError extends StatusError {
   constructor(
-    typeName: TypeName,
+    typeName: types.TypeName,
     currentStatus: types.Status,
     expectedStatuses: types.Status
   ) {
@@ -43,7 +43,9 @@ export class StatusfulMixin implements types.Statusful {
   public setStatus(status: types.Status): void {
     const selectableStatuses = this.getSelectableStatuses();
     if (isEmpty(selectableStatuses)) {
-      const typeName: TypeName = getTypeName(this.constructor) as TypeName;
+      const typeName: types.TypeName = getTypeName(
+        this.constructor
+      ) as types.TypeName;
       throw new UndefinedStatusesError(typeName);
     }
 
@@ -119,7 +121,9 @@ export class StatusfulMixin implements types.Statusful {
       if (error !== undefined) {
         throw error;
       }
-      const typeName: TypeName = getTypeName(this.constructor) as TypeName;
+      const typeName: types.TypeName = getTypeName(
+        this.constructor
+      ) as types.TypeName;
       throw new InvalidStatusError(
         typeName,
         this.status,
