@@ -22,7 +22,6 @@ import {
   PatternValidatorNotFoundError,
   UndefinableClassError,
   TypeConverterExists,
-  UndefinedConverterError,
   // Utilities
   PropsOf,
   TypeOf,
@@ -325,7 +324,6 @@ import {
   PatternValidatorNotFoundError as PatternValidatorNotFoundErrorExported,
   UndefinableClassError as UndefinableClassErrorExported,
   TypeConverterExists as TypeConverterExistsExported,
-  UndefinedConverterError as UndefinedConverterErrorExported,
   // Utilities
   PropsOf as PropsOfExported,
   TypeOf as TypeOfExported,
@@ -655,11 +653,6 @@ describe(`imports`, function() {
       });
       it('TypeConverterExists', () => {
         expect(TypeConverterExistsExported).to.be.equal(TypeConverterExists);
-      });
-      it('UndefinedConverterError', () => {
-        expect(UndefinedConverterErrorExported).to.be.equal(
-          UndefinedConverterError
-        );
       });
     });
     describe('utilities', () => {

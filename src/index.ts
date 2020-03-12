@@ -259,7 +259,6 @@ export {
   PatternValidatorNotFoundError,
   UndefinableClassError,
   TypeConverterExists,
-  UndefinedConverterError,
   // Utilities
   PropsOf,
   TypeOf,
