@@ -17,7 +17,7 @@ import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commi
 import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
 import { CommitConcurrencyError } from '../../../src/infrastructure/infrastructure-errors';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -52,7 +52,7 @@ describe(`CommitStore with MongoDB storage`, function() {
   const workerId = 'my-worker-id';
   const now = new Date();
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -64,7 +64,7 @@ describe(`CommitStore with MongoDB storage`, function() {
   let serializer: types.Serializer;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

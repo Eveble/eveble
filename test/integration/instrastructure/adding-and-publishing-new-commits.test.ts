@@ -14,7 +14,7 @@ import {
 } from '../../../src/infrastructure/structs/commit';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
 import { define } from '../../../src/decorators/define';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
@@ -41,7 +41,7 @@ describe(`Adding and publishing new commits`, function() {
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -55,7 +55,7 @@ describe(`Adding and publishing new commits`, function() {
   let storage: types.CommitStorage;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

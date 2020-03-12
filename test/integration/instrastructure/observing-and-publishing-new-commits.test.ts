@@ -16,7 +16,7 @@ import {
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
 import { define } from '../../../src/decorators/define';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
@@ -42,7 +42,7 @@ describe(`Observing and publishing new commits`, function() {
   const workerId = 'my-worker-id';
   const now = new Date();
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -56,7 +56,7 @@ describe(`Observing and publishing new commits`, function() {
   let commitPublisher: types.CommitPublisher;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

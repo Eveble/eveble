@@ -6,7 +6,7 @@ import { stubInterface } from 'ts-sinon';
 import { define } from '../../../src/decorators/define';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -34,7 +34,7 @@ describe(`CommitPublisher`, function() {
 
   let now: Date;
   let clock: any;
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   let commandBus: any;
@@ -53,7 +53,7 @@ describe(`CommitPublisher`, function() {
     clock = sinon.useFakeTimers(now.getTime());
     timeout = 60;
 
-    container = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     commandBus = stubInterface<types.CommandBus>();
@@ -62,19 +62,19 @@ describe(`CommitPublisher`, function() {
     storage = stubInterface<types.CommitStorage>();
     observer = stubInterface<types.CommitObserver>();
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
-    container
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
+    injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
       .toConstantValue(commandBus);
-    container.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
-    container
+    injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
+    injector
       .bind<types.Serializer>(BINDINGS.Serializer)
       .toConstantValue(serializer);
-    container
+    injector
       .bind<types.CommitStorage>(BINDINGS.CommitStorage)
       .toConstantValue(storage);
-    container
+    injector
       .bind<types.CommitObserver>(BINDINGS.CommitObserver)
       .toConstantValue(observer);
 
@@ -83,7 +83,7 @@ describe(`CommitPublisher`, function() {
     config.get.withArgs('eveble.commitStore.timeout').returns(timeout);
 
     commitPublisher = new CommitPublisher();
-    container.injectInto(commitPublisher);
+    injector.injectInto(commitPublisher);
   });
 
   afterEach(() => {

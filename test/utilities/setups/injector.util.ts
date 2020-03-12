@@ -1,19 +1,19 @@
 import { stubInterface } from 'ts-sinon';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 
 export function setupInjector(): {
-  container: Container;
+  injector: Injector;
   log: any;
   config: any;
 } {
-  const container = new Container();
+  const injector = new Injector();
   const log = stubInterface<types.Logger>();
   const config = stubInterface<types.Configurable>();
 
-  container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-  container.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
-  container.bind<types.Injector>(BINDINGS.Injector).toConstantValue(container);
-  return { container, log, config };
+  injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+  injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
+  injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
+  return { injector, log, config };
 }

@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { stubInterface } from 'ts-sinon';
 import { types } from '../../../src/types';
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -21,7 +21,7 @@ describe(`CommitMongoDBObserver`, function() {
   const workerId = 'my-worker-id';
   let clock: any;
   let mongoClient: MongoClient;
-  let container: Container;
+  let injector: Injector;
   let collection: Collection;
   let collectionMock: any;
   let config: any;
@@ -47,22 +47,22 @@ describe(`CommitMongoDBObserver`, function() {
     collection = mongoClient.db(dbName).collection(collectionName);
     collectionMock = sinon.mock(collection);
 
-    container = new Container();
+    injector = new Injector();
     observer = new CommitMongoDBObserver();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     storage = stubInterface<types.CommitStorage>();
     commitPublisher = stubInterface<types.CommitPublisher>();
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
-    container
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
+    injector
       .bind<Collection<any>>(BINDINGS.MongoDB.collections.Commits)
       .toConstantValue(collection);
-    container
+    injector
       .bind<types.CommitStorage>(BINDINGS.CommitStorage)
       .toConstantValue(storage);
-    container.injectInto(observer);
+    injector.injectInto(observer);
 
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('workerId').returns(workerId);

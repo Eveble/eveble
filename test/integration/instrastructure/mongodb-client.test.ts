@@ -10,7 +10,7 @@ import {
   MongoDBDatabaseConfig,
 } from '../../../src/infrastructure/clients/mongodb-client';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 
 chai.use(sinonChai);
@@ -23,14 +23,14 @@ describe(`MongoDB client`, function() {
     getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_DBNAME') || 'eveble_testing';
   const options = { useNewUrlParser: true, useUnifiedTopology: true };
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
 
   beforeEach(async () => {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
 
-    injector = new Container();
+    injector = new Injector();
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     injector.bind<any>(BINDINGS.MongoDB.library).toConstantValue(MongoClient);

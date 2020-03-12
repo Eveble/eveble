@@ -8,7 +8,7 @@ import {
 } from '../../../src/core/core-errors';
 import { define } from '../../../src/decorators/define';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
 import { Serializable } from '../../../src/components/serializable';
@@ -20,15 +20,15 @@ import { createEJSON } from '../../../src/utils/helpers';
 chai.use(sinonChai);
 
 describe(`EJSONSerializerAdapter`, function() {
-  let container: types.Injector;
+  let injector: types.Injector;
   let serializer: EJSONSerializerAdapter;
 
   beforeEach(() => {
-    container = new Container();
-    container.bind(BINDINGS.EJSON).toConstantValue(createEJSON());
+    injector = new Injector();
+    injector.bind(BINDINGS.EJSON).toConstantValue(createEJSON());
 
     serializer = new EJSONSerializerAdapter();
-    container.injectInto(serializer);
+    injector.injectInto(serializer);
     kernel.setSerializer(serializer);
   });
 
@@ -599,7 +599,7 @@ describe(`EJSONSerializerAdapter`, function() {
       it('allows to use custom type key', () => {
         const typeKey = '$type';
         const instance = new EJSONSerializerAdapter(typeKey);
-        container.injectInto(instance);
+        injector.injectInto(instance);
         instance.registerType('Car', Car);
 
         const car = new Car({ brand: 'Audi' });
@@ -680,7 +680,7 @@ describe(`EJSONSerializerAdapter`, function() {
       it('allows to use custom type key', () => {
         const typeKey = '$type';
         const instance = new EJSONSerializerAdapter(typeKey);
-        container.injectInto(instance);
+        injector.injectInto(instance);
         instance.registerType('Car', Car);
 
         const data = {

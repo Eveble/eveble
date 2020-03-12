@@ -6,7 +6,7 @@ import { define } from '../../../src/decorators/define';
 import { CommandSchedulingService } from '../../../src/infrastructure/command-scheduling-service';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { Service } from '../../../src/infrastructure/service';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
@@ -22,7 +22,7 @@ describe(`CommandSchedulingService`, function() {
 
   let now: any;
   // Dependencies
-  let container: Container;
+  let injector: Injector;
   let commandBus: any;
   let eventBus: any;
   let scheduler: any;
@@ -48,21 +48,21 @@ describe(`CommandSchedulingService`, function() {
   });
 
   beforeEach(() => {
-    container = new Container();
+    injector = new Injector();
     commandBus = stubInterface<types.CommandBus>();
     eventBus = stubInterface<types.EventBus>();
     scheduler = stubInterface<types.CommandScheduler>();
 
-    container
+    injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
       .toConstantValue(commandBus);
-    container.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
-    container
+    injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
+    injector
       .bind<types.CommandScheduler>(BINDINGS.CommandScheduler)
       .toConstantValue(scheduler);
 
     service = new CommandSchedulingService();
-    container.injectInto(service);
+    injector.injectInto(service);
   });
 
   it(`extends Service`, () => {

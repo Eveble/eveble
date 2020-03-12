@@ -1,7 +1,7 @@
 import { stubInterface } from 'ts-sinon';
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -16,20 +16,20 @@ describe(`SnapshotSerializer`, function() {
     key: string;
   }
 
-  let container: Container;
+  let injector: Injector;
   let serializer: any;
   let esSerializer: SnapshotSerializer;
 
   beforeEach(() => {
     serializer = stubInterface<types.Serializer>();
 
-    container = new Container();
+    injector = new Injector();
     esSerializer = new SnapshotSerializer();
 
-    container
+    injector
       .bind<types.Serializer>(BINDINGS.Serializer)
       .toConstantValue(serializer);
-    container.injectInto(esSerializer);
+    injector.injectInto(esSerializer);
   });
 
   it('serializes event sourceable', () => {

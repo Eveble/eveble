@@ -1,5 +1,5 @@
 import * as winston from 'winston';
-import { Container } from './injector';
+import { Injector } from './injector';
 import { Module } from './module';
 import { AppConfig } from '../configs/app-config';
 import { types } from '../types';
@@ -44,7 +44,7 @@ export abstract class BaseApp extends Module implements types.BaseApp {
       );
     }
     super(processedProps);
-    this.injector = processedProps.injector ?? new Container();
+    this.injector = processedProps.injector ?? new Injector();
   }
 
   /**

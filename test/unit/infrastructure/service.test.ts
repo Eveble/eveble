@@ -7,7 +7,7 @@ import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { define } from '../../../src/decorators/define';
 import { handle } from '../../../src/annotations/handle';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -21,19 +21,19 @@ describe(`Service`, function() {
     key: string;
   }
 
-  let container: Container;
+  let injector: Injector;
   let commandBus: any;
   let eventBus: any;
 
   beforeEach(() => {
-    container = new Container();
+    injector = new Injector();
     commandBus = stubInterface<types.CommandBus>();
     eventBus = stubInterface<types.EventBus>();
 
-    container
+    injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
       .toConstantValue(commandBus);
-    container.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
+    injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
   });
 
   it(`has CommandHandlingMixin mixin on prototype chain applied`, () => {
@@ -55,7 +55,7 @@ describe(`Service`, function() {
       }
     }
     const service = new MyService();
-    container.injectInto(service);
+    injector.injectInto(service);
 
     expect(service.hasHandler(MyCommand)).to.be.true;
     expect(service.hasHandler(MyEvent)).to.be.true;

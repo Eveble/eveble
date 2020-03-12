@@ -8,7 +8,7 @@ import { Event } from '../../../src/components/event';
 import { Projection } from '../../../src/infrastructure/projection';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import {
   RebuildingResult,
   ProjectionRebuilder,
@@ -79,7 +79,7 @@ describe(`ProjectionRebuilder`, function() {
     }
   }
 
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let commitStore: any;
   let eventBus: any;
@@ -87,17 +87,17 @@ describe(`ProjectionRebuilder`, function() {
   let rebuilder: ProjectionRebuilder;
 
   beforeEach(async () => {
-    container = new Container();
+    injector = new Injector();
 
     log = stubInterface<types.Logger>();
     commitStore = stubInterface<types.CommitStore>();
     eventBus = stubInterface<types.EventBus>();
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector
       .bind<types.CommitStore>(BINDINGS.CommitStore)
       .toConstantValue(commitStore);
-    container.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
+    injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
 
     // Projections
     projections = [
@@ -130,12 +130,12 @@ describe(`ProjectionRebuilder`, function() {
 
     // Projection initialization
     for (const projection of projections) {
-      await container.injectIntoAsync(projection);
+      await injector.injectIntoAsync(projection);
     }
 
     // Rebuilder
     rebuilder = new ProjectionRebuilder();
-    container.injectInto(rebuilder);
+    injector.injectInto(rebuilder);
   });
 
   it('logs start of rebuilding process', async () => {

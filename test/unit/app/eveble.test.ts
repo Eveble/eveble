@@ -14,7 +14,7 @@ import { Module } from '../../../src/core/module';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
@@ -35,7 +35,7 @@ describe(`Eveble Module`, function() {
   let appConfig: AppConfig;
   let app: any;
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // Dependencies
@@ -47,7 +47,7 @@ describe(`Eveble Module`, function() {
   let commandScheduler: any;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

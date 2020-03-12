@@ -10,7 +10,7 @@ import { define } from '../../../src/decorators/define';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import {
   AddingSnapshotError,
@@ -27,7 +27,7 @@ describe(`SnapshotMongoDBStorage`, function() {
   }
 
   let mongoClient: MongoClient;
-  let container: Container;
+  let injector: Injector;
   let collection: Collection;
   let collectionMock: any;
   let esSerializer: any;
@@ -61,7 +61,7 @@ describe(`SnapshotMongoDBStorage`, function() {
     collection = mongoClient.db(dbName).collection(collectionName);
     collectionMock = sinon.mock(collection);
 
-    container = new Container();
+    injector = new Injector();
     storage = new SnapshotMongoDBStorage();
     esSerializer = stubInterface<types.SnapshotSerializer>();
 
@@ -70,13 +70,13 @@ describe(`SnapshotMongoDBStorage`, function() {
       .withArgs(MyEventSourceable, serializedEs)
       .returns(eventSourceable);
 
-    container
+    injector
       .bind<types.SnapshotSerializer>(BINDINGS.SnapshotSerializer)
       .toConstantValue(esSerializer);
-    container
+    injector
       .bind<Collection<any>>(BINDINGS.MongoDB.collections.Snapshots)
       .toConstantValue(collection);
-    container.injectInto(storage);
+    injector.injectInto(storage);
   });
 
   after(async () => {

@@ -8,7 +8,7 @@ import { Db } from 'mongodb';
 import { MongoDBClient } from '../../../src/infrastructure/clients/mongodb-client';
 import { AgendaClient } from '../../../src/infrastructure/clients/agenda-client';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
@@ -39,7 +39,7 @@ describe(`AgendaClient`, function() {
     };
   });
 
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let Agenda: any;
   let agendaInstance: any;
@@ -48,7 +48,7 @@ describe(`AgendaClient`, function() {
   let client: any;
 
   const setupDoubles = function(): void {
-    container = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
 
     Agenda = sinon.stub();
@@ -63,9 +63,9 @@ describe(`AgendaClient`, function() {
     db = stubInterface<Db>();
     mongoClient.getDatabase.returns(db);
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container.bind<any>(BINDINGS.Agenda.library).toConstantValue(Agenda);
-    container
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector.bind<any>(BINDINGS.Agenda.library).toConstantValue(Agenda);
+    injector
       .bind<MongoDBClient>(BINDINGS.MongoDB.clients.CommandScheduler)
       .toConstantValue(mongoClient);
   };
@@ -117,7 +117,7 @@ describe(`AgendaClient`, function() {
 
   describe('initialization', () => {
     it('logs client initialization', async () => {
-      await container.injectIntoAsync(client);
+      await injector.injectIntoAsync(client);
       await client.initialize();
 
       expect(log.debug).to.be.calledWithExactly(
@@ -132,7 +132,7 @@ describe(`AgendaClient`, function() {
 
     context('successful initialization', () => {
       it(`initializes client with MongoDB database`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         expect(client.library).to.be.equal(agendaInstance);
@@ -153,13 +153,13 @@ describe(`AgendaClient`, function() {
       });
 
       it(`sets the client state to initialized upon successful creation`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         expect(client.isInState(AgendaClient.STATES.initialized)).to.be.true;
       });
 
       it('logs successful client initialization', async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         expect(log.debug).to.be.calledWithExactly(
@@ -177,7 +177,7 @@ describe(`AgendaClient`, function() {
       it('re-throws error from Agenda on creation', async () => {
         const error = new Error('my-error');
         Agenda.throws(error);
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).to.eventually.be.rejectedWith(error);
       });
@@ -185,7 +185,7 @@ describe(`AgendaClient`, function() {
       it('sets the client state to failed when error is thrown on initialization', async () => {
         const error = new Error('my-error');
         Agenda.throws(error);
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).to.eventually.be.rejectedWith(error);
         expect(client.isInState(AgendaClient.STATES.failed)).to.be.true;
@@ -194,7 +194,7 @@ describe(`AgendaClient`, function() {
       it('logs failed initialization as an error', async () => {
         const error = new Error('my-error');
         Agenda.throws(error);
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).to.eventually.be.rejectedWith(error);
         expect(log.error).to.be.calledWithExactly(
@@ -220,7 +220,7 @@ describe(`AgendaClient`, function() {
     });
 
     it('logs establishing connection', async () => {
-      await container.injectIntoAsync(client);
+      await injector.injectIntoAsync(client);
       await client.initialize();
       await client.connect();
       expect(log.debug).to.be.calledWithExactly(
@@ -230,14 +230,14 @@ describe(`AgendaClient`, function() {
 
     context('successful connection', () => {
       it(`connects client to MongoDB`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(agendaInstance.start).to.be.calledOnce;
       });
 
       it(`ensures that connection can be established only once`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -248,14 +248,14 @@ describe(`AgendaClient`, function() {
       });
 
       it(`sets the client state to connected upon successful connection with MongoDB`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(client.isInState(AgendaClient.STATES.connected)).to.be.true;
       });
 
       it('logs successful connection', async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(log.debug).to.be.calledWithExactly(
@@ -271,7 +271,7 @@ describe(`AgendaClient`, function() {
         const error = new Error('my-error');
         agendaInstance.start.rejects(error);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await expect(client.connect()).to.eventually.be.rejectedWith(error);
       });
@@ -279,7 +279,7 @@ describe(`AgendaClient`, function() {
         const error = new Error('my-error');
         agendaInstance.start.rejects(error);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await expect(client.connect()).to.eventually.be.rejectedWith(error);
         expect(client.isInState(AgendaClient.STATES.failed)).to.be.true;
@@ -289,7 +289,7 @@ describe(`AgendaClient`, function() {
         const error = new Error('my-error');
         agendaInstance.start.rejects(error);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await expect(client.connect()).to.eventually.be.rejectedWith(error);
         expect(log.error).to.be.calledWithExactly(
@@ -306,7 +306,7 @@ describe(`AgendaClient`, function() {
       it('returns true if client is connected', async () => {
         mongoClient.isConnected.returns(true);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(client.isConnected()).to.be.equal(true);
@@ -321,7 +321,7 @@ describe(`AgendaClient`, function() {
 
     describe('stopping', () => {
       it(`stops client from MongoDB`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -330,7 +330,7 @@ describe(`AgendaClient`, function() {
       });
 
       it(`logs information about client being stopped`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -344,7 +344,7 @@ describe(`AgendaClient`, function() {
       });
 
       it(`sets client state to stopped upon stopping`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -355,7 +355,7 @@ describe(`AgendaClient`, function() {
 
     describe('disconnecting', () => {
       it(`disconnects client from MongoDB`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -364,7 +364,7 @@ describe(`AgendaClient`, function() {
       });
 
       it(`logs information about client being disconnected`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -382,7 +382,7 @@ describe(`AgendaClient`, function() {
       });
 
       it(`sets client state to disconnected upon disconnection`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -391,7 +391,7 @@ describe(`AgendaClient`, function() {
       });
 
       it(`destroys Agenda library instance`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -402,7 +402,7 @@ describe(`AgendaClient`, function() {
 
     describe('reconnecting', () => {
       it(`reconnects client to MongoDB`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         mongoClient.isConnected.returns(true);
@@ -414,7 +414,7 @@ describe(`AgendaClient`, function() {
       });
 
       it(`logs information about client being reconnected`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         await client.disconnect();
@@ -427,7 +427,7 @@ describe(`AgendaClient`, function() {
       });
 
       it(`sets client state to connected upon successful reconnection`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         await client.disconnect();
@@ -440,7 +440,7 @@ describe(`AgendaClient`, function() {
   describe('hooks', () => {
     describe('ready', () => {
       it(`logs successful on active client(ready) upon firing Agenda's on ready hook`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(agendaInstance.on.args[0][0]).to.equal('ready');
@@ -457,7 +457,7 @@ describe(`AgendaClient`, function() {
       it(`logs successful on started job upon firing Agenda's on start hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(agendaInstance.on.args[1][0]).to.equal('start');
@@ -474,7 +474,7 @@ describe(`AgendaClient`, function() {
       it(`logs information on completed job upon firing Agenda's on complete hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(agendaInstance.on.args[2][0]).to.equal('complete');
@@ -491,7 +491,7 @@ describe(`AgendaClient`, function() {
       it(`logs information on successful job upon firing Agenda's on success hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(agendaInstance.on.args[3][0]).to.equal('success');
@@ -508,7 +508,7 @@ describe(`AgendaClient`, function() {
       it(`logs error on failed job upon firing Agenda's on fail hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
         expect(agendaInstance.on.args[4][0]).to.equal('fail');

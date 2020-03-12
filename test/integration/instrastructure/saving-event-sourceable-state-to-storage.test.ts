@@ -18,7 +18,7 @@ import { TaskList } from '../../domains/task-list/task-list';
 import { CreateTaskList } from '../../domains/task-list/task-commands';
 import { TaskListCreated } from '../../domains/task-list/task-events';
 import { Asserter } from '../../../src/domain/asserter';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -45,7 +45,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
   // Kernel
   let asserter: Asserter;
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -59,7 +59,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
   let repository: types.EventSourceableRepository;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

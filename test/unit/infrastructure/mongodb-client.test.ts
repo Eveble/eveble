@@ -14,7 +14,7 @@ import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
 import { InvalidStateError } from '../../../src/mixins/stateful-mixin';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -33,7 +33,7 @@ describe(`MongoDBClient`, function() {
     };
   });
 
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let MongoClient: any;
   let mongoClientInstance: any;
@@ -43,7 +43,7 @@ describe(`MongoDBClient`, function() {
   let client: MongoDBClient;
 
   const setupDoubles = function(): void {
-    container = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
 
     MongoClient = sinon.stub();
@@ -52,8 +52,8 @@ describe(`MongoDBClient`, function() {
     secondCollection = stubInterface<Collection<any>>();
     db = stubInterface<Db>();
 
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector
       .bind<MongoClientOriginal>(BINDINGS.MongoDB.library)
       .toConstantValue(MongoClient);
   };
@@ -126,7 +126,7 @@ describe(`MongoDBClient`, function() {
           }),
         ],
       });
-      await container.injectIntoAsync(instance);
+      await injector.injectIntoAsync(instance);
       expect(instance.id).to.be.equal(props.id);
       expect(instance.url).to.be.equal(props.url);
       expect(instance.databases[0].name).to.be.equal(databaseName);
@@ -173,7 +173,7 @@ describe(`MongoDBClient`, function() {
 
   describe('initialize', () => {
     it('logs client initialization', async () => {
-      await container.injectIntoAsync(client);
+      await injector.injectIntoAsync(client);
       await client.initialize();
 
       expect(log.debug).to.be.calledWithExactly(
@@ -189,7 +189,7 @@ describe(`MongoDBClient`, function() {
     });
     context('successful initialization', () => {
       it(`initializes client`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         expect(client.library).to.be.equal(mongoClientInstance);
@@ -203,14 +203,14 @@ describe(`MongoDBClient`, function() {
       });
 
       it(`sets the client state to initialized when client is initialized`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         expect(client.isInState(MongoDBClient.STATES.initialized)).to.be.true;
       });
 
       it('logs successful client initialization', async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         expect(log.debug).to.be.calledWithExactly(
@@ -230,7 +230,7 @@ describe(`MongoDBClient`, function() {
       it('re-throws error from MongoClient on creation', async () => {
         const error = new Error('my-error');
         MongoClient.throws(error);
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).to.eventually.be.rejectedWith(error);
       });
@@ -239,7 +239,7 @@ describe(`MongoDBClient`, function() {
         const error = new Error('my-error');
         MongoClient.throws(error);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await expect(client.initialize()).to.eventually.be.rejectedWith(error);
         expect(log.error).to.be.calledWithExactly(
           new Log(
@@ -267,7 +267,7 @@ describe(`MongoDBClient`, function() {
     });
 
     it('logs establishing connection', async () => {
-      await container.injectIntoAsync(client);
+      await injector.injectIntoAsync(client);
       await client.initialize();
 
       await client.connect();
@@ -278,7 +278,7 @@ describe(`MongoDBClient`, function() {
 
     context('successful connection', () => {
       it(`creates and connects client to MongoDB`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -288,7 +288,7 @@ describe(`MongoDBClient`, function() {
       });
 
       it(`ensures that connection can be established only once`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -300,7 +300,7 @@ describe(`MongoDBClient`, function() {
       });
 
       it(`sets the client state to connected when connection is established`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -308,7 +308,7 @@ describe(`MongoDBClient`, function() {
       });
 
       it('logs successful connection', async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -325,7 +325,7 @@ describe(`MongoDBClient`, function() {
         const error = new Error('my-error');
         mongoClientInstance.connect.rejects(error);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         expect(client.connect()).to.eventually.be.rejectedWith(error);
@@ -335,7 +335,7 @@ describe(`MongoDBClient`, function() {
         const error = new Error('my-error');
         mongoClientInstance.connect.rejects(error);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await expect(client.connect()).to.eventually.be.rejectedWith(error);
@@ -346,7 +346,7 @@ describe(`MongoDBClient`, function() {
         const error = new Error('my-error');
         mongoClientInstance.connect.rejects(error);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await expect(client.connect()).to.eventually.be.rejectedWith(error);
@@ -364,7 +364,7 @@ describe(`MongoDBClient`, function() {
       it('returns true if client is connected', async () => {
         mongoClientInstance.isConnected.returns(true);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -380,7 +380,7 @@ describe(`MongoDBClient`, function() {
       it(`disconnects client from MongoDB`, async () => {
         mongoClientInstance.isConnected.returns(true);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -391,7 +391,7 @@ describe(`MongoDBClient`, function() {
       it(`logs information about client being disconnected`, async () => {
         mongoClientInstance.isConnected.returns(true);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -411,7 +411,7 @@ describe(`MongoDBClient`, function() {
       it(`sets client state to disconnected upon disconnection`, async () => {
         mongoClientInstance.isConnected.returns(true);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -422,7 +422,7 @@ describe(`MongoDBClient`, function() {
       it(`destroys MongoClient library instance`, async () => {
         mongoClientInstance.isConnected.returns(true);
 
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -433,7 +433,7 @@ describe(`MongoDBClient`, function() {
 
     describe('reconnecting', () => {
       it(`reconnects client to MongoDB`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -446,7 +446,7 @@ describe(`MongoDBClient`, function() {
       });
 
       it(`logs information about client being reconnected`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -460,7 +460,7 @@ describe(`MongoDBClient`, function() {
       });
 
       it(`sets client state to connected upon successful reconnection`, async () => {
-        await container.injectIntoAsync(client);
+        await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
@@ -491,7 +491,7 @@ describe(`MongoDBClient`, function() {
           }),
         ],
       });
-      await container.injectIntoAsync(clientInstance);
+      await injector.injectIntoAsync(clientInstance);
       await clientInstance.initialize();
 
       await clientInstance.connect();
@@ -525,7 +525,7 @@ describe(`MongoDBClient`, function() {
           }),
         ],
       });
-      await container.injectIntoAsync(clientInstance);
+      await injector.injectIntoAsync(clientInstance);
       await clientInstance.initialize();
 
       await clientInstance.connect();

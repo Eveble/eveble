@@ -10,20 +10,20 @@ import { Event } from '../../../src/components/event';
 import { handle } from '../../../src/annotations/handle';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 
 chai.use(sinonChai);
 
 describe(`CommandHandlingMixin`, function() {
-  let container: types.Injector;
+  let injector: types.Injector;
   let commandBus: any;
 
   beforeEach(() => {
     commandBus = stubInterface<types.CommandBus>();
-    container = new Container();
-    container
+    injector = new Injector();
+    injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
       .toConstantValue(commandBus);
   });
@@ -71,7 +71,7 @@ describe(`CommandHandlingMixin`, function() {
       }
       const controller = new MyController();
       controller.registerCommandHandler = sinon.stub();
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       expect(controller.registerCommandHandler).to.be.calledTwice;
       expect(controller.registerCommandHandler).to.be.calledWithExactly(
@@ -126,7 +126,7 @@ describe(`CommandHandlingMixin`, function() {
       const handler = sinon.spy();
       class MyController extends CommandHandlingMixin {}
       const controller = new MyController();
-      container.injectInto(controller);
+      injector.injectInto(controller);
       controller.registerHandler = sinon.stub();
 
       controller.registerCommandHandler(MyCommand, handler);
@@ -138,7 +138,7 @@ describe(`CommandHandlingMixin`, function() {
       class MyController extends CommandHandlingMixin {}
       const controller = new MyController();
       const registerHandler = sinon.stub(controller, 'registerHandler');
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       controller.registerCommandHandler(MyCommand, handler);
       expect(registerHandler).to.be.calledOnce;
@@ -153,7 +153,7 @@ describe(`CommandHandlingMixin`, function() {
       const handler = sinon.stub();
       class MyController extends CommandHandlingMixin {}
       const controller = new MyController();
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       controller.registerCommandHandler(MyCommand, handler);
       expect(commandBus.registerHandler).to.be.calledOnce;
@@ -197,7 +197,7 @@ describe(`CommandHandlingMixin`, function() {
     it(`allows to send command through command bus`, async () => {
       class MyController extends CommandHandlingMixin {}
       const controller = new MyController();
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       const commandInstance = new MyCommand({
         targetId: 'my-target-id',
@@ -213,7 +213,7 @@ describe(`CommandHandlingMixin`, function() {
 
       class MyController extends CommandHandlingMixin {}
       const controller = new MyController();
-      container.injectInto(controller);
+      injector.injectInto(controller);
 
       const commandInstance = new MyCommand({
         targetId: 'my-target-id',

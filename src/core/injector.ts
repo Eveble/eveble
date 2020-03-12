@@ -41,7 +41,7 @@ async function executePostConstructAsync(target: any): Promise<void> {
   await target[methodName]();
 }
 
-export class Container extends InversifyContainer implements types.Injector {
+export class Injector extends InversifyContainer implements types.Injector {
   /**
    * [OVERRIDE]
    * Registers a type binding

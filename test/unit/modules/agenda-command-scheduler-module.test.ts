@@ -11,7 +11,7 @@ import { MongoDBClient } from '../../../src/infrastructure/clients/mongodb-clien
 import { AgendaClient } from '../../../src/infrastructure/clients/agenda-client';
 
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { AgendaCommandSchedulerModule } from '../../../src/app/modules/agenda-command-scheduler-module';
 import { Module } from '../../../src/core/module';
@@ -25,7 +25,7 @@ describe(`AgendaCommandSchedulerModule`, function() {
     appId: 'my-app-id',
   });
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   let serializer: any;
@@ -41,7 +41,7 @@ describe(`AgendaCommandSchedulerModule`, function() {
   let commandBus: any;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     serializer = stubInterface<types.Configurable>();

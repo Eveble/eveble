@@ -19,7 +19,7 @@ import {
   CommitConcurrencyError,
 } from '../../../src/infrastructure/infrastructure-errors';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { Log } from '../../../src/components/log-entry';
 import { Message } from '../../../src/components/message';
 import { COMMANDS_KEY, EVENTS_KEY } from '../../../src/constants/literal-keys';
@@ -34,7 +34,7 @@ chai.use(chaiAsPromised);
 describe(`Router`, function() {
   let now: any;
   let clock: any;
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let commandBus: any;
   let eventBus: any;
@@ -47,21 +47,21 @@ describe(`Router`, function() {
   beforeEach(() => {
     clock = sinon.useFakeTimers(now.getTime());
 
-    container = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     commandBus = stubInterface<types.CommandBus>();
     eventBus = stubInterface<types.EventBus>();
     repository = stubInterface<types.EventSourceableRepository>();
 
-    container
+    injector
       .bind<types.Injector>(BINDINGS.Injector)
-      .toConstantValue(container);
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container
+      .toConstantValue(injector);
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
       .toConstantValue(commandBus);
-    container.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
-    container
+    injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
+    injector
       .bind<types.EventSourceableRepository>(BINDINGS.EventSourceableRepository)
       .toConstantValue(repository);
   });
@@ -147,7 +147,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(router.routedCommands).to.be.instanceOf(Array);
       expect(router.routedCommands).to.be.empty;
@@ -161,7 +161,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(router.routedEvents).to.be.instanceOf(Array);
       expect(router.routedEvents).to.be.empty;
@@ -183,7 +183,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       await expect(
         router.initializingMessageHandler(
@@ -205,7 +205,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(log.debug).to.be.calledWithMatch(
         new Log(`defined initializing message 'MyEvent'`)
@@ -222,7 +222,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(commandBus.registerHandler).to.be.calledOnce;
       expect(commandBus.registerHandler.getCall(0).args[0]).to.be.equal(
@@ -242,7 +242,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(eventBus.subscribeTo).to.be.calledOnce;
       expect(eventBus.subscribeTo.getCall(0).args[0]).to.be.equal(MyEvent);
@@ -260,7 +260,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(log.debug).to.be.calledWithMatch(
         new Log(`set up initializing message handler for 'MyEvent'`)
@@ -277,7 +277,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      expect(container.injectIntoAsync(router)).to.eventually.be.rejectedWith(
+      expect(injector.injectIntoAsync(router)).to.eventually.be.rejectedWith(
         InvalidInitializingMessageError,
         `MyEventSourceable: the given initializing message is not one of allowed types. Expected [Command, Event], got InvalidMessage`
       );
@@ -296,7 +296,7 @@ describe(`Router`, function() {
         routedCommands = [MyCommand];
       }
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(commandBus.registerHandler).to.be.calledOnce;
       expect(commandBus.registerHandler.getCall(0).args[0]).to.be.equal(
@@ -318,7 +318,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(log.debug).to.be.calledWithMatch(
         new Log(`defined routed commands`)
@@ -338,7 +338,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(eventBus.subscribeTo).to.be.calledOnce;
       expect(eventBus.subscribeTo.getCall(0).args[0]).to.be.equal(MyEvent);
@@ -358,7 +358,7 @@ describe(`Router`, function() {
       }
 
       const router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       expect(log.debug).to.be.calledWithMatch(
         new Log(`defined routed events`)
@@ -393,7 +393,7 @@ describe(`Router`, function() {
 
     beforeEach(async () => {
       router = new MyRouter();
-      await container.injectIntoAsync(router);
+      await injector.injectIntoAsync(router);
 
       // Data
       props.id = 'my-event-sourceable-id';
@@ -461,7 +461,7 @@ describe(`Router`, function() {
       });
 
       it(`injects dependencies in to new instance of event sourceable`, async () => {
-        router.injector = stubInterface<Container>();
+        router.injector = stubInterface<types.Injector>();
         await router.initializingMessageHandler(commands.MyCommand);
         expect(router.injector.injectIntoAsync).to.be.calledOnce;
       });
@@ -816,29 +816,29 @@ describe(`Router`, function() {
       describe(`injects dependencies in to event sourceable`, () => {
         it(`for handled command`, async () => {
           repository.find.returns(eventSourceable);
-          container.injectIntoAsync = sinon.stub();
+          injector.injectIntoAsync = sinon.stub();
           await router.messageHandler(commands.MyCommand);
-          expect(container.injectIntoAsync).to.be.calledOnce;
-          expect(container.injectIntoAsync).to.be.calledWithExactly(
+          expect(injector.injectIntoAsync).to.be.calledOnce;
+          expect(injector.injectIntoAsync).to.be.calledWithExactly(
             eventSourceable
           );
         });
 
         it(`for handled event with correlation id`, async () => {
           repository.find.returns(eventSourceable);
-          container.injectIntoAsync = sinon.stub();
+          injector.injectIntoAsync = sinon.stub();
           await router.messageHandler(events.CorrelationEvent);
-          expect(container.injectIntoAsync).to.be.calledOnce;
-          expect(container.injectIntoAsync).to.be.calledWithExactly(
+          expect(injector.injectIntoAsync).to.be.calledOnce;
+          expect(injector.injectIntoAsync).to.be.calledWithExactly(
             eventSourceable
           );
         });
 
         it(`does not inject dependencies for events without correlation id`, async () => {
           repository.find.returns(eventSourceable);
-          container.injectIntoAsync = sinon.stub();
+          injector.injectIntoAsync = sinon.stub();
           await router.messageHandler(events.MyEvent);
-          expect(container.injectIntoAsync).to.be.not.called;
+          expect(injector.injectIntoAsync).to.be.not.called;
         });
       });
 

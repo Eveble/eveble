@@ -16,7 +16,7 @@ import { types } from '../../../src/types';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { initial } from '../../../src/annotations/initial';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { Log } from '../../../src/components/log-entry';
@@ -85,7 +85,7 @@ describe(`EventSourceableRepository`, function() {
   }
 
   let now: Date;
-  let container: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   let commitStore: any;
@@ -101,22 +101,20 @@ describe(`EventSourceableRepository`, function() {
   });
 
   beforeEach(() => {
-    container = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     commitStore = stubInterface<types.CommitStore>();
     snapshotter = stubInterface<types.Snapshotter>();
 
-    container
-      .bind<types.Injector>(BINDINGS.Injector)
-      .toConstantValue(container);
-    container.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    container.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
-    container
+    injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
+    injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+    injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
+    injector
       .bind<types.CommitStore>(BINDINGS.CommitStore)
       .toConstantValue(commitStore);
     repository = new EventSourceableRepository();
-    container.injectInto(repository);
+    injector.injectInto(repository);
 
     props.id = new Guid();
     events.initEvent = new MyInitEvent({
@@ -166,7 +164,7 @@ describe(`EventSourceableRepository`, function() {
     });
 
     it(`persists event sourceable as commit and snapshots it when snapshotter is defined`, async () => {
-      container
+      injector
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
       commitStore.createCommit.returns(commit);
@@ -226,7 +224,7 @@ describe(`EventSourceableRepository`, function() {
     it('logs thrown error while saving snapshot to storage', async () => {
       commitStore.createCommit.returns(commit);
       snapshotter.makeSnapshotOf.rejects(new Error('my-error'));
-      container
+      injector
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
       config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
@@ -268,7 +266,7 @@ describe(`EventSourceableRepository`, function() {
     });
 
     it(`returns undefined when event sourceable cannot be restored from snapshotter`, async () => {
-      container
+      injector
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
       config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
@@ -388,7 +386,7 @@ describe(`EventSourceableRepository`, function() {
         });
 
         it(`returns aggregate restored from snapshot`, async () => {
-          container
+          injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           snapshotter.getSnapshotOf.returns(snapshotedEs);
@@ -406,7 +404,7 @@ describe(`EventSourceableRepository`, function() {
         });
 
         it('logs restoring event sourceable from snapshot', async () => {
-          container
+          injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
@@ -424,7 +422,7 @@ describe(`EventSourceableRepository`, function() {
         });
 
         it('logs restored event sourceable from snapshot', async () => {
-          container
+          injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
@@ -443,7 +441,7 @@ describe(`EventSourceableRepository`, function() {
         });
 
         it(`returns aggregate restored from snapshot with replayed remaining eventSourceable events from commit store`, async () => {
-          container
+          injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
@@ -481,7 +479,7 @@ describe(`EventSourceableRepository`, function() {
         });
 
         it('logs restored event sourceable from snapshot with replayed remaining events from commit store', async () => {
-          container
+          injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
@@ -527,7 +525,7 @@ describe(`EventSourceableRepository`, function() {
         });
 
         it(`returns process restored from snapshot`, async () => {
-          container
+          injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           snapshotter.getSnapshotOf.returns(snapshotedEs);
@@ -546,7 +544,7 @@ describe(`EventSourceableRepository`, function() {
         });
 
         it(`returns process restored from snapshot with replayed remaining eventSourceable events from commit store`, async () => {
-          container
+          injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           snapshotter.getSnapshotOf.returns(snapshotedEs);
@@ -612,7 +610,7 @@ describe(`EventSourceableRepository`, function() {
     });
 
     it(`returns true if snapshotter is defined on repository`, () => {
-      container
+      injector
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
       config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);

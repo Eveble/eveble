@@ -8,7 +8,7 @@ import { Projection } from '../../../src/infrastructure/projection';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
@@ -44,13 +44,13 @@ describe('Event projection', function() {
   // Props
   const appId = 'my-app-id';
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   let eventBus: types.EventBus;
 
   beforeEach(async () => {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
     eventBus = new EventBus();

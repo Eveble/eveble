@@ -37,7 +37,7 @@ import { TaskCompleted } from '../../domains/task-list/task-events';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
 import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-task-completion-policy';
-import { Container } from '../../../src/core/injector';
+import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { CommandBus } from '../../../src/messaging/command-bus';
@@ -78,7 +78,7 @@ describe(`Routing with initializing Event on Process`, function() {
   // Kernel
   let asserter: Asserter;
   // Injector
-  let injector: Container;
+  let injector: Injector;
   let log: any;
   let config: any;
   // MongoDB
@@ -91,7 +91,7 @@ describe(`Routing with initializing Event on Process`, function() {
   let repository: types.EventSourceableRepository;
 
   const setupInjector = function(): void {
-    injector = new Container();
+    injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
 

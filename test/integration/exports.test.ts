@@ -133,7 +133,7 @@ import {
   InvalidTransportIdError,
   TransportExistsError,
 } from '../../src/core/core-errors';
-import { Container } from '../../src/core/injector';
+import { Injector } from '../../src/core/injector';
 import { Kernel, kernel } from '../../src/core/kernel';
 import { Library } from '../../src/core/library';
 import { LogTransport } from '../../src/core/log-transport';
@@ -418,13 +418,13 @@ import {
   SimpleLogFormatter as SimpleLogFormatterExported,
   ConsoleTransport as ConsoleTransportExported,
   BaseApp as BaseAppExported,
-  Container as ContainerExported,
   Kernel as KernelExported,
   kernel as kernelExported,
   Library as LibraryExported,
   LogTransport as LogTransportExported,
   Logger as LoggerExported,
   Module as ModuleExported,
+  Injector as InjectorExported,
   // Core Errors
   InjectorError as InjectorErrorExported,
   InvalidEventSourceableError as InvalidEventSourceableErrorExported,
@@ -927,8 +927,8 @@ describe(`imports`, function() {
       it('BaseApp', () => {
         expect(BaseAppExported).to.be.equal(BaseApp);
       });
-      it('Container', () => {
-        expect(ContainerExported).to.be.equal(Container);
+      it('Injector', () => {
+        expect(InjectorExported).to.be.equal(Injector);
       });
       it('Kernel', () => {
         expect(KernelExported).to.be.equal(Kernel);
