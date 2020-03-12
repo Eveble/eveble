@@ -129,7 +129,8 @@ export class Serializable
     this.prototype.registerHook(
       'onConstruction',
       'convert-serializable-list',
-      this.prototype.processSerializableList
+      this.prototype.processSerializableList,
+      true
     );
   }
 
