@@ -1,3 +1,6 @@
+/* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/camelcase */
+
 import { expect } from 'chai';
 import {
   postConstruct,
@@ -406,6 +409,7 @@ import {
   LogTransportConfig as LogTransportConfigExported,
   // Constants
   BINDINGS as BINDINGSExported,
+  EVEBLE_BINDINGS as EVEBLE_BINDINGSExported,
   DEFAULTS as DEFAULTSExported,
   LITERAL_KEYS as LITERAL_KEYS_EXPORTED,
   METADATA_KEYS as METADATA_KEYS_EXPORTED,
@@ -890,6 +894,9 @@ describe(`imports`, function() {
     describe('constants', () => {
       it('BINDINGS', () => {
         expect(BINDINGSExported).to.be.equal(BINDINGS);
+      });
+      it('EVEBLE_BINDINGS', () => {
+        expect(EVEBLE_BINDINGSExported).to.be.equal(BINDINGS);
       });
       it('DEFAULTS', () => {
         expect(DEFAULTSExported).to.be.equal(DEFAULTS);

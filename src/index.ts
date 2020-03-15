@@ -2,6 +2,9 @@
 EVEBLE
 */
 // Annotations
+// Constants
+import { BINDINGS } from './constants/bindings';
+
 export { delegate } from './annotations/delegate';
 export { handle } from './annotations/handle';
 export { initial } from './annotations/initial';
@@ -30,8 +33,6 @@ export { AppConfig } from './configs/app-config';
 export { EvebleConfig } from './configs/eveble-config';
 export { LoggingConfig } from './configs/logging-config';
 export { LogTransportConfig } from './configs/log-transport-config';
-// Constants
-export { BINDINGS } from './constants/bindings';
 // Prettier does not like export * as SOMETHING from '..';
 export { LITERAL_KEYS } from './constants/literal-keys';
 export { DEFAULTS } from './constants/defaults';
@@ -236,6 +237,7 @@ export {
   inject,
 } from '@parisholley/inversify-async';
 export { bootstrapLogger } from './utils/logger-bootstrapper';
+export { BINDINGS, BINDINGS as EVEBLE_BINDINGS };
 /*
 TYPEND
 */
