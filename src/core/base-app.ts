@@ -139,8 +139,8 @@ export abstract class BaseApp extends Module implements types.BaseApp {
    * @async
    */
   protected async onConfiguration(): Promise<void> {
-    this.bindKernelDependenciesOnInjector();
-    this.bindAppDependenciesOnInjector();
+    this.bindKernelDependencies();
+    this.bindAppDependencies();
     if (kernel.injector === undefined) {
       kernel.setInjector(this.injector);
     }
@@ -153,7 +153,7 @@ export abstract class BaseApp extends Module implements types.BaseApp {
   /**
    * Binds kernel dependencies on Injector.
    */
-  protected bindKernelDependenciesOnInjector(): void {
+  protected bindKernelDependencies(): void {
     this.injector
       .bind<types.Converter>(BINDINGS.Converter)
       .toConstantValue(kernel.converter);
@@ -171,7 +171,7 @@ export abstract class BaseApp extends Module implements types.BaseApp {
   /**
    * Binds app dependencies to Injector.
    */
-  protected bindAppDependenciesOnInjector(): void {
+  protected bindAppDependencies(): void {
     this.injector
       .bind<types.Injector>(BINDINGS.Injector)
       .toConstantValue(this.injector);
