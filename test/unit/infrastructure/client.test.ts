@@ -1,13 +1,8 @@
 import { expect } from 'chai';
 import { Client } from '../../../src/infrastructure/client';
-import { Struct } from '../../../src/components/struct';
 import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
 
 describe(`Client`, function() {
-  it(`extends Struct`, () => {
-    expect(Client.prototype).to.be.instanceof(Struct);
-  });
-
   it(`has StatefulMixin mixin on prototype chain applied`, () => {
     expect(Client.prototype).to.be.instanceof(StatefulMixin);
   });
