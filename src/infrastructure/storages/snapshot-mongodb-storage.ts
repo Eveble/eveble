@@ -21,7 +21,7 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
   protected collection: Collection;
 
   @inject(BINDINGS.SnapshotSerializer)
-  protected esSerializer: types.SnapshotSerializer;
+  protected snapshotSerializer: types.SnapshotSerializer;
 
   /**
    * Adds new snapshot as serialized version of `EventSourceable` instance to `MongoDB` snapshots collection.
@@ -29,19 +29,9 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
    * @param eventSourceable - Instance implementing `EventSourceable` interface.
    * @returns Identifier for document(as Snapshot's id) on MongoDB collection.
    */
-  public async addSnapshot(
-    eventSourceable: types.EventSourceable
-  ): Promise<string> {
-    const eventSourceableId = eventSourceable.getId().toString();
-    const serializedEventSourceable = this.esSerializer.serialize(
-      eventSourceable
-    );
-
-    const doc = {
-      _id: eventSourceableId,
-      snapshot: serializedEventSourceable,
-    };
-    const output = await this.collection.insertOne(doc);
+  public async save(eventSourceable: types.EventSourceable): Promise<string> {
+    const snapshot = this.snapshotSerializer.serialize(eventSourceable);
+    const output = await this.collection.insertOne(snapshot);
     if (!this.isSuccessfulInsert(output, 1)) {
       throw new AddingSnapshotError(
         this.constructor.name,
@@ -53,19 +43,20 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
   }
 
   /**
-   * Updates `EventSourceable` snapshot on z snapshots collection.
+   * Updates `EventSourceable` snapshot on the snapshots collection.
    * @async
    * @param eventSourceable - Instance implementing `EventSourceable` interface.
    * @returns Returns `true` if snapshot update was successful, else throws.
    * @throws {UpdatingSnapshotError}
    * Thrown if update operation on MongoDB is not successful.
    */
-  public async updateSnapshot(
+  public async update(
     eventSourceable: types.EventSourceable
   ): Promise<boolean> {
     const filter = { _id: eventSourceable.getId().toString() };
+    const snapshot = this.snapshotSerializer.serialize(eventSourceable);
     const update = {
-      $set: { snapshot: this.esSerializer.serialize(eventSourceable) },
+      $set: { snapshot: snapshot.snapshot },
     };
 
     const isSuccessful = await this.updateOne(filter, update);
@@ -86,14 +77,14 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
    * @param eventSourceableId - Identifier as string or `Guid` instance.
    * @returns Instance as a snapshot implementing `EventSourceable` interface, else `undefined`.
    */
-  public async getSnapshotById(
+  public async findById(
     EventSourceableType: types.EventSourceableType, // Can be skipped since were using EJSON serializer
     eventSourceableId: string | Guid
   ): Promise<types.EventSourceable | undefined> {
     const query = { _id: eventSourceableId.toString() };
     const foundSerializedSnapshot = await this.collection.findOne(query);
     if (foundSerializedSnapshot) {
-      return this.esSerializer.deserialize(
+      return this.snapshotSerializer.deserialize(
         EventSourceableType,
         foundSerializedSnapshot.snapshot
       );

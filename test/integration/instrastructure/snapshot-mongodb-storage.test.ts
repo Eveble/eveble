@@ -100,7 +100,7 @@ describe(`SnapshotMongoDBStorage`, function() {
   });
 
   it(`inserts snapshot to MongoDB snapshots collection`, async () => {
-    const result = await storage.addSnapshot(eventSourceable);
+    const result = await storage.save(eventSourceable);
     expect(result).to.be.equal(eventSourceableId);
 
     const expectedSnapshot = {
@@ -116,10 +116,10 @@ describe(`SnapshotMongoDBStorage`, function() {
   it(`updates snapshot on MongoDB snapshots collection`, async () => {
     const updatedName = 'Not-Foo-Anymore';
 
-    await storage.addSnapshot(eventSourceable);
+    await storage.save(eventSourceable);
 
     eventSourceable.name = updatedName;
-    await storage.updateSnapshot(eventSourceable);
+    await storage.update(eventSourceable);
 
     const expectedUpdatedSnapshot = {
       _id: `${eventSourceableId}`,
@@ -132,8 +132,8 @@ describe(`SnapshotMongoDBStorage`, function() {
   });
 
   it(`returns deserialized event sourceable snapshot from MongoDB snapshots collection by event sourceable's id`, async () => {
-    await storage.addSnapshot(eventSourceable);
-    const foundSnapshot = await storage.getSnapshotById(
+    await storage.save(eventSourceable);
+    const foundSnapshot = await storage.findById(
       MyEventSourceable,
       eventSourceableId
     );
@@ -142,7 +142,7 @@ describe(`SnapshotMongoDBStorage`, function() {
   });
 
   it(`returns undefined if snapshot cannot be found on MongoDB snapshots collection`, async () => {
-    const foundSnapshot = await storage.getSnapshotById(
+    const foundSnapshot = await storage.findById(
       MyEventSourceable,
       eventSourceableId
     );

@@ -39,12 +39,16 @@ describe(`SnapshotSerializer`, function() {
       key: 'my-value',
     };
     const instance = new MyEventSourceable({
+      id: 'my-id',
       key: 'my-value',
     });
     serializer.toData.withArgs(instance).returns(data);
     serializer.stringify.withArgs(data).returns(serializedEs);
 
-    expect(esSerializer.serialize(instance)).to.be.equal(serializedEs);
+    expect(esSerializer.serialize(instance)).to.be.eql({
+      _id: 'my-id',
+      snapshot: serializedEs,
+    });
     expect(serializer.toData).to.be.calledOnce;
     expect(serializer.toData).to.be.calledWithExactly(instance);
     expect(serializer.stringify).to.be.calledOnce;

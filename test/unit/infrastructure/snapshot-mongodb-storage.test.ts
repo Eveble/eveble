@@ -34,7 +34,8 @@ describe(`SnapshotMongoDBStorage`, function() {
   let storage: SnapshotMongoDBStorage;
   let eventSourceableId: string;
   let eventSourceable: EventSourceable;
-  let serializedEs: any;
+  let snapshot: any;
+  let snapshotedES: any;
 
   before(async () => {
     const mongoUrl = getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_URL');
@@ -52,7 +53,11 @@ describe(`SnapshotMongoDBStorage`, function() {
   });
 
   beforeEach(() => {
-    serializedEs = sinon.stub();
+    snapshotedES = sinon.stub();
+    snapshot = {
+      id: 'my-id',
+      snapshot: snapshotedES,
+    };
 
     const dbName =
       getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_DBNAME') || 'eveble_testing';
@@ -65,9 +70,9 @@ describe(`SnapshotMongoDBStorage`, function() {
     storage = new SnapshotMongoDBStorage();
     esSerializer = stubInterface<types.SnapshotSerializer>();
 
-    esSerializer.serialize.withArgs(eventSourceable).returns(serializedEs);
+    esSerializer.serialize.withArgs(eventSourceable).returns(snapshot);
     esSerializer.deserialize
-      .withArgs(MyEventSourceable, serializedEs)
+      .withArgs(MyEventSourceable, snapshotedES)
       .returns(eventSourceable);
 
     injector
@@ -87,16 +92,13 @@ describe(`SnapshotMongoDBStorage`, function() {
     const docId = 'mongo-id';
     collectionMock
       .expects('insertOne')
-      .withArgs({
-        _id: eventSourceableId,
-        snapshot: serializedEs,
-      })
+      .withArgs(snapshot)
       .resolves({
         insertedId: docId,
         insertedCount: 1,
       });
 
-    const result = await storage.addSnapshot(eventSourceable);
+    const result = await storage.save(eventSourceable);
     expect(result).to.be.equal(docId);
 
     collectionMock.verify();
@@ -105,16 +107,13 @@ describe(`SnapshotMongoDBStorage`, function() {
   it(`throws AddingSnapshotError on unsuccessful document insertion`, async () => {
     collectionMock
       .expects('insertOne')
-      .withArgs({
-        _id: eventSourceableId,
-        snapshot: serializedEs,
-      })
+      .withArgs(snapshot)
       .resolves({
         insertedCount: 0,
       });
 
     await expect(
-      storage.addSnapshot(eventSourceable)
+      storage.save(eventSourceable)
     ).to.eventually.be.rejectedWith(
       AddingSnapshotError,
       `SnapshotMongoDBStorage: adding snapshot for event sourceable 'SnapshotMongoDBStorage.MyEventSourceable' with id '${eventSourceableId.toString()}' failed`
@@ -128,7 +127,7 @@ describe(`SnapshotMongoDBStorage`, function() {
     };
     const update = {
       $set: {
-        snapshot: serializedEs,
+        snapshot: snapshot.snapshot,
       },
     };
 
@@ -137,7 +136,7 @@ describe(`SnapshotMongoDBStorage`, function() {
       .withArgs(filter, update)
       .resolves({ result: { nModified: 1 } });
 
-    await storage.updateSnapshot(eventSourceable);
+    await storage.update(eventSourceable);
 
     collectionMock.verify();
   });
@@ -148,7 +147,7 @@ describe(`SnapshotMongoDBStorage`, function() {
     };
     const update = {
       $set: {
-        snapshot: serializedEs,
+        snapshot: snapshot.snapshot,
       },
     };
 
@@ -158,7 +157,7 @@ describe(`SnapshotMongoDBStorage`, function() {
       .resolves({ result: { nModified: 0 } });
 
     await expect(
-      storage.updateSnapshot(eventSourceable)
+      storage.update(eventSourceable)
     ).to.eventually.be.rejectedWith(
       UpdatingSnapshotError,
       `SnapshotMongoDBStorage: updating snapshot for event sourceable 'SnapshotMongoDBStorage.MyEventSourceable' with id '${eventSourceableId.toString()}' failed`
@@ -175,12 +174,9 @@ describe(`SnapshotMongoDBStorage`, function() {
     collectionMock
       .expects('findOne')
       .withArgs(query)
-      .resolves({
-        _id: eventSourceableId,
-        snapshot: serializedEs,
-      });
+      .resolves(snapshot);
 
-    const foundSnapshot = await storage.getSnapshotById(
+    const foundSnapshot = await storage.findById(
       MyEventSourceable,
       eventSourceableId
     );
@@ -200,7 +196,7 @@ describe(`SnapshotMongoDBStorage`, function() {
       .withArgs(query)
       .resolves(null);
 
-    const foundSnapshot = await storage.getSnapshotById(
+    const foundSnapshot = await storage.findById(
       MyEventSourceable,
       eventSourceableId
     );

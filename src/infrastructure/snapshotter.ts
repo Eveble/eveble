@@ -59,7 +59,7 @@ export class Snapshotter implements types.Snapshotter {
     );
 
     const EventSourceableType = eventSourceable.constructor as types.EventSourceableType;
-    const lastSnapshot = await this.storage.getSnapshotById(
+    const lastSnapshot = await this.storage.findById(
       EventSourceableType,
       id
     );
@@ -68,7 +68,7 @@ export class Snapshotter implements types.Snapshotter {
 
     // Insert first snapshot of this event sourceable
     if (lastSnapshot === undefined) {
-      snapshotId = await this.addSnapshotToStorage(eventSourceable);
+      snapshotId = await this.saveToStorage(eventSourceable);
       // Update existing snapshot of this event sourceable
     } else {
       // Update only if event sourceable doubled version since last snapshot
@@ -76,7 +76,7 @@ export class Snapshotter implements types.Snapshotter {
         lastSnapshot.getVersion() <=
         currentVersion - this.getVersionFrequency();
       if (isUpdatable) {
-        snapshotId = await this.updateSnapshotOnStorage(
+        snapshotId = await this.updateOnStorage(
           eventSourceable,
           lastSnapshot
         );
@@ -101,7 +101,7 @@ export class Snapshotter implements types.Snapshotter {
     EventSourceableType: types.EventSourceableType,
     eventSourceableId: string | Guid
   ): Promise<types.EventSourceable | undefined> {
-    return this.storage.getSnapshotById(
+    return this.storage.findById(
       EventSourceableType, // Pass event sourceable type for complex storage implementations
       eventSourceableId
     );
@@ -121,17 +121,17 @@ export class Snapshotter implements types.Snapshotter {
    * @param eventSourceable - Instance implementing `EventSourceable` interface.
    * @returns Identifier of snapshot on storage.
    */
-  protected async addSnapshotToStorage(
+  protected async saveToStorage(
     eventSourceable: types.EventSourceable
   ): Promise<string | undefined> {
     try {
-      const snapshotId = await this.storage.addSnapshot(eventSourceable);
+      const snapshotId = await this.storage.save(eventSourceable);
       this.log.debug(
         new Log(
           `created new snapshot of '${eventSourceable.getTypeName()}' with id '${eventSourceable.getId()}'`
         )
           .on(this)
-          .in(this.addSnapshotToStorage)
+          .in(this.saveToStorage)
           .with('event sourceable', eventSourceable)
       );
 
@@ -159,19 +159,19 @@ export class Snapshotter implements types.Snapshotter {
    * @param lastSnapshot - Last available snapshot of `EventSourceable`.
    * @return Updated snapshot identifier.
    */
-  protected async updateSnapshotOnStorage(
+  protected async updateOnStorage(
     eventSourceable: types.EventSourceable,
     lastSnapshot: types.EventSourceable
   ): Promise<string> {
     try {
-      await this.storage.updateSnapshot(eventSourceable, lastSnapshot);
+      await this.storage.update(eventSourceable, lastSnapshot);
     } catch (error) {
       this.log.error(
         new Log(
           `failed to update last found snapshot(${lastSnapshot.getVersion()}) for '${eventSourceable.getTypeName()}' with id '${eventSourceable.getId()}' do to error: ${error}`
         )
           .on(this)
-          .in(this.updateSnapshotOnStorage)
+          .in(this.updateOnStorage)
           .with('event sourceable', eventSourceable)
           .with('updated last snapshot', lastSnapshot)
           .with('error', error)
@@ -183,7 +183,7 @@ export class Snapshotter implements types.Snapshotter {
         `updated last found snapshot(${lastSnapshot.getVersion()}) for '${eventSourceable.getTypeName()}' with id '${eventSourceable.getId()}'`
       )
         .on(this)
-        .in(this.updateSnapshotOnStorage)
+        .in(this.updateOnStorage)
         .with('updated last snapshot', lastSnapshot)
     );
 

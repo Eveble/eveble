@@ -13,9 +13,14 @@ export class SnapshotSerializer implements types.SnapshotSerializer {
    * @param eventSourceable - Instance implementing `EventSourceable` interface.
    * @returns Serialized event sourceable as a string.
    */
-  public serialize(eventSourceable: types.EventSourceable): string {
+  public serialize(
+    eventSourceable: types.EventSourceable
+  ): Record<string, any> {
     const data = this.serializer.toData(eventSourceable);
-    return this.serializer.stringify(data);
+    return {
+      _id: eventSourceable.getId().toString(),
+      snapshot: this.serializer.stringify(data),
+    };
   }
 
   /**
