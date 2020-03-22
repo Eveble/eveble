@@ -229,27 +229,11 @@ export class Eveble extends Module {
    * Binds infrastructure components on IoC.
    */
   protected bindInfrastructure(): void {
-    // Initialized manually do to issues with @injectable decorator for
-    // singletons from Inversify - that is not compatible with mixins(classes from polytype)
-    const constants = {
-      CommandBus: new CommandBus(),
-      EventBus: new EventBus(),
-    };
-
-    for (const [id, component] of Object.entries(constants)) {
-      if (!this.injector.isBound(BINDINGS[id])) {
-        this.injector.bind(BINDINGS[id]).toConstantValue(component);
-        this.log?.debug(
-          new Log(`bound '${id}' as constant value`)
-            .on(this)
-            .in(this.initializeTopLevelDependencies)
-        );
-      }
-    }
-
     const singletons = {
       CommitPublisher,
       CommitStore,
+      CommandBus,
+      EventBus,
       EventSourceableRepository,
     };
 

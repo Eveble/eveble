@@ -304,7 +304,7 @@ describe(`Eveble Module`, function() {
             )
           ).to.be.instanceof(CommandBus);
           expect(log.debug).to.be.calledWithExactly(
-            new Log(`bound 'CommandBus' as constant value`)
+            new Log(`bound 'CommandBus' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
           );
@@ -335,7 +335,7 @@ describe(`Eveble Module`, function() {
             await eveble.injector.getAsync<types.EventBus>(BINDINGS.EventBus)
           ).to.be.instanceof(EventBus);
           expect(log.debug).to.be.calledWithExactly(
-            new Log(`bound 'EventBus' as constant value`)
+            new Log(`bound 'EventBus' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
           );
