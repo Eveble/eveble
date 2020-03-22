@@ -274,18 +274,18 @@ describe(`CommitStore with MongoDB storage`, function() {
         id,
       });
       const firstCommit = await commitStore.createCommit(eventSourceable);
-      await commitStore.addCommit(firstCommit);
+      await commitStore.save(firstCommit);
       eventSourceable.version = 1;
       const secondCommit = await commitStore.createCommit(eventSourceable);
-      await commitStore.addCommit(secondCommit);
+      await commitStore.save(secondCommit);
       eventSourceable.version = 2;
       const thirdCommit = await commitStore.createCommit(eventSourceable);
-      await commitStore.addCommit(thirdCommit);
+      await commitStore.save(thirdCommit);
       eventSourceable.record(firstEvent);
       eventSourceable.record(secondEvent);
       eventSourceable.version = 3;
       const fourthCommit = await commitStore.createCommit(eventSourceable);
-      await commitStore.addCommit(fourthCommit);
+      await commitStore.save(fourthCommit);
 
       expect(fourthCommit).to.be.instanceof(Commit);
       expect(fourthCommit.id).to.be.a('string'); // Generated from MongoDBStorage
@@ -324,7 +324,7 @@ describe(`CommitStore with MongoDB storage`, function() {
       const aggregate = new MyAggregate({ id: 'my-id' });
 
       const commit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(commit);
+      await commitStore.save(commit);
 
       aggregate.version = 20; // Should be at version 1
       await expect(
@@ -342,10 +342,10 @@ describe(`CommitStore with MongoDB storage`, function() {
       const aggregate = new MyAggregate({ id: 'my-id' });
       const commit = await commitStore.createCommit(aggregate);
 
-      const commitId = await commitStore.addCommit(commit);
+      const commitId = await commitStore.save(commit);
       expect(commitId).to.be.a('string');
 
-      const foundCommit = (await commitStore.getCommitById(commitId)) as Commit;
+      const foundCommit = (await commitStore.findById(commitId)) as Commit;
 
       expect(foundCommit).to.be.instanceof(Commit);
       expect(foundCommit.id).to.be.a('string'); // Generated from MongoDBStorage
@@ -373,8 +373,8 @@ describe(`CommitStore with MongoDB storage`, function() {
       const aggregate = new MyAggregate({ id: 'my-id' });
 
       const commit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(commit);
-      await expect(commitStore.addCommit(commit)).to.eventually.be.rejectedWith(
+      await commitStore.save(commit);
+      await expect(commitStore.save(commit)).to.eventually.be.rejectedWith(
         CommitConcurrencyError,
         `CommitStoreWithMongoDBStorage.MyAggregate: expected event sourceable with id of 'my-id' to be at version 0 but is at version 1`
       );
@@ -386,16 +386,16 @@ describe(`CommitStore with MongoDB storage`, function() {
       const aggregate = new MyAggregate({ id: 'my-id' });
 
       const commit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(commit);
+      await commitStore.save(commit);
 
-      const foundCommit = await commitStore.getCommitById(commit.id);
+      const foundCommit = await commitStore.findById(commit.id);
       expect(foundCommit).to.be.instanceof(Commit);
       expect(foundCommit).to.be.eql(commit);
     });
 
     it(`returns undefined if commit by id can't be found`, async () => {
       const commitId = new Guid().toString();
-      const foundCommit = await commitStore.getCommitById(commitId);
+      const foundCommit = await commitStore.findById(commitId);
       expect(foundCommit).to.be.equal(undefined);
     });
   });
@@ -416,12 +416,12 @@ describe(`CommitStore with MongoDB storage`, function() {
 
       aggregate.record(firstEvent);
       const firstCommit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(firstCommit);
+      await commitStore.save(firstCommit);
 
       aggregate.version = 1;
       aggregate.record(secondEvent);
       const secondCommit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(secondCommit);
+      await commitStore.save(secondCommit);
 
       const events = await commitStore.getEvents(aggregateId);
       const firstV1Event = new MyEvent({ ...firstEvent, version: 1 });
@@ -445,12 +445,12 @@ describe(`CommitStore with MongoDB storage`, function() {
 
       aggregate.record(firstEvent);
       const firstCommit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(firstCommit);
+      await commitStore.save(firstCommit);
 
       aggregate.version = 1;
       aggregate.record(secondEvent);
       const secondCommit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(secondCommit);
+      await commitStore.save(secondCommit);
 
       const events = await commitStore.getEvents(aggregateId, 2);
       const firstV2Event = new MyEvent({ ...firstEvent, version: 2 });
@@ -481,12 +481,12 @@ describe(`CommitStore with MongoDB storage`, function() {
 
       aggregate.record(firstEvent);
       const firstCommit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(firstCommit);
+      await commitStore.save(firstCommit);
 
       aggregate.version = 1;
       aggregate.record(secondEvent);
       const secondCommit = await commitStore.createCommit(aggregate);
-      await commitStore.addCommit(secondCommit);
+      await commitStore.save(secondCommit);
 
       const events = await commitStore.getAllEvents();
       const firstV1Event = new MyEvent({ ...firstEvent, version: 1 });

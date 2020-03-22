@@ -210,10 +210,10 @@ describe(`Observing and publishing new commits`, function() {
         sendingAppId,
         sendingWorkerId
       );
-      await storage.addCommit(commitToPublishAsSendingApp);
+      await storage.save(commitToPublishAsSendingApp);
 
       await delay(500); // Simulate time passing while observing changes
-      const foundCommitAfterObserving = (await storage.getCommitById(
+      const foundCommitAfterObserving = (await storage.findById(
         commitId
       )) as Commit;
       const receivers = foundCommitAfterObserving?.receivers;
@@ -258,9 +258,9 @@ describe(`Observing and publishing new commits`, function() {
         sendingAppId,
         sendingWorkerId
       );
-      await storage.addCommit(commitToPublishAsSendingApp);
+      await storage.save(commitToPublishAsSendingApp);
 
-      const foundCommitAfterObserving = (await storage.getCommitById(
+      const foundCommitAfterObserving = (await storage.findById(
         commitId
       )) as Commit;
       const receivers = foundCommitAfterObserving?.receivers;

@@ -157,8 +157,8 @@ describe(`EventSourceableRepository`, function() {
 
       await repository.save(esInstance);
       expect(esInstance.getVersion()).to.be.equal(1);
-      expect(commitStore.addCommit).to.be.calledOnce;
-      expect(commitStore.addCommit).to.be.calledWithExactly(commit);
+      expect(commitStore.save).to.be.calledOnce;
+      expect(commitStore.save).to.be.calledWithExactly(commit);
     });
 
     it(`persists event sourceable as commit and snapshots it when snapshotter is defined`, async () => {
@@ -173,7 +173,7 @@ describe(`EventSourceableRepository`, function() {
 
       await repository.save(esInstance);
       expect(esInstance.getVersion()).to.be.equal(1);
-      expect(commitStore.addCommit).to.be.calledWithExactly(commit);
+      expect(commitStore.save).to.be.calledWithExactly(commit);
       expect(snapshotter.makeSnapshotOf).to.be.calledWithExactly(esInstance);
     });
 
@@ -202,7 +202,7 @@ describe(`EventSourceableRepository`, function() {
 
     it('logs thrown error while saving commit to storage', async () => {
       commitStore.createCommit.returns(commit);
-      commitStore.addCommit.rejects(new Error('my-error'));
+      commitStore.save.rejects(new Error('my-error'));
 
       const esInstance = new MyEventSourceable({ id: props.id });
       await expect(repository.save(esInstance)).to.eventually.be.rejectedWith(
