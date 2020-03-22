@@ -18,9 +18,9 @@ chai.use(chaiAsPromised);
 
 describe(`MongoDB client`, function() {
   // Props
-  const url = getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_URL');
+  const url = getenv.string('EVEBLE_COMMITSTORE_MONGODB_URL');
   const databaseName =
-    getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_DBNAME') || 'eveble_testing';
+    getenv.string('EVEBLE_COMMITSTORE_MONGODB_DBNAME') || 'eveble_testing';
   const options = { useNewUrlParser: true, useUnifiedTopology: true };
   // Injector
   let injector: Injector;
