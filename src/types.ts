@@ -900,24 +900,19 @@ export namespace types {
     ): EventSourceable;
   }
 
-  export type SerializedTypeForMongoDB = {
-    type: string;
-    data: {
-      _type: string;
-      [key: string]: any;
-    };
+  export type MongoDBSerializedType = {
+    _type: string;
+    [key: string]: any;
   };
 
-  export interface SerializedCommitForMongoDB {
+  export interface MongoDBSerializedCommit {
     _id: string;
     id: string;
     sourceId: string;
     version: number;
-    changes: {
-      eventSourceableType: string;
-      events: SerializedTypeForMongoDB[];
-      commands: SerializedTypeForMongoDB[];
-    };
+    eventSourceableType: string;
+    events: MongoDBSerializedType[];
+    commands: MongoDBSerializedType[];
     insertedAt: Date;
     eventTypes: string[];
     commandTypes: string[];
