@@ -82,7 +82,7 @@ export class CommitMongoDBObserver extends StatefulMixin {
 
     this.stream.on(
       'data',
-      async (serializedCommit: types.SerializedCommitForMongoDB) => {
+      async (serializedCommit: types.MongoDBSerializedCommit) => {
         const lockedCommit = await this.storage.lockCommit(
           serializedCommit.id,
           appId,

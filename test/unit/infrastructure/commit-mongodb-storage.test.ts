@@ -122,9 +122,7 @@ describe(`CommitMongoDBStorage`, function() {
   describe(`adding commit`, () => {
     it(`inserts commit to MongoDB collection`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<
-        types.SerializedCommitForMongoDB
-      >();
+      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
       commitSerializer.serialize.withArgs(commit).returns(serializedCommit);
 
       collectionMock
@@ -145,9 +143,7 @@ describe(`CommitMongoDBStorage`, function() {
 
     it(`throws AddingCommitFailedError on unsuccessful document insertion`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<
-        types.SerializedCommitForMongoDB
-      >();
+      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
       commitSerializer.serialize.withArgs(commit).returns(serializedCommit);
 
       collectionMock
@@ -167,9 +163,7 @@ describe(`CommitMongoDBStorage`, function() {
 
     it(`throws CommitConcurrencyError on duplicated key error`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<
-        types.SerializedCommitForMongoDB
-      >();
+      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
       commitSerializer.serialize.withArgs(commit).returns(serializedCommit);
 
       const error = new Error('duplicate key error index');
@@ -248,9 +242,7 @@ describe(`CommitMongoDBStorage`, function() {
       const query = {
         _id: commitId,
       };
-      const serializedCommit = stubInterface<
-        types.SerializedCommitForMongoDB
-      >();
+      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
       const commit = generateCommit(commitId, eventSourceableId, 1);
       collectionMock
         .expects('findOne')
@@ -431,9 +423,7 @@ describe(`CommitMongoDBStorage`, function() {
         },
       };
 
-      const serializedCommit = stubInterface<
-        types.SerializedCommitForMongoDB
-      >();
+      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
 
       collectionMock
         .expects('updateOne')
@@ -542,9 +532,7 @@ describe(`CommitMongoDBStorage`, function() {
       };
 
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<
-        types.SerializedCommitForMongoDB
-      >();
+      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
 
       collectionMock
         .expects('findOneAndUpdate')
@@ -603,9 +591,7 @@ describe(`CommitMongoDBStorage`, function() {
       };
 
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<
-        types.SerializedCommitForMongoDB
-      >();
+      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
 
       collectionMock
         .expects('findOneAndUpdate')
