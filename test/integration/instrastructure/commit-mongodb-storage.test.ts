@@ -80,12 +80,9 @@ describe(`CommitMongoDBStorage`, function() {
       id: commitId,
       sourceId: eventSourceableId.toString(),
       version,
-      changes: {
-        eventSourceableType:
-          'IntegrationCommitMongoDBStorage.MyEventSourceable',
-        events: [event],
-        commands: [command],
-      },
+      eventSourceableType: 'IntegrationCommitMongoDBStorage.MyEventSourceable',
+      events: [event],
+      commands: [command],
       insertedAt: now,
       sentBy: appId,
       receivers: [receiver],
@@ -114,35 +111,32 @@ describe(`CommitMongoDBStorage`, function() {
       id: commitId,
       sourceId: eventSourceableId.toString(),
       version,
-      changes: {
-        eventSourceableType:
-          'IntegrationCommitMongoDBStorage.MyEventSourceable',
-        events: [
-          {
-            type: 'IntegrationCommitMongoDBStorage.MyEvent',
-            data: {
-              _type: 'IntegrationCommitMongoDBStorage.MyEvent',
-              sourceId: serializeId(eventSourceableId),
-              timestamp: now,
-              name: 'Foo',
-              version,
-              metadata: {},
-            },
+      eventSourceableType: 'IntegrationCommitMongoDBStorage.MyEventSourceable',
+      events: [
+        {
+          type: 'IntegrationCommitMongoDBStorage.MyEvent',
+          data: {
+            _type: 'IntegrationCommitMongoDBStorage.MyEvent',
+            sourceId: serializeId(eventSourceableId),
+            timestamp: now,
+            name: 'Foo',
+            version,
+            metadata: {},
           },
-        ],
-        commands: [
-          {
-            type: 'IntegrationCommitMongoDBStorage.MyCommand',
-            data: {
-              _type: 'IntegrationCommitMongoDBStorage.MyCommand',
-              targetId: serializeId(eventSourceableId),
-              timestamp: now,
-              name: 'Foo',
-              metadata: {},
-            },
+        },
+      ],
+      commands: [
+        {
+          type: 'IntegrationCommitMongoDBStorage.MyCommand',
+          data: {
+            _type: 'IntegrationCommitMongoDBStorage.MyCommand',
+            targetId: serializeId(eventSourceableId),
+            timestamp: now,
+            name: 'Foo',
+            metadata: {},
           },
-        ],
-      },
+        },
+      ],
       insertedAt: now,
       eventTypes: ['IntegrationCommitMongoDBStorage.MyEvent'],
       commandTypes: ['IntegrationCommitMongoDBStorage.MyCommand'],

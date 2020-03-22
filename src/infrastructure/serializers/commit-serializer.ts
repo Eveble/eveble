@@ -1,4 +1,5 @@
 import { inject, injectable } from '@parisholley/inversify-async';
+import { union } from 'lodash';
 import { Commit, CommitReceiver } from '../structs/commit';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
@@ -22,28 +23,30 @@ export class CommitSerializer implements types.CommitSerializer {
     serializedCommit.version = commit.version;
     serializedCommit.insertedAt = commit.insertedAt;
     serializedCommit.sentBy = commit.sentBy;
-    serializedCommit.changes = {
-      eventSourceableType: commit.changes.eventSourceableType,
-      events: [],
-      commands: [],
-    };
+    serializedCommit.eventSourceableType = commit.eventSourceableType;
+    serializedCommit.events = [];
+    serializedCommit.commands = [];
     serializedCommit.eventTypes = [];
     serializedCommit.commandTypes = [];
     serializedCommit.receivers = [];
 
-    for (const event of commit.changes.events) {
-      serializedCommit.changes.events.push({
+    for (const event of commit.events) {
+      serializedCommit.events.push({
         type: event.getTypeName(),
         data: this.serializer.toData(event),
       });
-      serializedCommit.eventTypes.push(event.getTypeName());
+      serializedCommit.eventTypes = union(serializedCommit.eventTypes, [
+        event.getTypeName(),
+      ]);
     }
-    for (const command of commit.changes.commands) {
-      serializedCommit.changes.commands.push({
+    for (const command of commit.commands) {
+      serializedCommit.commands.push({
         type: command.getTypeName(),
         data: this.serializer.toData(command),
       });
-      serializedCommit.commandTypes.push(command.getTypeName());
+      serializedCommit.commandTypes = union(serializedCommit.commandTypes, [
+        command.getTypeName(),
+      ]);
     }
     for (const receiver of commit.receivers) {
       serializedCommit.receivers.push({ ...receiver });
@@ -64,25 +67,19 @@ export class CommitSerializer implements types.CommitSerializer {
     delete deserializedProps.eventTypes;
     deserializedProps.receivers = [];
 
-    deserializedProps.changes = {
-      eventSourceableType: serializedCommit.changes.eventSourceableType,
-      events: [],
-      commands: [],
-    };
+    deserializedProps.events = [];
+    deserializedProps.commands = [];
+
     // Only parse events that can be handled by this app
-    for (const event of serializedCommit.changes.events) {
+    for (const event of serializedCommit.events) {
       if (this.serializer.hasType(event.type)) {
-        deserializedProps.changes.events.push(
-          this.serializer.fromData(event.data)
-        );
+        deserializedProps.events.push(this.serializer.fromData(event.data));
       }
     }
     // Only parse commands that can be handled by this app
-    for (const command of serializedCommit.changes.commands) {
+    for (const command of serializedCommit.commands) {
       if (this.serializer.hasType(command.type)) {
-        deserializedProps.changes.commands.push(
-          this.serializer.fromData(command.data)
-        );
+        deserializedProps.commands.push(this.serializer.fromData(command.data));
       }
     }
 

@@ -117,22 +117,20 @@ describe(`CommitStore`, function() {
           id: commitId.toString(),
           sourceId: id,
           version: 1,
-          changes: {
-            eventSourceableType: 'CommitStore.MyAggregate',
-            events: [
-              new MyEvent({
-                sourceId: id,
-                timestamp: now,
-                version: 1,
-              }),
-              new MyOtherEvent({
-                sourceId: id,
-                timestamp: now,
-                version: 1,
-              }),
-            ],
-            commands: [],
-          },
+          eventSourceableType: 'CommitStore.MyAggregate',
+          events: [
+            new MyEvent({
+              sourceId: id,
+              timestamp: now,
+              version: 1,
+            }),
+            new MyOtherEvent({
+              sourceId: id,
+              timestamp: now,
+              version: 1,
+            }),
+          ],
+          commands: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [
@@ -184,22 +182,20 @@ describe(`CommitStore`, function() {
           id: commitId.toString(),
           sourceId: id,
           version: 1,
-          changes: {
-            eventSourceableType: 'CommitStore.MyProcess',
-            events: [
-              new MyEvent({
-                sourceId: id,
-                timestamp: now,
-                version: 1,
-              }),
-              new MyOtherEvent({
-                sourceId: id,
-                timestamp: now,
-                version: 1,
-              }),
-            ],
-            commands: [firstCommand, secondCommand],
-          },
+          eventSourceableType: 'CommitStore.MyProcess',
+          events: [
+            new MyEvent({
+              sourceId: id,
+              timestamp: now,
+              version: 1,
+            }),
+            new MyOtherEvent({
+              sourceId: id,
+              timestamp: now,
+              version: 1,
+            }),
+          ],
+          commands: [firstCommand, secondCommand],
           insertedAt: now,
           sentBy: appId,
           receivers: [
@@ -246,22 +242,20 @@ describe(`CommitStore`, function() {
           id: commitId.toString(),
           sourceId: id,
           version: 11,
-          changes: {
-            eventSourceableType: 'CommitStore.MyEventSourceable',
-            events: [
-              new MyEvent({
-                sourceId: id,
-                timestamp: now,
-                version: 11,
-              }),
-              new MyOtherEvent({
-                sourceId: id,
-                timestamp: now,
-                version: 11,
-              }),
-            ],
-            commands: [],
-          },
+          eventSourceableType: 'CommitStore.MyEventSourceable',
+          events: [
+            new MyEvent({
+              sourceId: id,
+              timestamp: now,
+              version: 11,
+            }),
+            new MyOtherEvent({
+              sourceId: id,
+              timestamp: now,
+              version: 11,
+            }),
+          ],
+          commands: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [
@@ -319,11 +313,9 @@ describe(`CommitStore`, function() {
           id: 'commit-id',
           sourceId: 'my-id',
           version: 2,
-          changes: {
-            eventSourceableType: 'MyEventSourceable',
-            commands: [],
-            events: [],
-          },
+          eventSourceableType: 'MyEventSourceable',
+          commands: [],
+          events: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [],
@@ -341,11 +333,9 @@ describe(`CommitStore`, function() {
           id: 'commit-id',
           sourceId: 'my-id',
           version: 2,
-          changes: {
-            eventSourceableType: 'MyEventSourceable',
-            commands: [],
-            events: [],
-          },
+          eventSourceableType: 'MyEventSourceable',
+          commands: [],
+          events: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [],
@@ -368,11 +358,9 @@ describe(`CommitStore`, function() {
           id: 'commit-id',
           sourceId: 'my-id',
           version: 2,
-          changes: {
-            eventSourceableType: 'MyEventSourceable',
-            commands: [],
-            events: [],
-          },
+          eventSourceableType: 'MyEventSourceable',
+          commands: [],
+          events: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [],
@@ -397,11 +385,9 @@ describe(`CommitStore`, function() {
           id: 'commit-id',
           sourceId: 'my-id',
           version: 2,
-          changes: {
-            eventSourceableType: 'MyEventSourceable',
-            commands: [],
-            events: [],
-          },
+          eventSourceableType: 'MyEventSourceable',
+          commands: [],
+          events: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [],
@@ -421,17 +407,14 @@ describe(`CommitStore`, function() {
           id: 'commit-id',
           sourceId: 'my-id',
           version: 2,
-          changes: {
-            eventSourceableType: 'MyEventSourceable',
-            commands: [],
-            events: [],
-          },
+          eventSourceableType: 'MyEventSourceable',
+          commands: [],
+          events: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [],
         });
         const error = new Error('my-error');
-        storage.addCommit.withArgs(commit).rejects(error);
 
         await expect(
           commitStore.addCommit(commit)
@@ -452,11 +435,9 @@ describe(`CommitStore`, function() {
           id: 'commit-id',
           sourceId: 'my-id',
           version: 2,
-          changes: {
-            eventSourceableType: 'MyEventSourceable',
-            commands: [],
-            events: [],
-          },
+          eventSourceableType: 'MyEventSourceable',
+          commands: [],
+          events: [],
           insertedAt: now,
           sentBy: appId,
           receivers: [],
@@ -482,11 +463,9 @@ describe(`CommitStore`, function() {
         id: commitId.toString(),
         sourceId: 'my-event-sourceable-id',
         version: 1,
-        changes: {
-          eventSourceableType: 'CommitStore.MyAggregate',
-          events: [],
-          commands: [],
-        },
+        eventSourceableType: 'CommitStore.MyAggregate',
+        events: [],
+        commands: [],
         insertedAt: now,
         sentBy: appId,
         receivers: [],
@@ -515,14 +494,10 @@ describe(`CommitStore`, function() {
 
       storage.getCommits.withArgs('my-id', 1).returns([
         {
-          changes: {
-            events: [firstEvent, secondEvent],
-          },
+          events: [firstEvent, secondEvent],
         },
         {
-          changes: {
-            events: [thirdEvent],
-          },
+          events: [thirdEvent],
         },
       ]);
 
@@ -539,14 +514,10 @@ describe(`CommitStore`, function() {
 
       storage.getCommits.withArgs('my-id', 20).returns([
         {
-          changes: {
-            events: [firstEvent, secondEvent],
-          },
+          events: [firstEvent, secondEvent],
         },
         {
-          changes: {
-            events: [thirdEvent],
-          },
+          events: [thirdEvent],
         },
       ]);
 
@@ -570,14 +541,10 @@ describe(`CommitStore`, function() {
 
       storage.getAllCommits.returns([
         {
-          changes: {
-            events: [firstEvent, secondEvent],
-          },
+          events: [firstEvent, secondEvent],
         },
         {
-          changes: {
-            events: [thirdEvent],
-          },
+          events: [thirdEvent],
         },
       ]);
 

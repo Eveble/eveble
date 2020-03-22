@@ -57,11 +57,9 @@ describe(`CommitSerializer`, function() {
       id: commitId,
       sourceId: eventSourceableId.toString(),
       version,
-      changes: {
-        eventSourceableType: 'CommitMongoDBStorage.MyEventSourceable',
-        events: [event],
-        commands: [command],
-      },
+      eventSourceableType: 'CommitMongoDBStorage.MyEventSourceable',
+      events: [event],
+      commands: [command],
       insertedAt: now,
       sentBy: appId,
       receivers: [receiver],
@@ -90,32 +88,30 @@ describe(`CommitSerializer`, function() {
       id: commitId,
       sourceId: eventSourceableId.toString(),
       version,
-      changes: {
-        eventSourceableType: 'CommitMongoDBStorage.MyEventSourceable',
-        events: [
-          {
-            type: 'CommitMongoDBStorage.MyEvent',
-            data: {
-              _type: 'CommitMongoDBStorage.MyEvent',
-              sourceId: serializeId(eventSourceableId),
-              timestamp: now,
-              name: 'Foo',
-              version,
-            },
+      eventSourceableType: 'CommitMongoDBStorage.MyEventSourceable',
+      events: [
+        {
+          type: 'CommitMongoDBStorage.MyEvent',
+          data: {
+            _type: 'CommitMongoDBStorage.MyEvent',
+            sourceId: serializeId(eventSourceableId),
+            timestamp: now,
+            name: 'Foo',
+            version,
           },
-        ],
-        commands: [
-          {
-            type: 'CommitMongoDBStorage.MyCommand',
-            data: {
-              _type: 'CommitMongoDBStorage.MyCommand',
-              targetId: serializeId(eventSourceableId),
-              timestamp: now,
-              name: 'Foo',
-            },
+        },
+      ],
+      commands: [
+        {
+          type: 'CommitMongoDBStorage.MyCommand',
+          data: {
+            _type: 'CommitMongoDBStorage.MyCommand',
+            targetId: serializeId(eventSourceableId),
+            timestamp: now,
+            name: 'Foo',
           },
-        ],
-      },
+        },
+      ],
       insertedAt: now,
       eventTypes: ['CommitMongoDBStorage.MyEvent'],
       commandTypes: ['CommitMongoDBStorage.MyCommand'],
@@ -156,30 +152,28 @@ describe(`CommitSerializer`, function() {
 
   it('serializes commit', () => {
     serializer.toData
-      .withArgs(commit.changes.events[0])
-      .returns(srlzdCommit.changes.events[0].data);
+      .withArgs(commit.events[0])
+      .returns(srlzdCommit.events[0].data);
     serializer.toData
-      .withArgs(commit.changes.commands[0])
-      .returns(srlzdCommit.changes.commands[0].data);
+      .withArgs(commit.commands[0])
+      .returns(srlzdCommit.commands[0].data);
 
     const result = commitSerializer.serialize(commit);
     expect(result).to.be.instanceof(Object);
     expect(result).to.be.eql(srlzdCommit);
-    expect(serializer.toData).to.be.calledWithExactly(commit.changes.events[0]);
-    expect(serializer.toData).to.be.calledWithExactly(
-      commit.changes.commands[0]
-    );
+    expect(serializer.toData).to.be.calledWithExactly(commit.events[0]);
+    expect(serializer.toData).to.be.calledWithExactly(commit.commands[0]);
   });
 
   it('deserializes commit', () => {
     serializer.hasType.withArgs('CommitMongoDBStorage.MyCommand').returns(true);
     serializer.hasType.withArgs('CommitMongoDBStorage.MyEvent').returns(true);
     serializer.fromData
-      .withArgs(srlzdCommit.changes.events[0].data)
-      .returns(commit.changes.events[0]);
+      .withArgs(srlzdCommit.events[0].data)
+      .returns(commit.events[0]);
     serializer.fromData
-      .withArgs(srlzdCommit.changes.commands[0].data)
-      .returns(commit.changes.commands[0]);
+      .withArgs(srlzdCommit.commands[0].data)
+      .returns(commit.commands[0]);
 
     const result = commitSerializer.deserialize(srlzdCommit);
     expect(result).to.be.instanceof(Commit);
@@ -191,10 +185,10 @@ describe(`CommitSerializer`, function() {
       'CommitMongoDBStorage.MyEvent'
     );
     expect(serializer.fromData).to.be.calledWithExactly(
-      srlzdCommit.changes.events[0].data
+      srlzdCommit.events[0].data
     );
     expect(serializer.fromData).to.be.calledWithExactly(
-      srlzdCommit.changes.commands[0].data
+      srlzdCommit.commands[0].data
     );
   });
 });

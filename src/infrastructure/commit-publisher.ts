@@ -79,10 +79,10 @@ export class CommitPublisher {
 
     this.setTimeout(commit);
     try {
-      for (const event of commit.changes.events) {
+      for (const event of commit.events) {
         await this.publishEvent(event);
       }
-      for (const command of commit.changes.commands) {
+      for (const command of commit.commands) {
         await this.sendCommand(command);
       }
 

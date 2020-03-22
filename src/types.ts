@@ -681,11 +681,9 @@ export namespace types {
     id: string;
     sourceId: string;
     version: number;
-    changes: {
-      eventSourceableType: string;
-      commands: Command[];
-      events: Event[];
-    };
+    eventSourceableType: string;
+    commands: Command[];
+    events: Event[];
     insertedAt: Date;
     sentBy: string;
     receivers: CommitReceiver[];

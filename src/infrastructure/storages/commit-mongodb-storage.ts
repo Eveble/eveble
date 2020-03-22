@@ -50,7 +50,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
         )) as number;
 
         throw new CommitConcurrencyError(
-          commit.changes.eventSourceableType,
+          commit.eventSourceableType,
           commit.sourceId,
           this.getExpectedVersionOnStorage(commit).toString(),
           foundDuplicatedVersion.toString()

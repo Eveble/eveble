@@ -152,11 +152,9 @@ describe(`CommitPublisher`, function() {
         id: commitId,
         sourceId: id,
         version: 1,
-        changes: {
-          eventSourceableType: 'CommitPublisher.MyEventSourceable',
-          events: [event],
-          commands: [command],
-        },
+        eventSourceableType: 'CommitPublisher.MyEventSourceable',
+        events: [event],
+        commands: [command],
         insertedAt: now,
         sentBy: appId,
         receivers: [

@@ -99,11 +99,11 @@ export class Commit extends Serializable implements types.Commit {
 
   public version: number;
 
-  public changes: {
-    eventSourceableType: string;
-    commands: types.Command[];
-    events: types.Event[];
-  };
+  public eventSourceableType: string;
+
+  public commands: types.Command[];
+
+  public events: types.Event[];
 
   public insertedAt: Date;
 
@@ -117,7 +117,7 @@ export class Commit extends Serializable implements types.Commit {
    */
   public getEventTypeNames(): types.TypeName[] {
     const typeNames: types.TypeName[] = [];
-    for (const event of this.changes.events) {
+    for (const event of this.events) {
       typeNames.push(event.getTypeName());
     }
     return typeNames;
@@ -129,7 +129,7 @@ export class Commit extends Serializable implements types.Commit {
    */
   public getCommandTypeNames(): types.TypeName[] {
     const typeNames: types.TypeName[] = [];
-    for (const command of this.changes.commands) {
+    for (const command of this.commands) {
       typeNames.push(command.getTypeName());
     }
     return typeNames;

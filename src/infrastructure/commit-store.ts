@@ -81,11 +81,9 @@ export class CommitStore implements types.CommitStore {
     const props: Partial<Commit> = {
       sourceId: sourceId.toString(),
       version: newVersion,
-      changes: {
-        eventSourceableType,
-        commands,
-        events,
-      },
+      eventSourceableType,
+      commands,
+      events,
       insertedAt: timestamp,
       sentBy: appId,
       receivers: [receiver],
@@ -118,7 +116,7 @@ export class CommitStore implements types.CommitStore {
   public async addCommit(commit: types.Commit): Promise<string> {
     this.log.debug(
       new Log(
-        `adding commit for '${commit.changes.eventSourceableType}@${commit.sourceId}'`
+        `adding commit for '${commit.eventSourceableType}@${commit.sourceId}'`
       )
         .on(this)
         .in(this.addCommit)
@@ -130,7 +128,7 @@ export class CommitStore implements types.CommitStore {
       commitId = await this.storage.addCommit(commit);
       this.log.debug(
         new Log(
-          `added commit with id '${commitId}' for '${commit.changes.eventSourceableType}@${commit.sourceId}'`
+          `added commit with id '${commitId}' for '${commit.eventSourceableType}@${commit.sourceId}'`
         )
           .on(this)
           .in(this.addCommit)
@@ -139,7 +137,7 @@ export class CommitStore implements types.CommitStore {
     } catch (error) {
       this.log.error(
         new Log(
-          `failed adding commit for '${commit.changes.eventSourceableType}@${commit.sourceId}' do to error: ${error}`
+          `failed adding commit for '${commit.eventSourceableType}@${commit.sourceId}' do to error: ${error}`
         )
           .on(this)
           .in(this.addCommit)
@@ -198,7 +196,7 @@ export class CommitStore implements types.CommitStore {
   protected getEventsFromCommits(commits: types.Commit[] = []): types.Event[] {
     const events: types.Event[] = [];
     for (const commit of commits) {
-      for (const event of commit.changes.events) {
+      for (const event of commit.events) {
         events.push(event);
       }
     }

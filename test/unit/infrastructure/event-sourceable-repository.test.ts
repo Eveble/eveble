@@ -132,11 +132,9 @@ describe(`EventSourceableRepository`, function() {
       id: 'commit-id',
       sourceId: props.id.toString(),
       version: 0,
-      changes: {
-        eventSourceableType: 'Namespace.MyAggregate',
-        commands: [],
-        events: [],
-      },
+      eventSourceableType: 'Namespace.MyAggregate',
+      commands: [],
+      events: [],
       insertedAt: now,
       sentBy: 'my-app-id',
       receivers: [
