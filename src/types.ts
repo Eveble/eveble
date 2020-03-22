@@ -791,12 +791,12 @@ export namespace types {
   }
 
   export interface SnapshotStorage {
-    addSnapshot(eventSourceable: EventSourceable): Promise<string | undefined>;
-    getSnapshotById(
+    save(eventSourceable: EventSourceable): Promise<string | undefined>;
+    findById(
       EventSourceableType: EventSourceableType,
       eventSourceableId: string | Stringifiable
     ): Promise<EventSourceable | undefined>;
-    updateSnapshot(
+    update(
       eventSourceable: EventSourceable,
       lastSnapshot?: EventSourceable
     ): Promise<boolean>;
@@ -893,7 +893,7 @@ export namespace types {
   }
 
   export interface SnapshotSerializer {
-    serialize(eventSourceable: EventSourceable): string;
+    serialize(eventSourceable: EventSourceable): Record<string, any>;
     deserialize(
       EventSourceableType: EventSourceableType,
       serializedEventSourceable: string

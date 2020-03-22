@@ -65,8 +65,8 @@ describe(`Snapshotter`, function() {
       eventSourceable.version = versionFrequency - 1;
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(storage.updateSnapshot).to.be.not.called;
-      expect(storage.addSnapshot).to.be.not.called;
+      expect(storage.update).to.be.not.called;
+      expect(storage.save).to.be.not.called;
     });
 
     it(`logs skipping snapshot when not enough versions have passed`, async () => {
@@ -94,12 +94,12 @@ describe(`Snapshotter`, function() {
         id,
       });
       eventSourceable.version = versionFrequency;
-      storage.getSnapshotById.returns(undefined);
+      storage.findById.returns(undefined);
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(storage.addSnapshot).to.be.calledOnce;
-      expect(storage.addSnapshot).to.be.calledWithExactly(eventSourceable);
-      expect(storage.updateSnapshot).to.be.not.called;
+      expect(storage.save).to.be.calledOnce;
+      expect(storage.save).to.be.calledWithExactly(eventSourceable);
+      expect(storage.update).to.be.not.called;
     });
 
     it(`logs saving the current state of event sourceable to storage`, async () => {
@@ -108,7 +108,7 @@ describe(`Snapshotter`, function() {
         id,
       });
       eventSourceable.version = versionFrequency;
-      storage.getSnapshotById.returns(undefined);
+      storage.findById.returns(undefined);
 
       await snapshotter.makeSnapshotOf(eventSourceable);
       expect(log.debug).to.be.calledWithMatch(
@@ -122,7 +122,7 @@ describe(`Snapshotter`, function() {
           `created new snapshot of 'Snapshotter.MyEventSourceable' with id 'my-id'`
         )
           .on(snapshotter)
-          .in('addSnapshotToStorage')
+          .in('saveToStorage')
           .with('event sourceable', eventSourceable)
       );
     });
@@ -133,8 +133,8 @@ describe(`Snapshotter`, function() {
         id,
       });
       eventSourceable.version = versionFrequency;
-      storage.getSnapshotById.returns(undefined);
-      storage.addSnapshot.rejects(new Error('my-error'));
+      storage.findById.returns(undefined);
+      storage.save.rejects(new Error('my-error'));
 
       await expect(
         snapshotter.makeSnapshotOf(eventSourceable)
@@ -155,7 +155,7 @@ describe(`Snapshotter`, function() {
         id,
       });
       lastSnapshot.version = versionFrequency;
-      storage.getSnapshotById.returns(lastSnapshot);
+      storage.findById.returns(lastSnapshot);
 
       const eventSourceable = new MyEventSourceable({
         id,
@@ -163,12 +163,12 @@ describe(`Snapshotter`, function() {
       eventSourceable.version = versionFrequency + 10;
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(storage.updateSnapshot).to.be.calledOnce;
-      expect(storage.updateSnapshot).to.be.calledWithExactly(
+      expect(storage.update).to.be.calledOnce;
+      expect(storage.update).to.be.calledWithExactly(
         eventSourceable,
         lastSnapshot
       );
-      expect(storage.addSnapshot).to.be.not.called;
+      expect(storage.save).to.be.not.called;
     });
 
     it(`logs updating existing event sourceable snapshot on storage`, async () => {
@@ -177,7 +177,7 @@ describe(`Snapshotter`, function() {
         id,
       });
       lastSnapshot.version = versionFrequency;
-      storage.getSnapshotById.returns(lastSnapshot);
+      storage.findById.returns(lastSnapshot);
 
       const eventSourceable = new MyEventSourceable({
         id,
@@ -196,7 +196,7 @@ describe(`Snapshotter`, function() {
           `updated last found snapshot(10) for 'Snapshotter.MyEventSourceable' with id 'my-id'`
         )
           .on(snapshotter)
-          .in('updateSnapshotOnStorage')
+          .in('updateOnStorage')
           .with('updated last snapshot', lastSnapshot)
       );
     });
@@ -207,13 +207,13 @@ describe(`Snapshotter`, function() {
         id,
       });
       lastSnapshot.version = versionFrequency;
-      storage.getSnapshotById.returns(lastSnapshot);
+      storage.findById.returns(lastSnapshot);
       const eventSourceable = new MyEventSourceable({
         id,
       });
       eventSourceable.version = versionFrequency + 10;
       const error = new Error('my-error');
-      storage.updateSnapshot.rejects(error);
+      storage.update.rejects(error);
 
       await expect(
         snapshotter.makeSnapshotOf(eventSourceable)
@@ -223,7 +223,7 @@ describe(`Snapshotter`, function() {
           `failed to update last found snapshot(10) for 'Snapshotter.MyEventSourceable' with id 'my-id' do to error: Error: my-error`
         )
           .on(snapshotter)
-          .in('updateSnapshotOnStorage')
+          .in('updateOnStorage')
           .with('event sourceable', eventSourceable)
           .with('updated last snapshot', lastSnapshot)
           .with('error', error)
@@ -236,7 +236,7 @@ describe(`Snapshotter`, function() {
         id,
       });
       lastSnapshot.version = versionFrequency - 1;
-      storage.getSnapshotById.returns(lastSnapshot);
+      storage.findById.returns(lastSnapshot);
 
       const eventSourceable = new MyEventSourceable({
         id,
@@ -244,8 +244,8 @@ describe(`Snapshotter`, function() {
       eventSourceable.version = versionFrequency;
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(storage.updateSnapshot).to.be.not.called;
-      expect(storage.addSnapshot).to.be.not.called;
+      expect(storage.update).to.be.not.called;
+      expect(storage.save).to.be.not.called;
     });
 
     it(`logs not updating existing event sourceable snapshot when not enough versions have passed`, async () => {
@@ -254,7 +254,7 @@ describe(`Snapshotter`, function() {
         id,
       });
       lastSnapshot.version = versionFrequency - 1;
-      storage.getSnapshotById.returns(lastSnapshot);
+      storage.findById.returns(lastSnapshot);
 
       const eventSourceable = new MyEventSourceable({
         id,
@@ -288,16 +288,16 @@ describe(`Snapshotter`, function() {
       const eventSourceable = new MyEventSourceable({
         id,
       });
-      storage.getSnapshotById.returns(eventSourceable);
+      storage.findById.returns(eventSourceable);
 
       const snapshot = await snapshotter.getSnapshotOf(MyEventSourceable, id);
       expect(snapshot).to.be.equal(eventSourceable);
-      expect(storage.getSnapshotById).to.be.calledWith(MyEventSourceable, id);
+      expect(storage.findById).to.be.calledWith(MyEventSourceable, id);
     });
 
     it(`returns undefined if event sourceable snapshot cannot be found on storage`, async () => {
       const id = 'my-id';
-      storage.getSnapshotById.returns(undefined);
+      storage.findById.returns(undefined);
 
       const snapshot = await snapshotter.getSnapshotOf(MyEventSourceable, id);
       expect(snapshot).to.be.equal(undefined);
