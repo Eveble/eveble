@@ -51,11 +51,9 @@ describe(`Commit`, function() {
         id: commitId,
         sourceId: id,
         version: 1,
-        changes: {
-          eventSourceableType: 'MyProcess',
-          events: [firstEvent, secondEvent],
-          commands: [firstCommand, secondCommand],
-        },
+        eventSourceableType: 'MyProcess',
+        events: [firstEvent, secondEvent],
+        commands: [firstCommand, secondCommand],
         insertedAt: now,
         sentBy: 'my-app-id',
         receivers: [
@@ -71,9 +69,9 @@ describe(`Commit`, function() {
       expect(commit.id).to.be.equal(commitId);
       expect(commit.sourceId).to.be.equal(id);
       expect(commit.version).to.be.equal(1);
-      expect(commit.changes.eventSourceableType).to.be.equal('MyProcess');
-      expect(commit.changes.events).to.be.eql([firstEvent, secondEvent]);
-      expect(commit.changes.commands).to.be.eql([firstCommand, secondCommand]);
+      expect(commit.eventSourceableType).to.be.equal('MyProcess');
+      expect(commit.events).to.be.eql([firstEvent, secondEvent]);
+      expect(commit.commands).to.be.eql([firstCommand, secondCommand]);
       expect(commit.insertedAt).to.be.equal(now);
       expect(commit.sentBy).to.be.equal('my-app-id');
       expect(commit.receivers).to.be.eql([
@@ -107,11 +105,9 @@ describe(`Commit`, function() {
         id: 'my-commit-id',
         sourceId: id,
         version: 1,
-        changes: {
-          eventSourceableType: 'MyProcess',
-          events: [firstEvent, secondEvent],
-          commands: [firstCommand, secondCommand],
-        },
+        eventSourceableType: 'MyProcess',
+        events: [firstEvent, secondEvent],
+        commands: [firstCommand, secondCommand],
         insertedAt: now,
         sentBy: firstAppId,
         receivers: [firstReceiver, secondReceiver],
@@ -140,11 +136,9 @@ describe(`Commit`, function() {
         id: 'my-commit-id',
         sourceId: id,
         version: 1,
-        changes: {
-          eventSourceableType: 'MyProcess',
-          events: [firstEvent, secondEvent],
-          commands: [firstCommand, secondCommand],
-        },
+        eventSourceableType: 'MyProcess',
+        events: [firstEvent, secondEvent],
+        commands: [firstCommand, secondCommand],
         insertedAt: now,
         sentBy: firstAppId,
         receivers: [firstReceiver],
@@ -160,11 +154,9 @@ describe(`Commit`, function() {
         id: 'my-commit-id',
         sourceId: id,
         version: 1,
-        changes: {
-          eventSourceableType: 'MyProcess',
-          events: [firstEvent, secondEvent],
-          commands: [],
-        },
+        eventSourceableType: 'MyProcess',
+        events: [firstEvent, secondEvent],
+        commands: [],
         insertedAt: now,
         sentBy: 'my-app-id',
         receivers: [],
@@ -180,11 +172,9 @@ describe(`Commit`, function() {
         id: 'my-commit-id',
         sourceId: id,
         version: 1,
-        changes: {
-          eventSourceableType: 'MyProcess',
-          events: [],
-          commands: [firstCommand, secondCommand],
-        },
+        eventSourceableType: 'MyProcess',
+        events: [],
+        commands: [firstCommand, secondCommand],
         insertedAt: now,
         sentBy: 'my-app-id',
         receivers: [],

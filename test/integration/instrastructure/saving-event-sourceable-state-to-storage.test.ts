@@ -165,10 +165,10 @@ describe(`Saving Event Sourceable state to storage`, function() {
     expect(commit.id).to.be.a('string'); // Generated from MongoDBStorage
     expect(commit.sourceId).to.be.equal(taskListId.toString());
     expect(commit.version).to.be.equal(1);
-    expect(commit.changes.eventSourceableType).to.be.equal('TaskList');
+    expect(commit.eventSourceableType).to.be.equal('TaskList');
 
-    expect(commit.changes.events).to.be.instanceof(Array);
-    const firstEvent = commit.changes.events[0] as any;
+    expect(commit.events).to.be.instanceof(Array);
+    const firstEvent = commit.events[0] as any;
     expect(firstEvent).to.be.instanceof(TaskListCreated);
     expect(firstEvent.sourceId).to.be.eql(taskListId);
     expect(firstEvent.timestamp).to.be.instanceof(Date);
@@ -176,8 +176,8 @@ describe(`Saving Event Sourceable state to storage`, function() {
     expect(firstEvent.title).to.be.equal(title);
     expect(firstEvent.tasks).to.be.eql([]);
 
-    expect(commit.changes.commands).to.be.instanceof(Array);
-    expect(commit.changes.commands).to.be.eql([]);
+    expect(commit.commands).to.be.instanceof(Array);
+    expect(commit.commands).to.be.eql([]);
 
     expect(commit.insertedAt).to.be.instanceof(Date);
     expect(commit.sentBy).to.be.equal(appId);

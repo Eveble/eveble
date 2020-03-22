@@ -171,12 +171,10 @@ describe(`Observing and publishing new commits`, function() {
           id: commitId,
           sourceId: id.toString(),
           version: 1,
-          changes: {
-            eventSourceableType:
-              'ObservingAndPublishingNewCommits.MyEventSourceable',
-            events: [event],
-            commands: [command],
-          },
+          eventSourceableType:
+            'ObservingAndPublishingNewCommits.MyEventSourceable',
+          events: [event],
+          commands: [command],
           insertedAt: now,
           sentBy: sendingAppId,
           receivers: [

@@ -158,23 +158,23 @@ describe(`CommitStore with MongoDB storage`, function() {
       expect(commit.id).to.be.a('string'); // Generated from MongoDBStorage
       expect(commit.sourceId).to.be.equal(id);
       expect(commit.version).to.be.equal(1);
-      expect(commit.changes.eventSourceableType).to.be.equal(
+      expect(commit.eventSourceableType).to.be.equal(
         'CommitStoreWithMongoDBStorage.MyAggregate'
       );
 
-      expect(commit.changes.events).to.be.instanceof(Array);
-      expect(commit.changes.events[0]).to.be.instanceof(MyEvent);
-      expect(commit.changes.events[0].sourceId).to.be.equal(id);
-      expect(commit.changes.events[0].timestamp).to.be.instanceof(Date);
-      expect(commit.changes.events[0].version).to.be.equal(1);
+      expect(commit.events).to.be.instanceof(Array);
+      expect(commit.events[0]).to.be.instanceof(MyEvent);
+      expect(commit.events[0].sourceId).to.be.equal(id);
+      expect(commit.events[0].timestamp).to.be.instanceof(Date);
+      expect(commit.events[0].version).to.be.equal(1);
 
-      expect(commit.changes.events[1]).to.be.instanceof(MyOtherEvent);
-      expect(commit.changes.events[1].sourceId).to.be.equal(id);
-      expect(commit.changes.events[1].timestamp).to.be.instanceof(Date);
-      expect(commit.changes.events[1].version).to.be.equal(1);
+      expect(commit.events[1]).to.be.instanceof(MyOtherEvent);
+      expect(commit.events[1].sourceId).to.be.equal(id);
+      expect(commit.events[1].timestamp).to.be.instanceof(Date);
+      expect(commit.events[1].version).to.be.equal(1);
 
-      expect(commit.changes.commands).to.be.instanceof(Array);
-      expect(commit.changes.commands).to.be.eql([]);
+      expect(commit.commands).to.be.instanceof(Array);
+      expect(commit.commands).to.be.eql([]);
 
       expect(commit.insertedAt).to.be.instanceof(Date);
       expect(commit.sentBy).to.be.equal(appId);
@@ -230,23 +230,23 @@ describe(`CommitStore with MongoDB storage`, function() {
       expect(commit.id).to.be.a('string'); // Generated from MongoDBStorage
       expect(commit.sourceId).to.be.equal(id);
       expect(commit.version).to.be.equal(1);
-      expect(commit.changes.eventSourceableType).to.be.equal(
+      expect(commit.eventSourceableType).to.be.equal(
         'CommitStoreWithMongoDBStorage.MyProcess'
       );
 
-      expect(commit.changes.events).to.be.instanceof(Array);
-      expect(commit.changes.events[0]).to.be.instanceof(MyEvent);
-      expect(commit.changes.events[0].sourceId).to.be.equal(id);
-      expect(commit.changes.events[0].timestamp).to.be.instanceof(Date);
-      expect(commit.changes.events[0].version).to.be.equal(1);
+      expect(commit.events).to.be.instanceof(Array);
+      expect(commit.events[0]).to.be.instanceof(MyEvent);
+      expect(commit.events[0].sourceId).to.be.equal(id);
+      expect(commit.events[0].timestamp).to.be.instanceof(Date);
+      expect(commit.events[0].version).to.be.equal(1);
 
-      expect(commit.changes.events[1]).to.be.instanceof(MyOtherEvent);
-      expect(commit.changes.events[1].sourceId).to.be.equal(id);
-      expect(commit.changes.events[1].timestamp).to.be.instanceof(Date);
-      expect(commit.changes.events[1].version).to.be.equal(1);
+      expect(commit.events[1]).to.be.instanceof(MyOtherEvent);
+      expect(commit.events[1].sourceId).to.be.equal(id);
+      expect(commit.events[1].timestamp).to.be.instanceof(Date);
+      expect(commit.events[1].version).to.be.equal(1);
 
-      expect(commit.changes.commands).to.be.instanceof(Array);
-      expect(commit.changes.commands).to.be.eql([firstCommand, secondCommand]);
+      expect(commit.commands).to.be.instanceof(Array);
+      expect(commit.commands).to.be.eql([firstCommand, secondCommand]);
 
       expect(commit.insertedAt).to.be.instanceof(Date);
       expect(commit.sentBy).to.be.equal(appId);
@@ -291,23 +291,23 @@ describe(`CommitStore with MongoDB storage`, function() {
       expect(fourthCommit.id).to.be.a('string'); // Generated from MongoDBStorage
       expect(fourthCommit.sourceId).to.be.equal(id);
       expect(fourthCommit.version).to.be.equal(4);
-      expect(fourthCommit.changes.eventSourceableType).to.be.equal(
+      expect(fourthCommit.eventSourceableType).to.be.equal(
         'CommitStoreWithMongoDBStorage.MyEventSourceable'
       );
 
-      expect(fourthCommit.changes.events).to.be.instanceof(Array);
-      expect(fourthCommit.changes.events[0]).to.be.instanceof(MyEvent);
-      expect(fourthCommit.changes.events[0].sourceId).to.be.equal(id);
-      expect(fourthCommit.changes.events[0].timestamp).to.be.instanceof(Date);
-      expect(fourthCommit.changes.events[0].version).to.be.equal(4);
+      expect(fourthCommit.events).to.be.instanceof(Array);
+      expect(fourthCommit.events[0]).to.be.instanceof(MyEvent);
+      expect(fourthCommit.events[0].sourceId).to.be.equal(id);
+      expect(fourthCommit.events[0].timestamp).to.be.instanceof(Date);
+      expect(fourthCommit.events[0].version).to.be.equal(4);
 
-      expect(fourthCommit.changes.events[1]).to.be.instanceof(MyOtherEvent);
-      expect(fourthCommit.changes.events[1].sourceId).to.be.equal(id);
-      expect(fourthCommit.changes.events[1].timestamp).to.be.instanceof(Date);
-      expect(fourthCommit.changes.events[1].version).to.be.equal(4);
+      expect(fourthCommit.events[1]).to.be.instanceof(MyOtherEvent);
+      expect(fourthCommit.events[1].sourceId).to.be.equal(id);
+      expect(fourthCommit.events[1].timestamp).to.be.instanceof(Date);
+      expect(fourthCommit.events[1].version).to.be.equal(4);
 
-      expect(fourthCommit.changes.commands).to.be.instanceof(Array);
-      expect(fourthCommit.changes.commands).to.be.eql([]);
+      expect(fourthCommit.commands).to.be.instanceof(Array);
+      expect(fourthCommit.commands).to.be.eql([]);
 
       expect(fourthCommit.insertedAt).to.be.instanceof(Date);
       expect(fourthCommit.sentBy).to.be.equal(appId);
@@ -352,11 +352,11 @@ describe(`CommitStore with MongoDB storage`, function() {
       expect(foundCommit.sourceId).to.be.equal(id);
       expect(foundCommit.version).to.be.equal(1);
 
-      expect(foundCommit.changes.eventSourceableType).to.be.equal(
+      expect(foundCommit.eventSourceableType).to.be.equal(
         'CommitStoreWithMongoDBStorage.MyAggregate'
       );
-      expect(foundCommit.changes.events).to.be.eql([]);
-      expect(foundCommit.changes.commands).to.be.eql([]);
+      expect(foundCommit.events).to.be.eql([]);
+      expect(foundCommit.commands).to.be.eql([]);
 
       expect(foundCommit.insertedAt).to.be.instanceof(Date);
       expect(foundCommit.sentBy).to.be.equal(appId);
