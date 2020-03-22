@@ -221,7 +221,7 @@ describe(`CommitMongoDBStorage`, function() {
     it(`inserts commit to MongoDB collection`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
 
-      const result = await storage.addCommit(commit);
+      const result = await storage.save(commit);
       expect(result).to.be.equal(commitId);
 
       const expectedCommit = generateSerializedCommit(
@@ -236,10 +236,10 @@ describe(`CommitMongoDBStorage`, function() {
     });
 
     it(`throws commit concurrency exception on duplicated key error`, async () => {
-      await storage.addCommit(generateCommit(commitId, eventSourceableId, 1));
+      await storage.save(generateCommit(commitId, eventSourceableId, 1));
 
       await expect(
-        storage.addCommit(generateCommit(commitId, eventSourceableId, 1))
+        storage.save(generateCommit(commitId, eventSourceableId, 1))
       ).to.eventually.be.rejectedWith(
         CommitConcurrencyError,
         `IntegrationCommitMongoDBStorage.MyEventSourceable: expected event sourceable with id of '${eventSourceableId}' to be at version 0 but is at version 1`
@@ -249,24 +249,24 @@ describe(`CommitMongoDBStorage`, function() {
 
   describe(`retrieving last commit version`, () => {
     it(`returns last commit version by event sourceable's id`, async () => {
-      await storage.addCommit(generateCommit(commitId, eventSourceableId, 10));
-      const lastCommitVersion = await storage.getLastCommitVersionById(
+      await storage.save(generateCommit(commitId, eventSourceableId, 10));
+      const lastCommitVersion = await storage.findLastVersionById(
         eventSourceableId
       );
       expect(lastCommitVersion).to.be.equal(10);
     });
 
     it(`returns undefined when commit cannot be found for event sourceable's`, async () => {
-      const lastCommitVersion = await storage.getLastCommitVersionById('my-id');
+      const lastCommitVersion = await storage.findLastVersionById('my-id');
       expect(lastCommitVersion).to.be.equal(undefined);
     });
   });
 
   describe(`retrieving commits`, () => {
     it('returns commit by id', async () => {
-      await storage.addCommit(generateCommit(commitId, eventSourceableId, 1));
+      await storage.save(generateCommit(commitId, eventSourceableId, 1));
 
-      const foundCommit = await storage.getCommitById(commitId);
+      const foundCommit = await storage.findById(commitId);
       expect(foundCommit).to.be.instanceof(Commit);
       expect(foundCommit).to.be.eql(
         generateCommit(commitId, eventSourceableId, 1)
@@ -274,7 +274,7 @@ describe(`CommitMongoDBStorage`, function() {
     });
 
     it(`returns undefined if commit by id can't be found`, async () => {
-      const foundCommit = await storage.getCommitById(commitId);
+      const foundCommit = await storage.findById(commitId);
       expect(foundCommit).to.be.equal(undefined);
     });
 
@@ -282,10 +282,10 @@ describe(`CommitMongoDBStorage`, function() {
       const firstCommitId = new Guid().toString();
       const secondCommitId = new Guid().toString();
 
-      await storage.addCommit(
+      await storage.save(
         generateCommit(firstCommitId, eventSourceableId, 10)
       );
-      await storage.addCommit(
+      await storage.save(
         generateCommit(secondCommitId, eventSourceableId, 11)
       );
 
@@ -307,13 +307,13 @@ describe(`CommitMongoDBStorage`, function() {
       const thirdCommitId = new Guid().toString();
       const otherEventSourceableId = 'my-other-id';
 
-      await storage.addCommit(
+      await storage.save(
         generateCommit(firstCommitId, eventSourceableId, 1)
       );
-      await storage.addCommit(
+      await storage.save(
         generateCommit(secondCommitId, eventSourceableId, 2)
       );
-      await storage.addCommit(
+      await storage.save(
         generateCommit(thirdCommitId, otherEventSourceableId, 5)
       );
 
@@ -328,19 +328,19 @@ describe(`CommitMongoDBStorage`, function() {
 
   describe(`flagging commits`, () => {
     it(`flags commit as published`, async () => {
-      await storage.addCommit(generateCommit(commitId, eventSourceableId, 1));
+      await storage.save(generateCommit(commitId, eventSourceableId, 1));
 
       await storage.flagCommitAsPublished(commitId, appId, workerId, now);
     });
 
     it(`flags commit as failed`, async () => {
-      await storage.addCommit(generateCommit(commitId, eventSourceableId, 1));
+      await storage.save(generateCommit(commitId, eventSourceableId, 1));
 
       await storage.flagCommitAsFailed(commitId, appId, workerId, now);
     });
 
     it(`flags commit as timeouted`, async () => {
-      await storage.addCommit(generateCommit(commitId, eventSourceableId, 1));
+      await storage.save(generateCommit(commitId, eventSourceableId, 1));
 
       await storage.flagAndResolveCommitAsTimeouted(
         commitId,

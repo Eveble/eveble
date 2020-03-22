@@ -86,14 +86,14 @@ describe(`CommitStore`, function() {
 
     commitStore = new CommitStore();
     injector.injectInto(commitStore);
-    storage.generateCommitId.returns(undefined);
+    storage.generateId.returns(undefined);
   });
 
   describe(`creating commit`, () => {
     it(`creates a first commit for an aggregate`, async () => {
       const commitId = new Guid('91f09174-aebc-48e9-9ce8-672a670ede37');
-      storage.getLastCommitVersionById.returns(undefined);
-      storage.generateCommitId.returns(commitId);
+      storage.findLastVersionById.returns(undefined);
+      storage.generateId.returns(commitId);
 
       const id = 'my-id';
       const aggregate = new MyAggregate({ id });
@@ -147,8 +147,8 @@ describe(`CommitStore`, function() {
 
     it(`creates a first commit for a process`, async () => {
       const commitId = new Guid('91f09174-aebc-48e9-9ce8-672a670ede37');
-      storage.getLastCommitVersionById.returns(undefined);
-      storage.generateCommitId.returns(commitId);
+      storage.findLastVersionById.returns(undefined);
+      storage.generateId.returns(commitId);
 
       const id = 'my-id';
       const process = new MyProcess({ id });
@@ -213,8 +213,8 @@ describe(`CommitStore`, function() {
     it(`creates another commit for event sourceable`, async () => {
       const foundLastCommitVersion = 10;
       const commitId = new Guid('91f09174-aebc-48e9-9ce8-672a670ede37');
-      storage.getLastCommitVersionById.returns(foundLastCommitVersion);
-      storage.generateCommitId.returns(commitId);
+      storage.findLastVersionById.returns(foundLastCommitVersion);
+      storage.generateId.returns(commitId);
 
       const id = 'my-id';
       const firstEvent = new MyEvent({
@@ -272,7 +272,7 @@ describe(`CommitStore`, function() {
 
     it(`throws CommitConcurrencyError if the version in the store does not equal the expected version`, async () => {
       const foundLastCommitVersion = 10;
-      storage.getLastCommitVersionById.returns(foundLastCommitVersion);
+      storage.findLastVersionById.returns(foundLastCommitVersion);
 
       const eventSourceable = new MyEventSourceable({
         id: 'my-id',
@@ -321,11 +321,11 @@ describe(`CommitStore`, function() {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.addCommit.withArgs(commit).returns(commitId);
+        storage.save.withArgs(commit).returns(commitId);
 
-        expect(await commitStore.addCommit(commit)).to.be.equal(commitId);
-        expect(storage.addCommit).to.be.calledOnce;
-        expect(storage.addCommit).to.be.calledWithExactly(commit);
+        expect(await commitStore.save(commit)).to.be.equal(commitId);
+        expect(storage.save).to.be.calledOnce;
+        expect(storage.save).to.be.calledWithExactly(commit);
       });
 
       it(`logs adding commit`, async () => {
@@ -341,14 +341,14 @@ describe(`CommitStore`, function() {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.addCommit.withArgs(commit).returns(commitId);
+        storage.save.withArgs(commit).returns(commitId);
 
-        await commitStore.addCommit(commit);
+        await commitStore.save(commit);
         expect(log.debug).to.be.calledTwice;
         expect(log.debug).to.be.calledWithExactly(
           new Log(`adding commit for 'MyEventSourceable@my-id'`)
             .on(commitStore)
-            .in(commitStore.addCommit)
+            .in(commitStore.save)
             .with('commit', commit)
         );
       });
@@ -366,16 +366,16 @@ describe(`CommitStore`, function() {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.addCommit.withArgs(commit).returns(commitId);
+        storage.save.withArgs(commit).returns(commitId);
 
-        await commitStore.addCommit(commit);
+        await commitStore.save(commit);
         expect(log.debug).to.be.calledTwice;
         expect(log.debug).to.be.calledWithExactly(
           new Log(
             `added commit with id 'commit-id' for 'MyEventSourceable@my-id'`
           )
             .on(commitStore)
-            .in(commitStore.addCommit)
+            .in(commitStore.save)
             .with('commit', commit)
         );
       });
@@ -393,9 +393,9 @@ describe(`CommitStore`, function() {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.addCommit.withArgs(commit).returns(commitId);
+        storage.save.withArgs(commit).returns(commitId);
 
-        await commitStore.addCommit(commit);
+        await commitStore.save(commit);
         expect(commitPublisher.publishChanges).to.be.calledOnce;
         expect(commitPublisher.publishChanges).to.be.calledWithExactly(commit);
       });
@@ -415,9 +415,10 @@ describe(`CommitStore`, function() {
           receivers: [],
         });
         const error = new Error('my-error');
+        storage.save.withArgs(commit).rejects(error);
 
         await expect(
-          commitStore.addCommit(commit)
+          commitStore.save(commit)
         ).to.eventually.be.rejectedWith(error);
         expect(log.error).to.be.calledOnce;
         expect(log.error).to.be.calledWithExactly(
@@ -425,7 +426,7 @@ describe(`CommitStore`, function() {
             `failed adding commit for 'MyEventSourceable@my-id' do to error: Error: my-error`
           )
             .on(commitStore)
-            .in(commitStore.addCommit)
+            .in(commitStore.save)
             .with('commit', commit)
         );
       });
@@ -442,13 +443,13 @@ describe(`CommitStore`, function() {
           sentBy: appId,
           receivers: [],
         });
-        storage.addCommit
+        storage.save
           .withArgs(commit)
           .throws(
             new CommitConcurrencyError('MyTypeName', 'my-id', '123', '7')
           );
 
-        expect(commitStore.addCommit(commit)).to.eventually.be.rejectedWith(
+        expect(commitStore.save(commit)).to.eventually.be.rejectedWith(
           CommitConcurrencyError,
           `MyTypeName: expected event sourceable with id of 'my-id' to be at version 123 but is at version 7`
         );
@@ -470,18 +471,18 @@ describe(`CommitStore`, function() {
         sentBy: appId,
         receivers: [],
       });
-      storage.getCommitById.withArgs(commitId).resolves(commit);
+      storage.findById.withArgs(commitId).resolves(commit);
 
-      const foundCommit = await commitStore.getCommitById(commitId);
+      const foundCommit = await commitStore.findById(commitId);
       expect(foundCommit).to.be.instanceof(Commit);
       expect(foundCommit).to.be.eql(commit);
     });
 
     it(`returns undefined if commit by id can't be found`, async () => {
       const commitId = 'commit-id';
-      storage.getCommitById.withArgs(commitId).resolves(undefined);
+      storage.findById.withArgs(commitId).resolves(undefined);
 
-      const foundCommit = await storage.getCommitById(commitId);
+      const foundCommit = await storage.findById(commitId);
       expect(foundCommit).to.be.equal(undefined);
     });
   });

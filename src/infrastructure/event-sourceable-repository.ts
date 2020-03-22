@@ -45,7 +45,7 @@ export class EventSourceableRepository
     const storageIdentifiers: types.StorageIdentifiers = {};
     try {
       const commit = await this.commitStore.createCommit(eventSourceable);
-      const commitId = await this.commitStore.addCommit(commit);
+      const commitId = await this.commitStore.save(commit);
       storageIdentifiers.commitId = commitId;
 
       eventSourceable.incrementVersion();

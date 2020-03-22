@@ -37,7 +37,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * @throws {AddingCommitFailedError}
    * Thrown if commit with same id already exists on MongoDB collection.
    */
-  async addCommit(commit: types.Commit): Promise<string> {
+  async save(commit: types.Commit): Promise<string> {
     const serializedCommit = this.commitSerializer.serialize(commit);
     let output: InsertOneWriteOpResult<any>;
     try {
@@ -45,7 +45,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
     } catch (error) {
       // Duplicate key error index
       if (error.code === 11000) {
-        const foundDuplicatedVersion = (await this.getLastCommitVersionById(
+        const foundDuplicatedVersion = (await this.findLastVersionById(
           commit.sourceId
         )) as number;
 
@@ -74,7 +74,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * Generates commit's id.
    * @return Identifier for `Commit` compatible with MongoDB.
    */
-  public async generateCommitId(): Promise<string> {
+  public async generateId(): Promise<string> {
     return new Guid().toString();
   }
 
@@ -84,7 +84,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * @param eventSourceableId - Identifier as string or `Guid` instance.
    * @returns Last commit version as number, else `undefined`.
    */
-  public async getLastCommitVersionById(
+  public async findLastVersionById(
     eventSourceableId: string | Guid
   ): Promise<number | undefined> {
     const query = { sourceId: eventSourceableId.toString() };
@@ -106,9 +106,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * @param commitId - Identifier of `Commit`.
    * @returns Instance implementing `Commit` interface, else `undefined`.
    */
-  public async getCommitById(
-    commitId: string
-  ): Promise<types.Commit | undefined> {
+  public async findById(commitId: string): Promise<types.Commit | undefined> {
     const query = {
       _id: commitId,
     };
@@ -311,10 +309,10 @@ export class CommitMongoDBStorage implements types.CommitStorage {
   }
 
   /**
-   * Finds and returns deserialized form MongoDB collection.
+   * Finds and returns deserialized commits form MongoDB collection.
    * @async
    * @param query - The cursor query object.
-   * @param options - Optional settings
+   * @param options - Optional settings.
    * @return List of instances implementing `Commit` interface.
    */
   protected async findAndReturnDeserializedCommits(

@@ -135,7 +135,7 @@ describe(`CommitMongoDBStorage`, function() {
           insertedCount: 1,
         });
 
-      const result = await storage.addCommit(commit);
+      const result = await storage.save(commit);
       expect(result).to.be.equal(commitId);
       expect(commitSerializer.serialize).to.be.calledOnce;
       expect(commitSerializer.serialize).to.be.calledWithExactly(commit);
@@ -156,7 +156,7 @@ describe(`CommitMongoDBStorage`, function() {
         .resolves({ insertedCount: 0 });
 
       await expect(
-        storage.addCommit(generateCommit(commitId, eventSourceableId, 1))
+        storage.save(generateCommit(commitId, eventSourceableId, 1))
       ).to.eventually.be.rejectedWith(
         AddingCommitFailedError,
         `CommitMongoDBStorage: adding commit with id '${commitId.toString()}' failed on '${appId}'`
@@ -197,7 +197,7 @@ describe(`CommitMongoDBStorage`, function() {
         });
 
       await expect(
-        storage.addCommit(generateCommit(commitId, eventSourceableId, 1))
+        storage.save(generateCommit(commitId, eventSourceableId, 1))
       ).to.eventually.be.rejectedWith(
         CommitConcurrencyError,
         `CommitMongoDBStorage.MyEventSourceable: expected event sourceable with id of '${eventSourceableId.toString()}' to be at version 0 but is at version 1`
@@ -225,7 +225,7 @@ describe(`CommitMongoDBStorage`, function() {
           version: 10,
         });
 
-      const lastCommitVersion = await storage.getLastCommitVersionById(
+      const lastCommitVersion = await storage.findLastVersionById(
         eventSourceableId
       );
       expect(lastCommitVersion).to.be.equal(10);
@@ -236,7 +236,7 @@ describe(`CommitMongoDBStorage`, function() {
     it(`returns undefined when commit cannot be found for event sourceable's`, async () => {
       collectionMock.expects('findOne').resolves(null);
 
-      const lastCommitVersion = await storage.getLastCommitVersionById('my-id');
+      const lastCommitVersion = await storage.findLastVersionById('my-id');
       expect(lastCommitVersion).to.be.equal(undefined);
 
       collectionMock.verify();
@@ -258,7 +258,7 @@ describe(`CommitMongoDBStorage`, function() {
         .resolves(serializedCommit);
       commitSerializer.deserialize.withArgs(serializedCommit).returns(commit);
 
-      const foundCommit = await storage.getCommitById(commitId);
+      const foundCommit = await storage.findById(commitId);
       expect(foundCommit).to.be.instanceof(Commit);
       expect(foundCommit).to.be.eql(
         generateCommit(commitId, eventSourceableId, 1)
@@ -280,7 +280,7 @@ describe(`CommitMongoDBStorage`, function() {
         .withArgs(query)
         .resolves(null);
 
-      const foundCommit = await storage.getCommitById(commitId);
+      const foundCommit = await storage.findById(commitId);
       expect(foundCommit).to.be.equal(undefined);
 
       collectionMock.verify();

@@ -716,23 +716,23 @@ export namespace types {
 
   export interface CommitStore {
     createCommit(eventSourceable: EventSourceable): Promise<Commit>;
-    generateCommitId(): Promise<string>;
-    addCommit(commit: Commit): Promise<string>;
+    generateId(): Promise<string>;
+    save(commit: Commit): Promise<string>;
     getEvents(
       eventSourceableId: string | Stringifiable,
       versionOffset?: number
     ): Promise<Event[] | undefined>;
     getAllEvents(): Promise<Event[]>;
-    getCommitById(commitId: string): Promise<Commit | undefined>;
+    findById(commitId: string): Promise<Commit | undefined>;
   }
 
   export interface CommitStorage {
-    addCommit(commit: Commit): Promise<string>;
-    getLastCommitVersionById(
+    save(commit: Commit): Promise<string>;
+    findLastVersionById(
       eventSourceableId: string | Stringifiable
     ): Promise<number | undefined>;
-    generateCommitId(): Promise<string>;
-    getCommitById(commitId: string): Promise<Commit | undefined>;
+    generateId(): Promise<string>;
+    findById(commitId: string): Promise<Commit | undefined>;
     getCommits(
       eventSourceableId: string | Stringifiable,
       versionOffset: number

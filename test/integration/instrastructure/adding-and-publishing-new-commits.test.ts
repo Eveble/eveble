@@ -190,12 +190,12 @@ describe(`Adding and publishing new commits`, function() {
       const eventHandler = sinon.stub();
       eventBus.registerHandler(MyEvent, eventHandler);
 
-      await commitStore.addCommit(commit);
+      await commitStore.save(commit);
 
       expect(eventHandler).to.be.calledWith(event);
       expect(commandHandler).to.be.calledWith(command);
 
-      const foundCommitAfterPublishing = (await commitStore.getCommitById(
+      const foundCommitAfterPublishing = (await commitStore.findById(
         commit.id
       )) as Commit;
       expect(foundCommitAfterPublishing).to.be.instanceof(Commit);
@@ -217,9 +217,9 @@ describe(`Adding and publishing new commits`, function() {
       };
       commandBus.registerHandler(MyCommand, commandHandler);
 
-      await commitStore.addCommit(commit);
+      await commitStore.save(commit);
 
-      const foundCommitAfterTimeout = (await commitStore.getCommitById(
+      const foundCommitAfterTimeout = (await commitStore.findById(
         commit.id
       )) as Commit;
       expect(foundCommitAfterTimeout).to.be.instanceof(Commit);
@@ -241,10 +241,10 @@ describe(`Adding and publishing new commits`, function() {
       commandBus.registerHandler(MyCommand, commandHandler);
 
       try {
-        await commitStore.addCommit(commit);
+        await commitStore.save(commit);
       } catch (e) {}
 
-      const foundCommitAfterFail = (await commitStore.getCommitById(
+      const foundCommitAfterFail = (await commitStore.findById(
         commit.id
       )) as Commit;
       expect(foundCommitAfterFail).to.be.instanceof(Commit);
@@ -258,7 +258,7 @@ describe(`Adding and publishing new commits`, function() {
 
     it(`does not process commands that can't be handled`, async () => {
       const send = sinon.spy(commandBus, 'send');
-      await commitStore.addCommit(commit);
+      await commitStore.save(commit);
       expect(send).to.not.be.called;
     });
 
@@ -275,9 +275,9 @@ describe(`Adding and publishing new commits`, function() {
       };
       commandBus.registerHandler(MyCommand, commandHandler);
 
-      await commitStore.addCommit(commit);
+      await commitStore.save(commit);
 
-      const foundCommitAfterTimeout = (await commitStore.getCommitById(
+      const foundCommitAfterTimeout = (await commitStore.findById(
         commit.id
       )) as Commit;
       expect(foundCommitAfterTimeout).to.be.instanceof(Commit);

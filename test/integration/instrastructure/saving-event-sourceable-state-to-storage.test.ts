@@ -237,7 +237,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
       const storageIdentifiers = await repository.save(esInstance);
       const { commitId } = storageIdentifiers;
 
-      const foundCommit = (await commitStore.getCommitById(
+      const foundCommit = (await commitStore.findById(
         commitId as string
       )) as Commit;
       expectCommitIsMatchingCreatedTaskList(foundCommit, taskListId, title);
@@ -260,7 +260,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
       const { commitId, snapshotId } = storageIdentifiers;
 
       // Expected commit
-      const foundCommit = (await commitStore.getCommitById(
+      const foundCommit = (await commitStore.findById(
         commitId as string
       )) as Commit;
       expectCommitIsMatchingCreatedTaskList(foundCommit, taskListId, title);

@@ -46,7 +46,7 @@ export class CommitStore implements types.CommitStore {
 
     let currentVersion: number;
     // Fetch last inserted batch to get the current version
-    const lastVersion = await this.storage.getLastCommitVersionById(sourceId);
+    const lastVersion = await this.storage.findLastVersionById(sourceId);
     if (lastVersion !== undefined) {
       // Take version of last existing commit
       currentVersion = lastVersion;
@@ -88,7 +88,7 @@ export class CommitStore implements types.CommitStore {
       sentBy: appId,
       receivers: [receiver],
     };
-    const commitId = await this.generateCommitId();
+    const commitId = await this.generateId();
     if (commitId) {
       props.id = commitId.toString();
     } else {
@@ -103,8 +103,8 @@ export class CommitStore implements types.CommitStore {
    * @async
    * @return Identifier for commit compatible with storage implementation.
    */
-  public async generateCommitId(): Promise<string> {
-    return this.storage.generateCommitId();
+  public async generateId(): Promise<string> {
+    return this.storage.generateId();
   }
 
   /**
@@ -113,25 +113,25 @@ export class CommitStore implements types.CommitStore {
    * @param commit - Instance implementing `Commit` interface.
    * @return Identifier of commit on commit storage.
    */
-  public async addCommit(commit: types.Commit): Promise<string> {
+  public async save(commit: types.Commit): Promise<string> {
     this.log.debug(
       new Log(
         `adding commit for '${commit.eventSourceableType}@${commit.sourceId}'`
       )
         .on(this)
-        .in(this.addCommit)
+        .in(this.save)
         .with('commit', commit)
     );
 
-    let commitId;
+    let commitId: string;
     try {
-      commitId = await this.storage.addCommit(commit);
+      commitId = await this.storage.save(commit);
       this.log.debug(
         new Log(
           `added commit with id '${commitId}' for '${commit.eventSourceableType}@${commit.sourceId}'`
         )
           .on(this)
-          .in(this.addCommit)
+          .in(this.save)
           .with('commit', commit)
       );
     } catch (error) {
@@ -140,7 +140,7 @@ export class CommitStore implements types.CommitStore {
           `failed adding commit for '${commit.eventSourceableType}@${commit.sourceId}' do to error: ${error}`
         )
           .on(this)
-          .in(this.addCommit)
+          .in(this.save)
           .with('commit', commit)
       );
       throw error;
@@ -182,10 +182,10 @@ export class CommitStore implements types.CommitStore {
    * @param commitId - Identifier of `Commit`.
    * @returns Instance implementing `Commit` interface, else `undefined`.
    */
-  public async getCommitById(
+  public async findById(
     commitId: string
   ): Promise<types.Commit | undefined> {
-    return this.storage.getCommitById(commitId);
+    return this.storage.findById(commitId);
   }
 
   /**
