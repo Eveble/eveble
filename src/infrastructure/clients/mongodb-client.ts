@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { MongoClient, Db, Collection, MongoClientOptions } from 'mongodb';
 import { inject } from '@parisholley/inversify-async';
 import { isEmpty } from 'lodash';
 import { Client } from '../client';
@@ -33,7 +33,6 @@ export class MongoDBDatabaseConfig extends Config {
   }
 }
 
-@define()
 export class MongoDBClient extends Client implements types.Client {
   @inject(BINDINGS.log)
   protected log: types.Logger;
@@ -50,11 +49,11 @@ export class MongoDBClient extends Client implements types.Client {
 
   public state: types.State;
 
-  public readonly url: string;
+  public url: string;
 
-  public readonly databases: MongoDBDatabaseConfig[];
+  public databases: MongoDBDatabaseConfig[];
 
-  public readonly options: Record<string, any>;
+  public options?: MongoClientOptions;
 
   public library?: MongoClient;
 
@@ -62,8 +61,11 @@ export class MongoDBClient extends Client implements types.Client {
    * Creates an instance of MongoDBClient.
    * @param props - Properties of the type required for construction.
    */
-  constructor(props: types.Props = {}) {
-    const processedProps: types.Props = { databases: [], ...props };
+  constructor(props: Partial<MongoDBClient>) {
+    const processedProps: types.Props = {
+      databases: [],
+      ...props,
+    };
     processedProps.options = {
       ...MongoDBClient.defaultOptions,
       ...(props.options || {}),

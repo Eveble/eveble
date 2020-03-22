@@ -38,17 +38,17 @@ export const getDatabaseName = function(targetName: string): string {
   return databaseName;
 };
 
-export const isSSL = function(targetName: string): string {
+export const isSSL = function(targetName: string): boolean {
   let isEnabled;
   switch (targetName) {
     case 'snapshotter':
-      isEnabled = getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_SSL');
+      isEnabled = getenv.bool('EVEBLE_SNAPSHOTTER_MONGODB_SSL');
       break;
     case 'commitStore':
-      isEnabled = getenv.string('EVEBLE_COMMITSTORE_MONGODB_SSL');
+      isEnabled = getenv.bool('EVEBLE_COMMITSTORE_MONGODB_SSL');
       break;
     case 'scheduler':
-      isEnabled = getenv.string('EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL');
+      isEnabled = getenv.bool('EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL');
       break;
     default:
       isEnabled = false;
