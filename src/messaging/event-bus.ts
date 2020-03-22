@@ -79,3 +79,9 @@ export class EventBus extends classes(HookableMixin, OneToManyHandlingMixin)
     return result;
   }
 }
+
+/*
+Fix for Inversify getClassPropsAsTargets function that can't resolve parent class constructor
+from mixed prototype.
+*/
+Object.getPrototypeOf(EventBus.prototype).constructor = Object;

@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
+import { injectable } from '@parisholley/inversify-async';
 import { Service } from '../../../src/infrastructure/service';
 import { CommandHandlingMixin } from '../../../src/mixins/command-handling-mixin';
 import { EventHandlingMixin } from '../../../src/mixins/event-handling-mixin';
@@ -59,5 +60,26 @@ describe(`Service`, function() {
 
     expect(service.hasHandler(MyCommand)).to.be.true;
     expect(service.hasHandler(MyEvent)).to.be.true;
+  });
+
+  it('ensures that service can be resolved by Inversify in singleton scope', () => {
+    @injectable()
+    class MyService extends Service {
+      MyCommand(@handle _command: MyCommand): void {
+        return undefined;
+      }
+
+      MyEvent(@subscribe _events: MyEvent): void {
+        return undefined;
+      }
+    }
+    injector
+      .bind<types.Service>('MyService')
+      .to(MyService)
+      .inSingletonScope();
+
+    injector.get('MyService');
+    expect(() => injector.get('MyService')).to.not.throw(Error);
+    expect(injector.get('MyService')).to.be.instanceof(MyService);
   });
 });

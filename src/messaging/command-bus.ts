@@ -71,3 +71,9 @@ export class CommandBus extends classes(HookableMixin, OneToOneHandlingMixin)
     return result;
   }
 }
+
+/*
+Fix for Inversify getClassPropsAsTargets function that can't resolve parent class constructor
+from mixed prototype.
+*/
+Object.getPrototypeOf(CommandBus.prototype).constructor = Object;
