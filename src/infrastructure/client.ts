@@ -1,12 +1,10 @@
-import { classes } from 'polytype';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
-import { Struct } from '../components/struct';
 import { StatefulMixin } from '../mixins/stateful-mixin';
 import { define } from '../decorators/define';
 
 @define()
-export class Client extends classes(Struct, StatefulMixin) {
+export class Client extends StatefulMixin {
   static STATES = {
     constructed: 'constructed',
     initialized: 'initialized',
@@ -31,7 +29,8 @@ export class Client extends classes(Struct, StatefulMixin) {
    * https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
    */
   constructor(props: types.Props = {}) {
-    super([props]);
+    super();
+    Object.assign(this, props);
     this.setState(Client.STATES.constructed);
   }
 
