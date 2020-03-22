@@ -1,4 +1,4 @@
-import { MongoClient, Collection } from 'mongodb';
+import { MongoClient, Collection, MongoClientOptions } from 'mongodb';
 import { MongoDBClient } from '../../../src/infrastructure/clients/mongodb-client';
 import {
   getUrl,
@@ -28,7 +28,7 @@ export const setupCommitStoreMongo = async function(
   const url = getUrl(target);
   const databaseName = getDatabaseName(target);
   const collectionName = getCollectionName(target);
-  const options = {
+  const options: MongoClientOptions = {
     ssl: isSSL(target),
   };
 
