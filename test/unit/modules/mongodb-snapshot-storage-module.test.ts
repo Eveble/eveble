@@ -5,7 +5,7 @@ import { stubInterface } from 'ts-sinon';
 import { MongoClient as MongoClientOriginal, Collection, Db } from 'mongodb';
 import getenv from 'getenv';
 import { AppConfig } from '../../../src/configs/app-config';
-import { MongoDBClient } from '../../../src/infrastructure/clients/mongodb-client';
+import { MongoDBClient } from '../../../src/app/clients/mongodb-client';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
 import { types } from '../../../src/types';
 import { Injector } from '../../../src/core/injector';

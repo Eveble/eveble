@@ -186,8 +186,8 @@ import { UnscheduleCommand } from '../../src/domain/unschedule-command';
 import { Process } from '../../src/domain/process';
 import { ValueObject } from '../../src/domain/value-object';
 // Infrastructure
-import { AgendaClient } from '../../src/infrastructure/clients/agenda-client';
-import { MongoDBClient } from '../../src/infrastructure/clients/mongodb-client';
+import { AgendaClient } from '../../src/app/clients/agenda-client';
+import { MongoDBClient } from '../../src/app/clients/mongodb-client';
 import { AgendaCommandScheduler } from '../../src/infrastructure/schedulers/agenda-command-scheduler';
 import { CommitSerializer } from '../../src/infrastructure/serializers/commit-serializer';
 import { SnapshotSerializer } from '../../src/infrastructure/serializers/snapshot-serializer';
@@ -200,7 +200,7 @@ import {
 } from '../../src/infrastructure/structs/commit';
 import { ScheduledJob } from '../../src/infrastructure/structs/scheduled-job';
 import { AgendaScheduledJobTransformer } from '../../src/infrastructure/transformers/agenda-scheduled-job-transformer';
-import { Client } from '../../src/infrastructure/client';
+import { Client } from '../../src/app/client';
 import { CommandSchedulingService } from '../../src/infrastructure/command-scheduling-service';
 import { CommitPublisher } from '../../src/infrastructure/commit-publisher';
 import { CommitStore } from '../../src/infrastructure/commit-store';

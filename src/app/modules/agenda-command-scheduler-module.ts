@@ -1,7 +1,7 @@
 import getenv from 'getenv';
 import { Collection } from 'mongodb';
-import { AgendaClient } from '../../infrastructure/clients/agenda-client';
-import { MongoDBClient } from '../../infrastructure/clients/mongodb-client';
+import { AgendaClient } from '../clients/agenda-client';
+import { MongoDBClient } from '../clients/mongodb-client';
 import { AgendaCommandScheduler } from '../../infrastructure/schedulers/agenda-command-scheduler';
 import { AgendaScheduledJobTransformer } from '../../infrastructure/transformers/agenda-scheduled-job-transformer';
 import { Module } from '../../core/module';

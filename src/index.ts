@@ -114,8 +114,8 @@ export { UnscheduleCommand } from './domain/unschedule-command';
 export { Process } from './domain/process';
 export { ValueObject } from './domain/value-object';
 // Infrastructure
-export { AgendaClient } from './infrastructure/clients/agenda-client';
-export { MongoDBClient } from './infrastructure/clients/mongodb-client';
+export { AgendaClient } from './app/clients/agenda-client';
+export { MongoDBClient } from './app/clients/mongodb-client';
 export { AgendaCommandScheduler } from './infrastructure/schedulers/agenda-command-scheduler';
 export { CommitSerializer } from './infrastructure/serializers/commit-serializer';
 export { SnapshotSerializer } from './infrastructure/serializers/snapshot-serializer';
@@ -125,7 +125,7 @@ export { SnapshotMongoDBStorage } from './infrastructure/storages/snapshot-mongo
 export { Commit, CommitReceiver } from './infrastructure/structs/commit';
 export { ScheduledJob } from './infrastructure/structs/scheduled-job';
 export { AgendaScheduledJobTransformer } from './infrastructure/transformers/agenda-scheduled-job-transformer';
-export { Client } from './infrastructure/client';
+export { Client } from './app/client';
 export { CommandSchedulingService } from './infrastructure/command-scheduling-service';
 export { CommitPublisher } from './infrastructure/commit-publisher';
 export { CommitStore } from './infrastructure/commit-store';
@@ -236,7 +236,6 @@ export {
   injectable,
   inject,
 } from '@parisholley/inversify-async';
-export { bootstrapLogger } from './utils/logger-bootstrapper';
 export { BINDINGS, BINDINGS as EVEBLE_BINDINGS };
 /*
 TYPEND

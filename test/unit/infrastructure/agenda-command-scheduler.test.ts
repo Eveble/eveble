@@ -5,7 +5,7 @@ import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
 import Agenda from 'agenda';
 import sinon from 'sinon';
-import { AgendaClient } from '../../../src/infrastructure/clients/agenda-client';
+import { AgendaClient } from '../../../src/app/clients/agenda-client';
 import { Command, Assignment } from '../../../src/components/command';
 import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';

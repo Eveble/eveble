@@ -112,9 +112,7 @@ describe(`SnapshotMongoDBStorage`, function() {
         insertedCount: 0,
       });
 
-    await expect(
-      storage.save(eventSourceable)
-    ).to.eventually.be.rejectedWith(
+    await expect(storage.save(eventSourceable)).to.eventually.be.rejectedWith(
       AddingSnapshotError,
       `SnapshotMongoDBStorage: adding snapshot for event sourceable 'SnapshotMongoDBStorage.MyEventSourceable' with id '${eventSourceableId.toString()}' failed`
     );
@@ -156,9 +154,7 @@ describe(`SnapshotMongoDBStorage`, function() {
       .withArgs(filter, update)
       .resolves({ result: { nModified: 0 } });
 
-    await expect(
-      storage.update(eventSourceable)
-    ).to.eventually.be.rejectedWith(
+    await expect(storage.update(eventSourceable)).to.eventually.be.rejectedWith(
       UpdatingSnapshotError,
       `SnapshotMongoDBStorage: updating snapshot for event sourceable 'SnapshotMongoDBStorage.MyEventSourceable' with id '${eventSourceableId.toString()}' failed`
     );
