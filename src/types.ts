@@ -820,7 +820,7 @@ export namespace types {
     };
   }
 
-  export interface Client extends Definable, Stateful {
+  export interface Client extends Stateful {
     getId(): string | Stringifiable;
     initialize(): Promise<void>;
     connect(): Promise<void>;

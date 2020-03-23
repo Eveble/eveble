@@ -59,10 +59,7 @@ export class Snapshotter implements types.Snapshotter {
     );
 
     const EventSourceableType = eventSourceable.constructor as types.EventSourceableType;
-    const lastSnapshot = await this.storage.findById(
-      EventSourceableType,
-      id
-    );
+    const lastSnapshot = await this.storage.findById(EventSourceableType, id);
 
     let snapshotId;
 
@@ -76,10 +73,7 @@ export class Snapshotter implements types.Snapshotter {
         lastSnapshot.getVersion() <=
         currentVersion - this.getVersionFrequency();
       if (isUpdatable) {
-        snapshotId = await this.updateOnStorage(
-          eventSourceable,
-          lastSnapshot
-        );
+        snapshotId = await this.updateOnStorage(eventSourceable, lastSnapshot);
       } else {
         this.logInsufficientPassedVersionsForSnapshot(
           eventSourceable,

@@ -182,9 +182,7 @@ export class CommitStore implements types.CommitStore {
    * @param commitId - Identifier of `Commit`.
    * @returns Instance implementing `Commit` interface, else `undefined`.
    */
-  public async findById(
-    commitId: string
-  ): Promise<types.Commit | undefined> {
+  public async findById(commitId: string): Promise<types.Commit | undefined> {
     return this.storage.findById(commitId);
   }
 

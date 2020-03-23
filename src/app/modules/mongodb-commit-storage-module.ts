@@ -4,7 +4,7 @@ import {
   MongoDBClient,
   MongoDBCollectionConfig,
   MongoDBDatabaseConfig,
-} from '../../infrastructure/clients/mongodb-client';
+} from '../clients/mongodb-client';
 import { CommitMongoDBStorage } from '../../infrastructure/storages/commit-mongodb-storage';
 import { CommitMongoDBObserver } from '../../infrastructure/storages/commit-mongodb-observer';
 import { Module } from '../../core/module';

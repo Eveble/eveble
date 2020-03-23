@@ -1,5 +1,5 @@
 import { MongoClient, Collection } from 'mongodb';
-import { MongoDBClient } from '../../../src/infrastructure/clients/mongodb-client';
+import { MongoDBClient } from '../../../src/app/clients/mongodb-client';
 import {
   getUrl,
   getDatabaseName,

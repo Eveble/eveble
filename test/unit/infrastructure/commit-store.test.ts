@@ -417,9 +417,9 @@ describe(`CommitStore`, function() {
         const error = new Error('my-error');
         storage.save.withArgs(commit).rejects(error);
 
-        await expect(
-          commitStore.save(commit)
-        ).to.eventually.be.rejectedWith(error);
+        await expect(commitStore.save(commit)).to.eventually.be.rejectedWith(
+          error
+        );
         expect(log.error).to.be.calledOnce;
         expect(log.error).to.be.calledWithExactly(
           new Log(

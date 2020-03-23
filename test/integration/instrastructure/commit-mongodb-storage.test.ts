@@ -282,12 +282,8 @@ describe(`CommitMongoDBStorage`, function() {
       const firstCommitId = new Guid().toString();
       const secondCommitId = new Guid().toString();
 
-      await storage.save(
-        generateCommit(firstCommitId, eventSourceableId, 10)
-      );
-      await storage.save(
-        generateCommit(secondCommitId, eventSourceableId, 11)
-      );
+      await storage.save(generateCommit(firstCommitId, eventSourceableId, 10));
+      await storage.save(generateCommit(secondCommitId, eventSourceableId, 11));
 
       const foundCommits = await storage.getCommits(eventSourceableId, 10);
       expect(foundCommits).to.be.eql([
@@ -307,12 +303,8 @@ describe(`CommitMongoDBStorage`, function() {
       const thirdCommitId = new Guid().toString();
       const otherEventSourceableId = 'my-other-id';
 
-      await storage.save(
-        generateCommit(firstCommitId, eventSourceableId, 1)
-      );
-      await storage.save(
-        generateCommit(secondCommitId, eventSourceableId, 2)
-      );
+      await storage.save(generateCommit(firstCommitId, eventSourceableId, 1));
+      await storage.save(generateCommit(secondCommitId, eventSourceableId, 2));
       await storage.save(
         generateCommit(thirdCommitId, otherEventSourceableId, 5)
       );

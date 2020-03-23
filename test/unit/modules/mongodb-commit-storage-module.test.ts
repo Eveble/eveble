@@ -9,7 +9,7 @@ import {
   MongoDBDatabaseConfig,
   MongoDBCollectionConfig,
   MongoDBClient,
-} from '../../../src/infrastructure/clients/mongodb-client';
+} from '../../../src/app/clients/mongodb-client';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';

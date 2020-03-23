@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Client } from '../../../src/infrastructure/client';
+import { Client } from '../../../src/app/client';
 import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
 
 describe(`Client`, function() {

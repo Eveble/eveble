@@ -15,7 +15,7 @@ import { Log } from '../../components/log-entry';
 import { ScheduleCommand } from '../../domain/schedule-command';
 import { UnscheduleCommand } from '../../domain/unschedule-command';
 import { Guid } from '../../domain/value-objects/guid';
-import { AgendaClient } from '../clients/agenda-client';
+import { AgendaClient } from '../../app/clients/agenda-client';
 
 @injectable()
 export class AgendaCommandScheduler extends StatefulMixin

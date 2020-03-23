@@ -7,8 +7,8 @@ import AgendaOriginal from 'agenda';
 import { MongoClient as MongoClientOriginal, Collection, Db } from 'mongodb';
 import { AgendaScheduledJobTransformer } from '../../../src/infrastructure/transformers/agenda-scheduled-job-transformer';
 import { AppConfig } from '../../../src/configs/app-config';
-import { MongoDBClient } from '../../../src/infrastructure/clients/mongodb-client';
-import { AgendaClient } from '../../../src/infrastructure/clients/agenda-client';
+import { MongoDBClient } from '../../../src/app/clients/mongodb-client';
+import { AgendaClient } from '../../../src/app/clients/agenda-client';
 
 import { types } from '../../../src/types';
 import { Injector } from '../../../src/core/injector';

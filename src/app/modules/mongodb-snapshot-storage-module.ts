@@ -1,6 +1,6 @@
 import getenv from 'getenv';
 import { Collection } from 'mongodb';
-import { MongoDBClient } from '../../infrastructure/clients/mongodb-client';
+import { MongoDBClient } from '../clients/mongodb-client';
 import { SnapshotMongoDBStorage } from '../../infrastructure/storages/snapshot-mongodb-storage';
 import { Module } from '../../core/module';
 import { types } from '../../types';

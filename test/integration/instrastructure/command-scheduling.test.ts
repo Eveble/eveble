@@ -13,7 +13,7 @@ import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commi
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
 import { AgendaCommandScheduler } from '../../../src/infrastructure/schedulers/agenda-command-scheduler';
-import { AgendaClient } from '../../../src/infrastructure/clients/agenda-client';
+import { AgendaClient } from '../../../src/app/clients/agenda-client';
 import { Router } from '../../../src/infrastructure/router';
 import { Task } from '../../domains/task-list/task';
 import { TaskList } from '../../domains/task-list/task-list';

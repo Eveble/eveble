@@ -9,7 +9,7 @@ import {
   MongoDBClient,
   MongoDBCollectionConfig,
   MongoDBDatabaseConfig,
-} from '../../../src/infrastructure/clients/mongodb-client';
+} from '../../../src/app/clients/mongodb-client';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
