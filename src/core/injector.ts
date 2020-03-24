@@ -135,4 +135,26 @@ export class Injector extends InversifyContainer implements types.Injector {
       await executePostConstructAsync(value);
     }
   }
+
+  /**
+   * Finds service identifiers by scope.
+   * @param scope - One of supported scopes by Inversify.
+   * @returns List of service identifiers binding with provided scope.
+   */
+  findByScope(
+    scope: inversifyTypes.BindingScope
+  ): inversifyTypes.ServiceIdentifier<any>[] {
+    const lookup = (this as any)._bindingDictionary;
+
+    const identifiers: inversifyTypes.ServiceIdentifier<any>[] = [];
+    lookup.traverse((key: any) => {
+      const bindings = lookup.get(key);
+      for (const binding of bindings) {
+        if (binding.scope === scope) {
+          identifiers.push(binding.serviceIdentifier);
+        }
+      }
+    });
+    return identifiers;
+  }
 }
