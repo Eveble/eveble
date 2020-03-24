@@ -49,6 +49,26 @@ describe('LoggingConfig', function() {
           console: new LogTransportConfig(),
         },
       });
+
+      it('has default console logging level assigned via LOGGING_LEVEL env', () => {
+        const defaultLoggingLevel = process.env.LOGGING_LEVEL;
+        process.env.LOGGING_LEVEL = 'crit';
+        expect(new LoggingConfig().get('transports.console.level')).to.be.equal(
+          'crit'
+        );
+
+        process.env.LOGGING_LEVEL = defaultLoggingLevel;
+      });
+
+      it('assigns console logging level as info if LOGGING_LEVEL env is not present ', () => {
+        const defaultLoggingLevel = process.env.LOGGING_LEVEL;
+        process.env.LOGGING_LEVEL = undefined;
+        expect(new LoggingConfig().get('transports.console.level')).to.be.equal(
+          'info'
+        );
+
+        process.env.LOGGING_LEVEL = defaultLoggingLevel;
+      });
     });
   });
 });
