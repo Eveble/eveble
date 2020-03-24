@@ -298,4 +298,105 @@ describe(`Injector`, () => {
     await injector.injectIntoAsync(instance);
     expect(initializeSpy).to.be.calledOnce;
   });
+
+  describe('bindings', () => {
+    it('returns service identifiers as a string matching singleton scope', () => {
+      @injectable()
+      class FirstSingleton {}
+      @injectable()
+      class SecondSingleton {}
+
+      const injector = new Injector();
+      injector
+        .bind<FirstSingleton>('FirstSingleton')
+        .to(FirstSingleton)
+        .inSingletonScope();
+      injector
+        .bind<SecondSingleton>('SecondSingleton')
+        .to(SecondSingleton)
+        .inSingletonScope();
+
+      expect(injector.findByScope('Singleton')).to.be.eql([
+        'FirstSingleton',
+        'SecondSingleton',
+      ]);
+    });
+
+    it('returns service identifiers as a string matching singleton scope', () => {
+      @injectable()
+      class FirstSingleton {}
+      @injectable()
+      class SecondSingleton {}
+
+      const injector = new Injector();
+      injector
+        .bind<FirstSingleton>('FirstSingleton')
+        .to(FirstSingleton)
+        .inSingletonScope();
+      injector
+        .bind<SecondSingleton>('SecondSingleton')
+        .to(SecondSingleton)
+        .inSingletonScope();
+
+      expect(injector.findByScope('Singleton')).to.be.eql([
+        'FirstSingleton',
+        'SecondSingleton',
+      ]);
+    });
+
+    it('returns service identifiers as a symbol matching singleton scope', () => {
+      @injectable()
+      class FirstSingleton {}
+      @injectable()
+      class SecondSingleton {}
+
+      const first = Symbol.for('FirstSingleton');
+      const second = Symbol.for('SecondSingleton');
+
+      const injector = new Injector();
+      injector
+        .bind<FirstSingleton>(first)
+        .to(FirstSingleton)
+        .inSingletonScope();
+      injector
+        .bind<SecondSingleton>(second)
+        .to(SecondSingleton)
+        .inSingletonScope();
+
+      expect(injector.findByScope('Singleton')).to.be.eql([first, second]);
+    });
+
+    it('returns service identifiers only matching provided scope', () => {
+      @injectable()
+      class TransientScope {}
+      @injectable()
+      class RequestScope {}
+      @injectable()
+      class ConstantValue {}
+      @injectable()
+      class Singleton {}
+
+      const injector = new Injector();
+      injector
+        .bind<TransientScope>('TransientScope')
+        .to(TransientScope)
+        .inTransientScope();
+      injector
+        .bind<RequestScope>('RequestScope')
+        .to(RequestScope)
+        .inRequestScope();
+      injector.bind<any>('ConstantValue').toConstantValue(ConstantValue);
+      injector
+        .bind<Singleton>('SingletonScope')
+        .to(Singleton)
+        .inSingletonScope();
+
+      expect(injector.findByScope('Singleton')).to.be.eql(['SingletonScope']);
+      expect(injector.findByScope('Transient')).to.be.eql([
+        'TransientScope',
+        'ConstantValue',
+      ]);
+      expect(injector.findByScope('Request')).to.be.eql(['RequestScope']);
+    });
+  });
 });

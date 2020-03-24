@@ -100,6 +100,9 @@ export namespace types {
     ): inversifyTypes.BindingToSyntax<T> & {
       toRoute(EventSourceableType: EventSourceableType): void;
     };
+    findByScope(
+      scope: inversifyTypes.BindingScope
+    ): inversifyTypes.ServiceIdentifier<any>[];
   }
 
   export type Validator = {
