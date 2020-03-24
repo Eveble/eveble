@@ -1,3 +1,4 @@
+import getenv from 'getenv';
 import { define } from '../decorators/define';
 import { Config } from '../components/config';
 import { LogTransportConfig } from './log-transport-config';
@@ -21,7 +22,9 @@ export class LoggingConfig extends Config {
   public transports?: {
     console?: LogTransportConfig;
   } = {
-    console: new LogTransportConfig(),
+    console: new LogTransportConfig({
+      level: getenv.string('LOGGING_LEVEL', 'info'),
+    }),
   };
 
   constructor(props?: Partial<LoggingConfig>) {
