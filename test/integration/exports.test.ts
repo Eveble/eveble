@@ -302,6 +302,7 @@ import {
   resolveSerializableFromPropType,
   createEJSON,
   isEventSourceableType,
+  loadENV,
 } from '../../src/utils/helpers';
 
 /*
@@ -589,6 +590,7 @@ import {
   resolveSerializableFromPropType as resolveSerializableFromPropTypeExported,
   createEJSON as createEJSONExported,
   isEventSourceableType as isEventSourceableTypeExported,
+  loadENV as loadENVExported,
   // External
   postConstruct as postConstructExported,
   injectable as injectableExported,
@@ -1536,6 +1538,9 @@ describe(`imports`, function() {
     });
     it('isEventSourceableType', () => {
       expect(isEventSourceableTypeExported).to.be.equal(isEventSourceableType);
+    });
+    it('loadENV', () => {
+      expect(loadENVExported).to.be.equal(loadENV);
     });
   });
 
