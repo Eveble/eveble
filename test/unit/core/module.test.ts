@@ -106,6 +106,7 @@ describe('Module', function() {
     generateId.returns(generatedId);
 
     injector.getAsync.withArgs(BINDINGS.log).returns(logger);
+    injector.findByScope.withArgs('Singleton').returns([]);
   });
 
   afterEach(() => {

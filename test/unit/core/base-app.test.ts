@@ -6,6 +6,8 @@ import sinon from 'sinon';
 import {
   Container,
   interfaces as inversifyTypes,
+  postConstruct,
+  injectable,
 } from '@parisholley/inversify-async';
 import * as winston from 'winston';
 import getenv from 'getenv';
@@ -26,6 +28,7 @@ import { LoggingConfig } from '../../../src/configs/logging-config';
 import { Logger } from '../../../src/core/logger';
 import { ConsoleTransport } from '../../../src/core/logging-transports/console-transport';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
+import { Injector } from '../../../src/core/injector';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -136,6 +139,7 @@ describe('BaseApp', function() {
     injector = stubInterface<types.Injector>();
     binding = stubInterface<inversifyTypes.BindingToSyntax<any>>();
     injector.bind.returns(binding);
+    injector.findByScope.withArgs('Singleton').returns([]);
 
     generateId = sinon.stub(AppConfig, 'generateId');
     generatedId = 'my-generated-id';
@@ -451,6 +455,101 @@ describe('BaseApp', function() {
             });
           });
         });
+      });
+    });
+
+    describe('initializes singletons', () => {
+      it('logs initialization of singletons', async () => {
+        const ioc = new Injector();
+        ioc.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+
+        const app = new MyApp({
+          modules: [],
+          injector: ioc,
+        });
+
+        await app.initialize();
+        expect(log.debug).to.be.calledWithMatch(
+          new Log(`initializing singletons`).on(app).in('initializeSingletons')
+        );
+        await app.shutdown();
+      });
+
+      it('initializes all registered singletons as strings on injector', async () => {
+        const spy = sinon.spy();
+        @injectable()
+        class MyClass {
+          @postConstruct()
+          initialize(): void {
+            spy();
+          }
+        }
+        const ioc = new Injector();
+        ioc.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+        const app = new MyApp({
+          modules: [],
+          injector: ioc,
+        });
+        app.injector
+          .bind<MyClass>('MyClass')
+          .to(MyClass)
+          .inSingletonScope();
+        await app.initialize();
+        expect(spy).to.be.calledOnce;
+        await app.shutdown();
+      });
+
+      it('initializes all registered singletons as symbols on injector', async () => {
+        const spy = sinon.spy();
+        @injectable()
+        class MyClass {
+          @postConstruct()
+          initialize(): void {
+            spy();
+          }
+        }
+
+        const symbolIdentifier = Symbol.for('MyClass');
+        const ioc = new Injector();
+        ioc.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+        const app = new MyApp({
+          modules: [],
+          injector: ioc,
+        });
+        app.injector
+          .bind<MyClass>(symbolIdentifier)
+          .to(MyClass)
+          .inSingletonScope();
+        await app.initialize();
+        expect(spy).to.be.calledOnce;
+        await app.shutdown();
+      });
+
+      it('ensures that all registered singletons are resolved in asynchronous mode', async () => {
+        const ioc = new Injector();
+        ioc.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
+
+        @injectable()
+        class MyClass {}
+        const app = new MyApp({
+          modules: [],
+          injector: ioc,
+        });
+
+        ioc.findByScope = sinon.stub();
+        const getAsync = sinon.spy(ioc, 'getAsync');
+        (ioc.findByScope as any).withArgs('Singleton').returns(['MyClass']);
+
+        app.injector
+          .bind<MyClass>('MyClass')
+          .to(MyClass)
+          .inSingletonScope();
+
+        await app.initialize();
+        expect(ioc.findByScope).to.be.calledOnce;
+        expect(ioc.findByScope).to.be.calledWithExactly('Singleton');
+        expect(getAsync).to.be.calledWithExactly('MyClass');
+        await app.shutdown();
       });
     });
   });
