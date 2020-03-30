@@ -227,6 +227,7 @@ export {
   resolveSerializableFromPropType,
   createEJSON,
   isEventSourceableType,
+  loadENV,
 } from './utils/helpers';
 // Types
 export { types } from './types';
