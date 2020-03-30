@@ -237,6 +237,7 @@ export {
   injectable,
   inject,
 } from '@parisholley/inversify-async';
+export { loggerLoader } from './utils/logger-loader';
 export { BINDINGS, BINDINGS as EVEBLE_BINDINGS };
 /*
 TYPEND

@@ -304,6 +304,7 @@ import {
   isEventSourceableType,
   loadENV,
 } from '../../src/utils/helpers';
+import { loggerLoader } from '../../src/utils/logger-loader';
 
 /*
 EXPORTED
@@ -591,6 +592,7 @@ import {
   createEJSON as createEJSONExported,
   isEventSourceableType as isEventSourceableTypeExported,
   loadENV as loadENVExported,
+  loggerLoader as loggerLoaderExported,
   // External
   postConstruct as postConstructExported,
   injectable as injectableExported,
@@ -1541,6 +1543,9 @@ describe(`imports`, function() {
     });
     it('loadENV', () => {
       expect(loadENVExported).to.be.equal(loadENV);
+    });
+    it('loggerLoader', () => {
+      expect(loggerLoaderExported).to.be.equal(loggerLoader);
     });
   });
 
