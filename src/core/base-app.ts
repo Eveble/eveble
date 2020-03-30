@@ -82,12 +82,12 @@ export abstract class BaseApp extends Module implements types.BaseApp {
     this.setState(BaseApp.STATES.configuring);
 
     await this.onConfiguration();
-    this.log?.debug(new Log(`initialize`).on(this).in(this.initialize));
 
     if (this.modules !== undefined) {
       await this.initializeModules(this.modules, this, this.injector);
     }
     await this.runInitializeHooks(this.injector);
+    await this.initializeSingletons();
 
     this.log?.debug(
       new Log(`config:`)
@@ -148,6 +148,8 @@ export abstract class BaseApp extends Module implements types.BaseApp {
     this.bindExternalDependencies();
     this.bindLoggerDependencies();
     await this.initializeLogger();
+
+    this.log?.debug(new Log(`initialize`).on(this).in(this.initialize));
   }
 
   /**
@@ -227,7 +229,10 @@ export abstract class BaseApp extends Module implements types.BaseApp {
     this.log = logger;
 
     const transportId = BINDINGS.console;
-    if (this.config.get(`logging.transports.${transportId}.isEnabled`)) {
+    if (
+      this.config.get(`logging.transports.${transportId}.isEnabled`) &&
+      !this.log.hasTransport(transportId)
+    ) {
       const consoleTransport = await this.createConsoleTransport();
       logger.registerTransport(transportId, consoleTransport);
     }
@@ -299,5 +304,20 @@ export abstract class BaseApp extends Module implements types.BaseApp {
     consoleTransport.info(
       new Log(this.config.get(`logging.transports.console.messages.exit`))
     );
+  }
+
+  /**
+   * Initializes all bound singletons on `Injector`.
+   * @async
+   */
+  protected async initializeSingletons(): Promise<void> {
+    this.log?.debug(
+      new Log(`initializing singletons`).on(this).in(this.initializeSingletons)
+    );
+
+    const serviceIdentifiers = this.injector.findByScope('Singleton');
+    for (const serviceIdentifier of serviceIdentifiers) {
+      await this.injector.getAsync<any>(serviceIdentifier);
+    }
   }
 }
