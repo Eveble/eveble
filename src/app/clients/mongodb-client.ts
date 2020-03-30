@@ -55,7 +55,7 @@ export class MongoDBClient extends Client implements types.Client {
 
   public options?: MongoClientOptions;
 
-  public library?: MongoClient;
+  public _library?: MongoClient;
 
   /**
    * Creates an instance of MongoDBClient.
@@ -86,7 +86,7 @@ export class MongoDBClient extends Client implements types.Client {
         .with('options', this.options)
     );
     try {
-      this.library = new this.MongoDB(this.url, this.options);
+      this._library = new this.MongoDB(this.url, this.options);
       this.setState(Client.STATES.initialized);
       this.log.debug(
         new Log(`successfully initialized client '${this.getId()}'`)
@@ -112,6 +112,21 @@ export class MongoDBClient extends Client implements types.Client {
   }
 
   /**
+   * Gets library instance.
+   * @returns `MongoClient` instance.
+   */
+  public get library(): MongoClient {
+    this.validateState([
+      MongoDBClient.STATES.initialized,
+      MongoDBClient.STATES.connected,
+      MongoDBClient.STATES.paused,
+      MongoDBClient.STATES.stopped,
+      MongoDBClient.STATES.disconnected,
+    ]);
+    return this._library as MongoClient;
+  }
+
+  /**
    * Connects to MongoDB.
    * @async
    * @throws {Error}
@@ -131,7 +146,7 @@ export class MongoDBClient extends Client implements types.Client {
       new Log(`connecting client '${this.getId()}'`).on(this).in(this.connect)
     );
     try {
-      await this.library?.connect();
+      await this._library?.connect();
       this.setState(Client.STATES.connected);
       if (!isEmpty(this.databases)) {
         await this.initializeDatabases(this.databases);
@@ -167,9 +182,9 @@ export class MongoDBClient extends Client implements types.Client {
         .on(this)
         .in(this.disconnect)
     );
-    await this.library?.close();
+    await this._library?.close();
     this.setState(Client.STATES.disconnected);
-    delete this.library;
+    delete this._library;
     this.log.debug(
       new Log(`disconnected client '${this.getId()}'`)
         .on(this)
@@ -199,9 +214,9 @@ export class MongoDBClient extends Client implements types.Client {
    */
   public isConnected(): boolean {
     return (
-      this.library !== undefined &&
+      this._library !== undefined &&
       this.isInState(Client.STATES.connected) &&
-      this.library?.isConnected()
+      this._library?.isConnected()
     );
   }
 
@@ -217,7 +232,7 @@ export class MongoDBClient extends Client implements types.Client {
       Client.STATES.stopped,
     ]);
 
-    return (this.library as MongoClient)?.db(name);
+    return (this._library as MongoClient)?.db(name);
   }
 
   /**
