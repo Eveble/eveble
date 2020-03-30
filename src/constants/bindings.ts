@@ -1,4 +1,5 @@
 export const BINDINGS = {
+  App: Symbol.for('App'),
   Injector: Symbol.for('Injector'),
   Converter: Symbol.for('Converter'),
   Library: Symbol.for('Library'),
