@@ -155,6 +155,7 @@ export class Injector extends InversifyContainer implements types.Injector {
         }
       }
     });
+
     return identifiers;
   }
 }
