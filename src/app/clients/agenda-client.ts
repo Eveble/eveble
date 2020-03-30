@@ -3,12 +3,10 @@ import { inject } from '@parisholley/inversify-async';
 import { Client } from '../client';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
-import { define } from '../../decorators/define';
 import { Log } from '../../components/log-entry';
 import { MongoDBClient } from './mongodb-client';
 import { Guid } from '../../domain/value-objects/guid';
 
-@define()
 export class AgendaClient extends Client implements types.Client {
   @inject(BINDINGS.log)
   protected log: types.Logger;
