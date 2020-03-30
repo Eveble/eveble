@@ -1,10 +1,10 @@
 /*
 EVEBLE
 */
-// Annotations
+
 // Constants
 import { BINDINGS } from './constants/bindings';
-
+// Annotations
 export { delegate } from './annotations/delegate';
 export { handle } from './annotations/handle';
 export { initial } from './annotations/initial';
