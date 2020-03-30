@@ -1,9 +1,7 @@
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { StatefulMixin } from '../mixins/stateful-mixin';
-import { define } from '../decorators/define';
 
-@define()
 export class Client extends StatefulMixin {
   static STATES = {
     constructed: 'constructed',
