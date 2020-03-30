@@ -96,6 +96,8 @@ export class App extends BaseApp {
       processedProps.modules.unshift(new Eveble());
     }
     super(processedProps);
+    // Bind itself on injector for further reference
+    this.injector.bind<types.App>(BINDINGS.App).toConstantValue(this);
 
     this.envFilePath = envFilePath;
   }
@@ -175,7 +177,7 @@ export class App extends BaseApp {
     await super.onConfiguration();
 
     await this.initializeGracefulShutdown();
-    this.initializeExternalDependencies();
+    await this.initializeExternalDependencies();
     await this.initializeSchedulers();
     await this.initializeStorages();
   }
@@ -218,8 +220,9 @@ export class App extends BaseApp {
 
   /**
    * Initializes external dependencies.
+   * @async
    */
-  protected initializeExternalDependencies(): void {
+  protected async initializeExternalDependencies(): Promise<void> {
     this.log?.debug(
       new Log(`initializing external dependencies`)
         .on(this)

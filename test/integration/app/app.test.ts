@@ -520,6 +520,14 @@ describe(`App`, function() {
         });
       });
     });
+
+    it('binds app instance on injector', async () => {
+      const app = new App({
+        modules: [],
+        injector,
+      });
+      expect(injector.get<types.App>(BINDINGS.App)).to.be.equal(app);
+    });
   });
 
   describe(`helpers`, () => {
