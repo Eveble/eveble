@@ -398,5 +398,30 @@ describe(`Injector`, () => {
       ]);
       expect(injector.findByScope('Request')).to.be.eql(['RequestScope']);
     });
+
+    it('ensure that order of resolved service identifiers is consistent with the order of bindings', () => {
+      @injectable()
+      class First {}
+      @injectable()
+      class Second {}
+      @injectable()
+      class Thrid {}
+
+      const injector = new Injector();
+      injector
+        .bind<Thrid>('3')
+        .to(Thrid)
+        .inSingletonScope();
+      injector
+        .bind<First>('1')
+        .to(First)
+        .inSingletonScope();
+      injector
+        .bind<Second>('2')
+        .to(Second)
+        .inSingletonScope();
+
+      expect(injector.findByScope('Singleton')).to.be.eql(['3', '1', '2']);
+    });
   });
 });
