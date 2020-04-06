@@ -13,7 +13,7 @@ export class AssertionError extends DomainError {}
 export class UndefinedActionError extends DomainError {
   constructor(entityName: string, assertionApi: string) {
     super(
-      `${entityName}: action name is not set while using assertion '${assertionApi}'. Please define action by using 'entity.on('action-name').ensure.${assertionApi}(...)' or 'entity.on(MyCommand).ensure.${assertionApi}(...)`
+      `${entityName}: action name is not set while using assertion '${assertionApi}'. Please define action by using 'entity.on('action-name-as-string').${assertionApi}(...)' or 'entity.on(MyCommandType).ensure.${assertionApi}(...)`
     );
   }
 }
