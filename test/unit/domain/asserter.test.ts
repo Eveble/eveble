@@ -44,11 +44,33 @@ describe(`Asserter`, () => {
       expect(asserter.getAssertions()).to.have.members([assertion]);
     });
 
-    it('returns true if  assertion is registered on asserter', () => {
+    it('returns true if assertion is registered on asserter', () => {
       const asserter = new Asserter();
       const assertion = new MyAssertion();
       asserter.registerAssertion(assertion);
       expect(asserter.hasAssertion(MyAssertion)).to.be.true;
+    });
+
+    it('returns true if explicit api is registered on asserter', () => {
+      const asserter = new Asserter();
+      const assertion = new MyAssertion();
+      asserter.registerAssertion(assertion);
+      expect(asserter.hasApi('ensure.is.true')).to.be.true;
+      expect(asserter.hasApi('ensure.is.false')).to.be.true;
+    });
+
+    it('returns true if partial api is registered on asserter', () => {
+      const asserter = new Asserter();
+      const assertion = new MyAssertion();
+      asserter.registerAssertion(assertion);
+      expect(asserter.hasApi('ensure.is')).to.be.true;
+    });
+
+    it('returns false if api is not registered on asserter', () => {
+      const asserter = new Asserter();
+      const assertion = new MyAssertion();
+      asserter.registerAssertion(assertion);
+      expect(asserter.hasApi('not-registered')).to.be.false;
     });
 
     it('extends asserter api with the one from assertion', () => {
