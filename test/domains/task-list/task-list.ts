@@ -101,7 +101,7 @@ export class TaskList extends Aggregate {
   }
 
   AssignTaskList(@route command: AssignTaskList): void {
-    this.on('AssignTaskList').ensure.is.inOneOfStates([
+    this.on(AssignTaskList).ensure.is.inOneOfStates([
       TaskList.STATES.created,
       TaskList.STATES.open,
     ]);
@@ -114,7 +114,7 @@ export class TaskList extends Aggregate {
   }
 
   OpenTaskList(@route command: OpenTaskList): void {
-    this.on('OpenTaskList').ensure.is.not.inOneOfStates([
+    this.on(OpenTaskList).ensure.is.not.inOneOfStates([
       TaskList.STATES.open,
       TaskList.STATES.closed,
     ]);
@@ -122,7 +122,7 @@ export class TaskList extends Aggregate {
   }
 
   CloseTaskList(@route command: CloseTaskList): void {
-    this.on('CloseTaskList').ensure.is.inState(TaskList.STATES.open);
+    this.on(CloseTaskList).ensure.is.inState(TaskList.STATES.open);
     this.record(new TaskListClosed(this.pickEventProps(command)));
   }
 
@@ -130,7 +130,7 @@ export class TaskList extends Aggregate {
   TASK
   */
   CreateTask(@route command: CreateTask): void {
-    this.on('CreateTask').ensure.is.not.inState(
+    this.on(CreateTask).ensure.is.not.inState(
       TaskList.STATES.closed,
       new TaskListClosedError(this.getId().toString())
     );
@@ -150,7 +150,7 @@ export class TaskList extends Aggregate {
     }
 
     const foundTask = this.in<Task>('tasks').findById(command.id);
-    foundTask.on('expire').ensure.is.ableTo();
+    foundTask.ensure.is.ableTo.expire();
 
     this.record(
       new TaskExpired({
@@ -161,10 +161,10 @@ export class TaskList extends Aggregate {
   }
 
   AcceptTask(@route command: AcceptTask): void {
-    this.on('AcceptTask').ensure.is.not.inState(TaskList.STATES.closed);
+    this.on(AcceptTask).ensure.is.not.inState(TaskList.STATES.closed);
 
     const foundTask = this.in<Task>('tasks').findById(command.id);
-    foundTask.on('accept').ensure.is.ableTo();
+    foundTask.ensure.is.ableTo.accept();
 
     this.record(
       new TaskAccepted({
@@ -175,10 +175,10 @@ export class TaskList extends Aggregate {
   }
 
   ChangeTaskPriority(@route command: ChangeTaskPriority): void {
-    this.on('ChangeTaskPriority').ensure.is.not.inState(TaskList.STATES.closed);
+    this.on(ChangeTaskPriority).ensure.is.not.inState(TaskList.STATES.closed);
 
     const foundTask = this.in<Task>('tasks').findById(command.id);
-    foundTask.on('changePriority').ensure.is.ableTo(command.priority);
+    foundTask.ensure.is.ableTo.changePriority(command.priority);
 
     this.record(
       new TaskAccepted({
@@ -235,7 +235,7 @@ export class TaskList extends Aggregate {
     props?: Record<string, any>
   ): void {
     const foundTask = this.in<Task>('tasks').findById(taskId);
-    foundTask.on(actionName).ensure.is.ableTo(actionName);
+    foundTask.ensure.is.ableTo[actionName]();
     const eventProps: Record<string, any> = {
       ...this.eventProps(),
       task: foundTask,
