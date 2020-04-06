@@ -4,6 +4,12 @@ import { types } from '../types';
 import { SerializableError } from '../components/serializable-error';
 
 /*
+ASSERTION ERRORS
+*/
+@define('AssertionError')
+export class AssertionError extends DomainError {}
+
+/*
 LIST ERRORS
 */
 @define('ListError')
