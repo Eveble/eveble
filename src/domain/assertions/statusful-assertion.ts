@@ -2,9 +2,10 @@ import { Assertion } from '../assertion';
 import { DomainError } from '../domain-error';
 import { define } from '../../decorators/define';
 import { types } from '../../types';
+import { UndefinedActionError, AssertionError } from '../domain-errors';
 
 @define('InvalidStatusTransitionError')
-export class InvalidStatusTransitionError extends DomainError {
+export class InvalidStatusTransitionError extends AssertionError {
   entityName: string;
 
   entityId: string;
@@ -57,7 +58,7 @@ export class StatusfulAssertion extends Assertion {
     error?: DomainError
   ): types.Asserter {
     if (!this.asserter.getEntity().isInStatus(expectedStatus)) {
-      this.failAssertion(expectedStatus, error);
+      this.failAssertion(expectedStatus, 'ensure.is.inStatus', error);
     }
     return this.asserter;
   }
@@ -73,7 +74,7 @@ export class StatusfulAssertion extends Assertion {
     error?: DomainError
   ): types.Asserter {
     if (this.asserter.getEntity().isInStatus(expectedStatus)) {
-      this.failAssertion(expectedStatus, error);
+      this.failAssertion(expectedStatus, 'ensure.is.not.inStatus', error);
     }
     return this.asserter;
   }
@@ -89,7 +90,11 @@ export class StatusfulAssertion extends Assertion {
     error?: DomainError
   ): types.Asserter {
     if (!this.asserter.getEntity().isInOneOfStatuses(expectedStatuses)) {
-      this.failAssertion(expectedStatuses.join(', '), error);
+      this.failAssertion(
+        expectedStatuses.join(', '),
+        'ensure.is.inOneOfStatuses',
+        error
+      );
     }
     return this.asserter;
   }
@@ -105,7 +110,11 @@ export class StatusfulAssertion extends Assertion {
     error?: DomainError
   ): types.Asserter {
     if (this.asserter.getEntity().isInOneOfStatuses(expectedStatuses)) {
-      this.failAssertion(expectedStatuses.join(', '), error);
+      this.failAssertion(
+        expectedStatuses.join(', '),
+        'ensure.is.not.inOneOfStatuses',
+        error
+      );
     }
     return this.asserter;
   }
@@ -113,6 +122,7 @@ export class StatusfulAssertion extends Assertion {
   /**
    * Throws error on failed assertion - on invalid status of `Entity`.
    * @param expectedStatus - Expected status on `Entity`.
+   * @param api - Api path that is being invoked.
    * @param error - Optional instance of `DomainError` that will be thrown upon failed assertion.
    * @throws {DomainError}
    * Thrown if an error is passed as argument.
@@ -121,11 +131,24 @@ export class StatusfulAssertion extends Assertion {
    */
   protected failAssertion(
     expectedStatus: types.Status,
+    api: string,
     error?: DomainError
   ): void {
     if (error !== undefined) {
       throw error;
     } else {
+      if (!this.asserter.hasAction()) {
+        throw new UndefinedActionError(
+          this.asserter.getEntity().getTypeName(),
+          api
+        );
+      }
+      let action = this.asserter.getAction();
+      if (
+        (action as types.MessageType<types.Message>).getTypeName !== undefined
+      ) {
+        action = (action as types.MessageType<types.Message>).getTypeName();
+      }
       throw new InvalidStatusTransitionError(
         this.asserter.getEntity().getTypeName(),
         this.asserter
@@ -134,7 +157,7 @@ export class StatusfulAssertion extends Assertion {
           .toString(),
         this.asserter.getEntity().getStatus() as string,
         expectedStatus as string,
-        this.asserter.getAction().toString()
+        action.toString()
       );
     }
   }
