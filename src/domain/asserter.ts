@@ -69,6 +69,20 @@ export class Asserter implements types.Asserter {
   }
 
   /**
+   * Evaluates if explicit or partial api is registered on asserter.
+   * @param explicitOrPartialPath - Explicit or partial path of API.
+   * @returns Returns `true` if api is registered on asserter, else `false`.
+   */
+  hasApi(pathOrPartial: any): boolean {
+    for (const key of this.api.keys()) {
+      if (key.includes(pathOrPartial)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Changes type of current instance to any so it can be used on TypeScript.
    * @returns This instance of `Asserter`.
    */

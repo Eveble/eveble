@@ -600,6 +600,7 @@ export namespace types {
     registerAssertion(assertion: Assertion): void;
     getAssertions(): Assertion[];
     getApi(): Map<string, Function>;
+    hasApi(path: string): boolean;
     hasAssertion(assertionCtor: any): boolean;
   }
 
