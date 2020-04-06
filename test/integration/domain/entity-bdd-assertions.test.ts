@@ -613,7 +613,7 @@ describe(`Entity BDD assertions`, function() {
 
     it(`provides a api to assert that entity is able to change state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(() => entity.on('start').ensure.is.ableTo()).to.throw(
+      expect(() => entity.ensure.is.ableTo.start()).to.throw(
         InvalidStateTransitionError,
         `MyEntity: cannot 'start' when in 'created' state(expected states: 'accepted')`
       );
@@ -621,7 +621,7 @@ describe(`Entity BDD assertions`, function() {
 
     it(`ensures that state of entity is unchanged if error is not thrown upon validation`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(() => entity.on('start').ensure.is.ableTo()).to.throw(
+      expect(() => entity.ensure.is.ableTo.start()).to.throw(
         InvalidStateTransitionError,
         `MyEntity: cannot 'start' when in 'created' state(expected states: 'accepted')`
       );
@@ -632,7 +632,8 @@ describe(`Entity BDD assertions`, function() {
       const entity = new MyEntity({ id: 'my-id' });
       const declinedAt = new Date();
       const declineReason = 'My reason';
-      entity.on('decline').ensure.is.ableTo(declinedAt, declineReason);
+
+      entity.ensure.is.ableTo.decline(declinedAt, declineReason);
       expect(handler).to.be.calledWithExactly(declinedAt, declineReason);
     });
   });
@@ -694,28 +695,28 @@ describe(`Entity BDD assertions`, function() {
 
     it(`returns true if entity can change to selected state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(entity.on('complete').is.ableTo()).to.be.true;
-      expect(entity.on('expire').is.ableTo()).to.be.true;
+      expect(entity.is.ableTo.complete()).to.be.true;
+      expect(entity.is.ableTo.expire()).to.be.true;
     });
 
     it(`returns false if entity can't change to selected state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       entity.complete();
-      expect(entity.on('complete').is.ableTo()).to.be.false;
-      expect(entity.on('expire').is.ableTo()).to.be.false;
+      expect(entity.is.ableTo.complete()).to.be.false;
+      expect(entity.is.ableTo.expire()).to.be.false;
     });
 
     it(`ensures that state of entity is unchanged if assertion returns true`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(entity.on('complete').is.ableTo()).to.be.true;
-      expect(entity.on('expire').is.ableTo()).to.be.true;
+      expect(entity.is.ableTo.complete()).to.be.true;
+      expect(entity.is.ableTo.expire()).to.be.true;
       expect(entity.isInState(MyEntity.STATES.created)).to.be.true;
     });
 
     it(`ensures that state of entity is unchanged if assertion returns false`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       entity.complete();
-      expect(entity.on('expire').is.ableTo()).to.be.false;
+      expect(entity.is.ableTo.expire()).to.be.false;
       expect(entity.isInState(MyEntity.STATES.completed)).to.be.true;
     });
 
@@ -723,8 +724,7 @@ describe(`Entity BDD assertions`, function() {
       const entity = new MyEntity({ id: 'my-id' });
       const declinedAt = new Date();
       const declineReason = 'My reason';
-      expect(entity.on('decline').is.ableTo(declinedAt, declineReason)).to.be
-        .true;
+      expect(entity.is.ableTo.decline(declinedAt, declineReason)).to.be.true;
       expect(handler).to.be.calledWithExactly(declinedAt, declineReason);
     });
   });
