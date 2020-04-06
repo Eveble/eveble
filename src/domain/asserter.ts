@@ -37,7 +37,6 @@ export class Asserter implements types.Asserter {
    */
   public registerAssertion(assertion: types.Assertion): void {
     for (const [path, method] of assertion.getApi()) {
-      const boundMethod = method.bind(assertion);
       this.api.set(path, method);
       // Ensure that apis don't conflict with each other.
       if (has(this, path)) {
@@ -49,7 +48,12 @@ export class Asserter implements types.Asserter {
       }
       // Build up api in form of accessible, nested object properties reassembling
       // sinon `expect` implementation
-      set(this, path, boundMethod);
+      if (typeof method === 'function') {
+        const boundMethod = method.bind(assertion);
+        set(this, path, boundMethod);
+      } else {
+        set(this, path, method);
+      }
     }
     this.assertions.push(assertion);
   }
