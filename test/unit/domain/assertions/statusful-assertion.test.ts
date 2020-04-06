@@ -7,6 +7,7 @@ import {
 } from '../../../../src/domain/assertions/statusful-assertion';
 import { types } from '../../../../src/types';
 import { DomainError } from '../../../../src/domain/domain-error';
+import { UndefinedActionError } from '../../../../src/domain/domain-errors';
 
 chai.use(sinonChai);
 
@@ -20,6 +21,7 @@ describe(`StatusfulAssertion`, () => {
 
     asserter.getEntity.returns(entity);
     asserter.getAction.returns('my-action');
+    asserter.hasAction.returns(true);
     entity.getTypeName.returns('MyTypeName');
     entity.getId.returns('my-id');
   });
@@ -69,6 +71,17 @@ describe(`StatusfulAssertion`, () => {
         expect(entity.isInStatus).to.be.calledWithExactly(expectedStatus);
       });
 
+      it('throws UndefinedActionError if action is not set on asserter', () => {
+        const assertion = new StatusfulAssertion(asserter);
+        entity.isInStatus.returns(false);
+        asserter.hasAction.returns(false);
+
+        expect(() => assertion.ensureIsInStatus('expected-status')).to.throw(
+          UndefinedActionError,
+          `MyTypeName: action name is not set while using assertion 'ensure.is.inStatus'. Please define action by using 'entity.on('action-name-as-string').ensure.is.inStatus(...)' or 'entity.on(MyCommandType).ensure.ensure.is.inStatus(...)`
+        );
+      });
+
       it('throws InvalidStatusTransitionError if entity is not in status', () => {
         const assertion = new StatusfulAssertion(asserter);
         entity.isInStatus.returns(false);
@@ -110,6 +123,17 @@ describe(`StatusfulAssertion`, () => {
         );
         expect(entity.isInStatus).to.be.calledOnce;
         expect(entity.isInStatus).to.be.calledWithExactly(expectedStatus);
+      });
+
+      it('throws UndefinedActionError if action is not set on asserter', () => {
+        const assertion = new StatusfulAssertion(asserter);
+        entity.isInStatus.returns(true);
+        asserter.hasAction.returns(false);
+
+        expect(() => assertion.ensureIsNotInStatus('expected-status')).to.throw(
+          UndefinedActionError,
+          `MyTypeName: action name is not set while using assertion 'ensure.is.not.inStatus'. Please define action by using 'entity.on('action-name-as-string').ensure.is.not.inStatus(...)' or 'entity.on(MyCommandType).ensure.ensure.is.not.inStatus(...)`
+        );
       });
 
       it('throws InvalidStatusTransitionError if entity is in status', () => {
@@ -154,6 +178,19 @@ describe(`StatusfulAssertion`, () => {
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
         expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
           expectedStatuses
+        );
+      });
+
+      it('throws UndefinedActionError if action is not set on asserter', () => {
+        const assertion = new StatusfulAssertion(asserter);
+        entity.isInOneOfStatuses.returns(false);
+        asserter.hasAction.returns(false);
+
+        expect(() =>
+          assertion.ensureIsInOneOfStatuses(['expected-status'])
+        ).to.throw(
+          UndefinedActionError,
+          `MyTypeName: action name is not set while using assertion 'ensure.is.inOneOfStatuses'. Please define action by using 'entity.on('action-name-as-string').ensure.is.inOneOfStatuses(...)' or 'entity.on(MyCommandType).ensure.ensure.is.inOneOfStatuses(...)`
         );
       });
 
@@ -205,6 +242,19 @@ describe(`StatusfulAssertion`, () => {
         expect(entity.isInOneOfStatuses).to.be.calledOnce;
         expect(entity.isInOneOfStatuses).to.be.calledWithExactly(
           expectedStatuses
+        );
+      });
+
+      it('throws UndefinedActionError if action is not set on asserter', () => {
+        const assertion = new StatusfulAssertion(asserter);
+        entity.isInOneOfStatuses.returns(true);
+        asserter.hasAction.returns(false);
+
+        expect(() =>
+          assertion.ensureIsNotInOneOfStatuses(['expected-status'])
+        ).to.throw(
+          UndefinedActionError,
+          `MyTypeName: action name is not set while using assertion 'ensure.is.not.inOneOfStatuses'. Please define action by using 'entity.on('action-name-as-string').ensure.is.not.inOneOfStatuses(...)' or 'entity.on(MyCommandType).ensure.ensure.is.not.inOneOfStatuses(...)`
         );
       });
 
