@@ -114,6 +114,17 @@ describe(`Asserter`, () => {
       expect(asserter.getAction()).to.be.equal('my-action');
     });
 
+    it('returns true if action is set on asserter', () => {
+      const asserter = new Asserter();
+      asserter.setAction('my-action');
+      expect(asserter.hasAction()).to.be.true;
+    });
+
+    it('returns false if action is not set on asserter', () => {
+      const asserter = new Asserter();
+      expect(asserter.hasAction()).to.be.false;
+    });
+
     it('sets the action as MessageableType type constructor', () => {
       class MyCommand extends Command {}
 

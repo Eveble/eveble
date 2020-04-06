@@ -123,6 +123,14 @@ export class Asserter implements types.Asserter {
   }
 
   /**
+   * Evaluates if action is set on asserter.
+   * @returns Returns `true` if action is set on asserter, else `false`.
+   */
+  public hasAction(): boolean {
+    return this.action !== undefined;
+  }
+
+  /**
    * Return registered assertions.
    * @returns List of registered instances of `Assertion` interface.
    */
