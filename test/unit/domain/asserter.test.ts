@@ -133,6 +133,13 @@ describe(`Asserter`, () => {
       expect(asserter.getAction()).to.be.equal(MyCommand);
     });
 
+    it('allows to clear the action', () => {
+      const asserter = new Asserter();
+      asserter.setAction('my-action');
+      asserter.clearAction();
+      expect(asserter.getAction()).to.be.undefined;
+    });
+
     it('sets the target as Entity instance', () => {
       const entity = stubInterface<types.Entity>();
 

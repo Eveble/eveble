@@ -119,6 +119,13 @@ export class Asserter implements types.Asserter {
   }
 
   /**
+   * Clears the action
+   */
+  public clearAction(): void {
+    this.action = undefined;
+  }
+
+  /**
    * Gets action for which assertion is being made.
    * @returns Action as string or `Stringifiable` implementation.
    */

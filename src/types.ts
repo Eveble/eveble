@@ -581,6 +581,8 @@ export namespace types {
     hasBy(key: string, value: any): boolean;
     hasSame(element: T): boolean;
     hasById(id: string | Stringifiable): boolean;
+    replaceById(id: string | types.Stringifiable, element: T): void;
+    replaceBy(key: string, value: any, element: T): void;
     removeById(id: string | Stringifiable): void;
     removeBy(key: string, value: any): void;
     first(): T | undefined;
@@ -595,6 +597,7 @@ export namespace types {
     setAction(action: Stringifiable | MessageType<Message>): void;
     getAction(): Stringifiable | MessageType<Message> | undefined;
     hasAction(): boolean;
+    clearAction(): void;
     setEntity(entity: Entity): void;
     getEntity(): Entity;
     assert(): Asserter;
