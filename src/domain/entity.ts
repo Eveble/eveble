@@ -14,6 +14,8 @@ import {
   ROLLBACK_STATE_METHOD_KEY,
 } from '../constants/literal-keys';
 import { kernel } from '../core/kernel';
+import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
+import { List } from './list';
 
 @define('Entity')
 export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
@@ -260,6 +262,22 @@ export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
       );
     }
     Object.assign(this, this[SAVED_STATE_KEY]);
+    /*
+    Fix for rollbacking serializable lists since thier
+    internal symbol properties(SOURCE_KEY, LIST_KEY, SERIALIZABLE_TYPE_KEY) will not be rollbacked with Object.assign
+    */
+    const serializablesListProps = Reflect.getMetadata(
+      SERIALIZABLE_LIST_PROPS_KEY,
+      this.constructor
+    );
+    for (const [key, serializable] of Object.entries(serializablesListProps)) {
+      this[key] = new List(
+        this,
+        key,
+        serializable,
+        (this[SAVED_STATE_KEY] as any)[key] || []
+      );
+    }
     delete this[SAVED_STATE_KEY];
   }
 
