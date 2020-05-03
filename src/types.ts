@@ -593,7 +593,7 @@ export namespace types {
 
   export interface Asserter {
     setAction(action: Stringifiable | MessageType<Message>): void;
-    getAction(): Stringifiable | MessageType<Message>;
+    getAction(): Stringifiable | MessageType<Message> | undefined;
     hasAction(): boolean;
     setEntity(entity: Entity): void;
     getEntity(): Entity;

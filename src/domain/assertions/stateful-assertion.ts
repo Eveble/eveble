@@ -142,7 +142,9 @@ export class StatefulAssertion extends Assertion {
           api
         );
       }
-      let action = this.asserter.getAction();
+      let action = this.asserter.getAction() as
+        | types.Stringifiable
+        | types.MessageType<types.Message>;
       if (
         (action as types.MessageType<types.Message>).getTypeName !== undefined
       ) {
