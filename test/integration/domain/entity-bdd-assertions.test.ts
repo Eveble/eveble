@@ -611,7 +611,7 @@ describe(`Entity BDD assertions`, function() {
       kernel.setAsserter(undefined as any);
     });
 
-    it(`provides a api to assert that entity is able to change state`, () => {
+    it(`provides an api to assert that entity is able to change state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       expect(() => entity.ensure.is.ableTo.start()).to.throw(
         InvalidStateTransitionError,
@@ -695,28 +695,28 @@ describe(`Entity BDD assertions`, function() {
 
     it(`returns true if entity can change to selected state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(entity.is.ableTo.complete()).to.be.true;
-      expect(entity.is.ableTo.expire()).to.be.true;
+      expect(entity.can.complete()).to.be.true;
+      expect(entity.can.expire()).to.be.true;
     });
 
     it(`returns false if entity can't change to selected state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       entity.complete();
-      expect(entity.is.ableTo.complete()).to.be.false;
-      expect(entity.is.ableTo.expire()).to.be.false;
+      expect(entity.can.complete()).to.be.false;
+      expect(entity.can.expire()).to.be.false;
     });
 
     it(`ensures that state of entity is unchanged if assertion returns true`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(entity.is.ableTo.complete()).to.be.true;
-      expect(entity.is.ableTo.expire()).to.be.true;
+      expect(entity.can.complete()).to.be.true;
+      expect(entity.can.expire()).to.be.true;
       expect(entity.isInState(MyEntity.STATES.created)).to.be.true;
     });
 
     it(`ensures that state of entity is unchanged if assertion returns false`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       entity.complete();
-      expect(entity.is.ableTo.expire()).to.be.false;
+      expect(entity.can.expire()).to.be.false;
       expect(entity.isInState(MyEntity.STATES.completed)).to.be.true;
     });
 
@@ -724,7 +724,7 @@ describe(`Entity BDD assertions`, function() {
       const entity = new MyEntity({ id: 'my-id' });
       const declinedAt = new Date();
       const declineReason = 'My reason';
-      expect(entity.is.ableTo.decline(declinedAt, declineReason)).to.be.true;
+      expect(entity.can.decline(declinedAt, declineReason)).to.be.true;
       expect(handler).to.be.calledWithExactly(declinedAt, declineReason);
     });
   });

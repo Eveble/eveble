@@ -100,11 +100,138 @@ export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
    * @param action - Name of action to be taken or `Command` that is handled.
    * @return Instance implementing `Asserter` interface.
    */
-  public on(action: string | types.Stringifiable): any {
+  public on(action: string | types.Stringifiable): this {
     kernel.asserter.setAction(action);
-    kernel.asserter.setEntity(this);
-    // Return as any so assertion extensions can be accessed without TypeScript errors
-    return kernel.asserter as any;
+    return this;
+  }
+
+  /**
+   * Exposes the `ensure` BDD assertion for `Entity`.
+   * @remarks
+   * The `entity.ensure` getter-method will return a Proxified instance of the
+   * `Entity`. This proxified instance listens to all get methods and
+   * catches the requested method name.
+   *
+   * If the requested get method/property name matches exactly or partially
+   * one of registered apis on `Asserter`(like: `is`) it returns associated
+   * object assigned to that assertion. Like for example - for registered
+   * `AbilityAssertion`, calling entity with:
+   *```ts
+   * entity.ensure.is
+   *```
+   * Will result with returned object:
+   *```ts
+   * {ableTo: ...}
+   *```
+   * That can be called like:
+   *```ts
+   * entity.ensure.is.ableTo.doAction(...)
+   *```
+   * Same rules of behavior will apply to other assertions like:
+   * `StatefulAssertion`, `StatusfulAssertion`.
+   *
+   * However, since we want to enable an expressive apis on Entities - we allow
+   * users to defined thier own apis. By calling:
+   *```ts
+   * entity.ensure.myMethod()
+   *```
+   * A backup of the entity state will be created that will be rollbacked directly * after the invocation of the method(and that will happen automatically)
+   * (it behaves exactly like `ensure.is.ableTo` assertion from `AbilityAssertion`)
+   *
+   * This allows for evaluation of state change on command handlers directly
+   * without writing unnecessary duplicated code that would ensure that
+   * state indeed can be changed(first method) and then actually change
+   * it(second method).
+   * @return Proxified instance of `Entity`.
+   */
+  public get ensure(): this & {
+    [key: string]: any;
+  } {
+    return new Proxy(this, {
+      get(target: any, key: string | symbol): any {
+        // Fallback for use `entity.ensure` without specified method
+        if (key === Symbol.toStringTag) {
+          return this;
+        }
+        const propKey = key as string;
+        // Add dot on end of propKey to ensure that only paths are
+        // matched - and not partial words
+        if (kernel.asserter.hasApi(`${propKey}.`)) {
+          kernel.asserter.setEntity(target);
+          return (kernel.asserter as any).ensure[propKey];
+        }
+
+        if (typeof target[propKey] === 'function') {
+          const proxifiedMethod = new Proxy(target[propKey], {
+            apply(_targetMethod, _thisArg, args): any {
+              target[SAVE_STATE_METHOD_KEY]();
+              let result: any;
+              let error: Error | undefined;
+              try {
+                result = target[propKey](...args);
+              } catch (e) {
+                error = e;
+              }
+              target[ROLLBACK_STATE_METHOD_KEY]();
+              if (error !== undefined) throw error;
+              return result;
+            },
+          });
+          return proxifiedMethod;
+        }
+
+        if (target[propKey] === undefined) {
+          return target;
+        }
+        return target[propKey];
+      },
+    });
+  }
+
+  /**
+   * Method to enforce TypeScript compliance with `Asserter` and `AbilityAssertion`.
+   */
+  get ableTo(): this {
+    return this;
+  }
+
+  /**
+   * Method to enforce TypeScript compliance with `Asserter` and `AbilityAssertion`.
+   */
+  get is(): this & {
+    [key: string]: any;
+  } {
+    return this;
+  }
+
+  /**
+   * Evaluates if action can be taken on `Entity`.
+   * Prior to invocation of any non-assertion methods snapshot of current state
+   * is done - that will be automatically rollbacked after method execution.
+   * Proxified instance wraps the executed method and ensures that boolean is
+   * returned as result indicating if method indeed can be executed(`true`) - or
+   * fail with thrown error(`false`)
+   * @return Proxified instance of `Entity`.
+   */
+  public get can(): any {
+    return new Proxy(this, {
+      get(target: any, propKey: string): any {
+        const proxifiedMethod = new Proxy(target[propKey], {
+          apply(_targetMethod, _thisArg, args): any {
+            target[SAVE_STATE_METHOD_KEY]();
+            let isAble = true;
+            try {
+              target[propKey](...args);
+            } catch (e) {
+              isAble = false;
+            }
+            target[ROLLBACK_STATE_METHOD_KEY]();
+            return isAble;
+          },
+        });
+        return proxifiedMethod;
+      },
+    });
   }
 
   /**
