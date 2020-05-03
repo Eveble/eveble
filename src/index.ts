@@ -91,6 +91,7 @@ export { Assertion } from './domain/assertion';
 export { BoundedContext } from './domain/bounded-context';
 export { DomainError } from './domain/domain-error';
 export {
+  AssertionError,
   ListError,
   IdentifiableAlreadyExistsError,
   ElementAlreadyExistsError,

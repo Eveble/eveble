@@ -163,6 +163,7 @@ import { Assertion } from '../../src/domain/assertion';
 import { BoundedContext } from '../../src/domain/bounded-context';
 import { DomainError } from '../../src/domain/domain-error';
 import {
+  AssertionError,
   ListError,
   IdentifiableAlreadyExistsError,
   ElementAlreadyExistsError,
@@ -475,6 +476,7 @@ import {
   Process as ProcessExported,
   ValueObject as ValueObjectExported,
   // Domain Error
+  AssertionError as AssertionErrorExported,
   ListError as ListErrorExported,
   IdentifiableAlreadyExistsError as IdentifiableAlreadyExistsErrorExported,
   ElementAlreadyExistsError as ElementAlreadyExistsErrorExported,
@@ -599,7 +601,7 @@ import {
   inject as injectExported,
 } from '../../src/index';
 
-describe(`imports`, function() {
+describe(`exports`, function() {
   /*
   TYPEND
   */
@@ -1110,6 +1112,9 @@ describe(`imports`, function() {
       expect(ValueObjectExported).to.be.equal(ValueObject);
     });
     describe('errors', () => {
+      it('AssertionError', () => {
+        expect(AssertionErrorExported).to.be.equal(AssertionError);
+      });
       it('ListError', () => {
         expect(ListErrorExported).to.be.equal(ListError);
       });
