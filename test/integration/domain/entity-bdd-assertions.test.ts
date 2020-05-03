@@ -1,6 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
+import { pull } from 'lodash';
 import {
   StatefulAssertion,
   InvalidStateTransitionError,
@@ -15,6 +16,7 @@ import {
   InvalidStatusTransitionError,
 } from '../../../src/domain/assertions/statusful-assertion';
 import { kernel } from '../../../src/core/kernel';
+import { ValueObject } from '../../../src/domain/value-object';
 
 chai.use(sinonChai);
 
@@ -595,6 +597,26 @@ describe(`Entity BDD assertions`, function() {
         this.setState(MyEntity.STATES.declined);
       }
     }
+
+    @define('Price', { isRegistrable: false })
+    class Price extends ValueObject {
+      value: number;
+    }
+
+    @define('Item', { isRegistrable: false })
+    class Item extends Entity {
+      price: Price;
+    }
+
+    @define('Order', { isRegistrable: false })
+    class Order extends Entity {
+      items: Item[];
+
+      removeItem(item: Item): void {
+        pull(this.items, item);
+      }
+    }
+
     let asserter: Asserter;
 
     before(() => {
@@ -635,6 +657,21 @@ describe(`Entity BDD assertions`, function() {
 
       entity.ensure.is.ableTo.decline(declinedAt, declineReason);
       expect(handler).to.be.calledWithExactly(declinedAt, declineReason);
+    });
+
+    it(`allows to use 'ensure.is.ableTo' with serializable lists to ensure ability of manipulating list`, () => {
+      const itemProps = {
+        id: 'my-item-id',
+        price: new Price({ value: 1.29 }),
+      };
+      const order = new Order({
+        id: 'my-order-id',
+        items: [],
+      });
+      const item = order.ensure.is.ableTo.in<Item>('items').create(itemProps);
+      expect(item).to.be.instanceof(Item);
+      expect(item).to.be.eql(itemProps);
+      expect(order.items).to.be.empty;
     });
   });
 
