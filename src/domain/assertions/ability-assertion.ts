@@ -26,11 +26,13 @@ export class AbilityAssertion extends Assertion {
                 entity[SAVE_STATE_METHOD_KEY]();
                 const result = entity[propKey](...args);
                 entity[ROLLBACK_STATE_METHOD_KEY]();
+                target.asserter.clearAction();
                 return result;
               },
             });
             return proxifiedMethod;
           }
+          return entity[propKey];
         },
       }),
     ],
