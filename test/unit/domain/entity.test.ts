@@ -3,6 +3,7 @@ import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { PropTypes, ValidationError } from 'typend';
 import { pull } from 'lodash';
+import sinon from 'sinon';
 import { Entity } from '../../../src/domain/entity';
 import { Serializable } from '../../../src/components/serializable';
 import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
@@ -39,6 +40,9 @@ describe('Entity', function() {
     age?: number;
 
     activate(): void {
+      if (this.isInState(Person.STATES.disabled)) {
+        throw new Error('Person disabled');
+      }
       this.setState(Person.STATES.active);
     }
 
@@ -277,44 +281,162 @@ describe('Entity', function() {
   });
 
   describe('asserting', () => {
-    it('throws UnavailableAsserterError if assertion is not set', () => {
-      kernel.setAsserter(undefined as any);
+    describe('with asserter', () => {
+      describe('on', () => {
+        it('throws UnavailableAsserterError if assertion is not set', () => {
+          kernel.setAsserter(undefined as any);
 
-      const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
 
-      expect(() => entity.on('my-action')).to.throw(
-        UnavailableAsserterError,
-        `Assertion is unavailable outside on application environment. Define application before using any features related to assertion on entities or set asserter on kernel by using <kernel.setAsserter()>`
-      );
-    });
+          expect(() => entity.on('my-action')).to.throw(
+            UnavailableAsserterError,
+            `Assertion is unavailable outside on application environment. Define application before using any features related to assertion on entities or set asserter on kernel by using <kernel.setAsserter()>`
+          );
+        });
 
-    it('sets the entity on asserter', () => {
-      const entity = new Person({ id: 'my-id', name: 'my-name' });
-      entity.on('my-action');
-      expect(asserter.setEntity).to.be.calledOnce;
-      expect(asserter.setEntity).to.be.calledWith(entity);
-    });
+        it('sets the action as a string on asserter', () => {
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          entity.on('my-action');
+          expect(asserter.setAction).to.be.calledOnce;
+          expect(asserter.setAction).to.be.calledWith('my-action');
+        });
 
-    it('sets the action as a string on asserter', () => {
-      const entity = new Person({ id: 'my-id', name: 'my-name' });
-      entity.on('my-action');
-      expect(asserter.setAction).to.be.calledOnce;
-      expect(asserter.setAction).to.be.calledWith('my-action');
-    });
+        it('sets the action as a Command on asserter', () => {
+          @define('MyCommand', { isRegistrable: false })
+          class MyCommand extends Command {}
 
-    it('sets the action as a Command on asserter', () => {
-      @define('MyCommand', { isRegistrable: false })
-      class MyCommand extends Command {}
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          entity.on(MyCommand);
+          expect(asserter.setAction).to.be.calledOnce;
+          expect(asserter.setAction).to.be.calledWith(MyCommand);
+        });
 
-      const entity = new Person({ id: 'my-id', name: 'my-name' });
-      entity.on(MyCommand);
-      expect(asserter.setAction).to.be.calledOnce;
-      expect(asserter.setAction).to.be.calledWith(MyCommand);
-    });
+        it(`returns entity instance 'on' setting action`, () => {
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          expect(entity.on('my-action')).to.be.equal(entity);
+        });
+      });
 
-    it('returns the asserter instance', () => {
-      const entity = new Person({ id: 'my-id', name: 'my-name' });
-      expect(entity.on('my-action')).to.be.equal(asserter);
+      describe('ensure', () => {
+        it('returns proxified instance of entity', () => {
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          expect(entity.ensure).to.be.instanceof(Person);
+          expect(entity.ensure).to.not.be.equal(entity);
+        });
+
+        it(`ensures that error is not thrown upon using 'entity.ensure' without method name`, () => {
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          expect(() => entity.ensure).to.not.throw(Error);
+        });
+
+        it(`returns matching assertion from asserter if provided method name is matching registered assertion's api`, () => {
+          asserter.hasApi.withArgs('is.').returns(true);
+          const isAssertion = sinon.stub();
+          asserter.ensure = {
+            is: isAssertion,
+          };
+
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          expect(entity.ensure.is).to.be.equal(isAssertion);
+          expect(asserter.hasApi).to.be.calledOnce;
+          expect(asserter.hasApi).to.be.calledWithExactly('is.');
+          expect(asserter.setEntity).to.be.calledOnce;
+          expect(asserter.setEntity).to.be.calledWithExactly(entity);
+        });
+
+        it('returns proxified method if provided property key matches function on entity but there is no registered assertion api', () => {
+          asserter.hasApi.withArgs('updateProfile.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          entity.updateProfile = sinon.stub();
+
+          const props = {
+            name: 'my-other-name',
+          };
+          expect(entity.ensure.updateProfile(props)).to.not.be.instanceof(
+            Person
+          );
+          expect(entity.updateProfile).to.be.calledOnce;
+          expect(entity.updateProfile).to.be.calledWithMatch(props);
+        });
+
+        it('ensures that state of entity is rollbacked after invocation of non-assertion method', () => {
+          asserter.hasApi.withArgs('updateProfile.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const props = {
+            name: 'my-other-name',
+          };
+          entity.ensure.updateProfile(props);
+          expect(entity.name).to.be.equal('my-name');
+        });
+
+        it('ensures that state of entity is rollbacked before re-throwing error from non-assertion method', () => {
+          asserter.hasApi.withArgs('updateProfile.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+
+          entity.ensure.disable();
+          expect(() => entity.ensure.activate()).to.throw(Error);
+          expect(entity.isInState(Person.STATES.disabled)).to.be.true;
+        });
+
+        it('returns property if provided key is not matching assertion api or method', () => {
+          asserter.hasApi.withArgs('name.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+
+          expect(entity.ensure.name).to.be.equal('my-name');
+        });
+
+        it('returns entity if provided key does not match property, assertion api or method', () => {
+          asserter.hasApi.withArgs('name.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+
+          expect(entity.ensure.test).to.be.equal(entity);
+        });
+      });
+
+      describe('can', () => {
+        it('returns proxified instance of entity', () => {
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          expect(entity.can).to.be.instanceof(Person);
+          expect(entity.can).to.not.be.equal(entity);
+        });
+
+        it(`ensures that error is not thrown upon using 'entity.can' without method name`, () => {
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          expect(() => entity.can).to.not.throw(Error);
+        });
+
+        it('returns proxified method if provided property key matches function on entity', () => {
+          asserter.hasApi.withArgs('updateProfile.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          entity.updateProfile = sinon.stub();
+
+          const props = {
+            name: 'my-other-name',
+          };
+          expect(entity.can.updateProfile(props)).to.be.true;
+          expect(entity.updateProfile).to.be.calledOnce;
+          expect(entity.updateProfile).to.be.calledWithMatch(props);
+        });
+
+        it('ensures that state of entity is rollbacked after invocation method', () => {
+          asserter.hasApi.withArgs('updateProfile.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const props = {
+            name: 'my-other-name',
+          };
+          entity.can.updateProfile(props);
+          expect(entity.name).to.be.equal('my-name');
+        });
+
+        it('ensures that state of entity is rollbacked before re-throwing error from  method', () => {
+          asserter.hasApi.withArgs('updateProfile.').returns(false);
+          const entity = new Person({ id: 'my-id', name: 'my-name' });
+
+          expect(entity.can.disable()).to.be.true;
+          expect(entity.can.activate()).to.be.false;
+          expect(entity.isInState(Person.STATES.disabled)).to.be.true;
+        });
+      });
     });
   });
 
