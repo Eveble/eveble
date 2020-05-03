@@ -164,6 +164,7 @@ import { BoundedContext } from '../../src/domain/bounded-context';
 import { DomainError } from '../../src/domain/domain-error';
 import {
   AssertionError,
+  UndefinedActionError,
   ListError,
   IdentifiableAlreadyExistsError,
   ElementAlreadyExistsError,
@@ -477,6 +478,7 @@ import {
   ValueObject as ValueObjectExported,
   // Domain Error
   AssertionError as AssertionErrorExported,
+  UndefinedActionError as UndefinedActionErrorExported,
   ListError as ListErrorExported,
   IdentifiableAlreadyExistsError as IdentifiableAlreadyExistsErrorExported,
   ElementAlreadyExistsError as ElementAlreadyExistsErrorExported,
@@ -1114,6 +1116,9 @@ describe(`exports`, function() {
     describe('errors', () => {
       it('AssertionError', () => {
         expect(AssertionErrorExported).to.be.equal(AssertionError);
+      });
+      it('UndefinedActionError', () => {
+        expect(UndefinedActionErrorExported).to.be.equal(UndefinedActionError);
       });
       it('ListError', () => {
         expect(ListErrorExported).to.be.equal(ListError);
