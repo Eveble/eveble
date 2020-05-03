@@ -14,7 +14,7 @@ export class AssertionApiAlreadyExistsError extends ExtendableError {
 export class Asserter implements types.Asserter {
   protected assertions: types.Assertion[];
 
-  protected action: types.Stringifiable | types.MessageType<types.Command>;
+  protected action?: types.Stringifiable | types.MessageType<types.Command>;
 
   protected entity: types.Entity;
 
@@ -122,7 +122,10 @@ export class Asserter implements types.Asserter {
    * Gets action for which assertion is being made.
    * @returns Action as string or `Stringifiable` implementation.
    */
-  public getAction(): types.Stringifiable {
+  public getAction():
+    | types.Stringifiable
+    | types.MessageType<types.Message>
+    | undefined {
     return this.action;
   }
 
