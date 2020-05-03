@@ -28,8 +28,8 @@ chai.use(sinonChai);
 describe('Entity', function() {
   let asserter: any;
 
-  @define('Person', { isRegistrable: false })
-  class Person extends Entity {
+  @define('Account', { isRegistrable: false })
+  class Account extends Entity {
     static STATES = {
       active: 'active',
       disabled: 'disabled',
@@ -40,14 +40,14 @@ describe('Entity', function() {
     age?: number;
 
     activate(): void {
-      if (this.isInState(Person.STATES.disabled)) {
-        throw new Error('Person disabled');
+      if (this.isInState(Account.STATES.disabled)) {
+        throw new Error('Account disabled');
       }
-      this.setState(Person.STATES.active);
+      this.setState(Account.STATES.active);
     }
 
     disable(): void {
-      this.setState(Person.STATES.disabled);
+      this.setState(Account.STATES.disabled);
     }
 
     changeName(name: string): void {
@@ -193,7 +193,7 @@ describe('Entity', function() {
         id: new Guid(),
         name: 'my-name',
       };
-      expect(new Person(props)).to.be.eql(props);
+      expect(new Account(props)).to.be.eql(props);
     });
 
     describe('static constructor', () => {
@@ -202,8 +202,8 @@ describe('Entity', function() {
           id: new Guid(),
           name: 'value',
         };
-        const entity = Person.from(props);
-        expect(entity).to.be.instanceof(Person);
+        const entity = Account.from(props);
+        expect(entity).to.be.instanceof(Account);
         expect(entity.id).to.be.equal(props.id);
         expect(entity.name).to.be.equal(props.name);
       });
@@ -215,8 +215,8 @@ describe('Entity', function() {
         const props2 = {
           name: 'value',
         };
-        const person = Person.from(props1, props2);
-        expect(person).to.be.instanceof(Person);
+        const person = Account.from(props1, props2);
+        expect(person).to.be.instanceof(Account);
         expect(person).to.be.eql({
           id: props1.id,
           name: props2.name,
@@ -254,14 +254,14 @@ describe('Entity', function() {
 
     it(`returns false when entities are not instances of same class and have same id`, () => {
       const first = new Entity({ id: 'my-id' });
-      const second = new Person({ id: 'my-id', name: 'my-name' });
+      const second = new Account({ id: 'my-id', name: 'my-name' });
       expect(first.equals(second)).to.be.false;
     });
   });
 
   describe('recording state change', () => {
     it(`assigns properties on entity instance`, () => {
-      const entity = new Person({
+      const entity = new Account({
         id: 'my-id',
         name: 'Foo',
       });
@@ -270,7 +270,7 @@ describe('Entity', function() {
     });
 
     it(`only assigns properties from sources that matches prop types on entity instance and omits the rest`, () => {
-      const entity = new Person({
+      const entity = new Account({
         id: 'my-id',
         name: 'Foo',
       });
@@ -287,13 +287,13 @@ describe('Entity', function() {
     });
 
     it(`throws ValidationError upon assign invalid properties to entity instance`, () => {
-      const entity = new Person({
+      const entity = new Account({
         id: 'my-id',
         name: 'Foo',
       });
       expect(() => entity.changeName((1 as any) as string)).to.throw(
         ValidationError,
-        `Person: (Key 'name': Expected Number(1) to be a String in {"id":String("my-id"), "name":Number(1)})`
+        `Account: (Key 'name': Expected Number(1) to be a String in {"id":String("my-id"), "name":Number(1)})`
       );
     });
   });
@@ -304,7 +304,7 @@ describe('Entity', function() {
         it('throws UnavailableAsserterError if assertion is not set', () => {
           kernel.setAsserter(undefined as any);
 
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
 
           expect(() => entity.on('my-action')).to.throw(
             UnavailableAsserterError,
@@ -313,7 +313,7 @@ describe('Entity', function() {
         });
 
         it('sets the action as a string on asserter', () => {
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           entity.on('my-action');
           expect(asserter.setAction).to.be.calledOnce;
           expect(asserter.setAction).to.be.calledWith('my-action');
@@ -323,27 +323,27 @@ describe('Entity', function() {
           @define('MyCommand', { isRegistrable: false })
           class MyCommand extends Command {}
 
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           entity.on(MyCommand);
           expect(asserter.setAction).to.be.calledOnce;
           expect(asserter.setAction).to.be.calledWith(MyCommand);
         });
 
         it(`returns entity instance 'on' setting action`, () => {
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           expect(entity.on('my-action')).to.be.equal(entity);
         });
       });
 
       describe('ensure', () => {
         it('returns proxified instance of entity', () => {
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
-          expect(entity.ensure).to.be.instanceof(Person);
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
+          expect(entity.ensure).to.be.instanceof(Account);
           expect(entity.ensure).to.not.be.equal(entity);
         });
 
         it(`ensures that error is not thrown upon using 'entity.ensure' without method name`, () => {
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           expect(() => entity.ensure).to.not.throw(Error);
         });
 
@@ -354,7 +354,7 @@ describe('Entity', function() {
             is: isAssertion,
           };
 
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           expect(entity.ensure.is).to.be.equal(isAssertion);
           expect(asserter.hasApi).to.be.calledOnce;
           expect(asserter.hasApi).to.be.calledWithExactly('is.');
@@ -364,14 +364,14 @@ describe('Entity', function() {
 
         it('returns proxified method if provided property key matches function on entity but there is no registered assertion api', () => {
           asserter.hasApi.withArgs('updateProfile.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           entity.updateProfile = sinon.stub();
 
           const props = {
             name: 'my-other-name',
           };
           expect(entity.ensure.updateProfile(props)).to.not.be.instanceof(
-            Person
+            Account
           );
           expect(entity.updateProfile).to.be.calledOnce;
           expect(entity.updateProfile).to.be.calledWithMatch(props);
@@ -379,7 +379,7 @@ describe('Entity', function() {
 
         it('ensures that state of entity is rollbacked after invocation of non-assertion method', () => {
           asserter.hasApi.withArgs('updateProfile.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           const props = {
             name: 'my-other-name',
           };
@@ -389,23 +389,23 @@ describe('Entity', function() {
 
         it('ensures that state of entity is rollbacked before re-throwing error from non-assertion method', () => {
           asserter.hasApi.withArgs('updateProfile.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
 
           entity.ensure.disable();
           expect(() => entity.ensure.activate()).to.throw(Error);
-          expect(entity.isInState(Person.STATES.disabled)).to.be.true;
+          expect(entity.isInState(Account.STATES.disabled)).to.be.true;
         });
 
         it('returns property if provided key is not matching assertion api or method', () => {
           asserter.hasApi.withArgs('name.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
 
           expect(entity.ensure.name).to.be.equal('my-name');
         });
 
         it('returns entity if provided key does not match property, assertion api or method', () => {
           asserter.hasApi.withArgs('name.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
 
           expect(entity.ensure.test).to.be.equal(entity);
         });
@@ -413,19 +413,19 @@ describe('Entity', function() {
 
       describe('can', () => {
         it('returns proxified instance of entity', () => {
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
-          expect(entity.can).to.be.instanceof(Person);
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
+          expect(entity.can).to.be.instanceof(Account);
           expect(entity.can).to.not.be.equal(entity);
         });
 
         it(`ensures that error is not thrown upon using 'entity.can' without method name`, () => {
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           expect(() => entity.can).to.not.throw(Error);
         });
 
         it('returns proxified method if provided property key matches function on entity', () => {
           asserter.hasApi.withArgs('updateProfile.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           entity.updateProfile = sinon.stub();
 
           const props = {
@@ -438,7 +438,7 @@ describe('Entity', function() {
 
         it('ensures that state of entity is rollbacked after invocation method', () => {
           asserter.hasApi.withArgs('updateProfile.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
           const props = {
             name: 'my-other-name',
           };
@@ -448,11 +448,11 @@ describe('Entity', function() {
 
         it('ensures that state of entity is rollbacked before re-throwing error from  method', () => {
           asserter.hasApi.withArgs('updateProfile.').returns(false);
-          const entity = new Person({ id: 'my-id', name: 'my-name' });
+          const entity = new Account({ id: 'my-id', name: 'my-name' });
 
           expect(entity.can.disable()).to.be.true;
           expect(entity.can.activate()).to.be.false;
-          expect(entity.isInState(Person.STATES.disabled)).to.be.true;
+          expect(entity.isInState(Account.STATES.disabled)).to.be.true;
         });
       });
     });
@@ -460,7 +460,7 @@ describe('Entity', function() {
 
   describe('save and rollback of state', () => {
     it('allows to save and rollback Entity state', () => {
-      const entity = new Person({ id: 'my-id', name: 'initial-name' });
+      const entity = new Account({ id: 'my-id', name: 'initial-name' });
       entity[SAVE_STATE_METHOD_KEY]();
       entity.changeName('changed-name');
       expect(entity.name).to.be.equal('changed-name');
@@ -487,7 +487,7 @@ describe('Entity', function() {
     });
 
     it('ensures that save is deleted after issuing rollback', () => {
-      const entity = new Person({ id: 'my-id', name: 'initial-name' });
+      const entity = new Account({ id: 'my-id', name: 'initial-name' });
       entity[SAVE_STATE_METHOD_KEY]();
       expect(entity.isStateSaved()).to.be.true;
       entity.changeName('changed-name');
@@ -496,10 +496,10 @@ describe('Entity', function() {
     });
 
     it('does not allow to rollback unavailable previous state', () => {
-      const entity = new Person({ id: 'my-id', name: 'initial-name' });
+      const entity = new Account({ id: 'my-id', name: 'initial-name' });
       expect(() => entity[ROLLBACK_STATE_METHOD_KEY]()).to.throw(
         SavedStateNotFoundError,
-        `Person@my-id: expected entity to be have state saved before rollbacking it`
+        `Account@my-id: expected entity to be have state saved before rollbacking it`
       );
     });
   });
