@@ -373,6 +373,29 @@ describe('List', function() {
     });
   });
 
+  describe('replaceById', () => {
+    it('adds element by id if it does not exist', () => {
+      const source = new Company({ id: 'my-company-id', employees: [] });
+      const element = new Employee({ id: 'my-id' });
+      source.in<Employee>('employees').replaceById(element.id, element);
+      expect(source.in<Employee>('employees').getById('my-id')).to.be.equal(
+        element
+      );
+    });
+
+    it('replaces existing element by id', () => {
+      const source = new Company({ id: 'my-company-id', employees: [] });
+      const element = new Employee({ id: 'my-id' });
+      const updatedElement = new Employee({ id: 'my-id' });
+      source.in<Employee>('employees').add(element);
+      source
+        .in<Employee>('employees')
+        .replaceById(updatedElement.id, updatedElement);
+      expect(source.in<Employee>('employees').getById('my-id')).to.be.equal(
+        updatedElement
+      );
+    });
+  });
   describe('removeById', () => {
     it('removes identifiable element by matching identifier', () => {
       const source = new Company({ id: 'my-company-id', employees: [] });

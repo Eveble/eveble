@@ -413,6 +413,47 @@ export class List<T extends types.Serializable> extends Array {
   }
 
   /**
+   * Replaces element by identifier.
+   * @param id - Identifier of `Serializable`.
+   * @param element - `Serializable` instance matching type for which list is dedicated.
+   * @example
+   *```ts
+   * @define('Employee')
+   * class Employee extends Serializable {
+   *   id: string;
+   *
+   *   getId(): string {
+   *     return this.id;
+   *   }
+   * }
+   *
+   * @define('Company')
+   * class Company extends Serializable {
+   *   id: string;
+   *
+   *   employees: Employee[];
+   * }
+   *
+   * const source = new Company({ id: 'my-company-id', employees: [] });
+   * const element = new Employee({ id: 'my-id' });
+   * const updatedElement = new Employee({ id: 'my-id' });
+   * source.in<Employee>('employees').add(element);
+   * source.in<Employee>('employees').replaceById(
+   *  element.id, updatedElement
+   * );
+   * expect(source.in<Employee>('employees').getById('my-id')).to.be
+   *   .equal(updatedElement);
+   *```
+   */
+  public replaceById(id: string | types.Stringifiable, element: T): void {
+    const foundSerializable = this.getById(id);
+    if (foundSerializable === undefined) {
+      this.add(element);
+    } else {
+      this[this.indexOf(foundSerializable)] = element;
+    }
+  }
+  /**
    * Removes `Serializable` from list by its identifier.
    * @param id - Identifier of `Serializable`.
    * @example
