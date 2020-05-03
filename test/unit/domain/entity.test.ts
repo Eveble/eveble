@@ -58,6 +58,24 @@ describe('Entity', function() {
       this.assign(props);
     }
   }
+  @define('Price', { isRegistrable: false })
+  class Price extends ValueObject {
+    value: number;
+  }
+
+  @define('Item', { isRegistrable: false })
+  class Item extends Entity {
+    price: Price;
+  }
+
+  @define('Order', { isRegistrable: false })
+  class Order extends Entity {
+    items: Item[];
+
+    removeItem(item: Item): void {
+      pull(this.items, item);
+    }
+  }
 
   beforeEach(() => {
     asserter = stubInterface<types.Asserter>();
@@ -451,25 +469,6 @@ describe('Entity', function() {
     });
 
     it('ensures that nested types state is also preserved on rollback operation', () => {
-      @define('Price', { isRegistrable: false })
-      class Price extends ValueObject {
-        value: number;
-      }
-
-      @define('Item', { isRegistrable: false })
-      class Item extends Entity {
-        price: Price;
-      }
-
-      @define('Order', { isRegistrable: false })
-      class Order extends Entity {
-        items: Item[];
-
-        removeItem(item: Item): void {
-          pull(this.items, item);
-        }
-      }
-
       const items = [
         new Item({ id: 'first', price: new Price({ value: 1.29 }) }),
         new Item({ id: 'second', price: new Price({ value: 6.99 }) }),
