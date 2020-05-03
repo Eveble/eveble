@@ -43,7 +43,7 @@ export class ExpiringTaskCompletionPolicy {
    * Sets expiration duration for policy.
    * @param expireIn - The amount of time in milliseconds after which `Task` will expire.
    */
-  public setExpirationDuration(expireIn): void {
+  public setExpirationDuration(expireIn: number): void {
     this.expireIn = expireIn;
   }
 }
