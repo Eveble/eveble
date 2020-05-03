@@ -396,6 +396,37 @@ describe('List', function() {
       );
     });
   });
+
+  describe('replaceBy', () => {
+    it('adds element it does not exist', () => {
+      const source = new Order({
+        id: 'my-order-id',
+        items: [],
+      });
+      const element = new Item({
+        name: 'my-name',
+      });
+      source.in<Item>('items').replaceBy('name', element.name, element);
+      expect(source.in<Item>('items').getBy('name', 'my-name')).to.be.equal(
+        element
+      );
+    });
+
+    it('replaces existing element by matching key and value', () => {
+      const source = new Order({ id: 'my-order-id', items: [] });
+      const firstElement = new Item({ name: 'my-name' });
+      const secondElement = new Item({ name: 'my-name' });
+      source.in<Item>('items').add(firstElement);
+      source.in<Item>('items').replaceBy('name', 'my-name', secondElement);
+      expect(source.in<Item>('items').getBy('name', 'my-name')).to.be.equal(
+        secondElement
+      );
+      expect(source.in<Item>('items').getBy('name', 'my-name')).to.be.not.equal(
+        firstElement
+      );
+    });
+  });
+
   describe('removeById', () => {
     it('removes identifiable element by matching identifier', () => {
       const source = new Company({ id: 'my-company-id', employees: [] });

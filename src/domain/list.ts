@@ -453,6 +453,45 @@ export class List<T extends types.Serializable> extends Array {
       this[this.indexOf(foundSerializable)] = element;
     }
   }
+
+  /**
+   * Replaces element by key and value.
+   * @param key - Property name(key) from `Serializable`.
+   * @param value - Property value that should be matched.
+   * @param element - `Serializable` instance matching type for
+   * which list is dedicated.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const element = new Item({ name: 'my-item-name' });
+   * const updatedElement = new Item({ name: 'my-item-name' });
+   * source.in<Item>('items').add(element);
+   * source.in<Item>('items').replaceBy(
+   *  'name', 'my-item-name', updatedElement
+   * );
+   * expect(
+   *  source.in<Item>('items').getBy('name', 'my-item-name')
+   * ).to.be.equal(updatedElement);
+   *```
+   */
+  public replaceBy(key: string, value: any, element: T): void {
+    const foundSerializable = this.getBy(key, value);
+    if (foundSerializable === undefined) {
+      this.add(element);
+    } else {
+      this[this.indexOf(foundSerializable)] = element;
+    }
+  }
+
   /**
    * Removes `Serializable` from list by its identifier.
    * @param id - Identifier of `Serializable`.
