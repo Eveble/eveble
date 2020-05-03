@@ -10,7 +10,7 @@ ASSERTION ERRORS
 export class AssertionError extends DomainError {}
 
 @define('UndefinedActionError')
-export class UndefinedActionError extends DomainError {
+export class UndefinedActionError extends AssertionError {
   constructor(entityName: string, assertionApi: string) {
     super(
       `${entityName}: action name is not set while using assertion '${assertionApi}'. Please define action by using 'entity.on('action-name-as-string').${assertionApi}(...)' or 'entity.on(MyCommandType).ensure.${assertionApi}(...)`
