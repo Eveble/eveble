@@ -119,6 +119,13 @@ export class Struct extends classes(DefinableMixin, HookableMixin) {
     const mappings: Record<keyof any, inversifyTypes.Metadata[]> =
       Reflect.getMetadata(METADATA_KEY.TAGGED_PROP, this.constructor) || {};
     const propTypes = omit(this.getPropTypes(), Object.keys(mappings));
-    return this.validateProps(props, propTypes, true);
+    const result = this.validateProps(props, propTypes, true);
+
+    const hooks: types.hooks.Mappings = this.getHooks('onValidation');
+    for (const hook of Object.values(hooks)) {
+      hook.bind(this)(props);
+    }
+
+    return result;
   }
 }
