@@ -229,14 +229,14 @@ describe(`Config`, function() {
       it(`returns value from configuration`, () => {
         const config = new Complex(complexProps);
 
-        expect(config.get('root')).to.be.equal('root-value');
-        expect(config.get('simple.first')).to.be.equal('first-value');
-        expect(config.get('nested.nested-first')).to.be.equal(
+        expect(config.get<string>('root')).to.be.equal('root-value');
+        expect(config.get<string>('simple.first')).to.be.equal('first-value');
+        expect(config.get<string>('nested.nested-first')).to.be.equal(
           'nested-first-value'
         );
-        expect(config.get('nested.nested-second.nested-third')).to.be.equal(
-          'nested-third-value'
-        );
+        expect(
+          config.get<string>('nested.nested-second.nested-third')
+        ).to.be.equal('nested-third-value');
       });
 
       it(`returns undefined if value cannot be found on configuration`, () => {
@@ -254,9 +254,9 @@ describe(`Config`, function() {
 
       it(`returns default value provided as second argument for unresolvable paths`, () => {
         const config = new Complex(complexProps);
-        expect(config.get('my-non-existing-path', 'default-value')).to.be.equal(
-          'default-value'
-        );
+        expect(
+          config.get<string>('my-non-existing-path', 'default-value')
+        ).to.be.equal('default-value');
       });
 
       it(`returns default values as fallback from class property initializers`, () => {
@@ -266,7 +266,7 @@ describe(`Config`, function() {
 
           lorem: string;
 
-          baz: {
+          baz?: {
             bar: number;
             qux: {
               ipsum: boolean;
@@ -295,15 +295,15 @@ describe(`Config`, function() {
           },
         });
 
-        expect(config.get('foo')).to.be.equal('foo-set');
-        expect(config.get('lorem')).to.be.equal('lorem-set');
-        expect(config.get('baz.bar')).to.be.equal(1337);
-        expect(config.get('baz.qux.ipsum')).to.be.equal(false);
+        expect(config.get<string>('foo')).to.be.equal('foo-set');
+        expect(config.get<string>('lorem')).to.be.equal('lorem-set');
+        expect(config.get<number>('baz.bar')).to.be.equal(1337);
+        expect(config.get<boolean>('baz.qux.ipsum')).to.be.equal(false);
 
-        expect(config.getDefault('foo')).to.be.equal('foo-default');
+        expect(config.getDefault<string>('foo')).to.be.equal('foo-default');
         expect(config.getDefault('lorem')).to.be.equal(undefined);
-        expect(config.getDefault('baz.bar')).to.be.equal(1234);
-        expect(config.getDefault('baz.qux.ipsum')).to.be.equal(true);
+        expect(config.getDefault<number>('baz.bar')).to.be.equal(1234);
+        expect(config.getDefault<boolean>('baz.qux.ipsum')).to.be.equal(true);
       });
     });
 
@@ -313,7 +313,7 @@ describe(`Config`, function() {
         class MyConfig extends Config {
           foo = 'foo-default';
 
-          baz: {
+          baz?: {
             bar: number;
             qux: {
               lorem: boolean;
@@ -332,9 +332,9 @@ describe(`Config`, function() {
         }
 
         const config = new MyConfig({});
-        expect(config.getDefault('foo')).to.be.equal('foo-default');
-        expect(config.getDefault('baz.bar')).to.be.equal(1234);
-        expect(config.getDefault('baz.qux.lorem')).to.be.equal(true);
+        expect(config.getDefault<string>('foo')).to.be.equal('foo-default');
+        expect(config.getDefault<number>('baz.bar')).to.be.equal(1234);
+        expect(config.getDefault<boolean>('baz.qux.lorem')).to.be.equal(true);
       });
     });
 
@@ -416,17 +416,17 @@ describe(`Config`, function() {
 
         const setSimple = new Simple({ first: 'first-set', second: 10 });
         config.set('simple', setSimple);
-        expect(config.get('simple')).to.be.eql(setSimple);
+        expect(config.get<Simple>('simple')).to.be.eql(setSimple);
 
         config.set('nested.nested-first', 'nested-first-set');
-        expect(config.get('nested.nested-first')).to.be.equal(
+        expect(config.get<string>('nested.nested-first')).to.be.equal(
           'nested-first-set'
         );
 
         config.set('nested.nested-second.nested-third', 'nested-third-set');
-        expect(config.get('nested.nested-second.nested-third')).to.be.equal(
-          'nested-third-set'
-        );
+        expect(
+          config.get<string>('nested.nested-second.nested-third')
+        ).to.be.equal('nested-third-set');
       });
     });
 
@@ -534,8 +534,8 @@ describe(`Config`, function() {
 
       expect(first.included).to.be.instanceof(Object);
       expect(first.included).to.be.eql({ 'Config.Second': second });
-      expect(first.get('firstKey')).to.be.equal('first');
-      expect(first.get('secondKey')).to.be.equal('second');
+      expect(first.get<string>('firstKey')).to.be.equal('first');
+      expect(first.get<string>('secondKey')).to.be.equal('second');
     });
 
     describe('simple', () => {
@@ -622,14 +622,20 @@ describe(`Config`, function() {
         expect(first.hasDefault('foo')).to.be.false;
         expect(second.hasDefault('foo')).to.be.true;
 
-        expect(first.get('foo')).to.be.equal('second-default-foo');
-        expect(second.get('foo')).to.be.equal('second-default-foo');
+        expect(first.get<string>('foo')).to.be.equal('second-default-foo');
+        expect(second.get<string>('foo')).to.be.equal('second-default-foo');
 
-        expect(second.getDefault('foo')).to.be.equal('second-default-foo');
-        expect(second.getDefault('foo')).to.be.equal('second-default-foo');
+        expect(second.getDefault<string>('foo')).to.be.equal(
+          'second-default-foo'
+        );
+        expect(second.getDefault<string>('foo')).to.be.equal(
+          'second-default-foo'
+        );
 
-        expect(first.getExact('foo')).to.be.equal('second-default-foo');
-        expect(second.getExact('foo')).to.be.equal('second-default-foo');
+        expect(first.getExact<string>('foo')).to.be.equal('second-default-foo');
+        expect(second.getExact<string>('foo')).to.be.equal(
+          'second-default-foo'
+        );
       });
     });
 
@@ -808,8 +814,8 @@ describe(`Config`, function() {
         expect(first.hasDefault('foo.baz.qux')).to.be.false;
         expect(second.hasDefault('foo.baz.qux')).to.be.true;
 
-        expect(first.get('foo.baz.qux')).to.be.equal('qux');
-        expect(second.get('foo.baz.qux')).to.be.equal('qux');
+        expect(first.get<string>('foo.baz.qux')).to.be.equal('qux');
+        expect(second.get<string>('foo.baz.qux')).to.be.equal('qux');
       });
     });
   });
