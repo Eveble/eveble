@@ -119,10 +119,12 @@
   dependencies:
     underscore "~1.8.3"
 
-"@eveble/helpers@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@eveble/helpers/-/helpers-0.2.1.tgz#bd7fddcfbb6535b43970614da1fee42c21f9b137"
-  integrity sha512-9glwPLCgJ+K0caDLEYjKtyuQI+IAnsz3tgooCMMBw65pisKcZigLHY/wr3eKZrkStxOrYxI77MWm0UPmp5zV/g==
+"@eveble/helpers@^1.0.1", "@eveble/helpers@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@eveble/helpers/-/helpers-1.0.3.tgz#4cedc4df777dfd2a7bac2387a7537bc22abbd3a1"
+  integrity sha512-gR/PKgh8yGIu6pHNrgaqb/Rgf9di6+rKQXXxofnRWVgP1pgQOpAb4TcqYJS/QV4JVSne5P0mc1oFo98jXbmprw==
+  dependencies:
+    reflect-metadata "^0.1.13"
 
 "@jsbits/deep-clone@^1.1.1":
   version "1.1.1"
@@ -1445,6 +1447,11 @@ dedent@^0.7.0:
   resolved "https://registry.yarnpkg.com/dedent/-/dedent-0.7.0.tgz#2495ddbaf6eb874abb0e1be9df22d2e5a544326c"
   integrity sha1-JJXduvbrh0q7Dhvp3yLS5aVEMmw=
 
+deep-diff@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/deep-diff/-/deep-diff-1.0.2.tgz#afd3d1f749115be965e89c63edc7abb1506b9c26"
+  integrity sha512-aWS3UIVH+NPGCD1kki+DCU9Dua032iSsO43LqQpcs4R3+dVv7tX0qBGjiVHJHjplsoUM2XRO/KB92glqc68awg==
+
 deep-eql@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/deep-eql/-/deep-eql-3.0.1.tgz#dfc9404400ad1c8fe023e7da1df1c147c4b444df"
@@ -1730,6 +1737,11 @@ es5-ext@^0.10.35, es5-ext@^0.10.46, es5-ext@^0.10.50:
     es6-iterator "~2.0.3"
     es6-symbol "~3.1.3"
     next-tick "~1.0.0"
+
+es6-error@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/es6-error/-/es6-error-4.1.1.tgz#9e3af407459deed47e9a91f9b885a84eb05c561d"
+  integrity sha512-Um/+FxMr9CISWh0bi5Zv0iOD+4cFh5qLeks1qhAopKVAJw3drgKbKySikp7wGhDL0HPeaja0P5ULZrxLkniUVg==
 
 es6-iterator@^2.0.1, es6-iterator@^2.0.3, es6-iterator@~2.0.3:
   version "2.0.3"
@@ -4377,6 +4389,11 @@ polytype@^0.9.2:
   resolved "https://registry.yarnpkg.com/polytype/-/polytype-0.9.2.tgz#c865d50115aec3768ca4cb68dfe30ed36e78ddec"
   integrity sha512-CqpVBYWlch6sIaJzAyehBXcuENdRQJR3Iyp2rvjEUG7iPba4zqnHgpNxYU7IX/Rk7/kYdpyS2E3tGguiEo6NBw==
 
+polytype@^0.9.4:
+  version "0.9.4"
+  resolved "https://registry.yarnpkg.com/polytype/-/polytype-0.9.4.tgz#38082d6e345670ca1963a0ef58f72d564290fae1"
+  integrity sha512-pkS84YcAEPHkIWEYKd9/QDmYPIhlmQeOUYwEO7IQRGEvlIkNIKCs6r4zhFSdTCNAEiCnfCgINHQNDfShlS2snw==
+
 posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
@@ -5155,10 +5172,10 @@ source-map-resolve@^0.5.3:
     source-map-url "^0.4.0"
     urix "^0.1.0"
 
-source-map-support@^0.5.6:
-  version "0.5.15"
-  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.15.tgz#20fe16f16e74644e21a396c78c841fa66e35df6c"
-  integrity sha512-wYF5aX1J0+V51BDT3Om7uXNn0ct2FWiV4bvwiGVefxkm+1S1o5jsecE5lb2U28DDblzxzxeIDbTVpXHI9D/9hA==
+source-map-support@^0.5.17:
+  version "0.5.19"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.19.tgz#a98b62f86dcaf4f67399648c085291ab9e8fed61"
+  integrity sha512-Wonm7zOCIJzBGQdB+thsPar0kYuCIzYvxZwlBa87yi/Mdjv7Tip2cyVbLj5o0cFPN4EVkuTwb3GDDyUx2DGnGw==
   dependencies:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
@@ -5607,14 +5624,14 @@ triple-beam@^1.2.0, triple-beam@^1.3.0:
   integrity sha512-XrHUvV5HpdLmIj4uVMxHggLbFSZYIn7HEWsqePZcI50pco+MPqJ50wMGY794X7AOOhxOBAjbkqfAbEe/QMp2Lw==
 
 ts-node@^8.6.2:
-  version "8.6.2"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.6.2.tgz#7419a01391a818fbafa6f826a33c1a13e9464e35"
-  integrity sha512-4mZEbofxGqLL2RImpe3zMJukvEvcO1XP8bj8ozBPySdCUXEcU5cIRwR0aM3R+VoZq7iXc8N86NC0FspGRqP4gg==
+  version "8.10.2"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.10.2.tgz#eee03764633b1234ddd37f8db9ec10b75ec7fb8d"
+  integrity sha512-ISJJGgkIpDdBhWVu3jufsWpK3Rzo7bdiIXJjQc0ynKxVOVcg2oIrf2H2cejminGrptVc6q6/uynAHNCuWGbpVA==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
     make-error "^1.1.1"
-    source-map-support "^0.5.6"
+    source-map-support "^0.5.17"
     yn "3.1.1"
 
 ts-sinon@^1.0.25:
@@ -5715,10 +5732,20 @@ typedoc@^0.16.11:
     typedoc-default-themes "^0.7.2"
     typescript "3.7.x"
 
-typend@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/typend/-/typend-0.1.0.tgz#459e96a223c10a53fe62a1ecff61a3d1ad6c2bfa"
-  integrity sha512-yCfjs8VucuoLsICQBLxny3ljBIXLoVPTW3OQCZXPEiZzt2gkmGzYEFG/eIdv/R7ebCSreKVcPJ0aWqlutP7phw==
+typend@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/typend/-/typend-1.0.1.tgz#a56ddf84d50a97d22f3d5c9f89b9aac36a3560a8"
+  integrity sha512-7s4todDec+pQH7FPDI70/PenywwcypyMwr/ZJtIpZ6kEEn5XHKXSDUL6UAC+ctGm8nVyKv0L17r1uz4EvC7RIA==
+  dependencies:
+    "@eveble/helpers" "^1.0.1"
+    deep-diff "^1.0.2"
+    deepmerge "^4.2.2"
+    es6-error "^4.1.1"
+    lodash "^4.17.15"
+    polytype "^0.9.4"
+    reflect-metadata "^0.1.13"
+    tsruntime "^3.0.0-beta.1"
+    ttypescript "^1.5.10"
 
 typescript@3.7.x:
   version "3.7.4"
@@ -5726,9 +5753,9 @@ typescript@3.7.x:
   integrity sha512-A25xv5XCtarLwXpcDNZzCGvW2D1S3/bACratYBx2sax8PefsFhlYmkQicKHvpYflFS8if4zne5zT5kpJ7pzuvw==
 
 typescript@^3.8.3:
-  version "3.8.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.8.3.tgz#409eb8544ea0335711205869ec458ab109ee1061"
-  integrity sha512-MYlEfn5VrLNsgudQTVJeNaQFUAI7DkhnOjdpAp4T+ku1TfQClewlbSuTVHiA+8skNBgaf02TL/kLOvig4y3G8w==
+  version "3.9.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.6.tgz#8f3e0198a34c3ae17091b35571d3afd31999365a"
+  integrity sha512-Pspx3oKAPJtjNwE92YS05HQoY7z2SFyOpHo9MqJor3BXAGNaPUs83CuVp9VISFkSjyRfiTpmKuAYGJB7S7hOxw==
 
 typpy@2.3.11:
   version "2.3.11"
