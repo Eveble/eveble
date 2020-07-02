@@ -39,9 +39,14 @@ export class Serializable
       SERIALIZABLE_LIST_PROPS_KEY,
       this.constructor
     );
-    for (const [key, serializable] of Object.entries(serializablesListProps)) {
-      props[key] = new List(this, key, serializable, props[key] || []);
+    if (serializablesListProps !== undefined) {
+      for (const [key, serializable] of Object.entries(
+        serializablesListProps
+      )) {
+        props[key] = new List(this, key, serializable, props[key] || []);
+      }
     }
+
     return props;
   }
 
