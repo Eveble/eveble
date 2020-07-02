@@ -24,19 +24,19 @@ describe('UnscheduleCommand', function() {
   describe('prop types', () => {
     it('takes required targetId property as a string or Guid', () => {
       expect(UnscheduleCommand.getPropTypes().targetId).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Guid)
-        )
+          PropTypes.instanceOf(Guid),
+        ])
       );
     });
 
     it('takes required assignmentId property as a string or Guid', () => {
       expect(UnscheduleCommand.getPropTypes().assignmentId).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Guid)
-        )
+          PropTypes.instanceOf(Guid),
+        ])
       );
     });
 
@@ -48,10 +48,10 @@ describe('UnscheduleCommand', function() {
 
     it('takes required assignerId property as a string or Guid', () => {
       expect(UnscheduleCommand.getPropTypes().assignerId).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Guid)
-        )
+          PropTypes.instanceOf(Guid),
+        ])
       );
     });
 

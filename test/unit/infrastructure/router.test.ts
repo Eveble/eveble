@@ -491,20 +491,20 @@ describe(`Router`, function() {
           version: 0,
         };
         const expectedPropTypes = {
-          id: PropTypes.oneOf(
+          id: PropTypes.oneOf([
             PropTypes.instanceOf(String),
-            PropTypes.instanceOf(Guid)
-          ),
-          state: PropTypes.oneOf(
+            PropTypes.instanceOf(Guid),
+          ]),
+          state: PropTypes.oneOf([
             undefined,
             PropTypes.instanceOf(String),
-            PropTypes.instanceOf(Number)
-          ),
-          status: PropTypes.oneOf(
+            PropTypes.instanceOf(Number),
+          ]),
+          status: PropTypes.oneOf([
             undefined,
             PropTypes.instanceOf(String),
-            PropTypes.instanceOf(Number)
-          ),
+            PropTypes.instanceOf(Number),
+          ]),
           version: PropTypes.instanceOf(Number),
           schemaVersion: PropTypes.instanceOf(Number).isOptional,
           metadata: PropTypes.object.isOptional,
@@ -686,20 +686,20 @@ describe(`Router`, function() {
             version: 0,
           };
           const expectedPropTypes = {
-            id: PropTypes.oneOf(
+            id: PropTypes.oneOf([
               PropTypes.instanceOf(String),
-              PropTypes.instanceOf(Guid)
-            ),
-            state: PropTypes.oneOf(
+              PropTypes.instanceOf(Guid),
+            ]),
+            state: PropTypes.oneOf([
               undefined,
               PropTypes.instanceOf(String),
-              PropTypes.instanceOf(Number)
-            ),
-            status: PropTypes.oneOf(
+              PropTypes.instanceOf(Number),
+            ]),
+            status: PropTypes.oneOf([
               undefined,
               PropTypes.instanceOf(String),
-              PropTypes.instanceOf(Number)
-            ),
+              PropTypes.instanceOf(Number),
+            ]),
             version: PropTypes.instanceOf(Number),
             schemaVersion: PropTypes.instanceOf(Number).isOptional,
             metadata: PropTypes.object.isOptional,

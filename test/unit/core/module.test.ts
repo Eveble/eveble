@@ -347,23 +347,23 @@ describe('Module', function() {
           appId: PropTypes.instanceOf(String).isOptional,
           workerId: PropTypes.instanceOf(String).isOptional,
           conversion: PropTypes.shape({
-            type: PropTypes.oneOf(
+            type: PropTypes.oneOf([
               PropTypes.equal('manual'),
-              PropTypes.equal('runtime')
-            ),
+              PropTypes.equal('runtime'),
+            ]),
           }).isOptional,
           validation: PropTypes.shape({
-            type: PropTypes.oneOf(
+            type: PropTypes.oneOf([
               PropTypes.equal('manual'),
-              PropTypes.equal('runtime')
-            ),
+              PropTypes.equal('runtime'),
+            ]),
           }).isOptional,
           description: PropTypes.shape({
-            formatting: PropTypes.oneOf(
-              PropTypes.equal('default'),
+            formatting: PropTypes.oneOf([
               PropTypes.equal('compact'),
-              PropTypes.equal('debug')
-            ),
+              PropTypes.equal('debug'),
+              PropTypes.equal('default'),
+            ]),
           }).isOptional,
           logging: PropTypes.instanceOf(LoggingConfig).isOptional,
           clients: PropTypes.shape({

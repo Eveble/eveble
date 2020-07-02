@@ -44,10 +44,10 @@ describe('ScheduleCommand', function() {
   describe('prop types', () => {
     it('takes required targetId property as a string or Guid', () => {
       expect(ScheduleCommand.getPropTypes().targetId).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Guid)
-        )
+          PropTypes.instanceOf(Guid),
+        ])
       );
     });
 

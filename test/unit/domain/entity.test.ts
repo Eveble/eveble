@@ -120,10 +120,10 @@ describe('Entity', function() {
 
     it('takes required id property as a string or Guid', () => {
       expect(Entity.getPropTypes().id).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Guid)
-        )
+          PropTypes.instanceOf(Guid),
+        ])
       );
     });
 
@@ -135,21 +135,21 @@ describe('Entity', function() {
 
     it('takes optional state property as a string', () => {
       expect(Entity.getPropTypes().state).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           undefined,
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Number)
-        )
+          PropTypes.instanceOf(Number),
+        ])
       );
     });
 
     it('takes optional status property as a string', () => {
       expect(Entity.getPropTypes().status).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           undefined,
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Number)
-        )
+          PropTypes.instanceOf(Number),
+        ])
       );
     });
 
