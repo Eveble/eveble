@@ -16,6 +16,8 @@ describe('AppConfig', function() {
   });
 
   afterEach(() => {
+    delete process.env.APP_ID;
+    delete process.env.WORKER_ID;
     generateId.restore();
   });
 
