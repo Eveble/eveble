@@ -1,4 +1,3 @@
-import { isString } from 'lodash';
 import { classes } from 'polytype';
 import { injectable } from '@parisholley/inversify-async';
 import { InvalidTransportIdError, TransportExistsError } from './core-errors';
@@ -100,7 +99,7 @@ export class Logger extends classes(StatefulMixin, RFC5424LoggingMixin)
     transport: types.LogTransport,
     shouldOverride = false
   ): void {
-    if (!isString(id)) {
+    if (typeof id !== 'string') {
       throw new InvalidTransportIdError(kernel.describer.describe(id));
     }
     if (this.hasTransport(id) && !shouldOverride) {
