@@ -46,7 +46,7 @@
     "url": "git://github.com/eveble/eveble.git"
   },
   "dependencies": {
-    "@eveble/helpers": "^1.0.2",
+    "@eveble/helpers": "^1.0.3",
     "@eveble/ejson": "^2.3.0",
     "@parisholley/inversify-async": "^1.1.7",
     "chalk": "^3.0.0",
