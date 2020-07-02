@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { Integer, PropTypes, ValidationError } from 'typend';
 import { inject } from '@parisholley/inversify-async';
+import sinon from 'sinon';
 import { Struct } from '../../../src/components/struct';
 import { define } from '../../../src/decorators/define';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
@@ -185,7 +186,7 @@ describe('Struct', function() {
   });
 
   describe('hooks', () => {
-    describe('supports onConstruction hook', () => {
+    it('supports onConstruction hook', () => {
       @define('Car')
       class Car extends Struct {
         brand: string;
@@ -200,6 +201,38 @@ describe('Struct', function() {
 
       const instance = new Car({ brand: 'my-brand' });
       expect(instance.brand).to.be.equal('my-processed-brand');
+    });
+
+    it('supports onValidation hook', () => {
+      @define('Car')
+      class Car extends Struct {
+        model: string;
+      }
+      const validatorFn = (props: types.Props): types.Props => {
+        if (props.model === 'Multipla') {
+          throw new Error('Denied');
+        }
+        return props;
+      };
+      Car.prototype.registerHook('onValidation', 'my-validator', validatorFn);
+
+      expect(() => new Car({ model: 'Multipla' })).to.throw(Error, 'Denied');
+    });
+
+    it('ensures that onValidation hooks are executed after prop types validation', () => {
+      @define('Car')
+      class Car extends Struct {
+        model: string;
+      }
+      const validatorFn = sinon.stub();
+
+      Car.prototype.registerHook('onValidation', 'my-validator', validatorFn);
+      Car.prototype.validateProps = sinon.stub();
+
+      expect(() => new Car({ model: 'A5' })).to.not.throw(Error);
+      expect(Car.prototype.validateProps).to.be.calledOnce;
+      expect(validatorFn).to.be.calledOnce;
+      expect(Car.prototype.validateProps).to.be.calledBefore(validatorFn);
     });
   });
 });
