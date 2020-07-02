@@ -15,6 +15,7 @@ import {
 } from '../../../src/utils/helpers';
 import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
+import { Struct } from '../../../src/components/struct';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
@@ -75,6 +76,12 @@ describe('helpers', function() {
     it('returns false for nil', () => {
       expect(isDefinable(null)).to.be.false;
       expect(isDefinable(undefined)).to.be.false;
+    });
+
+    it('returns true for Struct', () => {
+      @define('MyStruct', { isRegistrable: false })
+      class MyStruct extends Struct {}
+      expect(isDefinable(new MyStruct())).to.be.true;
     });
 
     it('returns false for not defined(@define) classes implementing Definable interface', () => {

@@ -12,6 +12,7 @@ import { isClassInstance } from '@eveble/helpers';
 import decache from 'decache';
 import dotenv from 'dotenv-extended';
 import { types } from '../types';
+import { Struct } from '../components/struct';
 
 /**
  * Evaluates if provided argument is a `Definable` implementation.
@@ -20,7 +21,12 @@ import { types } from '../types';
  */
 export function isDefinable(arg: any): boolean {
   if (arg == null) return false;
-  return instanceOf<types.Definable>(arg) && isDefined(arg.constructor);
+
+  return (
+    // TODO: instanceOf from Typend is still not fully reliable atm
+    (arg instanceof Struct || instanceOf<types.Definable>(arg)) &&
+    isDefined(arg.constructor)
+  );
 }
 
 /**
