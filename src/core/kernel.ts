@@ -236,7 +236,8 @@ export class Kernel {
 }
 
 const library = new Library();
-if (isMocha(global) && isMochaInWatchMode()) {
+// Fix types being forcefully overridden without consent on Mocha in `--watch` mode
+if (isMocha(global) && isMochaInWatchMode(process)) {
   library.setState(Library.STATES.override);
 }
 const config: types.KernelConfig = {
