@@ -55,7 +55,9 @@ export class ConsoleTransport extends LogTransport
     };
     this.client = this.createWinstonLogger(props);
 
-    const logColors: Record<string, string> = this.config.get(`logColors`);
+    const logColors: Record<string, string> = this.config.get<
+      Record<string, string>
+    >(`logColors`);
     if (logColors !== undefined) {
       this.initializeColors(this.config.get(`logColors`));
     }
