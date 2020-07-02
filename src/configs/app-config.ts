@@ -34,7 +34,7 @@ export class AppConfig extends Config {
   } = { type: 'runtime' };
 
   public description?: {
-    formatting: 'default' | 'compact' | 'debug';
+    formatting: 'compact' | 'debug' | 'default';
   } = { formatting: 'default' };
 
   public eveble?: EvebleConfig = new EvebleConfig();
