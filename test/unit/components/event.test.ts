@@ -47,10 +47,10 @@ describe('Event', function() {
   describe('prop types', () => {
     it('takes required sourceId property as a string or Guid', () => {
       expect(Event.getPropTypes().sourceId).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Guid)
-        )
+          PropTypes.instanceOf(Guid),
+        ])
       );
     });
 

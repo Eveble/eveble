@@ -57,10 +57,10 @@ describe('AppConfig', function() {
     it(`takes optional conversion property as an object with type property as one of: 'manual' or 'runtime'`, () => {
       expect(AppConfig.getPropTypes().conversion).to.be.eql(
         PropTypes.shape({
-          type: PropTypes.oneOf(
+          type: PropTypes.oneOf([
             PropTypes.equal('manual'),
-            PropTypes.equal('runtime')
-          ),
+            PropTypes.equal('runtime'),
+          ]),
         }).isOptional
       );
     });
@@ -68,10 +68,10 @@ describe('AppConfig', function() {
     it(`takes optional validation property as an object with type property as one of: 'manual' or 'runtime'`, () => {
       expect(AppConfig.getPropTypes().validation).to.be.eql(
         PropTypes.shape({
-          type: PropTypes.oneOf(
+          type: PropTypes.oneOf([
             PropTypes.equal('manual'),
-            PropTypes.equal('runtime')
-          ),
+            PropTypes.equal('runtime'),
+          ]),
         }).isOptional
       );
     });
@@ -79,11 +79,11 @@ describe('AppConfig', function() {
     it(`takes optional description property as an object with formatting property as one of: 'default', 'compact', or 'debug'`, () => {
       expect(AppConfig.getPropTypes().description).to.be.eql(
         PropTypes.shape({
-          formatting: PropTypes.oneOf(
-            PropTypes.equal('default'),
+          formatting: PropTypes.oneOf([
             PropTypes.equal('compact'),
-            PropTypes.equal('debug')
-          ),
+            PropTypes.equal('debug'),
+            PropTypes.equal('default'),
+          ]),
         }).isOptional
       );
     });

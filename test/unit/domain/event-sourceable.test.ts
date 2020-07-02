@@ -245,10 +245,10 @@ describe(`EventSourceable`, function() {
 
     it('takes required id property as a string or Guid', () => {
       expect(EventSourceable.getPropTypes().id).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Guid)
-        )
+          PropTypes.instanceOf(Guid),
+        ])
       );
     });
 
@@ -272,21 +272,21 @@ describe(`EventSourceable`, function() {
 
     it('takes optional state property as a string', () => {
       expect(EventSourceable.getPropTypes().state).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           undefined,
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Number)
-        )
+          PropTypes.instanceOf(Number),
+        ])
       );
     });
 
     it('takes optional status property as a string', () => {
       expect(EventSourceable.getPropTypes().status).to.be.eql(
-        PropTypes.oneOf(
+        PropTypes.oneOf([
           undefined,
           PropTypes.instanceOf(String),
-          PropTypes.instanceOf(Number)
-        )
+          PropTypes.instanceOf(Number),
+        ])
       );
     });
 
@@ -317,12 +317,12 @@ describe(`EventSourceable`, function() {
       getLegacyTransformer: PropTypes.instanceOf(Function),
     });
 
-    const stringOrStringifiable = PropTypes.oneOf(
+    const stringOrStringifiable = PropTypes.oneOf([
       PropTypes.instanceOf(String),
       PropTypes.interface({
         toString: PropTypes.instanceOf(Function),
-      })
-    );
+      }),
+    ]);
 
     it('takes required COMMAND property as a list of Command instances', () => {
       // https://github.com/microsoft/TypeScript/issues/1863
