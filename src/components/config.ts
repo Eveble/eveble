@@ -197,7 +197,7 @@ export class Config extends Struct implements types.Configurable {
    * ).to.be.equal('my-runtime-fallback');
    * ```
    */
-  public get(path: string, runtimeDefaultValue?: any): any {
+  public get<T extends any>(path: string, runtimeDefaultValue?: T): T | any {
     let foundValue: any = get(this, path);
     if (foundValue !== undefined) {
       // Since were returning reference to object, any runtime changes to object would change the original instance - for this were loosing the reference
@@ -226,7 +226,7 @@ export class Config extends Struct implements types.Configurable {
    * @param path - Configuration path using dotted notation for nested objects.
    * @returns Resolved value if its found over provided path or value from other included configurations.
    */
-  public getExact(path: string): any {
+  public getExact<T extends any>(path: string): T | any {
     let foundValue: any = get(this, path);
     if (foundValue !== undefined) {
       // Since were returning reference to Object, any runtime changes to Object would change the original instance - for this were loosing reference
@@ -250,7 +250,7 @@ export class Config extends Struct implements types.Configurable {
    * @param path - Configuration path using dotted notation for nested objects.
    * @return Resolved default value or undefined.
    */
-  public getDefault(path: string): any {
+  public getDefault<T extends any>(path: string): T | any {
     let foundDefaultValue = get(this.getPropertyInitializers(), path);
 
     if (foundDefaultValue !== undefined) {
@@ -329,7 +329,7 @@ export class Config extends Struct implements types.Configurable {
    * ).to.throw(ValidationError)
    * ```
    */
-  public set(path: string, value: any): void {
+  public set<T extends any>(path: string, value: T): void {
     // First validate on copy if provided value matches properties types
     const copy = this.toPlainObject();
     set(copy, path, value);

@@ -35,20 +35,22 @@ export class DetailedLogFormatter implements types.LogFormatter {
 
     // Formatting
     const colors: Record<string, string> = this.processPartsColors(config);
-    const separator: string = chalk`{${colors.separator} ${config.get(
+    const separator: string = chalk`{${colors.separator} ${config.get<string>(
       'parts.separator'
     )}}`;
     // Parts
-    const initial: string = config.get('parts.initial', '');
+    const initial: string = config.get<string>('parts.initial', '');
     const timestamp: string =
       (entry as any).timestamp !== undefined
         ? chalk`{${colors.timestamp} ${(entry as any).timestamp}}${separator}`
         : '';
     const label =
-      config.get('flags.isLabeled') &&
-      config.get('parts.label') !== undefined &&
-      config.get('parts.label').length > 0
-        ? chalk`{${colors.label} ${config.get('parts.label')}}${separator}`
+      config.get<boolean>('flags.isLabeled') &&
+      config.get<string>('parts.label') !== undefined &&
+      config.get<string>('parts.label').length > 0
+        ? chalk`{${colors.label} ${config.get<string>(
+            'parts.label'
+          )}}${separator}`
         : '';
 
     let targetName = '';
@@ -57,22 +59,22 @@ export class DetailedLogFormatter implements types.LogFormatter {
 
     if (entry.metadata) {
       let entryTypeName = entry.typeName;
-      if (config.get('flags.isAbbreviatingSources')) {
+      if (config.get<boolean>('flags.isAbbreviatingSources')) {
         entryTypeName = this.abbreviate(entry.typeName, config);
       }
-      targetName = config.get('flags.showTarget')
+      targetName = config.get<boolean>('flags.showTarget')
         ? chalk`${separator}{${colors.target} ${entryTypeName}}`
         : '';
 
       if (
-        config.get('flags.showMethod') &&
+        config.get<boolean>('flags.showMethod') &&
         entry.methodName !== undefined &&
         entry.methodName.length > 0
       ) {
         const methodNotation = entry.isStaticMethod() ? '.' : '::';
         const methodType = chalk`{${colors.separator} ${methodNotation}}`;
         let entryMethodName = entry.methodName;
-        if (config.get('flags.isAbbreviatingSources')) {
+        if (config.get<boolean>('flags.isAbbreviatingSources')) {
           entryMethodName = this.abbreviate(entry.methodName, config);
         }
         methodName = chalk`${methodType}{${colors.method} ${entryMethodName}}`;
@@ -95,7 +97,9 @@ export class DetailedLogFormatter implements types.LogFormatter {
   protected processPartsColors(
     config: LogTransportConfig
   ): Record<string, string> {
-    const partsColors: Record<string, string> = config.get('partsColors', {});
+    const partsColors: Record<string, string> = config.get<
+      Record<string, string>
+    >('partsColors', {});
 
     const processed: Record<string, string> = {};
     for (const [part, color] of Object.entries(partsColors)) {
@@ -110,9 +114,9 @@ export class DetailedLogFormatter implements types.LogFormatter {
    * @param config - `LogTransportConfig` instance.
    * @returns abbreviate
    */
-  protected abbreviate(str, config): string {
+  protected abbreviate(str: string, config: LogTransportConfig): string {
     return abbreviate(str, {
-      length: config.get('abbreviationLength'),
+      length: config.get<number>('abbreviationLength'),
     });
   }
 }
