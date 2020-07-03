@@ -52,6 +52,7 @@
   "dependencies": {
     "@eveble/helpers": "^1.0.3",
     "@eveble/ejson": "^2.3.0",
+    "typend": "^1.0.1",
     "reflect-metadata": "^0.1.13",
     "tsruntime": "^3.0.0-beta.1",
     "ttypescript": "^1.5.10",
@@ -64,7 +65,6 @@
     "has-ansi": "^4.0.0",
     "lodash": "^4.17.15",
     "polytype": "^0.9.2",
-    "typend": "^1.0.1",
     "uuid": "^7.0.3",
     "winston": "^3.2.1",
     "agenda": "^3.0.0",
