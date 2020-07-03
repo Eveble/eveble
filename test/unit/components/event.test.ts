@@ -7,7 +7,7 @@ import { define } from '../../../src/decorators/define';
 import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
-describe('Event', function() {
+describe('Event', function () {
   let now: Date;
   let clock: any;
 

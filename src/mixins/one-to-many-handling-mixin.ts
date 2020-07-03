@@ -144,7 +144,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
    */
   public getTypeByHandler(handlerReference: types.Handler): any | undefined {
     for (const [messageType, handlers] of this[HANDLERS].entries()) {
-      const unboundHandlers = handlers.map(handler => {
+      const unboundHandlers = handlers.map((handler) => {
         return (handler as any).original || handler;
       });
       // Compare original function and bound ones as a fallback
@@ -207,7 +207,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
       this.getHandler(
         message.constructor as types.MessageType<types.Message>
       ) || [];
-    const promises = handlers.map(handler => {
+    const promises = handlers.map((handler) => {
       return handler(message);
     });
     return Promise.all(promises);

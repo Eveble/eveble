@@ -15,7 +15,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitMongoDBObserver`, function() {
+describe(`CommitMongoDBObserver`, function () {
   const now = new Date();
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';

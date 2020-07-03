@@ -17,7 +17,7 @@ import { Module } from '../../../src/core/module';
 
 chai.use(sinonChai);
 
-describe(`MongoDBSnapshotStorageModule`, function() {
+describe(`MongoDBSnapshotStorageModule`, function () {
   // Props
   const appConfig = new AppConfig({
     appId: 'my-app-id',
@@ -35,7 +35,7 @@ describe(`MongoDBSnapshotStorageModule`, function() {
   let snapshotsCollection: any;
   let db: any;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -49,7 +49,7 @@ describe(`MongoDBSnapshotStorageModule`, function() {
       .toConstantValue(serializer);
   };
 
-  const setupMongo = function(): void {
+  const setupMongo = function (): void {
     MongoClient = sinon.stub();
     mongoClientInstance = stubInterface<MongoClientOriginal>();
     snapshotsCollection = stubInterface<Collection<any>>();
@@ -64,7 +64,7 @@ describe(`MongoDBSnapshotStorageModule`, function() {
       .toConstantValue(MongoClient);
   };
 
-  const setupApp = function(): void {
+  const setupApp = function (): void {
     app = stubInterface<types.App>();
     app.config = appConfig;
   };

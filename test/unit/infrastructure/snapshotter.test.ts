@@ -14,7 +14,7 @@ import { UndefinedSnapshotterFrequencyError } from '../../../src/infrastructure/
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Snapshotter`, function() {
+describe(`Snapshotter`, function () {
   @define('Snapshotter.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {}
 

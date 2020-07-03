@@ -13,7 +13,7 @@ import { subscribe } from '../../../src/annotations/subscribe';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 
-describe(`Service`, function() {
+describe(`Service`, function () {
   @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command {}
 
@@ -73,10 +73,7 @@ describe(`Service`, function() {
         return undefined;
       }
     }
-    injector
-      .bind<types.Service>('MyService')
-      .to(MyService)
-      .inSingletonScope();
+    injector.bind<types.Service>('MyService').to(MyService).inSingletonScope();
 
     injector.get('MyService');
     expect(() => injector.get('MyService')).to.not.throw(Error);

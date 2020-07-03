@@ -12,7 +12,7 @@ import { Log } from '../../../src/components/log-entry';
 
 chai.use(sinonChai);
 
-describe('ConsoleTransport', function() {
+describe('ConsoleTransport', function () {
   let injector: types.Injector;
   let combinedFormat: any;
   let config: LogTransportConfig;

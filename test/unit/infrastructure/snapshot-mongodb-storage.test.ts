@@ -20,7 +20,7 @@ import {
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`SnapshotMongoDBStorage`, function() {
+describe(`SnapshotMongoDBStorage`, function () {
   @define('SnapshotMongoDBStorage.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {
     name: string;
@@ -90,13 +90,10 @@ describe(`SnapshotMongoDBStorage`, function() {
 
   it(`inserts snapshot to MongoDB collection`, async () => {
     const docId = 'mongo-id';
-    collectionMock
-      .expects('insertOne')
-      .withArgs(snapshot)
-      .resolves({
-        insertedId: docId,
-        insertedCount: 1,
-      });
+    collectionMock.expects('insertOne').withArgs(snapshot).resolves({
+      insertedId: docId,
+      insertedCount: 1,
+    });
 
     const result = await storage.save(eventSourceable);
     expect(result).to.be.equal(docId);
@@ -105,12 +102,9 @@ describe(`SnapshotMongoDBStorage`, function() {
   });
 
   it(`throws AddingSnapshotError on unsuccessful document insertion`, async () => {
-    collectionMock
-      .expects('insertOne')
-      .withArgs(snapshot)
-      .resolves({
-        insertedCount: 0,
-      });
+    collectionMock.expects('insertOne').withArgs(snapshot).resolves({
+      insertedCount: 0,
+    });
 
     await expect(storage.save(eventSourceable)).to.eventually.be.rejectedWith(
       AddingSnapshotError,
@@ -167,10 +161,7 @@ describe(`SnapshotMongoDBStorage`, function() {
       _id: eventSourceableId,
     };
 
-    collectionMock
-      .expects('findOne')
-      .withArgs(query)
-      .resolves(snapshot);
+    collectionMock.expects('findOne').withArgs(query).resolves(snapshot);
 
     const foundSnapshot = await storage.findById(
       MyEventSourceable,
@@ -187,10 +178,7 @@ describe(`SnapshotMongoDBStorage`, function() {
       _id: eventSourceableId,
     };
 
-    collectionMock
-      .expects('findOne')
-      .withArgs(query)
-      .resolves(null);
+    collectionMock.expects('findOne').withArgs(query).resolves(null);
 
     const foundSnapshot = await storage.findById(
       MyEventSourceable,

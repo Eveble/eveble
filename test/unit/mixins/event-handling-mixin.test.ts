@@ -15,7 +15,7 @@ import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 
 chai.use(sinonChai);
 
-describe(`EventHandlingMixin`, function() {
+describe(`EventHandlingMixin`, function () {
   let injector: types.Injector;
   let eventBus: any;
 
@@ -171,7 +171,7 @@ describe(`EventHandlingMixin`, function() {
 
     it(`ensures that context of registered handler on EventBus is bound to instance`, () => {
       eventBus.handlers = new Map();
-      eventBus.subscribeTo = function(event, handler): void {
+      eventBus.subscribeTo = function (event, handler): void {
         this.handlers.set(event, handler);
       };
 

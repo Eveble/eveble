@@ -19,7 +19,7 @@ import { Struct } from '../../../src/components/struct';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-describe('helpers', function() {
+describe('helpers', function () {
   @define('SerializableStub')
   class SerializableStub {
     getPropTypes(): void {}

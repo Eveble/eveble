@@ -1,6 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/camelcase */
-
 import { expect } from 'chai';
 import {
   postConstruct,
@@ -413,6 +410,7 @@ import {
   LogTransportConfig as LogTransportConfigExported,
   // Constants
   BINDINGS as BINDINGSExported,
+  // eslint-disable-next-line camelcase
   EVEBLE_BINDINGS as EVEBLE_BINDINGSExported,
   DEFAULTS as DEFAULTSExported,
   LITERAL_KEYS as LITERAL_KEYS_EXPORTED,
@@ -603,7 +601,7 @@ import {
   inject as injectExported,
 } from '../../src/index';
 
-describe(`exports`, function() {
+describe(`exports`, function () {
   /*
   TYPEND
   */

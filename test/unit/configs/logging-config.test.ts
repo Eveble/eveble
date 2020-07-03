@@ -4,7 +4,7 @@ import { LoggingConfig } from '../../../src/configs/logging-config';
 import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { Config } from '../../../src/components/config';
 
-describe('LoggingConfig', function() {
+describe('LoggingConfig', function () {
   it('extends Config', () => {
     expect(LoggingConfig.prototype).to.be.instanceof(Config);
   });

@@ -24,7 +24,7 @@ import { initial } from '../../../src/annotations/initial';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Mapping Router with routing provider on Injector`, function() {
+describe(`Mapping Router with routing provider on Injector`, function () {
   @define('RoutesProvider.MyCommand')
   class MyCommand extends Command {}
   @define('RoutesProvider.MyOtherCommand')
@@ -45,7 +45,7 @@ describe(`Mapping Router with routing provider on Injector`, function() {
   let eventBus: types.EventBus;
   let repository: any;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -55,7 +55,7 @@ describe(`Mapping Router with routing provider on Injector`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     commandBus = new CommandBus();
     eventBus = new EventBus();
     repository = stubInterface<types.EventSourceableRepository>();
@@ -81,7 +81,7 @@ describe(`Mapping Router with routing provider on Injector`, function() {
     serializer = injector.get<types.Serializer>(BINDINGS.Serializer);
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }

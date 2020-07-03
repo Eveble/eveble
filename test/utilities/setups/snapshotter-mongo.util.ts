@@ -9,7 +9,7 @@ import {
 } from './mongo-env.util';
 import { types } from '../../../src/types';
 
-export const setupSnapshotterMongo = async function(
+export const setupSnapshotterMongo = async function (
   injector: types.Injector,
   clients: Record<string, types.Client>,
   collections: Record<string, Collection>

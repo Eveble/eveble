@@ -22,7 +22,7 @@ import { HandlingMixin } from '../../../src/mixins/handling-mixin';
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-describe('OneToManyHandlingMixin', function() {
+describe('OneToManyHandlingMixin', function () {
   @define('MyEvent', { isRegistrable: false })
   class MyEvent extends Event {
     key: string;
@@ -397,13 +397,13 @@ describe('OneToManyHandlingMixin', function() {
         const firstSpy = sinon.spy();
         const secondSpy = sinon.spy();
         const thirdSpy = sinon.spy();
-        const firstHandler = async function(typeInstance): Promise<void> {
+        const firstHandler = async function (typeInstance): Promise<void> {
           await firstSpy(typeInstance);
         };
-        const secondHandler = async function(typeInstance): Promise<void> {
+        const secondHandler = async function (typeInstance): Promise<void> {
           await secondSpy(typeInstance);
         };
-        const thirdHandler = async function(typeInstance): Promise<void> {
+        const thirdHandler = async function (typeInstance): Promise<void> {
           await thirdSpy(typeInstance);
         };
 
@@ -441,13 +441,13 @@ describe('OneToManyHandlingMixin', function() {
 
         const firstSpy = sinon.spy();
         const secondSpy = sinon.spy();
-        const delayedFirstHandler = async function(
+        const delayedFirstHandler = async function (
           typeInstance
         ): Promise<void> {
           await delay(5);
           await firstSpy(typeInstance);
         };
-        const secondHandler = async function(typeInstance): Promise<void> {
+        const secondHandler = async function (typeInstance): Promise<void> {
           await secondSpy(typeInstance);
         };
 
@@ -473,7 +473,7 @@ describe('OneToManyHandlingMixin', function() {
 
         const firstSpy = sinon.spy();
         const secondSpy = sinon.spy();
-        const errorThrowingHandler = async function(
+        const errorThrowingHandler = async function (
           typeInstance
         ): Promise<void> {
           if (typeInstance instanceof MyEvent) {
@@ -481,7 +481,7 @@ describe('OneToManyHandlingMixin', function() {
           }
           await firstSpy(typeInstance);
         };
-        const secondHandler = async function(typeInstance): Promise<void> {
+        const secondHandler = async function (typeInstance): Promise<void> {
           await secondSpy(typeInstance);
         };
 

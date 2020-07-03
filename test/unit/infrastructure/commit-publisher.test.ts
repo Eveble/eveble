@@ -20,10 +20,10 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 function sleep(ms: number): Promise<any> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe(`CommitPublisher`, function() {
+describe(`CommitPublisher`, function () {
   @define('CommitPublisher.MyCommand', { isRegistrable: false })
   class MyCommand extends Command {}
   @define('CommitPublisher.MyEvent', { isRegistrable: false })

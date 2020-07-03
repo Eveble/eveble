@@ -19,7 +19,7 @@ import { Log } from '../../../src/components/log-entry';
 
 chai.use(sinonChai);
 
-describe(`AgendaCommandSchedulerModule`, function() {
+describe(`AgendaCommandSchedulerModule`, function () {
   // Props
   const appConfig = new AppConfig({
     appId: 'my-app-id',
@@ -40,7 +40,7 @@ describe(`AgendaCommandSchedulerModule`, function() {
   let agendaInstance: any;
   let commandBus: any;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -58,7 +58,7 @@ describe(`AgendaCommandSchedulerModule`, function() {
       .toConstantValue(commandBus);
   };
 
-  const setupMongo = function(): void {
+  const setupMongo = function (): void {
     MongoClient = sinon.stub();
     mongoClientInstance = stubInterface<MongoClientOriginal>();
     commandSchedulerCollection = stubInterface<Collection<any>>();
@@ -73,7 +73,7 @@ describe(`AgendaCommandSchedulerModule`, function() {
       .toConstantValue(MongoClient);
   };
 
-  const setupAgenda = function(): void {
+  const setupAgenda = function (): void {
     Agenda = sinon.stub();
     agendaInstance = stubInterface<AgendaOriginal>();
 
@@ -84,7 +84,7 @@ describe(`AgendaCommandSchedulerModule`, function() {
       .toConstantValue(Agenda);
   };
 
-  const setupApp = function(): void {
+  const setupApp = function (): void {
     app = stubInterface<types.App>();
     app.config = appConfig;
   };

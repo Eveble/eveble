@@ -3,7 +3,7 @@ import { ValueObject } from '../../../src/domain/value-object';
 import { Serializable } from '../../../src/components/serializable';
 import { isDefinable } from '../../../src/utils/helpers';
 
-describe(`ValueObject`, function() {
+describe(`ValueObject`, function () {
   it(`extends Serializable`, () => {
     expect(ValueObject.prototype).to.be.instanceof(Serializable);
   });

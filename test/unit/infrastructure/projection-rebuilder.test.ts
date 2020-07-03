@@ -19,7 +19,7 @@ import { ProjectionAlreadyRebuildingError } from '../../../src/infrastructure/in
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`ProjectionRebuilder`, function() {
+describe(`ProjectionRebuilder`, function () {
   @define('ProjectionRebuilder.MyEvent', { isRegistrable: false })
   class MyEvent extends Event {
     value: string;

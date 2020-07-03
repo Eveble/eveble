@@ -6,7 +6,7 @@ import { types } from '../../../src/types';
 
 chai.use(sinonChai);
 
-describe(`RFC5424LoggingMixin`, function() {
+describe(`RFC5424LoggingMixin`, function () {
   let log;
 
   beforeEach(() => {

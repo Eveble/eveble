@@ -26,7 +26,7 @@ import {
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitMongoDBStorage`, function() {
+describe(`CommitMongoDBStorage`, function () {
   @define('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
   class MyCommand extends Command {
     name: string;
@@ -125,13 +125,10 @@ describe(`CommitMongoDBStorage`, function() {
       const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
       commitSerializer.serialize.withArgs(commit).returns(serializedCommit);
 
-      collectionMock
-        .expects('insertOne')
-        .withArgs(serializedCommit)
-        .resolves({
-          insertedId: commitId,
-          insertedCount: 1,
-        });
+      collectionMock.expects('insertOne').withArgs(serializedCommit).resolves({
+        insertedId: commitId,
+        insertedCount: 1,
+      });
 
       const result = await storage.save(commit);
       expect(result).to.be.equal(commitId);
@@ -183,12 +180,9 @@ describe(`CommitMongoDBStorage`, function() {
           version: 1,
         },
       };
-      collectionMock
-        .expects('findOne')
-        .withArgs(query, options)
-        .resolves({
-          version: 10,
-        });
+      collectionMock.expects('findOne').withArgs(query, options).resolves({
+        version: 10,
+      });
 
       await expect(
         storage.save(generateCommit(commitId, eventSourceableId, 1))
@@ -212,12 +206,9 @@ describe(`CommitMongoDBStorage`, function() {
           version: 1,
         },
       };
-      collectionMock
-        .expects('findOne')
-        .withArgs(query, options)
-        .resolves({
-          version: 10,
-        });
+      collectionMock.expects('findOne').withArgs(query, options).resolves({
+        version: 10,
+      });
 
       const lastCommitVersion = await storage.findLastVersionById(
         eventSourceableId
@@ -267,10 +258,7 @@ describe(`CommitMongoDBStorage`, function() {
       const query = {
         _id: commitId,
       };
-      collectionMock
-        .expects('findOne')
-        .withArgs(query)
-        .resolves(null);
+      collectionMock.expects('findOne').withArgs(query).resolves(null);
 
       const foundCommit = await storage.findById(commitId);
       expect(foundCommit).to.be.equal(undefined);
@@ -371,10 +359,7 @@ describe(`CommitMongoDBStorage`, function() {
       };
       const findResultMock = sinon.mock(findResult);
 
-      collectionMock
-        .expects('find')
-        .withArgs({}, {})
-        .resolves(findResult);
+      collectionMock.expects('find').withArgs({}, {}).resolves(findResult);
 
       findResultMock
         .expects('toArray')

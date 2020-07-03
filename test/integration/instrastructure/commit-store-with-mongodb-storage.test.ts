@@ -29,7 +29,7 @@ import { kernel } from '../../../src/core/kernel';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitStore with MongoDB storage`, function() {
+describe(`CommitStore with MongoDB storage`, function () {
   @define('CommitStoreWithMongoDBStorage.MyEventSourceable')
   class MyEventSourceable extends EventSourceable {}
   @define('CommitStoreWithMongoDBStorage.MyAggregate')
@@ -63,7 +63,7 @@ describe(`CommitStore with MongoDB storage`, function() {
   let commitStore: types.CommitStore;
   let serializer: types.Serializer;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -73,12 +73,12 @@ describe(`CommitStore with MongoDB storage`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupDefaultConfiguration = function(): void {
+  const setupDefaultConfiguration = function (): void {
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('workerId').returns(workerId);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     commitPublisher = stubInterface<types.CommitPublisher>();
 
     // Serializer
@@ -109,7 +109,7 @@ describe(`CommitStore with MongoDB storage`, function() {
     commitStore = injector.get<types.CommitStore>(BINDINGS.CommitStore);
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }

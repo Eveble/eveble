@@ -26,7 +26,7 @@ import { kernel } from '../../../src/core/kernel';
 
 chai.use(chaiAsPromised);
 
-describe(`EventSourceable BDD assertions`, function() {
+describe(`EventSourceable BDD assertions`, function () {
   let injector: Injector;
   let asserter: Asserter;
 

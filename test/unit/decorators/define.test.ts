@@ -15,7 +15,7 @@ import {
 
 chai.use(sinonChai);
 
-describe(`define`, function() {
+describe(`define`, function () {
   let originalLibrary: any;
   let library: any;
 

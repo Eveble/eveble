@@ -276,9 +276,7 @@ export class TaskList extends Aggregate {
   }
 
   TaskExpired(@subscribe event: TaskExpired): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .expire();
+    this.in<Task>('tasks').findById(event.task.id).expire();
   }
 
   TaskPriorityChanged(@subscribe event: TaskPriorityChanged): void {
@@ -288,44 +286,30 @@ export class TaskList extends Aggregate {
   }
 
   TaskAccepted(@subscribe event: TaskAccepted): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .accept();
+    this.in<Task>('tasks').findById(event.task.id).accept();
   }
 
   TaskDeclined(@subscribe event: TaskDeclined): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .decline(event.reason);
+    this.in<Task>('tasks').findById(event.task.id).decline(event.reason);
   }
 
   TaskStarted(@subscribe event: TaskStarted): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .start();
+    this.in<Task>('tasks').findById(event.task.id).start();
   }
 
   TaskCompleted(@subscribe event: TaskCompleted): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .complete();
+    this.in<Task>('tasks').findById(event.task.id).complete();
   }
 
   TaskPostponed(@subscribe event: TaskPostponed): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .postpone(event.tillAt);
+    this.in<Task>('tasks').findById(event.task.id).postpone(event.tillAt);
   }
 
   TaskQuitted(@subscribe event: TaskQuitted): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .quit();
+    this.in<Task>('tasks').findById(event.task.id).quit();
   }
 
   TaskHold(@subscribe event: TaskHold): void {
-    this.in<Task>('tasks')
-      .findById(event.task.id)
-      .hold();
+    this.in<Task>('tasks').findById(event.task.id).hold();
   }
 }

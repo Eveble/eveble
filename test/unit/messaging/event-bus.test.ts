@@ -15,7 +15,7 @@ import { Event } from '../../../src/components/event';
 
 chai.use(sinonChai);
 
-describe('EventBus', function() {
+describe('EventBus', function () {
   @define('MyEvent', { isRegistrable: false })
   class MyEvent extends Event {
     key: string;
@@ -109,7 +109,7 @@ describe('EventBus', function() {
 
     it('ensures that events are handled concurrently', async () => {
       const firstSpy = sinon.spy();
-      const delayedFirstHandler = async function(
+      const delayedFirstHandler = async function (
         eventInstance: MyEvent
       ): Promise<void> {
         await delay(5);

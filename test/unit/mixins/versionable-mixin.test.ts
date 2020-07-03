@@ -16,7 +16,7 @@ import {
 } from '../../../src/mixins/versionable-mixin';
 import { define } from '../../../src/decorators/define';
 
-describe(`VersionableMixin`, function() {
+describe(`VersionableMixin`, function () {
   describe('prop types', () => {
     it('enforces with Versionable schemaVersion prop type as optional number', () => {
       @define('MyClass', { isRegistrable: false })

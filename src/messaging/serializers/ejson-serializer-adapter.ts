@@ -75,7 +75,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
      * @param json -  Result from parsing JSON by EJSON.
      * @return Factory function that will be passed to `EJSON.addType`.
      */
-    const construct = function(
+    const construct = function (
       serializer: EJSONSerializerAdapter,
       TypeCtor: types.Type,
       json: Record<string, any>
@@ -567,7 +567,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
       const value = serializable[key];
       if (Array.isArray(value)) {
         // This is an array of sub values / Serializable
-        data[key] = value.map(item => {
+        data[key] = value.map((item) => {
           return instanceOf<types.Serializable>(item)
             ? this.toData(item)
             : item;
@@ -620,7 +620,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
         props[key] = this.fromData(data[key]);
       } else if (Array.isArray(value)) {
         // This is an array of values / sub-serializables
-        props[key] = value.map(item => {
+        props[key] = value.map((item) => {
           if (item[this.getTypeKey()] !== undefined) {
             return this.fromData(item);
           }

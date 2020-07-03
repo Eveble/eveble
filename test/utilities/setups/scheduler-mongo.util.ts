@@ -9,7 +9,7 @@ import {
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
 
-export const setupSchedulerMongo = async function(
+export const setupSchedulerMongo = async function (
   injector: types.Injector,
   clients: Record<string, types.Client>,
   collections: Record<string, Collection>

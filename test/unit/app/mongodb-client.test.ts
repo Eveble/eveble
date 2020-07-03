@@ -19,7 +19,7 @@ import { Injector } from '../../../src/core/injector';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`MongoDBClient`, function() {
+describe(`MongoDBClient`, function () {
   let props: Record<string, any>;
 
   before(() => {
@@ -42,7 +42,7 @@ describe(`MongoDBClient`, function() {
   let db: any;
   let client: MongoDBClient;
 
-  const setupDoubles = function(): void {
+  const setupDoubles = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
 
@@ -58,7 +58,7 @@ describe(`MongoDBClient`, function() {
       .toConstantValue(MongoClient);
   };
 
-  const setupMongoClient = function(): void {
+  const setupMongoClient = function (): void {
     mongoClientInstance.db.returns(db);
     db.collection.withArgs('first-collection').returns(firstCollection);
     db.collection.withArgs('second-collection').returns(secondCollection);

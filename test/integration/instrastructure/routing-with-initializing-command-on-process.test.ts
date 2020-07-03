@@ -56,7 +56,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Routing with initializing Command on Process`, function() {
+describe(`Routing with initializing Command on Process`, function () {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
 
@@ -91,7 +91,7 @@ describe(`Routing with initializing Command on Process`, function() {
   let eventBus: types.EventBus;
   let repository: types.EventSourceableRepository;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -101,7 +101,7 @@ describe(`Routing with initializing Command on Process`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupDefaultConfiguration = function(): void {
+  const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('workerId').returns(workerId);
@@ -111,7 +111,7 @@ describe(`Routing with initializing Command on Process`, function() {
     config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     commandBus = new CommandBus();
     eventBus = new EventBus();
 
@@ -172,26 +172,26 @@ describe(`Routing with initializing Command on Process`, function() {
     );
   };
 
-  const setupDomainDependencies = function(): void {
+  const setupDomainDependencies = function (): void {
     injector
       .bind<any>('TaskList.TaskCompletionPolicy')
       .to(InfiniteTaskCompletionPolicy)
       .inSingletonScope();
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }
   };
 
-  const initializeRouters = function(): void {
+  const initializeRouters = function (): void {
     injector.injectInto(new TaskListRouter());
     injector.injectInto(new EmployeeRouter());
     injector.injectInto(new CancelingEmploymentRouter());
   };
 
-  const setupKernel = function(): void {
+  const setupKernel = function (): void {
     asserter = new Asserter();
     asserter.registerAssertion(new StatefulAssertion(asserter));
     asserter.registerAssertion(new StatusfulAssertion(asserter));

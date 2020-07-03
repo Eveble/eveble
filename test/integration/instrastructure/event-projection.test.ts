@@ -14,7 +14,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 
 chai.use(sinonChai);
 
-describe('Event projection', function() {
+describe('Event projection', function () {
   const sandbox = sinon.createSandbox();
 
   const handlers = {

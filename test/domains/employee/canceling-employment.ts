@@ -146,7 +146,7 @@ export class CancelingEmployment extends Process {
       })
     );
 
-    const closedTaskListsStrIds = this.closedTaskListsIds.map(item => {
+    const closedTaskListsStrIds = this.closedTaskListsIds.map((item) => {
       return item.toString();
     });
 

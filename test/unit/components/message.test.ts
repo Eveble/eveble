@@ -7,7 +7,7 @@ import { Serializable } from '../../../src/components/serializable';
 import { isDefinable } from '../../../src/utils/helpers';
 import { PickableProperties } from '../../../src/components/pickable-properties';
 
-describe('Message', function() {
+describe('Message', function () {
   let now: Date;
   let clock: any;
 

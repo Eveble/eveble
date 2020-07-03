@@ -6,7 +6,7 @@ import {
 import { ValueObject } from '../../../src/domain/value-object';
 import { isDefinable } from '../../../src/utils/helpers';
 
-describe('Guid', function() {
+describe('Guid', function () {
   it(`extends ValueObject`, () => {
     expect(Guid.prototype).to.be.instanceof(ValueObject);
   });

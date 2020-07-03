@@ -149,7 +149,7 @@ export class Commit extends Serializable implements types.Commit {
    * @returns Instance of `CommitReceiver`, else `undefined`.
    */
   public getReceiver(appId: string): CommitReceiver | undefined {
-    return this.receivers.find(receiver => {
+    return this.receivers.find((receiver) => {
       return receiver.appId.toString() === appId.toString();
     });
   }

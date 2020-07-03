@@ -25,7 +25,7 @@ import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
 
 chai.use(sinonChai);
 
-describe('Entity', function() {
+describe('Entity', function () {
   let asserter: any;
 
   @define('Account', { isRegistrable: false })

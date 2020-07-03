@@ -16,7 +16,7 @@ import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 
 chai.use(sinonChai);
 
-describe(`CommandHandlingMixin`, function() {
+describe(`CommandHandlingMixin`, function () {
   let injector: types.Injector;
   let commandBus: any;
 
@@ -167,7 +167,7 @@ describe(`CommandHandlingMixin`, function() {
 
     it(`ensures that context of registered handler on CommandBus is bound to instance`, () => {
       commandBus.handlers = new Map();
-      commandBus.registerHandler = function(command, handler): void {
+      commandBus.registerHandler = function (command, handler): void {
         this.handlers.set(command, handler);
       };
 

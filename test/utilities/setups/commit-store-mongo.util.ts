@@ -9,7 +9,7 @@ import {
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
 
-export const setupCommitStoreMongo = async function(
+export const setupCommitStoreMongo = async function (
   injector: types.Injector,
   clients: Record<string, types.Client>,
   collections: Record<string, Collection>
