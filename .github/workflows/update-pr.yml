@@ -1,0 +1,49 @@
+name: 'Update Pull Request'
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  assign_labels:
+    runs-on: ubuntu-latest
+    name: Assign labels
+    steps:
+      - uses: technote-space/pr-labeler-action@v4
+        with:
+          CONFIGURATION_PATH: .github/pr-labeler.yml # optional, .github/pr-labeler.yml is the default value
+  format_fix_pr_information:
+    runs-on: ubuntu-latest
+    name: Format fix Pull request
+    if: ${{ contains(github.event.pull_request.title, 'fix') }}
+    needs: [assign_labels]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read 'fix' body template
+        id: pull_request_body
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.github/PULL_REQUEST_TEMPLATE/bug_fix.md
+      - name: Update Pull Request
+        uses: AsasInnab/pr-body-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body: ${{ steps.pull_request_body.outputs.content }}
+  format_default_pr_information:
+    runs-on: ubuntu-latest
+    name: Format default Pull request
+    if: >
+      github.actor != 'github-actions[bot]' && (! contains(github.event.pull_request.title, 'fix')) && (! contains(github.event.pull_request.labels.*.name, 'bug') && ! contains(github.event.pull_request.labels.*.name, 'fix'))
+    needs: [assign_labels]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read 'default' body template
+        id: pull_request_body
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.github/pull_request_template.md
+      - name: Update Pull Request
+        uses: AsasInnab/pr-body-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body: ${{ steps.pull_request_body.outputs.content }}

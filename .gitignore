@@ -9,12 +9,10 @@ yarn-error.log
 # Compiled library
 dist
 
-# Documentation
-docs
-
 # Code coverage
 .nyc_output
 coverage
+coverage.lcov
 
 # OSX
 .DS_Store

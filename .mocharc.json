@@ -1,5 +1,4 @@
 {
-  "file": "./test/common.ts",
   "reporter": "spec",
   "ui": "bdd",
   "opts": false,
@@ -10,5 +9,6 @@
   "timeout": 6000,
   "slow": 100,
   "watch-files": ["src/**/*.ts", "test/**/*.ts"],
-  "require": ["ts-node/register"]
+  "require": ["ts-node/register"],
+  "file": "./test/common.ts"
 }

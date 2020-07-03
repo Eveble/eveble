@@ -1,0 +1,78 @@
+# Default GitHub labels
+- name: bug
+  description: Something isn't working
+  color: D73C52
+- name: documentation
+  description: Improvements or additions to documentation
+  color: 0075ca
+- name: duplicate
+  description: This issue or pull request already exists
+  color: cfd3d7
+- name: enhancement
+  description: New feature or request
+  color: a2eeef
+- name: good first issue
+  description: Good for newcomers
+  color: FFFFFF
+- name: help wanted
+  description: Extra attention is needed
+  color: 008672
+- name: invalid
+  description: This doesn't seem right
+  color: e4e669
+- name: question
+  description: Further information is requested
+  color: d876e3
+- name: released
+  description: Description (optional)
+  color: ededed
+- name: wontfix
+  description: This will not be worked on
+  color: ffffff
+# Workflow
+- name: tested
+  description: Code that has passed unit tests
+  color: eeeeee
+- name: linted
+  description: Code that has been linted
+  color: eeeeee
+- name: formatted
+  description: Code that has been formatted
+  color: eeeeee
+- name: covered
+  description: Code that is matching testing coverage specification
+  color: eeeeee
+- name: builds
+  description: Code that builds
+  color: A1E202
+- name: documented
+  description: Documentation that is auto generated
+  color: eeeeee
+- name: failed
+  description: Automated workflow failed
+  color: F50C5A
+# Conventional
+- name: feature
+  description: A new feature
+  color: 9332FD
+- name: fix
+  description: A bug fix
+  color: 6233FD
+- name: docs
+  description: Documentation only changes
+  color: FFFFFF
+- name: style
+  description: Changes that do not affect the meaning of the code
+  color: 351E5C
+- name: refactor
+  description: A code change that neither fixes a bug or adds a feature
+  color: 3265FE
+- name: perf
+  description: A code change that improves performance
+  color: 1E6AA8
+- name: test
+  description: Adding missing tests
+  color: 84FF2E
+- name: chore
+  description: Changes to the build process, libraries, generation
+  color: 000000
