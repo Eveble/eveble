@@ -29,7 +29,9 @@ export class AgendaScheduledJobTransformer {
       Object.keys(ScheduledJob.getPropTypes())
     );
 
-    Object.keys(props).forEach(key => props[key] === null && delete props[key]);
+    Object.keys(props).forEach(
+      (key) => props[key] === null && delete props[key]
+    );
 
     if (attrs.lastFinishedAt !== undefined) {
       props.completedAt = attrs.lastFinishedAt;

@@ -12,7 +12,7 @@ import {
 
 chai.use(sinonChai);
 
-describe('List', function() {
+describe('List', function () {
   @define('Item', { isRegistrable: false })
   class Item extends Serializable {
     name: string;

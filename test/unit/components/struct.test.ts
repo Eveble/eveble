@@ -12,7 +12,7 @@ import { types } from '../../../src/types';
 
 chai.use(sinonChai);
 
-describe('Struct', function() {
+describe('Struct', function () {
   @define('Parent')
   class Parent extends Struct {
     hasJob: boolean;

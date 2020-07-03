@@ -152,10 +152,7 @@ export class StatefulAssertion extends Assertion {
       }
       throw new InvalidStateTransitionError(
         this.asserter.getEntity().getTypeName(),
-        this.asserter
-          .getEntity()
-          .getId()
-          .toString(),
+        this.asserter.getEntity().getId().toString(),
         this.asserter.getEntity().getState() as string,
         expectedState as string,
         action.toString()

@@ -31,7 +31,7 @@ import { SerializableError } from '../../../src/components/serializable-error';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Router`, function() {
+describe(`Router`, function () {
   let now: any;
   let clock: any;
   let injector: Injector;
@@ -430,7 +430,7 @@ describe(`Router`, function() {
       beforeEach(() => {
         // Setup
         handler = sinon.stub();
-        MyEventSourceable.prototype.handle = function(
+        MyEventSourceable.prototype.handle = function (
           message: types.Command | types.Event
         ): Promise<any> {
           handler(message);
@@ -523,7 +523,7 @@ describe(`Router`, function() {
         // Since EventSourceable does not resolve id from message on construction like Aggregate and Process,
         // replacing the overriden handler from beforeEach hook will cause instance of MyEventSourceable to be in
         // invalid state with missing id.
-        MyEventSourceable.prototype.handle = async function(
+        MyEventSourceable.prototype.handle = async function (
           _message
         ): Promise<EventSourceable> {
           return this;
@@ -626,7 +626,7 @@ describe(`Router`, function() {
       beforeEach(() => {
         // Setup
         handler = sinon.stub();
-        MyEventSourceable.prototype.handle = function(
+        MyEventSourceable.prototype.handle = function (
           message: types.Command | types.Event
         ): Promise<any> {
           handler(message);
@@ -717,7 +717,7 @@ describe(`Router`, function() {
           // Since EventSourceable does not resolve id from message on construction like Aggregate and Process,
           // replacing the overriden handler from beforeEach hook will cause instance of MyEventSourceable to be in
           // invalid state with missing id.
-          MyEventSourceable.prototype.handle = async function(
+          MyEventSourceable.prototype.handle = async function (
             _message
           ): Promise<EventSourceable> {
             return this;

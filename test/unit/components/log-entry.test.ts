@@ -3,7 +3,7 @@ import { Log, LogMetadata } from '../../../src/components/log-entry';
 import { define } from '../../../src/decorators/define';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 
-describe('Log', function() {
+describe('Log', function () {
   @define('MyClass')
   class MyClass extends DefinableMixin {
     myMethod(first: string, second: string, third: string): void {

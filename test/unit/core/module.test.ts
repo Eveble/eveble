@@ -29,7 +29,7 @@ import { EvebleConfig } from '../../../src/configs/eveble-config';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('Module', function() {
+describe('Module', function () {
   class MyModule extends Module {
     // All avaialble custom hooks that developer can define on App/Modules
     beforeInitialize(): any {}

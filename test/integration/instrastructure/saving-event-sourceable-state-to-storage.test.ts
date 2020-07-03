@@ -38,7 +38,7 @@ import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Saving Event Sourceable state to storage`, function() {
+describe(`Saving Event Sourceable state to storage`, function () {
   // Props
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';
@@ -58,7 +58,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
   let commitStore: types.CommitStore;
   let repository: types.EventSourceableRepository;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -68,7 +68,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupDefaultConfiguration = function(): void {
+  const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('workerId').returns(workerId);
@@ -79,7 +79,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
     config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     commandBus = new CommandBus();
     eventBus = new EventBus();
 
@@ -141,13 +141,13 @@ describe(`Saving Event Sourceable state to storage`, function() {
     );
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }
   };
 
-  const setupKernel = function(): void {
+  const setupKernel = function (): void {
     asserter = new Asserter();
     asserter.registerAssertion(new StatefulAssertion(asserter));
     asserter.registerAssertion(new StatusfulAssertion(asserter));
@@ -156,7 +156,7 @@ describe(`Saving Event Sourceable state to storage`, function() {
     kernel.setSerializer(serializer);
   };
 
-  const expectCommitIsMatchingCreatedTaskList = function(
+  const expectCommitIsMatchingCreatedTaskList = function (
     commit: types.Commit,
     taskListId: Guid,
     title: string

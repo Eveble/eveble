@@ -19,7 +19,7 @@ import { createEJSON } from '../../../src/utils/helpers';
 
 chai.use(sinonChai);
 
-describe(`EJSONSerializerAdapter`, function() {
+describe(`EJSONSerializerAdapter`, function () {
   let injector: types.Injector;
   let serializer: EJSONSerializerAdapter;
 

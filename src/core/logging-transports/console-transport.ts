@@ -111,7 +111,7 @@ export class ConsoleTransport extends LogTransport
     }
     // Message formatting
     formatArgs.push(
-      format.printf(log => {
+      format.printf((log) => {
         return this.formatEntry(log);
       })
     );

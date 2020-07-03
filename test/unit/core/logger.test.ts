@@ -15,7 +15,7 @@ import { RFC5424LoggingMixin } from '../../../src/mixins/rfc-5424-logging-mixin'
 
 chai.use(sinonChai);
 
-describe('Logger', function() {
+describe('Logger', function () {
   let levels: types.LogLevels;
   let transport: types.LogTransport;
 

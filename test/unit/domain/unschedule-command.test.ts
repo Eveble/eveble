@@ -5,7 +5,7 @@ import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Command } from '../../../src/components/command';
 
-describe('UnscheduleCommand', function() {
+describe('UnscheduleCommand', function () {
   it(`extends Command`, () => {
     expect(UnscheduleCommand.prototype).to.be.instanceof(Command);
   });

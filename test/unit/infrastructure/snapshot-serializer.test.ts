@@ -10,7 +10,7 @@ import { define } from '../../../src/decorators/define';
 
 chai.use(sinonChai);
 
-describe(`SnapshotSerializer`, function() {
+describe(`SnapshotSerializer`, function () {
   @define('MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {
     key: string;

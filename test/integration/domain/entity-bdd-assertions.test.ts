@@ -20,7 +20,7 @@ import { ValueObject } from '../../../src/domain/value-object';
 
 chai.use(sinonChai);
 
-describe(`Entity BDD assertions`, function() {
+describe(`Entity BDD assertions`, function () {
   describe(`validating state assertion`, () => {
     @define('MyEntity', { isRegistrable: false })
     class MyEntity extends Entity {

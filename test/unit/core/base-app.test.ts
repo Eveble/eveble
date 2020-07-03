@@ -33,7 +33,7 @@ import { Injector } from '../../../src/core/injector';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('BaseApp', function() {
+describe('BaseApp', function () {
   class MyApp extends BaseApp {
     beforeInitialize(): any {
       return undefined;
@@ -490,10 +490,7 @@ describe('BaseApp', function() {
           modules: [],
           injector: ioc,
         });
-        app.injector
-          .bind<MyClass>('MyClass')
-          .to(MyClass)
-          .inSingletonScope();
+        app.injector.bind<MyClass>('MyClass').to(MyClass).inSingletonScope();
         await app.initialize();
         expect(spy).to.be.calledOnce;
         await app.shutdown();
@@ -540,10 +537,7 @@ describe('BaseApp', function() {
         const getAsync = sinon.spy(ioc, 'getAsync');
         (ioc.findByScope as any).withArgs('Singleton').returns(['MyClass']);
 
-        app.injector
-          .bind<MyClass>('MyClass')
-          .to(MyClass)
-          .inSingletonScope();
+        app.injector.bind<MyClass>('MyClass').to(MyClass).inSingletonScope();
 
         await app.initialize();
         expect(ioc.findByScope).to.be.calledOnce;

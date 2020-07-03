@@ -36,7 +36,7 @@ import { route } from '../../../src/annotations/route';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`EventSourceable`, function() {
+describe(`EventSourceable`, function () {
   let now: Date;
   let clock: any;
   let handlers: Record<string, Function>;

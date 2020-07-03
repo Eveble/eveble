@@ -31,7 +31,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Observing and publishing new commits`, function() {
+describe(`Observing and publishing new commits`, function () {
   @define('ObservingAndPublishingNewCommits.MyCommand')
   class MyCommand extends Command {}
   @define('ObservingAndPublishingNewCommits.MyEvent')
@@ -55,7 +55,7 @@ describe(`Observing and publishing new commits`, function() {
   let storage: types.CommitStorage;
   let commitPublisher: types.CommitPublisher;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -65,13 +65,13 @@ describe(`Observing and publishing new commits`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupDefaultConfiguration = function(): void {
+  const setupDefaultConfiguration = function (): void {
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('workerId').returns(workerId);
     config.get.withArgs('eveble.commitStore.timeout').returns(60);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     commandBus = new CommandBus();
     eventBus = new EventBus();
 
@@ -115,7 +115,7 @@ describe(`Observing and publishing new commits`, function() {
     );
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }
@@ -163,7 +163,7 @@ describe(`Observing and publishing new commits`, function() {
       });
       commitId = new Guid().toString();
 
-      generateCommit = function(
+      generateCommit = function (
         sendingAppId: string,
         sendingWorkerId: string
       ): Commit {

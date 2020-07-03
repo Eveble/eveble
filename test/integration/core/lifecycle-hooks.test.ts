@@ -11,10 +11,10 @@ import { BINDINGS } from '../../../src/constants/bindings';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('app lifecycle hooks', function() {
+describe('app lifecycle hooks', function () {
   // ================================= TEST HELPERS ================================= //
 
-  const createLifeCycleHookSpies = function(): Record<string, Function> {
+  const createLifeCycleHookSpies = function (): Record<string, Function> {
     const hooks = {};
     const hookNames = [
       'beforeInitialize',
@@ -194,19 +194,19 @@ describe('app lifecycle hooks', function() {
   });
 
   // Readability and 'understanding' is archived by writing expectations manually with use of few letter helpers to not clutter tests with full blown expectation statements.
-  const never = function(hook): void {
+  const never = function (hook): void {
     expect(hook).not.to.have.been.called;
   };
 
-  const once = function(hook): void {
+  const once = function (hook): void {
     expect(hook).to.have.been.calledOnce;
   };
 
-  const twice = function(hook): void {
+  const twice = function (hook): void {
     expect(hook).to.have.been.calledTwice;
   };
 
-  const before = function(firstHook, secondHook): void {
+  const before = function (firstHook, secondHook): void {
     expect(firstHook).to.have.been.to.have.been.calledBefore(secondHook);
   };
 

@@ -23,7 +23,7 @@ import { HandlingMixin } from '../../../src/mixins/handling-mixin';
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-describe('OneToOneHandlingMixin', function() {
+describe('OneToOneHandlingMixin', function () {
   @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command {
     key: string;

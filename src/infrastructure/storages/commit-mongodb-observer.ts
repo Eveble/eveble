@@ -154,7 +154,7 @@ export class CommitMongoDBObserver extends StatefulMixin {
       this.setState(CommitMongoDBObserver.STATES.paused);
       this.log.debug(new Log(`paused observing commits`));
     });
-    this.stream.on('error', async error => {
+    this.stream.on('error', async (error) => {
       this.setState(CommitMongoDBObserver.STATES.failed);
       this.log.error(new Log(`failed observing commits do to error: ${error}`));
       if (this.isInProduction()) {

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ExtendableError } from '../../../src/components/extendable-error';
 
-describe('MyExtendableError', function() {
+describe('MyExtendableError', function () {
   class MyExtendableError extends ExtendableError {}
 
   class MyError extends ExtendableError {

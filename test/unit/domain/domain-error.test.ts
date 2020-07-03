@@ -4,7 +4,7 @@ import { SerializableError } from '../../../src/components/serializable-error';
 import { isDefinable } from '../../../src/utils/helpers';
 import { define } from '../../../src/decorators/define';
 
-describe('DomainError', function() {
+describe('DomainError', function () {
   @define()
   class MyDomainError extends DomainError {}
 

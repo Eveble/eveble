@@ -7,7 +7,7 @@ import { define } from '../../../src/decorators/define';
 import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
-describe('Command', function() {
+describe('Command', function () {
   let now: Date;
   let clock: any;
 

@@ -14,7 +14,7 @@ import { Event } from '../../../src/components/event';
 
 chai.use(sinonChai);
 
-describe('CommandBus', function() {
+describe('CommandBus', function () {
   @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command {
     key: string;

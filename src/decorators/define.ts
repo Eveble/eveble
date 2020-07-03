@@ -32,7 +32,7 @@ export class InvalidTypeNameError extends ExtendableError {
  * define('MyNamespace.MyTypeName')
  * class MyType {}
  */
-define.beforeDefine = function(
+define.beforeDefine = function (
   _target: any,
   _reflectedType: tsruntimeTypes.ReflectedType,
   ...args: any[]
@@ -55,7 +55,7 @@ define.beforeDefine = function(
  * define('MyNamespace.MyTypeName')
  * class MyType {}
  */
-define.afterDefine = function(
+define.afterDefine = function (
   target: any,
   reflectedType: tsruntimeTypes.ReferenceType,
   ...args: any[]

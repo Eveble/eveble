@@ -17,7 +17,7 @@ import { InvalidStateError } from '../../../src/mixins/stateful-mixin';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`AgendaClient`, function() {
+describe(`AgendaClient`, function () {
   let props: Record<string, any>;
 
   before(() => {
@@ -47,7 +47,7 @@ describe(`AgendaClient`, function() {
   let db: any;
   let client: any;
 
-  const setupDoubles = function(): void {
+  const setupDoubles = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
 
@@ -70,7 +70,7 @@ describe(`AgendaClient`, function() {
       .toConstantValue(mongoClient);
   };
 
-  const setupAgendaClient = function(): void {
+  const setupAgendaClient = function (): void {
     client = new AgendaClient(props);
   };
 

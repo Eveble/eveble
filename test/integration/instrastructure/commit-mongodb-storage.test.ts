@@ -25,7 +25,7 @@ import { kernel } from '../../../src/core/kernel';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitMongoDBStorage`, function() {
+describe(`CommitMongoDBStorage`, function () {
   @define('IntegrationCommitMongoDBStorage.MyCommand')
   class MyCommand extends Command {
     name: string;
@@ -156,7 +156,7 @@ describe(`CommitMongoDBStorage`, function() {
   /*
   SETUP
   */
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -166,7 +166,7 @@ describe(`CommitMongoDBStorage`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     // Serializer
     injector.bind<any>(BINDINGS.EJSON).toConstantValue(createEJSON());
     injector
@@ -187,7 +187,7 @@ describe(`CommitMongoDBStorage`, function() {
     storage = injector.get<types.CommitStorage>(BINDINGS.CommitStorage);
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }

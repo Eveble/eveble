@@ -19,7 +19,7 @@ import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`SnapshotMongoDBStorage with MongoDB storage`, function() {
+describe(`SnapshotMongoDBStorage with MongoDB storage`, function () {
   @define('SnapshotterWithMongoDBStorage.MyEventSourceable')
   class MyEventSourceable extends EventSourceable {
     name: string;
@@ -38,7 +38,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, function() {
   let serializer: types.Serializer;
   let snapshotter: types.Snapshotter;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -48,7 +48,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupDefaultConfiguration = function(): void {
+  const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('eveble.commitStore.timeout').returns(60);
@@ -57,7 +57,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, function() {
     config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     // Serializer
     injector.bind<any>(BINDINGS.EJSON).toConstantValue(createEJSON());
     injector
@@ -82,7 +82,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, function() {
     snapshotter = injector.get<types.Snapshotter>(BINDINGS.Snapshotter);
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }

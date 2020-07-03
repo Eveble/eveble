@@ -156,7 +156,7 @@ export function resolveSerializableFromPropType(
  * By default, EJSON module stores types in variable that is not referenced on the EJSON object
  * itself. This creates issue when running tests in watch modes(like Mocha's --watch) since the state of EJSON is cached.
  */
-export const createEJSON = function(): any {
+export const createEJSON = function (): any {
   decache('@eveble/ejson');
   // eslint-disable-next-line global-require
   return require('@eveble/ejson');

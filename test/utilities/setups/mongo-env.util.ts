@@ -1,6 +1,6 @@
 import getenv from 'getenv';
 
-export const getUrl = function(targetName: string): string {
+export const getUrl = function (targetName: string): string {
   let url: string;
   switch (targetName) {
     case 'snapshotter':
@@ -19,7 +19,7 @@ export const getUrl = function(targetName: string): string {
   return url;
 };
 
-export const getDatabaseName = function(targetName: string): string {
+export const getDatabaseName = function (targetName: string): string {
   let databaseName;
   switch (targetName) {
     case 'snapshotter':
@@ -38,7 +38,7 @@ export const getDatabaseName = function(targetName: string): string {
   return databaseName;
 };
 
-export const isSSL = function(targetName: string): boolean {
+export const isSSL = function (targetName: string): boolean {
   let isEnabled;
   switch (targetName) {
     case 'snapshotter':
@@ -57,7 +57,7 @@ export const isSSL = function(targetName: string): boolean {
   return isEnabled;
 };
 
-export const getCollectionName = function(targetName: string): string {
+export const getCollectionName = function (targetName: string): string {
   let collectionName;
   switch (targetName) {
     case 'snapshotter':

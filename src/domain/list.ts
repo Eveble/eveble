@@ -374,7 +374,7 @@ export class List<T extends types.Serializable> extends Array {
    *```
    */
   public hasSame(element: T): boolean {
-    return this.some(serializable => {
+    return this.some((serializable) => {
       return serializable.equals(element);
     });
   }

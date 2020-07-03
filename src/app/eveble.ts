@@ -239,10 +239,7 @@ export class Eveble extends Module {
 
     for (const [id, component] of Object.entries(singletons)) {
       if (!this.injector.isBound(BINDINGS[id])) {
-        this.injector
-          .bind(BINDINGS[id])
-          .to(component)
-          .inSingletonScope();
+        this.injector.bind(BINDINGS[id]).to(component).inSingletonScope();
         this.log?.debug(
           new Log(`bound '${id}' in singleton scope`)
             .on(this)

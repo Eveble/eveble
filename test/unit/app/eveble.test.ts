@@ -29,7 +29,7 @@ import { Router } from '../../../src/infrastructure/router';
 
 chai.use(sinonChai);
 
-describe(`Eveble Module`, function() {
+describe(`Eveble Module`, function () {
   // Props
   const appId = 'my-app-id';
   let appConfig: AppConfig;
@@ -46,7 +46,7 @@ describe(`Eveble Module`, function() {
   let snapshotSerializer: any;
   let commandScheduler: any;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -56,7 +56,7 @@ describe(`Eveble Module`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupDefaultConfiguration = function(): void {
+  const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('eveble.commitStore.timeout').returns(60);
@@ -65,7 +65,7 @@ describe(`Eveble Module`, function() {
     config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     library = stubInterface<types.Library>();
     commitStorage = stubInterface<types.CommitStorage>();
     commitObserver = stubInterface<types.CommitObserver>();

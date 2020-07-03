@@ -22,7 +22,7 @@ import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/comm
 
 chai.use(sinonChai);
 
-describe(`MongoDBCommitStorageModule`, function() {
+describe(`MongoDBCommitStorageModule`, function () {
   // Props
   const appConfig = new AppConfig({
     appId: 'my-app-id',
@@ -40,7 +40,7 @@ describe(`MongoDBCommitStorageModule`, function() {
   let commitsCollection: any;
   let db: any;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -54,7 +54,7 @@ describe(`MongoDBCommitStorageModule`, function() {
       .toConstantValue(serializer);
   };
 
-  const setupMongo = function(): void {
+  const setupMongo = function (): void {
     MongoClient = sinon.stub();
     mongoClientInstance = stubInterface<MongoClientOriginal>();
     commitsCollection = stubInterface<Collection<any>>();
@@ -69,7 +69,7 @@ describe(`MongoDBCommitStorageModule`, function() {
       .toConstantValue(MongoClient);
   };
 
-  const setupApp = function(): void {
+  const setupApp = function (): void {
     app = stubInterface<types.App>();
     app.config = appConfig;
   };

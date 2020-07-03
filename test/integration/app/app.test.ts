@@ -26,7 +26,7 @@ import { kernel } from '../../../src/core/kernel';
 
 chai.use(sinonChai);
 
-describe(`App`, function() {
+describe(`App`, function () {
   let injector: Injector;
   let log: any;
   let originalProcessOn: any;

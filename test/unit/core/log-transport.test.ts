@@ -11,7 +11,7 @@ import { Injector } from '../../../src/core/injector';
 
 chai.use(sinonChai);
 
-describe(`LoggingTransport`, function() {
+describe(`LoggingTransport`, function () {
   interface LoggingClient {
     debug(
       level: types.LogLevel,

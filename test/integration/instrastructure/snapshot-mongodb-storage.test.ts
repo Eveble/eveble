@@ -19,7 +19,7 @@ import { kernel } from '../../../src/core/kernel';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`SnapshotMongoDBStorage`, function() {
+describe(`SnapshotMongoDBStorage`, function () {
   @define('IntegrationSnapshotMongoDBStorage.MyEventSourceable')
   class MyEventSourceable extends EventSourceable {
     name: string;
@@ -36,7 +36,7 @@ describe(`SnapshotMongoDBStorage`, function() {
   let serializer: types.Serializer;
   let storage: types.SnapshotStorage;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -46,7 +46,7 @@ describe(`SnapshotMongoDBStorage`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     // Serializer
     injector.bind<any>(BINDINGS.EJSON).toConstantValue(createEJSON());
     injector
@@ -67,7 +67,7 @@ describe(`SnapshotMongoDBStorage`, function() {
     storage = injector.get<types.SnapshotStorage>(BINDINGS.SnapshotStorage);
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }

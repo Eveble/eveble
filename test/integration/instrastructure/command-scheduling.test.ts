@@ -56,7 +56,7 @@ import { createEJSON } from '../../../src/utils/helpers';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Command scheduling`, function() {
+describe(`Command scheduling`, function () {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
 
@@ -89,7 +89,7 @@ describe(`Command scheduling`, function() {
   // Domain dependencies
   let taskCompletionPolicy: any;
 
-  const setupInjector = function(): void {
+  const setupInjector = function (): void {
     injector = new Injector();
     log = stubInterface<types.Logger>();
     config = stubInterface<types.Configurable>();
@@ -99,7 +99,7 @@ describe(`Command scheduling`, function() {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupAgenda = async function(): Promise<void> {
+  const setupAgenda = async function (): Promise<void> {
     injector.bind<any>(BINDINGS.Agenda.library).toConstantValue(Agenda);
 
     clients.agenda = new AgendaClient({
@@ -120,7 +120,7 @@ describe(`Command scheduling`, function() {
       .toConstantValue(clients.agenda);
   };
 
-  const setupDefaultConfiguration = function(): void {
+  const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
     config.get.withArgs('appId').returns(appId);
     config.get.withArgs('workerId').returns(workerId);
@@ -130,7 +130,7 @@ describe(`Command scheduling`, function() {
     config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
   };
 
-  const setupEvebleDependencies = function(): void {
+  const setupEvebleDependencies = function (): void {
     commandBus = new CommandBus();
     eventBus = new EventBus();
     commandSchedulingService = new CommandSchedulingService();
@@ -209,7 +209,7 @@ describe(`Command scheduling`, function() {
     injector.injectInto(commandSchedulingService);
   };
 
-  const setupKernel = function(): void {
+  const setupKernel = function (): void {
     asserter = new Asserter();
     asserter.registerAssertion(new StatefulAssertion(asserter));
     asserter.registerAssertion(new StatusfulAssertion(asserter));
@@ -218,24 +218,24 @@ describe(`Command scheduling`, function() {
     kernel.setSerializer(serializer);
   };
 
-  const setupDomainDependencies = function(): void {
+  const setupDomainDependencies = function (): void {
     taskCompletionPolicy = new ExpiringTaskCompletionPolicy(500);
     injector
       .bind<any>('TaskList.TaskCompletionPolicy')
       .toConstantValue(taskCompletionPolicy);
   };
 
-  const setupTypes = function(): void {
+  const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
     }
   };
 
-  const initializeRouters = function(): void {
+  const initializeRouters = function (): void {
     injector.injectInto(new TaskListRouter());
   };
 
-  const initializeScheduler = async function(): Promise<void> {
+  const initializeScheduler = async function (): Promise<void> {
     await commandScheduler.initialize();
   };
 
@@ -278,7 +278,7 @@ describe(`Command scheduling`, function() {
   /*
   ASSERTIONS
   */
-  const assertJobIsEnqueued = function(
+  const assertJobIsEnqueued = function (
     job: any,
     taskListId: Guid,
     taskId: Guid
@@ -295,7 +295,7 @@ describe(`Command scheduling`, function() {
     expect(job.data.id).to.be.equal(taskId.toString());
   };
 
-  const assertJobIsCompleted = function(
+  const assertJobIsCompleted = function (
     job: any,
     taskListId: Guid,
     taskId: Guid
@@ -313,7 +313,7 @@ describe(`Command scheduling`, function() {
     expect(job.data.id).to.be.equal(taskId.toString());
   };
 
-  const assertJobIsFailed = function(
+  const assertJobIsFailed = function (
     job: any,
     taskListId: Guid,
     taskId: Guid

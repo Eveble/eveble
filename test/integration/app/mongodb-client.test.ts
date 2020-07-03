@@ -16,7 +16,7 @@ import { BINDINGS } from '../../../src/constants/bindings';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`MongoDB client`, function() {
+describe(`MongoDB client`, function () {
   // Props
   const url = getenv.string('EVEBLE_COMMITSTORE_MONGODB_URL');
   const databaseName =
