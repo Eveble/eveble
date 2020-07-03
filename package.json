@@ -67,8 +67,8 @@
     "uuid": "^7.0.3",
     "winston": "^3.2.1",
     "agenda": "^3.0.0",
-    "mongodb": "^3.5.5",
     "polytype": "^0.9.4",
+    "mongodb": "^3.5.9",
     "saslprep": "^1.0.3",
     "dotenv": "^8.2.0",
     "dotenv-expand": "^5.1.0",
@@ -133,7 +133,7 @@
     "@types/agenda": "^2.0.6",
     "@types/getenv": "^1.0.0",
     "@types/lodash": "^4.14.149",
-    "@types/mongodb": "^3.5.2",
+    "@types/mongodb": "^3.5.25",
     "delay": "^4.3.0"
   },
   "scripts": {
