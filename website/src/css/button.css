@@ -1,0 +1,76 @@
+.button--dark {
+  --ifm-button-background-color: var(--ifm-dark-background-color-dark);
+}
+
+/* Primary Button on Hero */
+a.button.button--primary {
+  height: 3rem;
+  background: var(--ifm-dark-background-color-dark);
+  border-radius: 1.625rem;
+  color: var(--ifm-font-color-base-inverse);
+  font-family: 'Mukta', sans-serif;
+  font-size: 1rem;
+  line-height: 1.8rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  margin-bottom: 1.5rem;
+  width: 12rem;
+}
+
+/* ButtonHover */
+button.button--hover .icon {
+  transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  background: var(--ifm-color-white);
+}
+button.button--hover .icon.arrow {
+  transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+  left: 0.625rem;
+  width: 1.125rem;
+  height: 0.125rem;
+  background: none;
+}
+button.button--hover .icon.arrow::before {
+  position: absolute;
+  content: '';
+  top: -0.25rem;
+  right: 0.0625rem;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-top: 0.125rem solid var(--ifm-color-white);
+  border-right: 0.125rem solid var(--ifm-color-white);
+  transform: rotate(45deg);
+}
+
+button.button--hover:hover .button--circle .icon.arrow {
+  background: var(--ifm-color-white);
+  transform: translate(1rem, 0);
+}
+
+html[data-theme='dark'] button.button--hover .button--circle {
+  background: var(--ifm-color-white);
+}
+
+html[data-theme='dark']
+  button.button--hover
+  .button--circle
+  .icon.arrow::before {
+  border-top: 0.125rem solid var(--ifm-dark-background-color);
+  border-right: 0.125rem solid var(--ifm-dark-background-color);
+}
+
+html[data-theme='dark'] button.button--hover:hover .button--label {
+  color: var(--ifm-dark-background-color);
+}
+
+html[data-theme='dark'] button.button--hover span.button--label {
+  color: var(--ifm-font-color-base-inverse);
+}
+
+html[data-theme='dark'] a.button.button--primary {
+  background: var(--ifm-color-white);
+  color: var(--ifm-dark-background-color);
+}
