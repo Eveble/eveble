@@ -1,0 +1,8 @@
+html[data-theme=''] .terminal {
+  box-shadow: 14px 14px 26px #d9d9d9, -14px -14px 26px #ffffff;
+}
+
+html[data-theme='dark'] .terminal {
+  border: 1px solid #0f1010;
+  box-shadow: 23px 23px 47px #0f0f0f, -23px -23px 47px #151515;
+}
