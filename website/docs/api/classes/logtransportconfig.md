@@ -786,6 +786,10 @@ ___
 
 ### ▪ **partsColors**? : *object*
 
+###  initial
+
+• **initial**: *string* = "white"
+
 ###  label
 
 • **label**: *string* = "white"

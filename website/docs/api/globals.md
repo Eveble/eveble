@@ -1512,6 +1512,10 @@ Name | Type | Description |
 
 • **Validator**: *symbol* = Symbol.for('Validator')
 
+###  chalk
+
+• **chalk**: *symbol* = Symbol.for('chalk')
+
 ###  console
 
 • **console**: *string* = "console"
