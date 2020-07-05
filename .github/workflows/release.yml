@@ -66,7 +66,14 @@ jobs:
     strategy:
       matrix:
         node-version: [14.x]
-        mongodb-version: [4.2]
+    services:
+      mongodb:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
     name: Tests / Node@${{ matrix.node-version}} / Run tests
     steps:
       - uses: actions/checkout@v2
@@ -74,10 +81,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.3.0
-        with:
-          mongodb-version: ${{ matrix.mongodb-version }}
       - name: Install dependencies
         uses: jaid/action-npm-install@v1.2.1
       - run: yarn test
