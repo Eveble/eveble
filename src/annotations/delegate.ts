@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+import 'reflect-metadata';
 import { DELEGATED_KEY } from '../constants/metadata-keys';
 
 /*
