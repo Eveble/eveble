@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+import chalk from 'chalk';
 import { Injector } from './injector';
 import { Module } from './module';
 import { AppConfig } from '../configs/app-config';
@@ -189,6 +190,9 @@ export abstract class BaseApp extends Module implements types.BaseApp {
     if (!this.injector.isBound(BINDINGS.winston)) {
       this.injector.bind<any>(BINDINGS.winston).toConstantValue(winston);
     }
+    if (!this.injector.isBound(BINDINGS.chalk)) {
+      this.injector.bind<any>(BINDINGS.chalk).toConstantValue(chalk);
+    }
   }
 
   /**
@@ -196,15 +200,18 @@ export abstract class BaseApp extends Module implements types.BaseApp {
    */
   protected bindLoggerDependencies(): void {
     const converter = new StringifingConverter();
-    const simpleFormatter = new SimpleLogFormatter(converter);
-    const detailedFormatter = new DetailedLogFormatter(converter);
 
     if (!this.injector.isBound(BINDINGS.SimpleLogFormatter)) {
+      const simpleFormatter = new SimpleLogFormatter(converter);
       this.injector
         .bind<types.LogFormatter>(BINDINGS.SimpleLogFormatter)
         .toConstantValue(simpleFormatter);
     }
     if (!this.injector.isBound(BINDINGS.DetailedLogFormatter)) {
+      const detailedFormatter = new DetailedLogFormatter(
+        converter,
+        this.injector.get<any>(BINDINGS.chalk)
+      );
       this.injector
         .bind<types.LogFormatter>(BINDINGS.DetailedLogFormatter)
         .toConstantValue(detailedFormatter);

@@ -1,5 +1,4 @@
 import chai, { expect } from 'chai';
-import chalk from 'chalk';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
@@ -96,8 +95,8 @@ describe('ConsoleTransport', function () {
         method: 'white',
       },
       messages: {
-        start: chalk`{gray start}`,
-        exit: chalk`{gray exit}`,
+        start: 'start',
+        exit: 'exit',
       },
       parts: {
         initial: '$ ',

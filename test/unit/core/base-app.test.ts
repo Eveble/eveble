@@ -10,6 +10,7 @@ import {
   injectable,
 } from '@parisholley/inversify-async';
 import * as winston from 'winston';
+import chalk from 'chalk';
 import getenv from 'getenv';
 import { BaseApp } from '../../../src/core/base-app';
 import { Module } from '../../../src/core/module';
@@ -452,6 +453,29 @@ describe('BaseApp', function () {
               injector.isBound.withArgs(BINDINGS.winston).returns(true);
               await app.initialize();
               expect(injector.bind).to.not.be.calledWith(BINDINGS.winston);
+            });
+          });
+          context('chalk', () => {
+            it('binds chalk to constant value', async () => {
+              const app = new MyApp({
+                injector,
+              });
+              await app.initialize();
+              expect(injector.bind).to.have.been.calledWithExactly(
+                BINDINGS.chalk
+              );
+              expect(binding.toConstantValue).to.have.been.calledWithExactly(
+                chalk
+              );
+            });
+
+            it('ensures to not override existing binding of chalk set prior to initialization', async () => {
+              const app = new MyApp({
+                injector,
+              });
+              injector.isBound.withArgs(BINDINGS.chalk).returns(true);
+              await app.initialize();
+              expect(injector.bind).to.not.be.calledWith(BINDINGS.chalk);
             });
           });
         });

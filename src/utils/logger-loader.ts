@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+import chalk from 'chalk';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { StringifingConverter } from '../core/logging-transports/formatters/converters/stringifing-converter';
@@ -16,6 +17,9 @@ function bindExternalDependencies(injector: types.Injector): void {
   if (!injector.isBound(BINDINGS.winston)) {
     injector.bind<any>(BINDINGS.winston).toConstantValue(winston);
   }
+  if (!injector.isBound(BINDINGS.chalk)) {
+    injector.bind<any>(BINDINGS.chalk).toConstantValue(chalk);
+  }
 }
 
 /**
@@ -24,15 +28,18 @@ function bindExternalDependencies(injector: types.Injector): void {
  */
 function bindLoggerDependencies(injector: types.Injector): void {
   const converter = new StringifingConverter();
-  const simpleFormatter = new SimpleLogFormatter(converter);
-  const detailedFormatter = new DetailedLogFormatter(converter);
 
   if (!injector.isBound(BINDINGS.SimpleLogFormatter)) {
+    const simpleFormatter = new SimpleLogFormatter(converter);
     injector
       .bind<types.LogFormatter>(BINDINGS.SimpleLogFormatter)
       .toConstantValue(simpleFormatter);
   }
   if (!injector.isBound(BINDINGS.DetailedLogFormatter)) {
+    const detailedFormatter = new DetailedLogFormatter(
+      converter,
+      injector.get<any>(BINDINGS.chalk)
+    );
     injector
       .bind<types.LogFormatter>(BINDINGS.DetailedLogFormatter)
       .toConstantValue(detailedFormatter);

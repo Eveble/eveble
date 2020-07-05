@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import abbreviate from 'abbreviate';
 import { inject, injectable } from '@parisholley/inversify-async';
 import winston from 'winston';
@@ -10,15 +9,20 @@ import { BINDINGS } from '../../../constants/bindings';
 export class DetailedLogFormatter implements types.LogFormatter {
   protected converter: types.LogConverter;
 
+  protected chalk: any;
+
   /**
    * Creates an instance of SimpleLogFormatter.
    * @param converter - LogEntry converter instance.
    */
   constructor(
     @inject(BINDINGS.LogConverter)
-    converter: types.LogConverter
+    converter: types.LogConverter,
+    @inject(BINDINGS.chalk)
+    chalk: any
   ) {
     this.converter = converter;
+    this.chalk = chalk;
   }
 
   /**
@@ -35,49 +39,25 @@ export class DetailedLogFormatter implements types.LogFormatter {
 
     // Formatting
     const colors: Record<string, string> = this.processPartsColors(config);
-    const separator: string = chalk`{${colors.separator} ${config.get<string>(
-      'parts.separator'
-    )}}`;
+
     // Parts
-    const initial: string = config.get<string>('parts.initial', '');
-    const timestamp: string =
-      (entry as any).timestamp !== undefined
-        ? chalk`{${colors.timestamp} ${(entry as any).timestamp}}${separator}`
-        : '';
-    const label =
-      config.get<boolean>('flags.isLabeled') &&
-      config.get<string>('parts.label') !== undefined &&
-      config.get<string>('parts.label').length > 0
-        ? chalk`{${colors.label} ${config.get<string>(
-            'parts.label'
-          )}}${separator}`
-        : '';
+    const initial: string = this.getInitial(config, colors);
+    const timestamp: string = this.getTimestamp(entry, config, colors);
+    const label = this.getLabel(config, colors);
 
     let targetName = '';
     let methodName = '';
     let details = '';
 
     if (entry.metadata) {
-      let entryTypeName = entry.typeName;
-      if (config.get<boolean>('flags.isAbbreviatingSources')) {
-        entryTypeName = this.abbreviate(entry.typeName, config);
-      }
-      targetName = config.get<boolean>('flags.showTarget')
-        ? chalk`${separator}{${colors.target} ${entryTypeName}}`
-        : '';
+      targetName = this.getTargetName(entry, config, colors);
 
       if (
         config.get<boolean>('flags.showMethod') &&
         entry.methodName !== undefined &&
         entry.methodName.length > 0
       ) {
-        const methodNotation = entry.isStaticMethod() ? '.' : '::';
-        const methodType = chalk`{${colors.separator} ${methodNotation}}`;
-        let entryMethodName = entry.methodName;
-        if (config.get<boolean>('flags.isAbbreviatingSources')) {
-          entryMethodName = this.abbreviate(entry.methodName, config);
-        }
-        methodName = chalk`${methodType}{${colors.method} ${entryMethodName}}`;
+        methodName = this.getMethodName(entry, config, colors);
       }
 
       for (const metadata of entry.metadata.values()) {
@@ -87,6 +67,118 @@ export class DetailedLogFormatter implements types.LogFormatter {
 
     const { message, level } = entry as any;
     return `${initial}${timestamp}${label}${level}${targetName}${methodName}: ${message} ${rest}${details}`;
+  }
+
+  /**
+   * Return method name part of log entry.
+   * @param entry - Winston's or Eveble's instance implementing `LogEntry` interface.
+   * @param config - `LogTransportConfig` instance.
+   * @param colors - Colors object with keys as a string and values as chalk-friendly string.
+   * @return Formatted method name.
+   */
+  protected getMethodName(
+    entry: winston.LogEntry | types.LogEntry,
+    config: LogTransportConfig,
+    colors: Record<string, string>
+  ) {
+    const methodNotation = entry.isStaticMethod() ? '.' : '::';
+    const methodType = this.chalk.keyword(colors.separator)(methodNotation);
+    let entryMethodName = entry.methodName;
+    if (config.get<boolean>('flags.isAbbreviatingSources')) {
+      entryMethodName = this.abbreviate(entry.methodName, config);
+    }
+    return methodType + this.chalk.keyword(colors.method)(entryMethodName);
+  }
+
+  /**
+   * Return target name part of log entry.
+   * @param entry - Winston's or Eveble's instance implementing `LogEntry` interface.
+   * @param config - `LogTransportConfig` instance.
+   * @param colors - Colors object with keys as a string and values as chalk-friendly string.
+   * @return Formatted target name.
+   */
+  protected getTargetName(
+    entry: winston.LogEntry | types.LogEntry,
+    config: LogTransportConfig,
+    colors: Record<string, string>
+  ): string {
+    let entryTypeName: string = entry.typeName;
+    if (config.get<boolean>('flags.isAbbreviatingSources')) {
+      entryTypeName = this.abbreviate(entry.typeName, config);
+    }
+    return config.get<boolean>('flags.showTarget')
+      ? this.getSeparator(config, colors) +
+          this.chalk.keyword(colors.target)(entryTypeName)
+      : '';
+  }
+
+  /**
+   * Return label part of log entry.
+   * @param config - `LogTransportConfig` instance.
+   * @param colors - Colors object with keys as a string and values as chalk-friendly string.
+   * @return Formatted label.
+   */
+  protected getLabel(
+    config: LogTransportConfig,
+    colors: Record<string, string>
+  ) {
+    return config.get<boolean>('flags.isLabeled') &&
+      config.get<string>('parts.label') !== undefined &&
+      config.get<string>('parts.label').length > 0
+      ? this.chalk.keyword(colors.label)(config.get<string>('parts.label')) +
+          this.getSeparator(config, colors)
+      : '';
+  }
+
+  /**
+   * Return timestamp part of log entry.
+   * @param entry - Winston's or Eveble's instance implementing `LogEntry` interface.
+   * @param config - `LogTransportConfig` instance.
+   * @param colors - Colors object with keys as a string and values as chalk-friendly string.
+   * @return Formatted timestamp.
+   */
+  protected getTimestamp(
+    entry: winston.LogEntry | types.LogEntry,
+    config: LogTransportConfig,
+    colors: Record<string, string>
+  ): string {
+    if (config.flags?.isTimestamped === false) {
+      return '';
+    }
+    return (entry as any).timestamp !== undefined
+      ? this.chalk.keyword(colors.timestamp)((entry as any).timestamp) +
+          this.getSeparator(config, colors)
+      : '';
+  }
+
+  /**
+   * Return separator part of log entry.
+   * @param config - `LogTransportConfig` instance.
+   * @param colors - Colors object with keys as a string and values as chalk-friendly string.
+   * @return Formatted separator.
+   */
+  protected getSeparator(
+    config: LogTransportConfig,
+    colors: Record<string, string>
+  ): string {
+    return this.chalk.keyword(colors.separator)(
+      config.get<string>('parts.separator')
+    );
+  }
+
+  /**
+   * Return initial part of log entry.
+   * @param config - `LogTransportConfig` instance.
+   * @param colors - Colors object with keys as a string and values as chalk-friendly string.
+   * @return Formatted initial.
+   */
+  protected getInitial(
+    config: LogTransportConfig,
+    colors: Record<string, string>
+  ): string {
+    return this.chalk.keyword(colors.initial)(
+      config.get<string>('parts.initial')
+    );
   }
 
   /**
@@ -112,7 +204,7 @@ export class DetailedLogFormatter implements types.LogFormatter {
    * Abbreviates part of log entry.
    * @param str - Part of log entry.
    * @param config - `LogTransportConfig` instance.
-   * @returns abbreviate
+   * @returns Abbreviation.
    */
   protected abbreviate(str: string, config: LogTransportConfig): string {
     return abbreviate(str, {

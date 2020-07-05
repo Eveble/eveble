@@ -31,6 +31,7 @@ describe('LogTransportConfig', function () {
     it('takes optional partsColors property as an object', () => {
       expect(LogTransportConfig.getPropTypes().partsColors).to.be.eql(
         PropTypes.shape({
+          initial: PropTypes.instanceOf(String).isOptional,
           separator: PropTypes.instanceOf(String).isOptional,
           timestamp: PropTypes.instanceOf(String).isOptional,
           label: PropTypes.instanceOf(String).isOptional,
@@ -109,6 +110,7 @@ describe('LogTransportConfig', function () {
           debug: 'bold cyan',
         },
         partsColors: {
+          initial: 'white',
           separator: 'white',
           timestamp: 'white',
           label: 'white',

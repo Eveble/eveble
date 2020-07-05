@@ -1,5 +1,4 @@
 import chai, { expect } from 'chai';
-import chalk from 'chalk';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import * as winston from 'winston';
@@ -19,6 +18,7 @@ describe('ConsoleTransport', function () {
   let injector: types.Injector;
   let config: LogTransportConfig;
   let converter: types.LogConverter;
+  let chalk: any;
   let simpleFormatter: any;
   let detailedFormatter: any;
   let logger: any;
@@ -42,11 +42,21 @@ describe('ConsoleTransport', function () {
     logger = stubInterface<types.Logger>();
     logger.levels = levels;
 
+    // Simplify testing for time being
+    chalk = {
+      keyword: (_color: string) => {
+        return (str: string) => {
+          return str;
+        };
+      },
+    };
+
     converter = new StringifingConverter();
     simpleFormatter = new SimpleLogFormatter(converter);
-    detailedFormatter = new DetailedLogFormatter(converter);
+    detailedFormatter = new DetailedLogFormatter(converter, chalk);
 
     injector = new Injector();
+    injector.bind<any>(BINDINGS.chalk).toConstantValue(chalk);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
     injector
       .bind<types.LogFormatter>(BINDINGS.SimpleLogFormatter)
@@ -77,8 +87,8 @@ describe('ConsoleTransport', function () {
         method: 'white',
       },
       messages: {
-        start: chalk`{gray start}`,
-        exit: chalk`{gray exit}`,
+        start: 'start',
+        exit: 'exit',
       },
       parts: {
         initial: '$ ',
@@ -90,8 +100,8 @@ describe('ConsoleTransport', function () {
         isLabeled: true,
         showTarget: true,
         showMethod: true,
-        isColored: true,
-        isWholeLineColored: true,
+        isColored: false,
+        isWholeLineColored: false,
         includeStackTrace: true,
         isAbbreviatingSources: false,
       },
@@ -110,67 +120,61 @@ describe('ConsoleTransport', function () {
     context('with message only', () => {
       it('formats a message String with default configuration', () => {
         const winstonLogObj = {
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           timestamp: '2019-10-07T02:51:35',
           [Symbol.for('level')]: 'info',
         };
 
         const str = transport.formatEntry(winstonLogObj);
         expect(str).to.be.equal(
-          '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m: \u001b[32mmy-message\u001b[39m '
+          '$ 2019-10-07T02:51:35│my-app-id│info: my-message '
         );
       });
 
       it('does not show label if its not enabled on configuration', () => {
         const winstonLogObj = {
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           [Symbol.for('level')]: 'info',
         };
 
         config.set('flags.isLabeled', false);
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal(
-          '$ \u001b[32minfo\u001b[39m: \u001b[32mmy-message\u001b[39m '
-        );
+        expect(str).to.be.equal('$ info: my-message ');
       });
 
       it('does not show initial if its not set on configuration', () => {
         const winstonLogObj = {
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           [Symbol.for('level')]: 'info',
         };
 
         config.set('parts.initial', '');
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal(
-          '\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m: \u001b[32mmy-message\u001b[39m '
-        );
+        expect(str).to.be.equal('my-app-id│info: my-message ');
       });
 
       it('does not show timestamp if timestamped is disabled on configuration', () => {
         const winstonLogObj = {
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           [Symbol.for('level')]: 'info',
         };
 
         config.set('flags.isTimestamped', false);
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal(
-          '$ \u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m: \u001b[32mmy-message\u001b[39m '
-        );
+        expect(str).to.be.equal('$ my-app-id│info: my-message ');
       });
 
       it('shows label if labeled is enabled and label is set on configuration', () => {
         const winstonLogObj = {
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           timestamp: '2019-10-07T02:51:35',
           [Symbol.for('level')]: 'info',
         };
@@ -180,7 +184,7 @@ describe('ConsoleTransport', function () {
 
         const str = transport.formatEntry(winstonLogObj);
         expect(str).to.be.equal(
-          '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m: \u001b[32mmy-message\u001b[39m '
+          '$ 2019-10-07T02:51:35│my-app-id│info: my-message '
         );
       });
     });
@@ -188,8 +192,8 @@ describe('ConsoleTransport', function () {
     context('with multiple primitive arguments passed after message', () => {
       it('formats message with additional primitive arguments', () => {
         const winstonLogObj = {
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           timestamp: '2019-10-07T02:51:35',
           [Symbol.for('level')]: 'info',
           [Symbol.for('splat')]: [1, 'str', true, null, undefined],
@@ -197,7 +201,7 @@ describe('ConsoleTransport', function () {
 
         const str = transport.formatEntry(winstonLogObj);
         expect(str).to.be.equal(
-          "$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m: \u001b[32mmy-message\u001b[39m 1 'str' true null undefined"
+          "$ 2019-10-07T02:51:35│my-app-id│info: my-message 1 'str' true null undefined"
         );
       });
     });
@@ -215,8 +219,8 @@ describe('ConsoleTransport', function () {
         });
 
         const winstonLogObj = {
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           timestamp: '2019-10-07T02:51:35',
           [Symbol.for('level')]: 'info',
           [Symbol.for('splat')]: [myClassInstance, { second: 'second-value' }],
@@ -225,7 +229,7 @@ describe('ConsoleTransport', function () {
         const str = transport.formatEntry(winstonLogObj);
 
         expect(str).to.be.equal(
-          '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+          '$ 2019-10-07T02:51:35│my-app-id│info: my-message \n' +
             "MyClass { first: 'first-value' } \n" +
             "{ second: 'second-value' }"
         );
@@ -274,8 +278,8 @@ describe('ConsoleTransport', function () {
         });
 
         logEntry = new Log({
-          message: '\u001b[32mmy-message\u001b[39m',
-          level: '\u001b[32minfo\u001b[39m',
+          message: 'my-message',
+          level: 'info',
           timestamp: '2019-10-07T02:51:35',
           [Symbol.for('level')]: 'info',
           [Symbol.for('splat')]: [],
@@ -305,7 +309,7 @@ describe('ConsoleTransport', function () {
       it('formats a message with additional metadata', () => {
         const str = transport.formatEntry(logEntry);
         expect(str).to.be.equal(
-          '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+          '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
             'function arguments:\n' +
             "  first: 'first-value',\n" +
             "  second: 'second-value',\n" +
@@ -320,7 +324,7 @@ describe('ConsoleTransport', function () {
         it('omits all log details on simple message with additional simple formatting context', () => {
           logEntry.options.isSimple = true;
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal('\u001b[32mmy-message\u001b[39m ');
+          expect(str).to.be.equal('my-message ');
         });
 
         it('ensure that rest arguments are passed through', () => {
@@ -333,9 +337,7 @@ describe('ConsoleTransport', function () {
           ];
           logEntry.options.isSimple = true;
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
-            "\u001b[32mmy-message\u001b[39m 1 'str' true null undefined"
-          );
+          expect(str).to.be.equal("my-message 1 'str' true null undefined");
         });
       });
 
@@ -349,7 +351,7 @@ describe('ConsoleTransport', function () {
           );
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               "result:  'my-result'"
           );
         });
@@ -363,7 +365,7 @@ describe('ConsoleTransport', function () {
           );
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               "my-title:  MyClass { first: 'first-value', second: { '1': 'one' } }"
           );
         });
@@ -374,7 +376,7 @@ describe('ConsoleTransport', function () {
           logEntry.metadata.delete('properties');
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'function arguments:\n' +
               "  first: 'first-value',\n" +
               "  second: 'second-value',\n" +
@@ -388,7 +390,7 @@ describe('ConsoleTransport', function () {
           logEntry.metadata.delete('properties');
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'function arguments:\n' +
               "  first: 'first-value', second: 'second-value'"
           );
@@ -399,7 +401,7 @@ describe('ConsoleTransport', function () {
           logEntry.metadata.get('arguments').value = [];
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m '
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message '
           );
         });
       });
@@ -409,7 +411,7 @@ describe('ConsoleTransport', function () {
           logEntry.metadata.delete('arguments');
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'class properties:\n' +
               "  first: 'first-value', second: [Object]"
           );
@@ -420,7 +422,7 @@ describe('ConsoleTransport', function () {
           logEntry.metadata.delete('arguments');
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'class properties:\n' +
               "  first: 'first-value', second: [Object]"
           );
@@ -433,7 +435,7 @@ describe('ConsoleTransport', function () {
           delete myClassInstance.third;
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyClass\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyMethod\u001b[39m: \u001b[32mmy-message\u001b[39m '
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message '
           );
         });
       });
@@ -445,7 +447,7 @@ describe('ConsoleTransport', function () {
 
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
-            '$ \u001b[37m2019-10-07T02:51:35\u001b[39m\u001b[37m│\u001b[39m\u001b[37mmy-app-id\u001b[39m\u001b[37m│\u001b[39m\u001b[32minfo\u001b[39m\u001b[37m│\u001b[39m\u001b[37mMyC\u001b[39m\u001b[37m::\u001b[39m\u001b[37mmyM\u001b[39m: \u001b[32mmy-message\u001b[39m \n' +
+            '$ 2019-10-07T02:51:35│my-app-id│info│MyC::myM: my-message \n' +
               'function arguments:\n' +
               "  first: 'first-value',\n" +
               "  second: 'second-value',\n" +

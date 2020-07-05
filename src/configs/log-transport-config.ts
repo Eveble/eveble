@@ -24,12 +24,14 @@ export class LogTransportConfig extends Config {
   };
 
   public partsColors?: {
+    initial?: string;
     separator?: string;
     timestamp?: string;
     target?: string;
     method?: string;
     label?: string;
   } = {
+    initial: 'white',
     separator: 'white',
     timestamp: 'white',
     label: 'white',
@@ -45,7 +47,6 @@ export class LogTransportConfig extends Config {
     exit: chalk`{gray exit}`,
   };
 
-  // use chalk styling notation
   public parts?: {
     initial?: string;
     separator?: string;
