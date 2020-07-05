@@ -1,0 +1,30 @@
+import { types } from '../types';
+export declare class Kernel {
+    injector?: types.Injector;
+    private _converter;
+    private _validator;
+    private _describer;
+    private _library;
+    private _serializer?;
+    private _asserter?;
+    private _config;
+    constructor(converter: types.Converter, validator: types.Validator, describer: types.Describer, library: types.Library, config: types.KernelConfig);
+    get converter(): types.Converter;
+    get validator(): types.Validator;
+    get describer(): types.Describer;
+    get library(): types.Library;
+    get serializer(): types.Serializer;
+    get asserter(): types.Asserter;
+    setConverter(converter: types.Converter): void;
+    setValidator(validator: types.Validator): void;
+    setDescriber(describer: types.Describer): void;
+    setLibrary(library: types.Library): void;
+    setSerializer(serializer: types.Serializer): void;
+    setAsserter(asserter: types.Asserter): void;
+    setInjector(injector: types.Injector): void;
+    isConverting(): boolean;
+    isValidating(): boolean;
+    disableValidation(): void;
+    enableValidation(): void;
+}
+export declare const kernel: Kernel;

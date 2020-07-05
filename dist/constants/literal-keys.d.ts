@@ -1,0 +1,24 @@
+export declare const TYPE_KEY = "_type";
+export declare const HANDLERS: unique symbol;
+export declare const HANDLEABLE_TYPES: unique symbol;
+export declare const SOURCE_KEY: unique symbol;
+export declare const LIST_KEY: unique symbol;
+export declare const SERIALIZABLE_TYPE_KEY: unique symbol;
+export declare const SAVE_STATE_METHOD_KEY: unique symbol;
+export declare const SAVED_STATE_KEY: unique symbol;
+export declare const ROLLBACK_STATE_METHOD_KEY: unique symbol;
+export declare const COMMANDS_KEY: unique symbol;
+export declare const EVENTS_KEY: unique symbol;
+export declare const LITERAL_KEYS: {
+    TYPE_KEY: string;
+    HANDLERS: symbol;
+    HANDLEABLE_TYPES: symbol;
+    SOURCE_KEY: symbol;
+    LIST_KEY: symbol;
+    SERIALIZABLE_TYPE_KEY: symbol;
+    SAVE_STATE_METHOD_KEY: symbol;
+    SAVED_STATE_KEY: symbol;
+    ROLLBACK_STATE_METHOD_KEY: symbol;
+    COMMANDS_KEY: symbol;
+    EVENTS_KEY: symbol;
+};
