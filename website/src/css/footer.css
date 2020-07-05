@@ -1,0 +1,61 @@
+.footer .footer__logo {
+  max-width: 3rem;
+}
+.footer .footer__title {
+  font-size: 0.75rem;
+  line-height: 1.337;
+  color: var(--ifm-font-color-base);
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.footer .footer__link-item {
+  font-size: 0.75rem;
+  line-height: 1.337;
+  color: var(--ifm-font-color-base-lightest);
+  font-weight: 600;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.footer .license {
+  font-size: 0.75rem;
+  line-height: 1.337;
+  color: var(--ifm-font-color-base-lightest);
+  font-weight: 600;
+  font-family: 'Open Sans', sans-serif;
+  margin-bottom: 0.8rem;
+}
+
+.footer .copyright {
+  border-top: 1px solid var(--ifm-background-color-darkest);
+  padding-top: 1rem;
+  font-size: 0.75rem;
+  line-height: 1.337;
+  color: var(--ifm-font-color-base-lightest);
+  font-weight: 600;
+  font-family: 'Open Sans', sans-serif;
+}
+.footer .copyright a {
+  color: var(--ifm-font-color-base);
+}
+
+.footer .love {
+  content: url('https://api.iconify.design/ant-design:heart-filled.svg?color=%23ec2ca8&height=12');
+  vertical-align: -0.2em;
+}
+
+html[data-theme=''] .footer {
+  --ifm-footer-background-color: var(--ifm-background-color-darker);
+}
+
+html[data-theme='dark'] .footer {
+  --ifm-footer-background-color: var(--ifm-dark-background-color-lighter);
+}
+
+html[data-theme='dark'] .footer .footer__title {
+  color: var(--ifm-font-color-base-inverse);
+}
+
+html[data-theme='dark'] .footer .copyright {
+  border-top: 1px solid var(--ifm-dark-background-color-lightest);
+}

@@ -1,0 +1,97 @@
+/* stylelint-disable docusaurus/copyright-header */
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+@import 'fonts.css';
+@import 'navbar.css';
+@import 'footer.css';
+@import 'button.css';
+@import 'hero.css';
+@import 'terminal.css';
+@import 'features.css';
+
+/* You can override the default Infima variables here. */
+:root {
+  /* Light */
+  --ifm-light-background-color: #f5f5f7;
+  --ifm-background-color: var(--ifm-light-background-color);
+  --ifm-background-color-dark: #f2f2f5;
+  --ifm-background-color-darker: #f0f0f3;
+  --ifm-background-color-darkest: #ccccd6;
+  --ifm-background-color-light: #f8f8f9;
+  --ifm-background-color-lighter: #fafafb;
+  --ifm-background-color-lightest: #fdfdfe;
+
+  /* Dark */
+  --ifm-dark-background-color: #18191a;
+  --ifm-dark-background-color-dark: #161717;
+  --ifm-dark-background-color-darker: #141516;
+  --ifm-dark-background-color-darkest: #111212;
+  --ifm-dark-background-color-light: #1a1c1d;
+  --ifm-dark-background-color-lighter: #1f2122;
+  --ifm-dark-background-color-lightest: #303234;
+
+  /* Font Base*/
+  --ifm-font-color-base-dark: #000000;
+  --ifm-font-color-base-darker: #000000;
+  --ifm-font-color-base-darkest: #000000;
+  --ifm-font-color-base-light: #383c42;
+  --ifm-font-color-base-lighter: #545a63;
+  --ifm-font-color-base-lightest: #707884;
+
+  /* Font Inverse*/
+  --ifm-font-color-base-inverse: #ffffff;
+  --ifm-font-color-base-inverse-dark: #e6e6e6;
+  --ifm-font-color-base-inverse-darker: #d9d9d9;
+  --ifm-font-color-base-inverse-darkest: #b3b3b3;
+  --ifm-font-color-base-inverse-light: #ffffff;
+  --ifm-font-color-base-inverse-lighter: #ffffff;
+  --ifm-font-color-base-inverse-lightest: #ffffff;
+
+  /* Primary */
+  --ifm-color-primary: #7654ff;
+  --ifm-color-primary-dark: #5b32ff;
+  --ifm-color-primary-darker: #4d21ff;
+  --ifm-color-primary-darkest: #2f00ed;
+  --ifm-color-primary-light: #9176ff;
+  --ifm-color-primary-lighter: #9f87ff;
+  --ifm-color-primary-lightest: #c7baff;
+
+  /* Secondary */
+  --ifm-color-secondary: #ec2ca8;
+  --ifm-color-secondary-dark: #e7159d;
+  --ifm-color-secondary-darker: #da1494;
+  --ifm-color-secondary-darkest: #b4107a;
+  --ifm-color-secondary-light: #ee46b3;
+  --ifm-color-secondary-lighter: #ef53b8;
+  --ifm-color-secondary-lightest: #f379c8;
+
+  /* Navbar */
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-dark-navbar-background-color: var(--ifm-dark-background-color-lighter);
+  --ifm-navbar-link-color: var(--ifm-font-color-base-inverse);
+  /* Hero */
+  --ifm-hero-background-color: var(--ifm-color-dark);
+}
+
+.contents .contents__link {
+  color: var(--ifm-font-base-color);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.pixelated {
+  color: inherit;
+  font-family: 'Press Start 2P', cursive;
+}
+
+html .docusaurus-highlight-code-line {
+  background-color: #1d1e1f;
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}

@@ -1,0 +1,12 @@
+.features img {
+  width: 48px;
+  height: 48px;
+}
+
+html[theme=''].features div.text--center {
+  padding: 4rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  background: #f5f5f7;
+  box-shadow: 20px 20px 60px #d0d0d2, -20px -20px 60px #ffffff;
+}

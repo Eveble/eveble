@@ -1,0 +1,26 @@
+# Dependency directory
+# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
+node_modules
+
+# Dependency lock files
+package-lock.json
+yarn-error.log
+
+# Compiled library
+dist
+
+# Code coverage
+.nyc_output
+coverage
+coverage.lcov
+
+# OSX
+.DS_Store
+
+# Editors
+.vscode
+*.code-workspace
+.idea
+
+# Debug
+*.log

@@ -1,0 +1,22 @@
+{
+  "mode": "file",
+  "out": "./website/docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "exclude": ["index.ts"],
+  "inputFiles": ["./src/*"],
+  "ignoreCompilerErrors": "true",
+  "suppressExcessPropertyErrors": "true",
+  "suppressImplicitAnyIndexErrors": "true",
+  "experimentalDecorators": "true",
+  "emitDecoratorMetadata": "true",
+  "disableOutputCheck": true,
+  "excludeExternals": true,
+  "excludeNotExported": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "includeDeclarations": true,
+  "hideBreadcrumbs": true,
+  "hideSources": true,
+  "theme": "docusaurus2",
+  "skipSidebar": true
+}
