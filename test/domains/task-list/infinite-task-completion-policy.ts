@@ -15,8 +15,8 @@ export class InfiniteTaskCompletionPolicy {
 
   /**
    * Cancels expiring policy for Task in TaskList.
-   * @param _taskList - `TaskList` instance on which policy is cancelled.
-   * @param _taskId - Identifier of a `Task` which policy should be cancelled.
+   * @param _taskList - `TaskList` instance on which policy is canceled.
+   * @param _taskId - Identifier of a `Task` which policy should be canceled.
    */
   cancel(_taskList: TaskList, _taskId: Guid): void {
     return undefined;

@@ -31,7 +31,7 @@ chai.use(chaiAsPromised);
 
 describe('Module', function () {
   class MyModule extends Module {
-    // All avaialble custom hooks that developer can define on App/Modules
+    // All available custom hooks that developer can define on App/Modules
     beforeInitialize(): any {}
 
     onInitialize(): any {}

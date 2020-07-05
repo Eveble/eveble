@@ -304,7 +304,7 @@ describe('BaseApp', function () {
       expect(app.isInState(MyApp.STATES.initialized)).to.be.true;
     });
 
-    it(`runs initalizing hooks`, async () => {
+    it(`runs initializing hooks`, async () => {
       const app = new MyApp({
         injector,
       });

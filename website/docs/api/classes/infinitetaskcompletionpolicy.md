@@ -27,8 +27,8 @@ Cancels expiring policy for Task in TaskList.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`_taskList` | [TaskList](tasklist.md) | `TaskList` instance on which policy is cancelled. |
-`_taskId` | Guid | Identifier of a `Task` which policy should be cancelled.  |
+`_taskList` | [TaskList](tasklist.md) | `TaskList` instance on which policy is canceled. |
+`_taskId` | Guid | Identifier of a `Task` which policy should be canceled.  |
 
 **Returns:** *void*
 

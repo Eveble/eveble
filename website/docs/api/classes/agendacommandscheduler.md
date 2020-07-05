@@ -336,7 +336,7 @@ Unschedules command from Agenda.
 **`async`** 
 
 **`throws`** {CommandUnschedulingError}
-Thrown if scheduled command cannot be cancelled.
+Thrown if scheduled command cannot be canceled.
 
 **Parameters:**
 

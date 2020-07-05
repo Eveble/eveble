@@ -181,7 +181,7 @@ export class AgendaCommandScheduler extends StatefulMixin
    * @async
    * @param unscheduleCommand - Instance of `UnscheduleCommand`.
    * @throws {CommandUnschedulingError}
-   * Thrown if scheduled command cannot be cancelled.
+   * Thrown if scheduled command cannot be canceled.
    */
   public async unschedule(
     unscheduleCommand: UnscheduleCommand

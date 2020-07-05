@@ -15,8 +15,8 @@ import {
 
 /**
  * Annotates method parameter as a handler for `Command` type(or other) - type that is
- * used as first method paramter(i.e. for example below `MyCommandHandlingMethod` with
- *  paramter `MyCommand`).
+ * used as first method parameter(i.e. for example below `MyCommandHandlingMethod` with
+ *  parameter `MyCommand`).
  * @param target - Target which method parameter is being decorated.
  * @param methodName - Method name which parameter is being decorated.
  * @param index - Index number of the parameter that is being decorated.

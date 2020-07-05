@@ -147,7 +147,7 @@ describe('Struct', function () {
         });
       });
 
-      it('requires that developer define constructor on thier derived class', () => {
+      it('requires that developer define constructor on their derived class', () => {
         // Without Object.assign on Struct's constructor classes with property
         // initializers will never work as expected - this is one of possible solutions.
         @define('MyStructWithDefinedConstructor')

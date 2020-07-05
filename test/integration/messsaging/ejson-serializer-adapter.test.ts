@@ -438,7 +438,7 @@ describe(`EJSONSerializerAdapter`, function () {
             expect(serializer.equals(firstPerson, secondPerson)).to.be.true;
           });
 
-          it('returns false for not equal arguments by thier values', () => {
+          it('returns false for not equal arguments by their values', () => {
             serializer.registerType('Person', Person);
             serializer.registerType('Address', Address);
 
@@ -464,7 +464,7 @@ describe(`EJSONSerializerAdapter`, function () {
             expect(serializer.equals(firstPerson, secondPerson)).to.be.false;
           });
 
-          it('returns false for not equal arguments by thier types', () => {
+          it('returns false for not equal arguments by their types', () => {
             serializer.registerType('Person', Person);
             serializer.registerType('Address', Address);
 
@@ -494,7 +494,7 @@ describe(`EJSONSerializerAdapter`, function () {
 
       context(`by using serializer's in-build comparer`, () => {
         context('without nested types', () => {
-          it('returns true for equal arguments by thier values and types', () => {
+          it('returns true for equal arguments by their values and types', () => {
             serializer.registerType('Car', Car);
 
             const carA = new Car({
@@ -507,7 +507,7 @@ describe(`EJSONSerializerAdapter`, function () {
             expect(serializer.equals(carA, carB)).to.be.true;
           });
 
-          it('returns false for not equal arguments by thier values and types', () => {
+          it('returns false for not equal arguments by their values and types', () => {
             serializer.registerType('Car', Car);
 
             const carA = new Car({
@@ -521,7 +521,7 @@ describe(`EJSONSerializerAdapter`, function () {
           });
         });
         context('with nested types', () => {
-          it('returns true for equal arguments by thier values and types', () => {
+          it('returns true for equal arguments by their values and types', () => {
             serializer.registerType('Person', Person);
             serializer.registerType('Address', Address);
 
@@ -553,7 +553,7 @@ describe(`EJSONSerializerAdapter`, function () {
             expect(serializer.equals(firstPerson, secondPerson)).to.be.true;
           });
 
-          it('returns false for not equal arguments by thier values and types', () => {
+          it('returns false for not equal arguments by their values and types', () => {
             serializer.registerType('Person', Person);
             serializer.registerType('Address', Address);
 

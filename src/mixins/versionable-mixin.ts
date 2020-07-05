@@ -58,7 +58,7 @@ export class VersionableMixin {
   /**
    * Registrable hook for transforming legacy schema.
    * @param props - Properties object to be transformed.
-   * @returns Transformed legacy properties or thier unchanged state if up to date.
+   * @returns Transformed legacy properties or their unchanged state if up to date.
    */
   public transformLegacyProps(props: types.Props): types.Props {
     const instanceSchemaVersion: number = props.schemaVersion || 0;

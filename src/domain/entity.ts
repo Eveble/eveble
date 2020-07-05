@@ -133,7 +133,7 @@ export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
    * `StatefulAssertion`, `StatusfulAssertion`.
    *
    * However, since we want to enable an expressive apis on Entities - we allow
-   * users to defined thier own apis. By calling:
+   * users to defined their own apis. By calling:
    *```ts
    * entity.ensure.myMethod()
    *```
@@ -263,7 +263,7 @@ export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
     }
     Object.assign(this, this[SAVED_STATE_KEY]);
     /*
-    Fix for rollbacking serializable lists since thier
+    Fix for rollbacking serializable lists since their
     internal symbol properties(SOURCE_KEY, LIST_KEY, SERIALIZABLE_TYPE_KEY) will not be rollbacked with Object.assign
     */
     const serializablesListProps = Reflect.getMetadata(

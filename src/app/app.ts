@@ -283,7 +283,7 @@ export class App extends BaseApp {
    */
   protected async initializeStorages(): Promise<void> {
     this.log?.debug(
-      new Log(`initalizing storages`).on(this).in(this.initializeStorages)
+      new Log(`initializing storages`).on(this).in(this.initializeStorages)
     );
 
     if (

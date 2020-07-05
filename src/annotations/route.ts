@@ -18,7 +18,7 @@ import { subscribe } from './subscribe';
 
 /**
  * Annotates method parameter as a handler for routed `Command` or `Event` type(or other) - type that is
- * used as first method paramter.
+ * used as first method parameter.
  * @param target - Target which method parameter is being decorated.
  * @param methodName - Method name which parameter is being decorated.
  * @param index - Index number of the parameter that is being decorated.

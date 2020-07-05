@@ -137,7 +137,7 @@ ___
 
 *Overrides [DefinableMixin](definablemixin.md).[equals](definablemixin.md#equals)*
 
-Evaluates if guid is equal to other by comparing thier values.
+Evaluates if guid is equal to other by comparing their values.
 
 **Parameters:**
 

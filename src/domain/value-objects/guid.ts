@@ -57,7 +57,7 @@ export class Guid extends ValueObject implements types.Stringifiable {
   }
 
   /**
-   * Evaluates if guid is equal to other by comparing thier values.
+   * Evaluates if guid is equal to other by comparing their values.
    * @param otherGuid - Other instance of Guid.
    * @returns Returns true if both guid values are equal, else false.
    */

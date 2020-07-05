@@ -369,7 +369,7 @@ Same rules of behavior will apply to other assertions like:
 `StatefulAssertion`, `StatusfulAssertion`.
 
 However, since we want to enable an expressive apis on Entities - we allow
-users to defined thier own apis. By calling:
+users to defined their own apis. By calling:
 ```ts
 entity.ensure.myMethod()
 ```
@@ -2166,7 +2166,7 @@ Name | Type | Description |
 
 **Returns:** *[Props](../modules/types.md#props)*
 
-Transformed legacy properties or thier unchanged state if up to date.
+Transformed legacy properties or their unchanged state if up to date.
 
 ___
 

@@ -32,8 +32,8 @@ export class ExpiringTaskCompletionPolicy {
 
   /**
    * Cancels expiring policy for `Task` in `TaskList`.
-   * @param taskList - `TaskList` instance on which policy is cancelled.
-   * @param taskId - Identifier of a `Task` which policy should be cancelled.
+   * @param taskList - `TaskList` instance on which policy is canceled.
+   * @param taskId - Identifier of a `Task` which policy should be canceled.
    */
   public cancel(taskList: TaskList, taskId: Guid): void {
     taskList.unschedule(taskId, ExpireTask);

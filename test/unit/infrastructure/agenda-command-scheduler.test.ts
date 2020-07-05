@@ -249,7 +249,7 @@ describe(`AgendaCommandScheduler`, function () {
         );
       });
 
-      it('logs successfuly scheduled command', async () => {
+      it('logs successfully scheduled command', async () => {
         await scheduler.initialize();
         await scheduler.schedule(scheduleCommand);
 
@@ -364,7 +364,7 @@ describe(`AgendaCommandScheduler`, function () {
         );
       });
 
-      it('logs thrown error upon  Agenda client cancelling the job', async () => {
+      it('logs thrown error upon  Agenda client canceling the job', async () => {
         const error = new Error('my-error');
         agendaInstance.cancel.rejects(error);
 

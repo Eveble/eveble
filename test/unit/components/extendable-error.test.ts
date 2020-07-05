@@ -57,7 +57,7 @@ describe('MyExtendableError', function () {
       expect(error.customKey).to.be.equal('my-custom-key');
     });
 
-    it(`allows to set message as initalizing class property`, () => {
+    it(`allows to set message as initializing class property`, () => {
       expect(new MyOtherError().message).to.be.equal(
         'The other default message for other error'
       );

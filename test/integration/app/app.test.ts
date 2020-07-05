@@ -383,7 +383,7 @@ describe(`App`, function () {
         });
         await app.initialize();
         expect(log.debug).to.be.calledWithMatch(
-          new Log(`initalizing storages`).on(app).in('initializeStorages')
+          new Log(`initializing storages`).on(app).in('initializeStorages')
         );
         await app.shutdown();
       });

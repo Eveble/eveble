@@ -134,7 +134,7 @@ describe('SerializableError', function () {
       expect(error.message).to.be.equal(message);
     });
 
-    it(`allows to set message as initalizing class property`, () => {
+    it(`allows to set message as initializing class property`, () => {
       @define('MyDefaultError', { isRegistrable: false })
       class MyDefaultError extends SerializableError {
         message = 'The default message for error';

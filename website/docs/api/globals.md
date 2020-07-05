@@ -849,8 +849,8 @@ ___
 ▸ **handle**(`target`: Record‹string, any›, `methodName`: string, `index`: number): *void*
 
 Annotates method parameter as a handler for `Command` type(or other) - type that is
-used as first method paramter(i.e. for example below `MyCommandHandlingMethod` with
- paramter `MyCommand`).
+used as first method parameter(i.e. for example below `MyCommandHandlingMethod` with
+ parameter `MyCommand`).
 
 **`remarks`** 
 Since decorator is **executed before class instance is ever created**, we need to
@@ -918,7 +918,7 @@ ___
 ▸ **initial**(`target`: Record‹string, any›, `methodName`: string, `index`: number): *void*
 
 Annotates method parameter as a handler for initial `Command` or `Event` type(or other) - type that is
-used as first method paramter.
+used as first method parameter.
 
 **`remarks`** 
 Since decorator is **executed before class instance is ever created**, we need to
@@ -1145,7 +1145,7 @@ ___
 ▸ **route**(`target`: Record‹string, any›, `methodName`: string, `index`: number): *void*
 
 Annotates method parameter as a handler for routed `Command` or `Event` type(or other) - type that is
-used as first method paramter.
+used as first method parameter.
 
 **`remarks`** 
 Since decorator is **executed before class instance is ever created**, we need to
@@ -1284,7 +1284,7 @@ ___
 
 ▸ **subscribe**(`target`: Record‹string, any›, `propertyName`: string, `index`: number): *void*
 
-Annotates method as a handler for type(`Event` or other)- type that is used as first method paramter(i.e. for example below `MyEvent`).
+Annotates method as a handler for type(`Event` or other)- type that is used as first method parameter(i.e. for example below `MyEvent`).
 
 **`remarks`** 
 Since decorator is **executed before class instance is ever created**, we need to

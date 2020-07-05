@@ -521,7 +521,7 @@ describe(`Router`, function () {
 
       it(`throws ValidationError if event sourceable is in invalid state after handling initializing message`, async () => {
         // Since EventSourceable does not resolve id from message on construction like Aggregate and Process,
-        // replacing the overriden handler from beforeEach hook will cause instance of MyEventSourceable to be in
+        // replacing the overridden handler from beforeEach hook will cause instance of MyEventSourceable to be in
         // invalid state with missing id.
         MyEventSourceable.prototype.handle = async function (
           _message
@@ -715,7 +715,7 @@ describe(`Router`, function () {
 
         it(`throws ValidationError if event sourceable is in invalid state after handling initializing message`, async () => {
           // Since EventSourceable does not resolve id from message on construction like Aggregate and Process,
-          // replacing the overriden handler from beforeEach hook will cause instance of MyEventSourceable to be in
+          // replacing the overridden handler from beforeEach hook will cause instance of MyEventSourceable to be in
           // invalid state with missing id.
           MyEventSourceable.prototype.handle = async function (
             _message

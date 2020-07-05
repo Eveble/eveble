@@ -14,7 +14,7 @@ import {
 } from '../constants/metadata-keys';
 
 /**
- * Annotates method as a handler for type(`Event` or other)- type that is used as first method paramter(i.e. for example below `MyEvent`).
+ * Annotates method as a handler for type(`Event` or other)- type that is used as first method parameter(i.e. for example below `MyEvent`).
  * @param target - Target which method parameter is being decorated.
  * @param methodName - Method name which parameter is being decorated.
  * @param index - Index number of the parameter that is being decorated.

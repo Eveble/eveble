@@ -991,7 +991,7 @@ Name | Type | Description |
 
 **Returns:** *[Props](../modules/types.md#props)*
 
-Transformed legacy properties or thier unchanged state if up to date.
+Transformed legacy properties or their unchanged state if up to date.
 
 ___
 
