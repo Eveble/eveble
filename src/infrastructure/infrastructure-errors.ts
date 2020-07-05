@@ -5,7 +5,7 @@ import { SerializableError } from '../components/serializable-error';
 export class InfrastructureError extends SerializableError {}
 
 /*
-PERSISTANCE ERRORS
+PERSISTENCE ERRORS
 */
 @define('CommitConcurrencyError')
 export class CommitConcurrencyError extends InfrastructureError {

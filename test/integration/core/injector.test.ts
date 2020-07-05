@@ -405,10 +405,10 @@ describe(`Injector`, () => {
       @injectable()
       class Second {}
       @injectable()
-      class Thrid {}
+      class Third {}
 
       const injector = new Injector();
-      injector.bind<Thrid>('3').to(Thrid).inSingletonScope();
+      injector.bind<Third>('3').to(Third).inSingletonScope();
       injector.bind<First>('1').to(First).inSingletonScope();
       injector.bind<Second>('2').to(Second).inSingletonScope();
 
