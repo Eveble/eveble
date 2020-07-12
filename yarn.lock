@@ -363,7 +363,7 @@
   dependencies:
     underscore "~1.8.3"
 
-"@eveble/helpers@^1.0.1", "@eveble/helpers@^1.0.3":
+"@eveble/helpers@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@eveble/helpers/-/helpers-1.0.3.tgz#4cedc4df777dfd2a7bac2387a7537bc22abbd3a1"
   integrity sha512-gR/PKgh8yGIu6pHNrgaqb/Rgf9di6+rKQXXxofnRWVgP1pgQOpAb4TcqYJS/QV4JVSne5P0mc1oFo98jXbmprw==
@@ -6804,7 +6804,6 @@ npm@^6.10.3:
     cmd-shim "^3.0.3"
     columnify "~1.5.4"
     config-chain "^1.1.12"
-    debuglog "*"
     detect-indent "~5.0.0"
     detect-newline "^2.1.0"
     dezalgo "~1.0.3"
@@ -6819,7 +6818,6 @@ npm@^6.10.3:
     has-unicode "~2.0.1"
     hosted-git-info "^2.8.8"
     iferr "^1.0.2"
-    imurmurhash "*"
     infer-owner "^1.0.4"
     inflight "~1.0.6"
     inherits "^2.0.4"
@@ -6838,14 +6836,8 @@ npm@^6.10.3:
     libnpx "^10.2.2"
     lock-verify "^2.1.0"
     lockfile "^1.0.4"
-    lodash._baseindexof "*"
     lodash._baseuniq "~4.6.0"
-    lodash._bindcallback "*"
-    lodash._cacheindexof "*"
-    lodash._createcache "*"
-    lodash._getnative "*"
     lodash.clonedeep "~4.5.0"
-    lodash.restparam "*"
     lodash.union "~4.6.0"
     lodash.uniq "~4.5.0"
     lodash.without "~4.4.0"
@@ -9701,12 +9693,12 @@ typedoc@^0.17.7:
     shelljs "^0.8.4"
     typedoc-default-themes "^0.10.1"
 
-typend@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/typend/-/typend-1.0.1.tgz#a56ddf84d50a97d22f3d5c9f89b9aac36a3560a8"
-  integrity sha512-7s4todDec+pQH7FPDI70/PenywwcypyMwr/ZJtIpZ6kEEn5XHKXSDUL6UAC+ctGm8nVyKv0L17r1uz4EvC7RIA==
+typend@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/typend/-/typend-1.0.2.tgz#6711b424ab5dd9818aa3d857c03dc96c2080832b"
+  integrity sha512-LjEEtqmDZt0ELyXuTpxGPnjecH++HWVVSTpX2MncT+yAinzPM67ik3Vlu34Lscw7wIOAbojLyqvl7amHve447A==
   dependencies:
-    "@eveble/helpers" "^1.0.1"
+    "@eveble/helpers" "^1.0.3"
     deep-diff "^1.0.2"
     deepmerge "^4.2.2"
     es6-error "^4.1.1"
