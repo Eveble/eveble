@@ -52,7 +52,7 @@
   "dependencies": {
     "@eveble/helpers": "^1.0.3",
     "@eveble/ejson": "^2.3.0",
-    "typend": "^1.0.1",
+    "typend": "^1.0.2",
     "reflect-metadata": "^0.1.13",
     "tsruntime": "^3.0.0-beta.1",
     "ttypescript": "^1.5.10",
