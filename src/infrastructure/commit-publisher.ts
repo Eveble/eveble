@@ -72,8 +72,12 @@ export class CommitPublisher {
    * Thrown if there is any issue with handling published change(message).
    */
   async publishChanges(commit: types.Commit): Promise<void> {
-    const appId = this.config.get('appId');
-    const workerId = this.config.get('workerId');
+    const appId = this.config
+      .get<string | types.Stringifiable>('appId')
+      .toString();
+    const workerId = this.config
+      .get<string | types.Stringifiable>('workerId')
+      .toString();
     const receiver = commit.getReceiver(appId) as types.CommitReceiver;
     receiver.flagAsReceived(workerId);
 
@@ -202,7 +206,7 @@ export class CommitPublisher {
    * @param commit - Instance implementing `Commit` interface.
    */
   protected async setTimeout(commit: types.Commit): Promise<void> {
-    const timeout = this.config.get('eveble.commitStore.timeout');
+    const timeout = this.config.get<number>('eveble.commitStore.timeout');
 
     this.inProgress.set(
       commit.id.toString(),
@@ -218,8 +222,12 @@ export class CommitPublisher {
    * @param commit - Instance implementing `Commit` interface.
    */
   protected async onTimeout(commit: types.Commit): Promise<void> {
-    const appId = this.config.get('appId');
-    const workerId = this.config.get('workerId');
+    const appId = this.config
+      .get<string | types.Stringifiable>('appId')
+      .toString();
+    const workerId = this.config
+      .get<string | types.Stringifiable>('workerId')
+      .toString();
     commit.getReceiver(appId)?.flagAsTimeouted(workerId);
 
     const failedCommit = await this.storage.flagAndResolveCommitAsTimeouted(

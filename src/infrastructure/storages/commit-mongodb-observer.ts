@@ -50,8 +50,12 @@ export class CommitMongoDBObserver extends StatefulMixin {
   public async startObserving(
     commitPublisher: types.CommitPublisher
   ): Promise<void> {
-    const appId = this.config.get('appId');
-    const workerId = this.config.get('workerId');
+    const appId = this.config
+      .get<string | types.Stringifiable>('appId')
+      .toString();
+    const workerId = this.config
+      .get<string | types.Stringifiable>('workerId')
+      .toString();
     const registeredQuery = {
       $or: [
         { eventTypes: { $in: commitPublisher.getHandledEventTypes() } },

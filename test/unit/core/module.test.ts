@@ -344,8 +344,16 @@ describe('Module', function () {
         const expectedPropTypes = {
           included: PropTypes.object.isOptional,
           merged: PropTypes.object.isOptional,
-          appId: PropTypes.instanceOf(String).isOptional,
-          workerId: PropTypes.instanceOf(String).isOptional,
+          appId: PropTypes.oneOf([
+            undefined,
+            PropTypes.instanceOf(String),
+            PropTypes.interface({ toString: PropTypes.instanceOf(Function) }),
+          ]),
+          workerId: PropTypes.oneOf([
+            undefined,
+            PropTypes.instanceOf(String),
+            PropTypes.interface({ toString: PropTypes.instanceOf(Function) }),
+          ]),
           conversion: PropTypes.shape({
             type: PropTypes.oneOf([
               PropTypes.equal('manual'),

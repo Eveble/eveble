@@ -214,11 +214,11 @@ export namespace types {
   export interface Configurable extends Definable {
     isConfigurable(path: string): boolean;
     has(path: string): boolean;
-    get(path: string, runtimeDefaultValue?: any): any;
-    getExact(path: string): any;
-    getDefault(path: string): any;
+    get<T extends any>(path: string, runtimeDefaultValue?: any): T;
+    getExact<T extends any>(path: string): T;
+    getDefault<T extends any>(path: string): T;
     hasDefault(path: string): boolean;
-    set(path: string, value: any): void;
+    set<T extends any>(path: string, value: T): void;
     assign(props: Props): void;
     include(config: Configurable): void;
     merge(config: Configurable): void;

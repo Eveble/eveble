@@ -80,7 +80,9 @@ export class AgendaCommandSchedulerModule extends Module {
   async initializeMongoDBClientForCommandScheduler(): Promise<void> {
     const url = getenv.string(`EVEBLE_COMMAND_SCHEDULER_MONGODB_URL`);
     const options = {
-      ...this.config.get('clients.MongoDB.CommandScheduler'),
+      ...this.config.get<Record<string, any>>(
+        'clients.MongoDB.CommandScheduler'
+      ),
       ssl: getenv.bool(`EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL`),
       useUnifiedTopology: false,
     };
@@ -138,7 +140,9 @@ export class AgendaCommandSchedulerModule extends Module {
     const collectionName = getenv.string(
       'EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION'
     );
-    const options = this.config.get('clients.Agenda.CommandScheduler');
+    const options = this.config.get<Record<string, any>>(
+      'clients.Agenda.CommandScheduler'
+    );
     options.processEvery = getenv.int('EVEBLE_COMMAND_SCHEDULER_INTERVAL');
     const client = new AgendaClient({
       id: 'Agenda.clients.CommandScheduler',

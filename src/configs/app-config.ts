@@ -13,12 +13,12 @@ export class AppConfig extends Config {
     useUnifiedTopology: true,
   };
 
-  public appId?: string = getenv.string(
+  public appId?: string | types.Stringifiable = getenv.string(
     'APP_ID',
     AppConfig.generateId() as string
   );
 
-  public workerId?: string = getenv.string(
+  public workerId?: string | types.Stringifiable = getenv.string(
     'WORKER_ID',
     AppConfig.generateId() as string
   );

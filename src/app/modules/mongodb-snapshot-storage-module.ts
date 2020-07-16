@@ -47,7 +47,7 @@ export class MongoDBSnapshotStorageModule extends Module {
   protected async initializeClientForSnapshotter(): Promise<void> {
     const url = getenv.string(`EVEBLE_SNAPSHOTTER_MONGODB_URL`);
     const options = {
-      ...this.config.get('clients.MongoDB.Snapshotter'),
+      ...this.config.get<Record<string, any>>('clients.MongoDB.Snapshotter'),
       ssl: getenv.bool(`EVEBLE_SNAPSHOTTER_MONGODB_SSL`),
     };
     const databaseName = getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_DBNAME');

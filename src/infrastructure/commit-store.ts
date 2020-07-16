@@ -67,8 +67,12 @@ export class CommitStore implements types.CommitStore {
     const newVersion = currentVersion + 1;
     events = this.resolveEventsWithNewVersion(events, newVersion);
 
-    const appId = this.config.get('appId').toString();
-    const workerId = this.config.get('workerId').toString();
+    const appId = this.config
+      .get<string | types.Stringifiable>('appId')
+      .toString();
+    const workerId = this.config
+      .get<string | types.Stringifiable>('workerId')
+      .toString();
     const timestamp = new Date();
 
     const receiver = new CommitReceiver({

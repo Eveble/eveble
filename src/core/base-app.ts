@@ -253,9 +253,9 @@ export abstract class BaseApp extends Module implements types.BaseApp {
    * Creates Logger instance.
    */
   protected async createLogger(): Promise<types.Logger> {
-    const levels = {
+    const levels: types.LogLevels = {
       ...RFC5424,
-      ...this.config.get('logging.levels'),
+      ...this.config.get<types.LogLevels>('logging.levels'),
     };
     return new Logger(levels);
   }
@@ -269,7 +269,7 @@ export abstract class BaseApp extends Module implements types.BaseApp {
       this.config.set(`${key}.parts.label`, this.config.get(`appId`));
     }
 
-    const level = this.config.get(`${key}.level`);
+    const level = this.config.get<types.LogLevel>(`${key}.level`);
     const consoleOptions: LogTransportConfig = this.config.get(`${key}`);
     const consoleTransport = new ConsoleTransport(level, consoleOptions);
     this.injector.injectInto(consoleTransport);

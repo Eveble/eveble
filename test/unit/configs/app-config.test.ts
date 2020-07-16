@@ -28,13 +28,21 @@ describe('AppConfig', function () {
   describe('prop types', () => {
     it('takes optional appId property as a string', () => {
       expect(AppConfig.getPropTypes().appId).to.be.eql(
-        PropTypes.instanceOf(String).isOptional
+        PropTypes.oneOf([
+          undefined,
+          PropTypes.instanceOf(String),
+          PropTypes.interface({ toString: PropTypes.instanceOf(Function) }),
+        ])
       );
     });
 
     it('takes optional workerId property as a string', () => {
       expect(AppConfig.getPropTypes().workerId).to.be.eql(
-        PropTypes.instanceOf(String).isOptional
+        PropTypes.oneOf([
+          undefined,
+          PropTypes.instanceOf(String),
+          PropTypes.interface({ toString: PropTypes.instanceOf(Function) }),
+        ])
       );
     });
 

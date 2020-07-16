@@ -53,7 +53,7 @@ export class MongoDBCommitStorageModule extends Module {
   protected async initializeClientForCommitStorage(): Promise<void> {
     const url: string = getenv.string(`EVEBLE_COMMITSTORE_MONGODB_URL`);
     const options = {
-      ...this.config.get('clients.MongoDB.CommitStore'),
+      ...this.config.get<Record<string, any>>('clients.MongoDB.CommitStore'),
       ssl: getenv.bool(`EVEBLE_COMMITSTORE_MONGODB_SSL`),
     };
     const databaseName: string = getenv.string(
