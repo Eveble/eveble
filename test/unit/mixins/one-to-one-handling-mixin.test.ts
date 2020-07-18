@@ -25,17 +25,17 @@ chai.use(sinonChai);
 
 describe('OneToOneHandlingMixin', function () {
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     key: string;
   }
 
   @define('Namespaced.Command', { isRegistrable: false })
-  class NamespacedCommand extends Command {
+  class NamespacedCommand extends Command<NamespacedCommand> {
     key: string;
   }
 
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     key: string;
   }
 

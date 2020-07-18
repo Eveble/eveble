@@ -24,7 +24,6 @@ import { Guid } from './value-objects/guid';
 import { ScheduleCommand } from './schedule-command';
 import { UnscheduleCommand } from './unschedule-command';
 import { History } from './history';
-import { PickableProperties } from '../components/pickable-properties';
 
 @define('EventSourceable')
 export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
@@ -202,7 +201,7 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
     command.schedule(assignment);
 
     const scheduleCommand = new ScheduleCommand({
-      targetId: command.getId(),
+      targetId: command.getId() as string | Guid,
       command,
     });
     this[COMMANDS_KEY].push(scheduleCommand);
@@ -269,11 +268,6 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
    *   ...this.eventProps(),
    *   customerName: command.customerName,
    * }));
-   * this.record(new MyEvent(this.pickEventProps(command)));
-   * this.record(new MyEvent(this.pickEventProps(
-   *   command,
-   *   {key: 'value'}
-   * )));
    *```
    */
   public record(event: types.Event): void {
@@ -371,8 +365,7 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
   HELPERS
   */
   /**
-   * Picks base properties(`sourceId` & `version`) for new `Event` instance.
-   * @param sources - One or more source of properties.
+   * Picks base properties(`sourceId`, `timestamp`, `metadata`, `version`) for new `Event` instance.
    * @return Returns properties for `Event` instance.
    * @example
    *```ts
@@ -382,29 +375,39 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
    * }));
    *```
    */
-  public eventProps(): Record<keyof any, any> {
-    const eventProps: any = {};
-    eventProps.sourceId = this.getId();
-    eventProps.version = this.getVersion();
-    return eventProps;
+  public eventProps(): {
+    sourceId: Guid | string;
+    timestamp: Date;
+    metadata: Record<string, any>;
+    version: number;
+  } {
+    return {
+      sourceId: this.getId(),
+      version: this.getVersion(),
+      timestamp: new Date(),
+      metadata: {},
+    };
   }
 
   /**
-   * Generates pickable properties for new `Event` instance as  `PickableProperties`
-   * instance with all necessary sources for `Event`.
-   * @param sources - One or more source of properties.
-   * @return Returns properties for `Event` instance as `PickableProperties`.
+   * Picks base properties(`timestamp` & `metadata`) for new `Command` instance.
+   * @return Returns properties for `Command` instance.
    * @example
    *```ts
-   * this.record(new MyEvent(this.pickEventProps(command)));
-   * this.record(new MyEvent(this.pickEventProps(
-   *   command,
-   *   {key: 'value'}
-   * )));
+   * this.trigger(new MyCommand({
+   *   ...this.commandProps(),
+   *   customerName: command.customerName,
+   * }));
    *```
    */
-  public pickEventProps(...sources: Record<string, any>[]): PickableProperties {
-    return new PickableProperties(this, this.eventProps(), ...sources);
+  public commandProps(): {
+    timestamp: Date;
+    metadata: Record<string, any>;
+  } {
+    return {
+      timestamp: new Date(),
+      metadata: {},
+    };
   }
 
   /**

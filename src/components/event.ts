@@ -5,16 +5,26 @@ import { types } from '../types';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
 @define('Event')
-export class Event extends Message implements types.Event, types.Identifiable {
+export class Event<
+  T extends {
+    [key: string]: any;
+  }
+> extends Message implements types.Event, types.Identifiable {
   sourceId: Guid | string;
 
   version?: number;
 
   /**
    * Creates an instance of Event.
-   * @param props - Properties of the type required for construction.
+   * @param props - Properties matching generic `T` with `sourceId` as `Guid|string` and
+   * optional `version` as `number`.
    */
-  constructor(props: types.Props = {}) {
+  constructor(
+    props: types.ConstructorType<T> & {
+      sourceId: Guid | string;
+      version?: number;
+    }
+  ) {
     super(props);
     if (
       Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) === undefined
@@ -27,7 +37,7 @@ export class Event extends Message implements types.Event, types.Identifiable {
    * Returns event's originating source by id.
    * @return Event's source identifier as a instance of `Guid` or string.
    */
-  getId(): Guid | string {
+  public getId(): Guid | string {
     return this.sourceId;
   }
 }

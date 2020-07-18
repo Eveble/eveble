@@ -1,10 +1,11 @@
 import { get } from 'lodash';
 import { define } from '../decorators/define';
 import { Command, Assignment } from '../components/command';
+import { types } from '../types';
 
 @define('ScheduleCommand')
-export class ScheduleCommand extends Command {
-  public command: Command;
+export class ScheduleCommand extends Command<ScheduleCommand> {
+  public command: types.Command;
 
   /**
    * Evaluates if command is deliverable.

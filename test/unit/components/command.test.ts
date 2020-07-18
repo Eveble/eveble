@@ -6,6 +6,7 @@ import { Command, Assignment } from '../../../src/components/command';
 import { define } from '../../../src/decorators/define';
 import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
+import { types } from '../../../src/types';
 
 describe('Command', function () {
   let now: Date;
@@ -24,10 +25,10 @@ describe('Command', function () {
   });
 
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
 
   @define('MyCustomCommand', { isRegistrable: false })
-  class MyCustomCommand extends Command {
+  class MyCustomCommand extends Command<MyCustomCommand> {
     name: string;
   }
 
@@ -54,16 +55,18 @@ describe('Command', function () {
       );
     });
 
-    it('takes timestamp property as a Date', () => {
+    it('takes optional timestamp property as a Date', () => {
       clock.restore();
 
       expect(Command.getPropTypes().timestamp).to.be.eql(
-        PropTypes.instanceOf(Date)
+        PropTypes.instanceOf(Date).isOptional
       );
     });
 
-    it('takes metadata property as an object', () => {
-      expect(Command.getPropTypes().metadata).to.be.eql(PropTypes.object);
+    it('takes optional metadata property as an object', () => {
+      expect(Command.getPropTypes().metadata).to.be.eql(
+        PropTypes.object.isOptional
+      );
     });
   });
 
@@ -125,13 +128,13 @@ describe('Command', function () {
 
       it('requires explicit constructor for messages with property initializers', () => {
         @define('MyDefaultCommand', { isRegistrable: false })
-        class MyDefaultCommand extends Command {
+        class MyDefaultCommand extends Command<MyDefaultCommand> {
           key: string;
 
-          default = 'default';
+          default? = 'default';
 
-          constructor(props: Partial<MyDefaultCommand>) {
-            super();
+          constructor(props: types.ConstructorType<MyDefaultCommand>) {
+            super(props);
             Object.assign(this, this.processProps(props));
             Object.freeze(this);
           }

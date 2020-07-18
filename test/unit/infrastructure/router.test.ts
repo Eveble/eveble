@@ -72,26 +72,26 @@ describe(`Router`, function () {
   class InvalidMessage extends Message {}
 
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     name: string;
   }
   @define('MyOtherCommand', { isRegistrable: false })
-  class MyOtherCommand extends Command {
+  class MyOtherCommand extends Command<MyOtherCommand> {
     name: string;
   }
 
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     name: string;
   }
 
   @define('MyOtherEvent', { isRegistrable: false })
-  class MyOtherEvent extends Event {
+  class MyOtherEvent extends Event<MyOtherEvent> {
     name: string;
   }
 
   @define('MyCorrelatingEvent', { isRegistrable: false })
-  class MyCorrelatingEvent extends Event {
+  class MyCorrelatingEvent extends Event<MyCorrelatingEvent> {
     name: string;
   }
 
@@ -384,8 +384,8 @@ describe(`Router`, function () {
     }
 
     let router: Router;
-    let commands: Record<string, Command> = {};
-    let events: Record<string, Event> = {};
+    let commands: Record<string, Command<{}>> = {};
+    let events: Record<string, Event<{}>> = {};
     const props: Record<string, any> = {};
     let eventSourceable: EventSourceable;
 

@@ -33,9 +33,9 @@ chai.use(chaiAsPromised);
 
 describe(`Adding and publishing new commits`, function () {
   @define('AddingAndPublishingNewCommits.MyCommand')
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
   @define('AddingAndPublishingNewCommits.MyEvent')
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
 
   // Props
   const appId = 'my-app-id';
@@ -211,7 +211,7 @@ describe(`Adding and publishing new commits`, function () {
       config.get.withArgs('eveble.commitStore.timeout').returns(timeout);
 
       const commandHandlerSpy = sinon.stub();
-      const commandHandler = async (cmd: Command): Promise<void> => {
+      const commandHandler = async (cmd: Command<{}>): Promise<void> => {
         await delay(timeout + 5);
         commandHandlerSpy(cmd);
       };
@@ -269,7 +269,7 @@ describe(`Adding and publishing new commits`, function () {
       const flagCommitAsPublished = sinon.spy(storage, 'flagCommitAsPublished');
 
       const commandHandlerSpy = sinon.stub();
-      const commandHandler = async (cmd: Command): Promise<void> => {
+      const commandHandler = async (cmd: Command<{}>): Promise<void> => {
         await delay(timeout + 5);
         commandHandlerSpy(cmd);
       };

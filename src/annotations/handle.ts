@@ -35,7 +35,7 @@ import {
  * @example
  *```ts
  * @define('MyCommand')
- * class MyCommand extends Command {
+ * class MyCommand extends Command<MyCommand> {
  *  key: string;
  * }
  *

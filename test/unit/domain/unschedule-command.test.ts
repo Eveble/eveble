@@ -61,15 +61,15 @@ describe('UnscheduleCommand', function () {
       );
     });
 
-    it('takes timestamp property as a Date', () => {
+    it('takes optional timestamp property as a Date', () => {
       expect(UnscheduleCommand.getPropTypes().timestamp).to.be.eql(
-        PropTypes.instanceOf(Date)
+        PropTypes.instanceOf(Date).isOptional
       );
     });
 
-    it('takes metadata property as an object', () => {
+    it('takes optional metadata property as an object', () => {
       expect(UnscheduleCommand.getPropTypes().metadata).to.be.eql(
-        PropTypes.object
+        PropTypes.object.isOptional
       );
     });
   });

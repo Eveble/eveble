@@ -280,10 +280,11 @@ export class Router implements types.Router {
       );
 
       if (error instanceof DomainError) {
-        const props: Record<string, any> = {
-          sourceId: message.getId(),
+        const props = {
+          sourceId: message.getId() as string | Guid,
           thrower: this.EventSourceableType.getTypeName(),
           error,
+          metadata: {},
         };
         if (message.hasMetadata()) {
           props.metadata = { ...message.getMetadata() };

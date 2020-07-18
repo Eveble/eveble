@@ -38,14 +38,14 @@ describe(`CommitStore with MongoDB storage`, function () {
   class MyProcess extends Process {}
 
   @define('CommitStoreWithMongoDBStorage.MyCommand')
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
   @define('CommitStoreWithMongoDBStorage.MyOtherCommand')
-  class MyOtherCommand extends Command {}
+  class MyOtherCommand extends Command<MyOtherCommand> {}
 
   @define('CommitStoreWithMongoDBStorage.MyEvent')
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
   @define('CommitStoreWithMongoDBStorage.MyOtherEvent')
-  class MyOtherEvent extends Event {}
+  class MyOtherEvent extends Event<MyOtherEvent> {}
 
   // Props
   const appId = 'my-app-id';

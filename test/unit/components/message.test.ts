@@ -5,7 +5,6 @@ import { Message } from '../../../src/components/message';
 import { define } from '../../../src/decorators/define';
 import { Serializable } from '../../../src/components/serializable';
 import { isDefinable } from '../../../src/utils/helpers';
-import { PickableProperties } from '../../../src/components/pickable-properties';
 
 describe('Message', function () {
   let now: Date;
@@ -51,15 +50,15 @@ describe('Message', function () {
 
     it('returns property types as an object', () => {
       expect(Message.getPropTypes()).to.be.eql({
-        timestamp: PropTypes.instanceOf(Date),
-        metadata: PropTypes.object,
+        timestamp: PropTypes.instanceOf(Date).isOptional,
+        metadata: PropTypes.object.isOptional,
         schemaVersion: PropTypes.instanceOf(Number).isOptional,
       });
     });
   });
 
   describe('construction', () => {
-    it('initializes itself with current time as instance of Date if  timestamp is undefined', () => {
+    it('initializes itself with current time as instance of Date if timestamp is undefined', () => {
       const message = new MyMessage();
       expect(message.timestamp).to.be.eql(now);
     });
@@ -73,59 +72,6 @@ describe('Message', function () {
       const metadata = { key: 'value' };
       const message = new MyMessage({ metadata });
       expect(message.metadata).to.be.eql(metadata);
-    });
-
-    it('takes PickableProperties instance as properties and picks only required', () => {
-      @define('Employee', { isRegistrable: false })
-      class Employee extends Serializable {
-        id: string;
-      }
-
-      @define('Company', { isRegistrable: false })
-      class Company extends Serializable {
-        id: string;
-
-        isActive: boolean;
-
-        employees: Employee[];
-      }
-
-      @define('Company', { isRegistrable: false })
-      class CompanyCreated extends Message {
-        id: string;
-
-        address: string;
-
-        isActive: boolean;
-
-        employees: Employee[];
-      }
-
-      const employees = [
-        new Employee({ id: 'first' }),
-        new Employee({ id: 'second' }),
-      ];
-      const company = new Company({
-        id: 'my-id',
-        isActive: true,
-        employees,
-      });
-      const pickableProps = new PickableProperties(
-        company,
-        { address: 'my-address' },
-        {
-          firstPropertyThatIsNotPartOfCompanyCreated: true,
-          secondropertyThatIsNotPartOfCompanyCreated: true,
-        }
-      );
-      expect(new CompanyCreated(pickableProps)).to.be.eql({
-        id: 'my-id',
-        address: 'my-address',
-        isActive: true,
-        employees,
-        metadata: {},
-        timestamp: now,
-      });
     });
 
     it('requires explicit constructor for messages with property initializers', () => {

@@ -27,7 +27,7 @@ chai.use(chaiAsPromised);
 
 describe(`AgendaCommandScheduler`, function () {
   @define('AgendaCommandScheduler.MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     name: string;
   }
 

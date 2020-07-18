@@ -48,7 +48,7 @@ export class Aggregate extends EventSourceable {
    * @throws {InvalidInitializingMessageError}
    * Thrown if provided initializing message is not instance of `Command`.
    */
-  constructor(arg: History | Command | types.Props) {
+  constructor(arg: History | Command<{}> | types.Props) {
     // Build up Aggregate props
     const props: Record<string, any> = {
       version: 0,

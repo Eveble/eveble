@@ -24,12 +24,12 @@ chai.use(sinonChai);
 
 describe('OneToManyHandlingMixin', function () {
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     key: string;
   }
 
   @define('Namespaced.Event', { isRegistrable: false })
-  class NamespacedEvent extends Event {
+  class NamespacedEvent extends Event<NamespacedEvent> {
     key: string;
   }
 

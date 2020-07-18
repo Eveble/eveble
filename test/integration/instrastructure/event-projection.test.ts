@@ -23,7 +23,7 @@ describe('Event projection', function () {
   };
 
   @define('EventProjection.CustomerRegistered')
-  class CustomerRegistered extends Event {
+  class CustomerRegistered extends Event<CustomerRegistered> {
     firstName: string;
 
     lastName: string;

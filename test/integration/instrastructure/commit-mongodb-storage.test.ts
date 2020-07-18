@@ -27,11 +27,11 @@ chai.use(chaiAsPromised);
 
 describe(`CommitMongoDBStorage`, function () {
   @define('IntegrationCommitMongoDBStorage.MyCommand')
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     name: string;
   }
   @define('IntegrationCommitMongoDBStorage.MyEvent')
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     name: string;
   }
 

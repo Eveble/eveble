@@ -16,7 +16,7 @@ chai.use(sinonChai);
 
 describe(`CommandSchedulingService`, function () {
   @define('CommandSchedulingService.MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     name: string;
   }
 

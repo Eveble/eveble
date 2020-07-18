@@ -26,17 +26,17 @@ describe(`EventHandlingMixin`, function () {
   });
 
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     key: string;
   }
 
   @define('MyOtherEvent', { isRegistrable: false })
-  class MyOtherEvent extends Event {
+  class MyOtherEvent extends Event<MyOtherEvent> {
     key: string;
   }
 
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     key: string;
   }
 

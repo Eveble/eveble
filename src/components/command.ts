@@ -18,15 +18,22 @@ export class Assignment extends Serializable implements types.Assignment {
 }
 
 @define('Command')
-export class Command extends Message
-  implements types.Command, types.Identifiable {
+export class Command<
+  T extends {
+    [key: string]: any;
+  }
+> extends Message implements types.Command, types.Identifiable {
   targetId: Guid | string;
 
   /**
    * Creates an instance of Message.
-   * @param props - Properties of the type required for construction.
+   * @param props - Properties matching generic `T` with `targetId` as `Guid|string`.
    */
-  constructor(props: types.Props = {}) {
+  constructor(
+    props: types.ConstructorType<T> & {
+      targetId: Guid | string;
+    }
+  ) {
     super(props);
     if (
       Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) === undefined
@@ -39,7 +46,7 @@ export class Command extends Message
    * Returns command's targeted element by id.
    * @return Command's target identifier as a instance of `Guid` or string.
    */
-  getId(): Guid | string {
+  public getId(): Guid | string {
     return this.targetId;
   }
 
@@ -47,7 +54,7 @@ export class Command extends Message
    * Schedules command for delivery at specific time.
    * @param assignment - Scheduling assignment information.
    */
-  schedule(assignment: Assignment): void {
+  public schedule(assignment: Assignment): void {
     this.assignMetadata({
       scheduling: assignment,
     });
@@ -57,7 +64,7 @@ export class Command extends Message
    * Returns scheduling assignment if present.
    * @returns Instance of `Assignment`, else `undefined`.
    */
-  getAssignment(): Assignment | undefined {
+  public getAssignment(): Assignment | undefined {
     return get(this, 'metadata.scheduling', undefined);
   }
 
@@ -65,7 +72,7 @@ export class Command extends Message
    * Evaluates if command is scheduled for delivery.
    * @returns Returns `true` if command is scheduled, else `false`.
    */
-  isScheduled(): boolean {
+  public isScheduled(): boolean {
     if (!this.hasMetadata()) {
       return false;
     }
@@ -77,7 +84,7 @@ export class Command extends Message
    * Evaluates if message is deliverable(i.e. is not scheduled or is past delivery time).
    * @returns Returns `true` if command is deliverable, else `false`.
    */
-  isDeliverable(): boolean {
+  public isDeliverable(): boolean {
     const metadata = this.getMetadata();
     return (
       this.isScheduled() &&

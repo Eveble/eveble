@@ -4,7 +4,7 @@ import { types } from '../types';
 import { Guid } from './value-objects/guid';
 
 @define('UnscheduleCommand')
-export class UnscheduleCommand extends Command {
+export class UnscheduleCommand extends Command<UnscheduleCommand> {
   assignmentId: string | Guid;
 
   commandType: types.TypeName;

@@ -25,9 +25,9 @@ function sleep(ms: number): Promise<any> {
 
 describe(`CommitPublisher`, function () {
   @define('CommitPublisher.MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
   @define('CommitPublisher.MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
 
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';

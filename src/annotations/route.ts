@@ -37,7 +37,7 @@ import { subscribe } from './subscribe';
  * @example
  *```ts
  * @define('MyCommand')
- * class MyCommand extends Command {
+ * class MyCommand extends Command<MyCommand> {
  *  key: string;
  * }
  *
@@ -52,7 +52,7 @@ import { subscribe } from './subscribe';
  * @example
  *```ts
  * @define('MyEvent')
- * class MyEvent extends Event {
+ * class MyEvent extends Event<MyEvent> {
  *  key: string;
  * }
  *

@@ -33,7 +33,7 @@ import {
  * @example
  *```ts
  * @define('MyEvent')
- * class MyEvent extends Event {
+ * class MyEvent extends Event<MyEvent> {
  *  key: string;
  * }
  *

@@ -4,7 +4,7 @@ import { DomainException } from '../../../src/domain/domain-exception';
 import { Event } from '../../../src/components/event';
 
 @define()
-export class EmployeeCreated extends Event {
+export class EmployeeCreated extends Event<EmployeeCreated> {
   firstName: string;
 
   lastName: string;
@@ -15,19 +15,23 @@ export class EmployeeCreated extends Event {
 }
 
 @define()
-export class TaskListAssignedToEmployee extends Event {
+export class TaskListAssignedToEmployee extends Event<
+  TaskListAssignedToEmployee
+> {
   taskListId: Guid;
 }
 
 @define()
-export class EmployeeProductivityEstimated extends Event {
+export class EmployeeProductivityEstimated extends Event<
+  EmployeeProductivityEstimated
+> {
   estimatedPoints: number;
 
   points: number;
 }
 
 @define()
-export class EmployeeTerminated extends Event {
+export class EmployeeTerminated extends Event<EmployeeTerminated> {
   firstName: string;
 
   lastName: string;
@@ -42,7 +46,9 @@ CANCELING EMPLOYMENT
 */
 // Process
 @define()
-export class CancelingEmploymentInitiated extends Event {
+export class CancelingEmploymentInitiated extends Event<
+  CancelingEmploymentInitiated
+> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -51,7 +57,9 @@ export class CancelingEmploymentInitiated extends Event {
 }
 
 @define()
-export class CancelingEmploymentCompleted extends Event {
+export class CancelingEmploymentCompleted extends Event<
+  CancelingEmploymentCompleted
+> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -60,19 +68,25 @@ export class CancelingEmploymentCompleted extends Event {
 }
 
 @define()
-export class CancelingEmploymentFailed extends Event {
+export class CancelingEmploymentFailed extends Event<
+  CancelingEmploymentFailed
+> {
   employeeId: Guid;
 
   exception: DomainException;
 }
 // Employee Termination
 @define()
-export class EmployeeTerminationInitiated extends Event {
+export class EmployeeTerminationInitiated extends Event<
+  EmployeeTerminationInitiated
+> {
   employeeId: Guid;
 }
 
 @define()
-export class EmployeeTerminationCompleted extends Event {
+export class EmployeeTerminationCompleted extends Event<
+  EmployeeTerminationCompleted
+> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -80,7 +94,9 @@ export class EmployeeTerminationCompleted extends Event {
 
 // Closing task lists
 @define()
-export class ClosingEmployeeTaskListsInitiated extends Event {
+export class ClosingEmployeeTaskListsInitiated extends Event<
+  ClosingEmployeeTaskListsInitiated
+> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -89,14 +105,18 @@ export class ClosingEmployeeTaskListsInitiated extends Event {
 }
 
 @define()
-export class AddedClosedEmployeeTaskList extends Event {
+export class AddedClosedEmployeeTaskList extends Event<
+  AddedClosedEmployeeTaskList
+> {
   employeeId: Guid;
 
   taskListId: Guid;
 }
 
 @define()
-export class ClosingEmployeeTaskListsCompleted extends Event {
+export class ClosingEmployeeTaskListsCompleted extends Event<
+  ClosingEmployeeTaskListsCompleted
+> {
   taskListsIds: Guid[];
 
   closedTaskListsIds: Guid[];
