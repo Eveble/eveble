@@ -89,7 +89,6 @@ import { Event } from '../../src/components/event';
 import { ExtendableError } from '../../src/components/extendable-error';
 import { Log, LogMetadata } from '../../src/components/log-entry';
 import { Message } from '../../src/components/message';
-import { PickableProperties } from '../../src/components/pickable-properties';
 import { SerializableError } from '../../src/components/serializable-error';
 import { Serializable } from '../../src/components/serializable';
 import { Struct } from '../../src/components/struct';
@@ -399,7 +398,6 @@ import {
   Log as LogExported,
   LogMetadata as LogMetadataExported,
   Message as MessageExported,
-  PickableProperties as PickablePropertiesExported,
   SerializableError as SerializableErrorExported,
   Serializable as SerializableExported,
   Struct as StructExported,
@@ -869,9 +867,6 @@ describe(`exports`, function () {
       });
       it('Message', () => {
         expect(MessageExported).to.be.equal(Message);
-      });
-      it('PickableProperties', () => {
-        expect(PickablePropertiesExported).to.be.equal(PickableProperties);
       });
       it('SerializableError', () => {
         expect(SerializableErrorExported).to.be.equal(SerializableError);

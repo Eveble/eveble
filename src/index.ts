@@ -24,7 +24,6 @@ export { Event } from './components/event';
 export { ExtendableError } from './components/extendable-error';
 export { Log, LogMetadata } from './components/log-entry';
 export { Message } from './components/message';
-export { PickableProperties } from './components/pickable-properties';
 export { SerializableError } from './components/serializable-error';
 export { Serializable } from './components/serializable';
 export { Struct } from './components/struct';

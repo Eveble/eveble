@@ -24,7 +24,6 @@ import { Guid } from './value-objects/guid';
 import { ScheduleCommand } from './schedule-command';
 import { UnscheduleCommand } from './unschedule-command';
 import { History } from './history';
-import { PickableProperties } from '../components/pickable-properties';
 
 @define('EventSourceable')
 export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
@@ -390,21 +389,10 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
   }
 
   /**
-   * Generates pickable properties for new `Event` instance as  `PickableProperties`
-   * instance with all necessary sources for `Event`.
-   * @param sources - One or more source of properties.
-   * @return Returns properties for `Event` instance as `PickableProperties`.
    * @example
    *```ts
-   * this.record(new MyEvent(this.pickEventProps(command)));
-   * this.record(new MyEvent(this.pickEventProps(
-   *   command,
-   *   {key: 'value'}
-   * )));
    *```
    */
-  public pickEventProps(...sources: Record<string, any>[]): PickableProperties {
-    return new PickableProperties(this, this.eventProps(), ...sources);
   }
 
   /**

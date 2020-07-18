@@ -638,7 +638,6 @@ export namespace types {
     replayHistory(history: Event[]): void;
     assignMetadata(metadata: Record<string, any>): void;
     eventProps(): Record<keyof any, any>;
-    pickEventProps(...sources: Record<string, any>[]): Record<keyof any, any>[];
     incrementVersion(): void;
   }
 

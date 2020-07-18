@@ -911,86 +911,8 @@ describe(`EventSourceable`, function () {
       expect(instance.eventProps()).to.be.eql(eventProps);
     });
 
-    it(`returns PickableProperties instance for event properties from command`, () => {
-      const command = new CreateOrder({
-        targetId: orderProps.id,
-        customerName: 'Foo',
-      });
-
-      const eventProps = {
-        sourceId: orderProps.id,
-        version: 0,
-      };
-
       const instance = new Order({ id: orderProps.id });
-      const pickable = new PickableProperties(instance, eventProps, command);
-      expect(instance.pickEventProps(command)).to.be.instanceof(
-        PickableProperties
-      );
-      expect(instance.pickEventProps(command)).to.be.eql(pickable);
-    });
-
-    it(`returns PickableProperties instance for event properties from multiple sources`, () => {
-      const source1 = {
-        first: 'first-value',
       };
-
-      const source2 = {
-        second: 'second-value',
-        third: 3,
-      };
-
-      const eventProps = {
-        sourceId: orderProps.id,
-        version: 0,
-      };
-
-      const instance = new Order({ id: orderProps.id });
-      const pickable = new PickableProperties(
-        instance,
-        eventProps,
-        source1,
-        source2
-      );
-      expect(instance.pickEventProps(source1, source2)).to.be.instanceof(
-        PickableProperties
-      );
-      expect(instance.pickEventProps(source1, source2)).to.be.eql(pickable);
-    });
-    it(`returns PickableProperties instance for event properties from command and multiple sources`, () => {
-      const source1 = {
-        first: 'first-value',
-      };
-
-      const source2 = {
-        second: 'second-value',
-        third: 3,
-      };
-
-      const command = new CreateOrder({
-        targetId: orderProps.id,
-        customerName: 'Foo',
-      });
-
-      const eventProps = {
-        sourceId: orderProps.id,
-        version: 0,
-      };
-
-      const instance = new Order({ id: orderProps.id });
-      const pickable = new PickableProperties(
-        instance,
-        eventProps,
-        command,
-        source1,
-        source2
-      );
-      expect(
-        instance.pickEventProps(command, source1, source2)
-      ).to.be.instanceof(PickableProperties);
-      expect(instance.pickEventProps(command, source1, source2)).to.be.eql(
-        pickable
-      );
     });
   });
 

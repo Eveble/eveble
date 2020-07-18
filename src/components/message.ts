@@ -5,7 +5,6 @@ import { Serializable } from './serializable';
 import { isPlainRecord } from '../utils/helpers';
 import { define } from '../decorators/define';
 import { types } from '../types';
-import { PickableProperties } from './pickable-properties';
 
 @define('Message')
 export class Message extends Serializable implements types.Message {
@@ -24,12 +23,7 @@ export class Message extends Serializable implements types.Message {
    * validates them against prop types.
    */
   protected processProps(props: types.Props = {}): types.Props {
-    let processedProps: types.Props;
-    if (props instanceof PickableProperties) {
-      processedProps = props.pickProps(this.getPropTypes());
-    } else {
-      processedProps = { ...props };
-    }
+    const processedProps: types.Props = { ...props };
     if (!processedProps.timestamp) {
       processedProps.timestamp = new Date();
     }
