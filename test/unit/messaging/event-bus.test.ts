@@ -17,12 +17,12 @@ chai.use(sinonChai);
 
 describe('EventBus', function () {
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     key: string;
   }
 
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     key: string;
   }
 

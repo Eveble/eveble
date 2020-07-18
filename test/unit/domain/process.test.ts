@@ -22,15 +22,15 @@ describe(`Process`, function () {
   let clock: any;
   let handlers: Record<string, Function>;
   let props: Record<string, any>;
-  let commands: Record<string, Command>;
-  let events: Record<string, Event>;
+  let commands: Record<string, Command<{}>>;
+  let events: Record<string, Event<{}>>;
 
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     name: string;
   }
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     name: string;
   }
 
@@ -39,7 +39,7 @@ describe(`Process`, function () {
     name: string;
 
     MyCommand(@initial command: MyCommand): void {
-      this.record(new MyEvent(this.pickEventProps(command)));
+      this.record(new MyEvent({ ...this.eventProps(), name: command.name }));
       handlers.MyCommand(command);
     }
   }
@@ -59,7 +59,7 @@ describe(`Process`, function () {
     name: string;
 
     MyCommand(@initial command: MyCommand): void {
-      this.record(new MyEvent(this.pickEventProps(command)));
+      this.record(new MyEvent({ ...this.eventProps(), name: command.name }));
       handlers.MyCommand(command);
     }
 
@@ -283,7 +283,9 @@ describe(`Process`, function () {
         name: string;
 
         MyCommand(@initial command: MyCommand): void {
-          this.record(new MyEvent(this.pickEventProps(command)));
+          this.record(
+            new MyEvent({ ...this.eventProps(), name: command.name })
+          );
           handlers.MyCommand(command);
         }
       }

@@ -201,7 +201,7 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
     command.schedule(assignment);
 
     const scheduleCommand = new ScheduleCommand({
-      targetId: command.getId(),
+      targetId: command.getId() as string | Guid,
       command,
     });
     this[COMMANDS_KEY].push(scheduleCommand);
@@ -268,11 +268,6 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
    *   ...this.eventProps(),
    *   customerName: command.customerName,
    * }));
-   * this.record(new MyEvent(this.pickEventProps(command)));
-   * this.record(new MyEvent(this.pickEventProps(
-   *   command,
-   *   {key: 'value'}
-   * )));
    *```
    */
   public record(event: types.Event): void {
@@ -370,8 +365,7 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
   HELPERS
   */
   /**
-   * Picks base properties(`sourceId` & `version`) for new `Event` instance.
-   * @param sources - One or more source of properties.
+   * Picks base properties(`sourceId`, `timestamp`, `metadata`, `version`) for new `Event` instance.
    * @return Returns properties for `Event` instance.
    * @example
    *```ts
@@ -381,18 +375,39 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
    * }));
    *```
    */
-  public eventProps(): Record<keyof any, any> {
-    const eventProps: any = {};
-    eventProps.sourceId = this.getId();
-    eventProps.version = this.getVersion();
-    return eventProps;
+  public eventProps(): {
+    sourceId: Guid | string;
+    timestamp: Date;
+    metadata: Record<string, any>;
+    version: number;
+  } {
+    return {
+      sourceId: this.getId(),
+      version: this.getVersion(),
+      timestamp: new Date(),
+      metadata: {},
+    };
   }
 
   /**
+   * Picks base properties(`timestamp` & `metadata`) for new `Command` instance.
+   * @return Returns properties for `Command` instance.
    * @example
    *```ts
+   * this.trigger(new MyCommand({
+   *   ...this.commandProps(),
+   *   customerName: command.customerName,
+   * }));
    *```
    */
+  public commandProps(): {
+    timestamp: Date;
+    metadata: Record<string, any>;
+  } {
+    return {
+      timestamp: new Date(),
+      metadata: {},
+    };
   }
 
   /**

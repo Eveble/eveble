@@ -30,12 +30,12 @@ chai.use(chaiAsPromised);
 
 describe(`EventSourceableRepository`, function () {
   @define('MyInitEvent', { isRegistrable: false })
-  class MyInitEvent extends Event {
+  class MyInitEvent extends Event<MyInitEvent> {
     name: string;
   }
 
   @define('MyOtherEvent', { isRegistrable: false })
-  class MyOtherEvent extends Event {
+  class MyOtherEvent extends Event<MyOtherEvent> {
     age: number;
   }
 
@@ -94,7 +94,7 @@ describe(`EventSourceableRepository`, function () {
   let commit: Commit;
 
   const props: Record<string, any> = {};
-  const events: Record<string, Event> = {};
+  const events: Record<string, Event<{}>> = {};
 
   before(() => {
     now = new Date();

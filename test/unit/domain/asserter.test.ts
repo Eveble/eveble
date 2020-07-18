@@ -126,7 +126,7 @@ describe(`Asserter`, () => {
     });
 
     it('sets the action as MessageableType type constructor', () => {
-      class MyCommand extends Command {}
+      class MyCommand extends Command<MyCommand> {}
 
       const asserter = new Asserter();
       asserter.setAction(MyCommand);

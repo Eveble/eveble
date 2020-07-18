@@ -8,13 +8,26 @@ import { types } from '../types';
 
 @define('Message')
 export class Message extends Serializable implements types.Message {
-  public timestamp: Date;
+  public timestamp?: Date;
 
   /*
   Since Command & Event are frozen after construction, metadata property must be assigning on construction. This ensures that content of message is immutable; however metadata as an object will be unaffected by Object.freeze - thus allowing for additional data;
   to be assigned later on
   */
-  public metadata: Record<string, any>;
+  public metadata?: Record<string, any>;
+
+  /**
+   * Creates an instance of Message.
+   * @param props - Properties of the type required for construction.
+   * @remarks
+   * Since were dealing with special cases, mixins and limits of TypeScript, we
+   * use of "invoking multiple base constructors" from polytype to pass props to Struct's
+   * constructor:
+   * https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
+   */
+  constructor(props: types.Props = {}) {
+    super(props);
+  }
 
   /**
    * Processes properties for Message.
@@ -38,7 +51,7 @@ export class Message extends Serializable implements types.Message {
    * @returns Returns instance of `Date`.
    */
   public getTimestamp(): Date {
-    return this.timestamp;
+    return this.timestamp as Date;
   }
 
   /**

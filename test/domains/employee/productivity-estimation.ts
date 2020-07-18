@@ -54,7 +54,7 @@ export class ProductivityEstimation extends Process {
     this.record(
       new ProductivityEstimationInitiated({
         ...this.eventProps(),
-        taskId: task.getId(),
+        taskId: task.getId() as Guid,
         employeeId,
         estimatedPoints,
       })

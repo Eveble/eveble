@@ -64,13 +64,15 @@ export class Employee extends Aggregate {
   HANDLES
   */
   CreateEmployee(@initial command: CreateEmployee): void {
+    const { firstName, lastName } = command;
     this.record(
-      new EmployeeCreated(
-        this.pickEventProps(command, {
-          points: 0,
-          taskListsIds: [],
-        })
-      )
+      new EmployeeCreated({
+        ...this.eventProps(),
+        firstName,
+        lastName,
+        points: 0,
+        taskListsIds: [],
+      })
     );
   }
 
@@ -82,11 +84,11 @@ export class Employee extends Aggregate {
     }
 
     this.record(
-      new EmployeeProductivityEstimated(
-        this.pickEventProps(command, {
-          points: this.points,
-        })
-      )
+      new EmployeeProductivityEstimated({
+        ...this.eventProps(),
+        estimatedPoints: command.estimatedPoints,
+        points: this.points,
+      })
     );
   }
 
@@ -106,11 +108,19 @@ export class Employee extends Aggregate {
     );
   }
 
-  TerminateEmployee(@route command: TerminateEmployee): void {
+  TerminateEmployee(@route _command: TerminateEmployee): void {
     if (this.isInState('terminated')) {
       throw new EmployeeAlreadyTerminatedError(this.getId().toString());
     }
-    this.record(new EmployeeTerminated(this.pickEventProps(command)));
+    this.record(
+      new EmployeeTerminated({
+        ...this.eventProps(),
+        firstName: this.firstName,
+        lastName: this.lastName,
+        points: this.points,
+        taskListsIds: this.taskListsIds,
+      })
+    );
   }
 
   /**
@@ -118,7 +128,7 @@ export class Employee extends Aggregate {
    * @param taskListId - Task list identifier.
    * @returns Returns `true` if task list is assigned to employee, else `false`.
    */
-  protected hasTaskListAssigned(taskListId): boolean {
+  protected hasTaskListAssigned(taskListId: Guid): boolean {
     for (const id of this.taskListsIds) {
       if (id.equals(taskListId)) {
         return true;

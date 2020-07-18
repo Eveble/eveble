@@ -26,7 +26,6 @@ import {
 } from '../../../src/messaging/messaging-errors';
 import { UndefinedStatesError } from '../../../src/mixins/stateful-mixin';
 import { UndefinedStatusesError } from '../../../src/mixins/statusful-mixin';
-import { PickableProperties } from '../../../src/components/pickable-properties';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
 import { isDefinable } from '../../../src/utils/helpers';
@@ -41,38 +40,38 @@ describe(`EventSourceable`, function () {
   let clock: any;
   let handlers: Record<string, Function>;
   let orderProps: Record<string, any>;
-  let commands: Record<string, Command>;
-  let events: Record<string, Event>;
+  let commands: Record<string, Command<{}>>;
+  let events: Record<string, Event<{}>>;
 
   /*
   COMMANDS
   */
   @define('CreateOrder')
-  class CreateOrder extends Command {
+  class CreateOrder extends Command<CreateOrder> {
     customerName: string;
   }
 
   @define('PayOrder')
-  class PayOrder extends Command {}
+  class PayOrder extends Command<PayOrder> {}
 
   @define('FulfillOrder')
-  class FulfillOrder extends Command {}
+  class FulfillOrder extends Command<FulfillOrder> {}
 
   /*
   EVENTS
   */
   @define('OrderCreated')
-  class OrderCreated extends Event {
+  class OrderCreated extends Event<OrderCreated> {
     customerName: string;
   }
 
   @define('OrderPaid')
-  class OrderPaid extends Event {
+  class OrderPaid extends Event<OrderPaid> {
     customerName: string;
   }
 
   @define('OrderFulfilled')
-  class OrderFulfilled extends Event {
+  class OrderFulfilled extends Event<OrderFulfilled> {
     customerName: string;
 
     discountCode: string;
@@ -166,12 +165,22 @@ describe(`EventSourceable`, function () {
 
     // Handles
     CreateOrder(@initial command: CreateOrder): void {
-      this.record(new OrderCreated(this.pickEventProps(command)));
+      this.record(
+        new OrderCreated({
+          ...this.eventProps(),
+          customerName: command.customerName,
+        })
+      );
       handlers.CreateOrder(command);
     }
 
     PayOrder(@route command: PayOrder): void {
-      this.record(new OrderPaid(this.pickEventProps(command)));
+      this.record(
+        new OrderPaid({
+          ...this.eventProps(),
+          customerName: this.customerName,
+        })
+      );
       handlers.PayOrder(command);
     }
 
@@ -292,7 +301,7 @@ describe(`EventSourceable`, function () {
 
     const messagePropTypeShape = PropTypes.shape({
       getId: PropTypes.instanceOf(Function),
-      timestamp: PropTypes.instanceOf(Date),
+      timestamp: PropTypes.instanceOf(Date).isOptional,
       metadata: PropTypes.object.isOptional,
       getTimestamp: PropTypes.instanceOf(Function),
       assignMetadata: PropTypes.instanceOf(Function),
@@ -450,7 +459,7 @@ describe(`EventSourceable`, function () {
       };
       const instance = new Order({ id: 'my-id' });
       expect(() => {
-        instance.record((nonEvent as any) as Event);
+        instance.record((nonEvent as any) as Event<{}>);
       }).to.throw(
         InvalidEventError,
         `Order: event must be instance of Event, got {"type":String("Test"), "eventSourceableId":String("my-id")}`
@@ -459,7 +468,7 @@ describe(`EventSourceable`, function () {
 
     it(`expects recorded event with source id matching event sourcable's id`, () => {
       @define('MyEvent', { isRegistrable: false })
-      class MyEvent extends Event {}
+      class MyEvent extends Event<MyEvent> {}
 
       const event = new MyEvent({
         sourceId: 'other-id',
@@ -476,7 +485,7 @@ describe(`EventSourceable`, function () {
 
     it('does not throw error if there is missing handler for event', () => {
       @define('MyEvent', { isRegistrable: false })
-      class MyEvent extends Event {}
+      class MyEvent extends Event<MyEvent> {}
 
       const event = new MyEvent({
         sourceId: 'my-id',
@@ -495,7 +504,7 @@ describe(`EventSourceable`, function () {
       };
       const instance = new MyEventSourceable({ id: 'my-id' });
       expect(() => {
-        instance.record((nonEvent as any) as Event);
+        instance.record((nonEvent as any) as Event<{}>);
       }).to.throw(InvalidEventError);
       expect(instance.getEvents()).to.eql([]);
     });
@@ -576,7 +585,7 @@ describe(`EventSourceable`, function () {
       };
       const instance = new Order({ id: orderProps.id });
       expect(() => {
-        instance.record((nonEvent as any) as Event);
+        instance.record((nonEvent as any) as Event<{}>);
       }).to.throw(
         InvalidEventError,
         `Order: event must be instance of Event, got {"type":String("Test"), "eventSourceableId":String("my-id")}`
@@ -632,13 +641,13 @@ describe(`EventSourceable`, function () {
 
   describe(`history`, () => {
     @define('Created', { isRegistrable: false })
-    class Created extends Event {}
+    class Created extends Event<Created> {}
 
     @define('FirstChange', { isRegistrable: false })
-    class FirstChange extends Event {}
+    class FirstChange extends Event<FirstChange> {}
 
     @define('SecondChange', { isRegistrable: false })
-    class SecondChange extends Event {}
+    class SecondChange extends Event<SecondChange> {}
 
     it('replays given historic events on the event sourceable', () => {
       const instance = new EventSourceable({ id: orderProps.id });
@@ -679,7 +688,7 @@ describe(`EventSourceable`, function () {
 
     it(`throws HandlerNotFoundError when handler for message was not registered`, async () => {
       @define('NotHandledCommand')
-      class NotHandledCommand extends Command {}
+      class NotHandledCommand extends Command<NotHandledCommand> {}
 
       const id = 'my-id';
       const command = new NotHandledCommand({
@@ -764,7 +773,7 @@ describe(`EventSourceable`, function () {
 
   describe(`assigning properties`, () => {
     @define('UpdateProfile', { isRegistrable: false })
-    class UpdateProfile extends Event {
+    class UpdateProfile extends Event<UpdateProfile> {
       name: string;
 
       username: string;
@@ -773,7 +782,7 @@ describe(`EventSourceable`, function () {
     }
 
     @define('NotRelatedEvent', { isRegistrable: false })
-    class NotRelatedEvent extends Event {
+    class NotRelatedEvent extends Event<NotRelatedEvent> {
       propertyThatDoesNotMatchDefinition: string;
     }
 
@@ -902,17 +911,24 @@ describe(`EventSourceable`, function () {
   });
 
   describe(`picking properties`, () => {
-    it(`returns essential event properties: sourceId and version`, () => {
+    it(`returns essential event properties: sourceId, timestamp, metadata, version`, () => {
       const instance = new Order({ id: orderProps.id });
       const eventProps = {
         sourceId: orderProps.id,
+        timestamp: new Date(),
+        metadata: {},
         version: 0,
       };
       expect(instance.eventProps()).to.be.eql(eventProps);
     });
 
+    it(`returns essential command properties: metadata, timestamp`, () => {
       const instance = new Order({ id: orderProps.id });
+      const commandProps = {
+        timestamp: new Date(),
+        metadata: {},
       };
+      expect(instance.commandProps()).to.be.eql(commandProps);
     });
   });
 
@@ -1038,25 +1054,25 @@ describe(`EventSourceable`, function () {
 
   describe('flagging messages', () => {
     @define('FirstCommand', { isRegistrable: false })
-    class FirstCommand extends Command {}
+    class FirstCommand extends Command<FirstCommand> {}
     @define('SecondCommand', { isRegistrable: false })
-    class SecondCommand extends Command {}
+    class SecondCommand extends Command<SecondCommand> {}
 
     @define('FirstEvent', { isRegistrable: false })
-    class FirstEvent extends Event {}
+    class FirstEvent extends Event<FirstEvent> {}
     @define('SecondEvent', { isRegistrable: false })
-    class SecondEvent extends Event {}
+    class SecondEvent extends Event<SecondEvent> {}
 
     describe('initializing messages', () => {
       it(`throws InitializingMessageAlreadyExistsError when there is more then one initializing command found`, () => {
         const fn = (): any => {
           @define('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
-            FirstComand(@initial command: FirstCommand): Command {
+            FirstComand(@initial command: FirstCommand): Command<{}> {
               return command;
             }
 
-            SecondCommand(@initial command: SecondCommand): Command {
+            SecondCommand(@initial command: SecondCommand): Command<{}> {
               return command;
             }
           }
@@ -1071,11 +1087,11 @@ describe(`EventSourceable`, function () {
         const fn = (): any => {
           @define('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
-            FirstEvent(@initial event: FirstEvent): Event {
+            FirstEvent(@initial event: FirstEvent): Event<{}> {
               return event;
             }
 
-            SecondEvent(@initial event: SecondEvent): Event {
+            SecondEvent(@initial event: SecondEvent): Event<{}> {
               return event;
             }
           }
@@ -1090,11 +1106,11 @@ describe(`EventSourceable`, function () {
         const fn = (): any => {
           @define('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
-            FirstCommand(@initial command: FirstCommand): Command {
+            FirstCommand(@initial command: FirstCommand): Command<{}> {
               return command;
             }
 
-            FirstEvent(@initial event: FirstEvent): Event {
+            FirstEvent(@initial event: FirstEvent): Event<{}> {
               return event;
             }
           }
@@ -1109,19 +1125,19 @@ describe(`EventSourceable`, function () {
       it('sets the initializing command', () => {
         @define('MyClass', { isRegistrable: false })
         class MyClass extends EventSourceable {
-          FirstCommand(@initial command: FirstCommand): Command {
+          FirstCommand(@initial command: FirstCommand): Command<{}> {
             return command;
           }
 
-          SecondCommand(@handle command: SecondCommand): Command {
+          SecondCommand(@handle command: SecondCommand): Command<{}> {
             return command;
           }
 
-          FirstEvent(@subscribe event: FirstEvent): Event {
+          FirstEvent(@subscribe event: FirstEvent): Event<{}> {
             return event;
           }
 
-          SecondEvent(@subscribe event: SecondEvent): Event {
+          SecondEvent(@subscribe event: SecondEvent): Event<{}> {
             return event;
           }
         }
@@ -1131,19 +1147,19 @@ describe(`EventSourceable`, function () {
       it('sets the initializing event', () => {
         @define('MyClass', { isRegistrable: false })
         class MyClass extends EventSourceable {
-          FirstCommand(@handle command: FirstCommand): Command {
+          FirstCommand(@handle command: FirstCommand): Command<{}> {
             return command;
           }
 
-          SecondCommand(@handle command: SecondCommand): Command {
+          SecondCommand(@handle command: SecondCommand): Command<{}> {
             return command;
           }
 
-          FirstEvent(@initial event: FirstEvent): Event {
+          FirstEvent(@initial event: FirstEvent): Event<{}> {
             return event;
           }
 
-          SecondEvent(@subscribe event: SecondEvent): Event {
+          SecondEvent(@subscribe event: SecondEvent): Event<{}> {
             return event;
           }
         }
@@ -1153,19 +1169,19 @@ describe(`EventSourceable`, function () {
       it('returns undefined if initializing message is not set', () => {
         @define('MyClass', { isRegistrable: false })
         class MyClass extends EventSourceable {
-          FirstCommand(@handle command: FirstCommand): Command {
+          FirstCommand(@handle command: FirstCommand): Command<{}> {
             return command;
           }
 
-          SecondCommand(@handle command: SecondCommand): Command {
+          SecondCommand(@handle command: SecondCommand): Command<{}> {
             return command;
           }
 
-          FirstEvent(@subscribe event: FirstEvent): Event {
+          FirstEvent(@subscribe event: FirstEvent): Event<{}> {
             return event;
           }
 
-          SecondEvent(@subscribe event: SecondEvent): Event {
+          SecondEvent(@subscribe event: SecondEvent): Event<{}> {
             return event;
           }
         }
@@ -1178,11 +1194,11 @@ describe(`EventSourceable`, function () {
         it('routes commands', () => {
           @define('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
-            FirstCommand(@route command: FirstCommand): Command {
+            FirstCommand(@route command: FirstCommand): Command<{}> {
               return command;
             }
 
-            SecondCommand(@route command: SecondCommand): Command {
+            SecondCommand(@route command: SecondCommand): Command<{}> {
               return command;
             }
           }
@@ -1202,11 +1218,11 @@ describe(`EventSourceable`, function () {
         it('routes events', () => {
           @define('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
-            FirstEvent(@route event: FirstEvent): Event {
+            FirstEvent(@route event: FirstEvent): Event<{}> {
               return event;
             }
 
-            SecondEvent(@route event: SecondEvent): Event {
+            SecondEvent(@route event: SecondEvent): Event<{}> {
               return event;
             }
           }
@@ -1227,11 +1243,11 @@ describe(`EventSourceable`, function () {
         it('routes mixed messages', () => {
           @define('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
-            FirstCommand(@route command: FirstCommand): Command {
+            FirstCommand(@route command: FirstCommand): Command<{}> {
               return command;
             }
 
-            SecondEvent(@route event: SecondEvent): Event {
+            SecondEvent(@route event: SecondEvent): Event<{}> {
               return event;
             }
           }

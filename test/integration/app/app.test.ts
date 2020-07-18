@@ -532,9 +532,9 @@ describe(`App`, function () {
 
   describe(`helpers`, () => {
     @define('App.MyCommand')
-    class MyCommand extends Command {}
+    class MyCommand extends Command<{}> {}
     @define('App.MyEvent')
-    class MyEvent extends Event {}
+    class MyEvent extends Event<{}> {}
 
     let app: App;
     let commandBus: any;

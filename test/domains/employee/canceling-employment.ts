@@ -66,18 +66,24 @@ export class CancelingEmployment extends Process {
     }
 
     this.record(
-      new CancelingEmploymentInitiated(
-        this.pickEventProps(command, {
-          taskListsIds: [],
-          closedTaskListsIds: [],
-        })
-      )
+      new CancelingEmploymentInitiated({
+        ...this.eventProps(),
+        employeeId,
+        taskListsIds: [],
+        closedTaskListsIds: [],
+      })
     );
 
-    this.record(new EmployeeTerminationInitiated(this.pickEventProps(command)));
+    this.record(
+      new EmployeeTerminationInitiated({
+        ...this.eventProps(),
+        employeeId: this.employeeId,
+      })
+    );
 
     this.trigger(
       new TerminateEmployee({
+        ...this.commandProps(),
         targetId: employeeId,
       })
     );
@@ -120,7 +126,14 @@ export class CancelingEmployment extends Process {
 
       this.trigger(new CloseTaskList({ targetId: taskListsIds[0] }));
     } else {
-      this.record(new CancelingEmploymentCompleted(this.pickEventProps()));
+      this.record(
+        new CancelingEmploymentCompleted({
+          ...this.eventProps(),
+          employeeId: this.employeeId,
+          taskListsIds: this.taskListsIds,
+          closedTaskListsIds: this.closedTaskListsIds,
+        })
+      );
     }
   }
 
@@ -142,7 +155,7 @@ export class CancelingEmployment extends Process {
       new AddedClosedEmployeeTaskList({
         ...this.eventProps(),
         employeeId: this.employeeId,
-        taskListId: event.sourceId,
+        taskListId: event.sourceId as Guid,
       })
     );
 
@@ -153,7 +166,12 @@ export class CancelingEmployment extends Process {
     for (const id of this.taskListsIds) {
       if (!closedTaskListsStrIds.includes(id.toString())) {
         // Iterate till all task lists are closed
-        this.trigger(new CloseTaskList({ targetId: id }));
+        this.trigger(
+          new CloseTaskList({
+            ...this.commandProps(),
+            targetId: id,
+          })
+        );
         return;
       }
     }
@@ -178,7 +196,14 @@ export class CancelingEmployment extends Process {
     @subscribe _event: ClosingEmployeeTaskListsCompleted
   ): void {
     this.setState(CancelingEmployment.STATES['closingTaskLists.completed']);
-    this.record(new CancelingEmploymentCompleted(this.pickEventProps()));
+    this.record(
+      new CancelingEmploymentCompleted({
+        ...this.eventProps(),
+        employeeId: this.employeeId,
+        taskListsIds: this.taskListsIds,
+        closedTaskListsIds: this.closedTaskListsIds,
+      })
+    );
   }
 
   CancelingEmploymentCompleted(

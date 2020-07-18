@@ -15,10 +15,10 @@ import { BINDINGS } from '../../../src/constants/bindings';
 
 describe(`Service`, function () {
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
 
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     key: string;
   }
 

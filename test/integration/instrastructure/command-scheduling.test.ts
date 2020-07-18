@@ -513,7 +513,7 @@ describe(`Command scheduling`, function () {
 
   describe('batch unscheduling commands', () => {
     @define('CommandScheduling.MyCommand')
-    class MyCommand extends Command {
+    class MyCommand extends Command<MyCommand> {
       name: string;
     }
 

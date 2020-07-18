@@ -24,7 +24,7 @@ describe('ScheduleCommand', function () {
   });
 
   @define('MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {
+  class MyCommand extends Command<MyCommand> {
     key: string;
   }
 
@@ -52,22 +52,55 @@ describe('ScheduleCommand', function () {
     });
 
     it('takes required command property as a Command', () => {
-      expect(ScheduleCommand.getPropTypes().command).to.be.eql(
-        PropTypes.instanceOf(Command)
-      );
+      clock.restore();
+      const shape = PropTypes.interface({
+        targetId: PropTypes.oneOf([
+          PropTypes.instanceOf(String),
+          PropTypes.interface({ toString: PropTypes.instanceOf(Function) }),
+        ]),
+        getId: PropTypes.instanceOf(Function),
+        isDeliverable: PropTypes.instanceOf(Function),
+        isScheduled: PropTypes.instanceOf(Function),
+        schedule: PropTypes.instanceOf(Function),
+        getAssignment: PropTypes.instanceOf(Function),
+        timestamp: PropTypes.instanceOf(Date).isOptional,
+        metadata: PropTypes.object.isOptional,
+        getTimestamp: PropTypes.instanceOf(Function),
+        assignMetadata: PropTypes.instanceOf(Function),
+        hasMetadata: PropTypes.instanceOf(Function),
+        getMetadata: PropTypes.instanceOf(Function),
+        setCorrelationId: PropTypes.instanceOf(Function),
+        getCorrelationId: PropTypes.instanceOf(Function),
+        hasCorrelationId: PropTypes.instanceOf(Function),
+        getTypeName: PropTypes.instanceOf(Function),
+        toString: PropTypes.instanceOf(Function),
+        getPropTypes: PropTypes.instanceOf(Function),
+        toPlainObject: PropTypes.instanceOf(Function),
+        validateProps: PropTypes.instanceOf(Function),
+        getPropertyInitializers: PropTypes.instanceOf(Function),
+        equals: PropTypes.instanceOf(Function),
+        getSchemaVersion: PropTypes.instanceOf(Function),
+        transformLegacyProps: PropTypes.instanceOf(Function),
+        registerLegacyTransformer: PropTypes.instanceOf(Function),
+        overrideLegacyTransformer: PropTypes.instanceOf(Function),
+        hasLegacyTransformer: PropTypes.instanceOf(Function),
+        getLegacyTransformers: PropTypes.instanceOf(Function),
+        getLegacyTransformer: PropTypes.instanceOf(Function),
+      });
+      expect(ScheduleCommand.getPropTypes().command).to.be.eql(shape);
     });
 
-    it('takes timestamp property as a Date', () => {
+    it('takes optional timestamp property as a Date', () => {
       clock.restore();
 
       expect(ScheduleCommand.getPropTypes().timestamp).to.be.eql(
-        PropTypes.instanceOf(Date)
+        PropTypes.instanceOf(Date).isOptional
       );
     });
 
-    it('takes metadata property as an object', () => {
+    it('takes optional metadata property as an object', () => {
       expect(ScheduleCommand.getPropTypes().metadata).to.be.eql(
-        PropTypes.object
+        PropTypes.object.isOptional
       );
     });
   });

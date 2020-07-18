@@ -23,9 +23,9 @@ chai.use(chaiAsPromised);
 
 describe(`Projection`, function () {
   @define('Projection.MyEvent')
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
   @define('Projection.MyCommand')
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
 
   class MyProjection extends Projection {
     /**
@@ -60,7 +60,7 @@ describe(`Projection`, function () {
   let injector: Injector;
   let log: any;
   let eventBus: any;
-  let events: Record<string, Event>;
+  let events: Record<string, Event<{}>>;
   let projection: any;
 
   before(() => {

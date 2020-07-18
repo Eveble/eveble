@@ -6,6 +6,7 @@ import { Event } from '../../../src/components/event';
 import { define } from '../../../src/decorators/define';
 import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
+import { types } from '../../../src';
 
 describe('Event', function () {
   let now: Date;
@@ -24,10 +25,10 @@ describe('Event', function () {
   });
 
   @define('MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
 
   @define('MyCustomEvent', { isRegistrable: false })
-  class MyCustomEvent extends Event {
+  class MyCustomEvent extends Event<MyCustomEvent> {
     name: string;
   }
 
@@ -60,16 +61,18 @@ describe('Event', function () {
       );
     });
 
-    it('takes timestamp property as a Date', () => {
+    it('takes optional timestamp property as a Date', () => {
       clock.restore();
 
       expect(Event.getPropTypes().timestamp).to.be.eql(
-        PropTypes.instanceOf(Date)
+        PropTypes.instanceOf(Date).isOptional
       );
     });
 
-    it('takes metadata property as an object', () => {
-      expect(Event.getPropTypes().metadata).to.be.eql(PropTypes.object);
+    it('takes optional metadata property as an object', () => {
+      expect(Event.getPropTypes().metadata).to.be.eql(
+        PropTypes.object.isOptional
+      );
     });
   });
 
@@ -135,13 +138,13 @@ describe('Event', function () {
 
       it('requires explicit constructor for messages with property initializers', () => {
         @define('MyDefaultEvent', { isRegistrable: false })
-        class MyDefaultEvent extends Event {
+        class MyDefaultEvent extends Event<MyDefaultEvent> {
           key: string;
 
-          default = 'default';
+          default? = 'default';
 
-          constructor(props: Partial<MyDefaultEvent>) {
-            super();
+          constructor(props: types.ConstructorType<MyDefaultEvent>) {
+            super(props);
             Object.assign(this, this.processProps(props));
             Object.freeze(this);
           }

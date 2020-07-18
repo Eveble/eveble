@@ -26,14 +26,14 @@ chai.use(chaiAsPromised);
 
 describe(`Mapping Router with routing provider on Injector`, function () {
   @define('RoutesProvider.MyCommand')
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
   @define('RoutesProvider.MyOtherCommand')
-  class MyOtherCommand extends Command {}
+  class MyOtherCommand extends Command<MyOtherCommand> {}
 
   @define('RoutesProvider.MyEvent')
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
   @define('RoutesProvider.MyOtherEvent')
-  class MyOtherEvent extends Event {}
+  class MyOtherEvent extends Event<MyOtherEvent> {}
 
   // Injector
   let injector: Injector;

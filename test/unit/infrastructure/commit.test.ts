@@ -11,14 +11,14 @@ import { define } from '../../../src/decorators/define';
 
 describe(`Commit`, function () {
   @define('Commit.FirstCommand', { isRegistrable: false })
-  class FirstCommand extends Command {}
+  class FirstCommand extends Command<FirstCommand> {}
   @define('Commit.SecondCommand', { isRegistrable: false })
-  class SecondCommand extends Command {}
+  class SecondCommand extends Command<SecondCommand> {}
 
   @define('Commit.FirstEvent', { isRegistrable: false })
-  class FirstEvent extends Event {}
+  class FirstEvent extends Event<FirstEvent> {}
   @define('Commit.SecondEvent', { isRegistrable: false })
-  class SecondEvent extends Event {}
+  class SecondEvent extends Event<SecondEvent> {}
 
   const now: Date = new Date();
 

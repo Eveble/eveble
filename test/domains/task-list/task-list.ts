@@ -91,12 +91,7 @@ export class TaskList extends Aggregate {
     }
 
     this.record(
-      new TaskListCreated(
-        this.pickEventProps(command, {
-          title,
-          tasks: [],
-        })
-      )
+      new TaskListCreated({ ...this.eventProps(), title, tasks: [] })
     );
   }
 
@@ -113,17 +108,29 @@ export class TaskList extends Aggregate {
     );
   }
 
-  OpenTaskList(@route command: OpenTaskList): void {
+  OpenTaskList(@route _command: OpenTaskList): void {
     this.on(OpenTaskList).ensure.is.not.inOneOfStates([
       TaskList.STATES.open,
       TaskList.STATES.closed,
     ]);
-    this.record(new TaskListOpened(this.pickEventProps(command)));
+    this.record(
+      new TaskListOpened({
+        ...this.eventProps(),
+        title: this.title,
+        tasks: this.tasks,
+      })
+    );
   }
 
-  CloseTaskList(@route command: CloseTaskList): void {
+  CloseTaskList(@route _command: CloseTaskList): void {
     this.on(CloseTaskList).ensure.is.inState(TaskList.STATES.open);
-    this.record(new TaskListClosed(this.pickEventProps(command)));
+    this.record(
+      new TaskListClosed({
+        ...this.eventProps(),
+        title: this.title,
+        tasks: this.tasks,
+      })
+    );
   }
 
   /*

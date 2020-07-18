@@ -21,7 +21,7 @@ chai.use(chaiAsPromised);
 
 describe(`ProjectionRebuilder`, function () {
   @define('ProjectionRebuilder.MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {
+  class MyEvent extends Event<MyEvent> {
     value: string;
   }
 

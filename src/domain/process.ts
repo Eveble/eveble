@@ -51,7 +51,7 @@ export class Process extends EventSourceable {
    * @throws {InvalidInitializingMessageError}
    * Thrown if provided initializing message is not instance of `Command` or `Event`.
    */
-  constructor(arg: History | Command | Event | types.Props) {
+  constructor(arg: History | Command<{}> | Event<{}> | types.Props) {
     // Build up Process props
     const props: Record<string, any> = {
       version: 0,

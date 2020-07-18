@@ -50,8 +50,8 @@ describe('Message', function () {
 
     it('returns property types as an object', () => {
       expect(Message.getPropTypes()).to.be.eql({
-        timestamp: PropTypes.instanceOf(Date),
-        metadata: PropTypes.object,
+        timestamp: PropTypes.instanceOf(Date).isOptional,
+        metadata: PropTypes.object.isOptional,
         schemaVersion: PropTypes.instanceOf(Number).isOptional,
       });
     });

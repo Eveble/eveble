@@ -48,11 +48,11 @@ export class OneToManyHandlingMixin extends HandlingMixin
    * @example
    *```ts
    * @define('MyEvent')
-   * class MyEvent extends Event {
+   * class MyEvent extends Event<MyEvent> {
    *   key: string;
    * }
    * @define('MyOtherEvent')
-   * class MyOtherEvent extends Event {
+   * class MyOtherEvent extends Event<MyOtherEvent> {
    *   key: string;
    * }
    *

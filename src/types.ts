@@ -31,6 +31,11 @@ export namespace types {
     new (...args: any[]): T;
   }
 
+  export type NonMethodKeys<T> = {
+    [P in keyof T]: T[P] extends Function ? never : P;
+  }[keyof T];
+  export type ConstructorType<T> = Pick<T, NonMethodKeys<T>>;
+
   export type AnyFunction = (...args: any[]) => any;
 
   export type Prototype = Record<keyof any, any>;
@@ -434,7 +439,7 @@ export namespace types {
   export type Execution = 'sequential' | 'concurrent';
 
   export interface Message extends Serializable {
-    timestamp: Date;
+    timestamp?: Date;
     metadata?: Record<string, any>;
     getTimestamp(): Date;
     assignMetadata(props: Record<string, any>): void;

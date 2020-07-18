@@ -33,9 +33,9 @@ chai.use(chaiAsPromised);
 
 describe(`Observing and publishing new commits`, function () {
   @define('ObservingAndPublishingNewCommits.MyCommand')
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
   @define('ObservingAndPublishingNewCommits.MyEvent')
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
 
   // Props
   const appId = 'my-app-id';
@@ -145,8 +145,8 @@ describe(`Observing and publishing new commits`, function () {
 
   describe(`publishing changes`, () => {
     let id: Guid;
-    let event: Event;
-    let command: Command;
+    let event: Event<{}>;
+    let command: Command<{}>;
     let commitId: string;
     let generateCommit: Function;
 

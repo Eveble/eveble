@@ -6,27 +6,27 @@ import { define } from '../../../src/decorators/define';
 /*
 TASK LIST
 */
-@define('CreateTaskList')
-export class CreateTaskList extends Command {
+@define()
+export class CreateTaskList extends Command<CreateTaskList> {
   title: string;
 }
 
 @define()
-export class AssignTaskList extends Command {
+export class AssignTaskList extends Command<AssignTaskList> {
   employeeId: Guid;
 }
 
 @define()
-export class OpenTaskList extends Command {}
+export class OpenTaskList extends Command<OpenTaskList> {}
 
 @define()
-export class CloseTaskList extends Command {}
+export class CloseTaskList extends Command<CloseTaskList> {}
 
 /*
 TASK
 */
 @define()
-export class CreateTask extends Command {
+export class CreateTask extends Command<CreateTask> {
   id: Guid;
 
   name: string;
@@ -35,53 +35,53 @@ export class CreateTask extends Command {
 }
 
 @define()
-export class ChangeTaskPriority extends Command {
+export class ChangeTaskPriority extends Command<ChangeTaskPriority> {
   id: Guid;
 
   priority: taskTypes.Priority;
 }
 
 @define()
-export class AcceptTask extends Command {
+export class AcceptTask extends Command<AcceptTask> {
   id: Guid;
 }
 
 @define()
-export class DeclineTask extends Command {
+export class DeclineTask extends Command<DeclineTask> {
   id: Guid;
 
   reason: string;
 }
 
 @define()
-export class StartTask extends Command {
+export class StartTask extends Command<StartTask> {
   id: Guid;
 }
 
 @define()
-export class CompleteTask extends Command {
+export class CompleteTask extends Command<CompleteTask> {
   id: Guid;
 }
 
 @define()
-export class PostponeTask extends Command {
+export class PostponeTask extends Command<PostponeTask> {
   id: Guid;
 
   tillAt: Date;
 }
 
 @define()
-export class QuitTask extends Command {
+export class QuitTask extends Command<QuitTask> {
   id: Guid;
 }
 
 @define()
-export class HoldTask extends Command {
+export class HoldTask extends Command<HoldTask> {
   id: Guid;
 }
 
 @define()
-export class ExpireTask extends Command {
+export class ExpireTask extends Command<ExpireTask> {
   id: Guid;
 
   expireAt: Date;

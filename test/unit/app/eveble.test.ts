@@ -221,11 +221,11 @@ describe(`Eveble Module`, function () {
             .bind<types.Serializer>(BINDINGS.Serializer)
             .toConstantValue(serializer);
           @define('MyCommand')
-          class MyCommand extends Command {
+          class MyCommand extends Command<MyCommand> {
             key: string;
           }
           @define('Namespace.MyEvent')
-          class MyEvent extends Event {
+          class MyEvent extends Event<MyEvent> {
             key: string;
           }
 

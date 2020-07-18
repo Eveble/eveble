@@ -33,14 +33,14 @@ describe(`CommitStore`, function () {
   class MyProcess extends Process {}
 
   @define('CommitStore.MyCommand', { isRegistrable: false })
-  class MyCommand extends Command {}
+  class MyCommand extends Command<MyCommand> {}
   @define('CommitStore.MyOtherCommand', { isRegistrable: false })
-  class MyOtherCommand extends Command {}
+  class MyOtherCommand extends Command<MyOtherCommand> {}
 
   @define('CommitStore.MyEvent', { isRegistrable: false })
-  class MyEvent extends Event {}
+  class MyEvent extends Event<MyEvent> {}
   @define('CommitStore.MyOtherEvent', { isRegistrable: false })
-  class MyOtherEvent extends Event {}
+  class MyOtherEvent extends Event<MyOtherEvent> {}
 
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';
