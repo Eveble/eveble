@@ -4,7 +4,6 @@ import { types } from '../types';
 import { EVENTS_KEY, COMMANDS_KEY } from '../constants/literal-keys';
 import { Guid } from './value-objects/guid';
 import { History } from './history';
-import { PickableProperties } from '../components/pickable-properties';
 declare const EventSourceable_base: import("polytype").Polytype.ClusteredConstructor<[typeof Entity, typeof OneToOneHandlingMixin]>;
 export declare class EventSourceable extends EventSourceable_base implements types.EventSourceable {
     id: string | Guid;
@@ -32,8 +31,16 @@ export declare class EventSourceable extends EventSourceable_base implements typ
     assignMetadata(metadata: Record<string, any>): void;
     protected updateToEventVersion(event: types.Event): void;
     protected validateEventApplicability(event: types.Event): boolean;
-    eventProps(): Record<keyof any, any>;
-    pickEventProps(...sources: Record<string, any>[]): PickableProperties;
+    eventProps(): {
+        sourceId: Guid | string;
+        timestamp: Date;
+        metadata: Record<string, any>;
+        version: number;
+    };
+    commandProps(): {
+        timestamp: Date;
+        metadata: Record<string, any>;
+    };
     incrementVersion(): void;
     static resolveInitializingMessage(): types.MessageType<types.Command | types.Event> | undefined;
     static resolveRoutedCommands(): types.MessageType<types.Command>[];

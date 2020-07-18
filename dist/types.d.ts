@@ -8,6 +8,10 @@ export declare namespace types {
     interface Constructor<T> {
         new (...args: any[]): T;
     }
+    type NonMethodKeys<T> = {
+        [P in keyof T]: T[P] extends Function ? never : P;
+    }[keyof T];
+    type ConstructorType<T> = Pick<T, NonMethodKeys<T>>;
     type AnyFunction = (...args: any[]) => any;
     type Prototype = Record<keyof any, any>;
     type Primitive = any | string | number | boolean | symbol | void | undefined | null | never | unknown;
@@ -109,11 +113,11 @@ export declare namespace types {
     interface Configurable extends Definable {
         isConfigurable(path: string): boolean;
         has(path: string): boolean;
-        get(path: string, runtimeDefaultValue?: any): any;
-        getExact(path: string): any;
-        getDefault(path: string): any;
+        get<T extends any>(path: string, runtimeDefaultValue?: any): T;
+        getExact<T extends any>(path: string): T;
+        getDefault<T extends any>(path: string): T;
         hasDefault(path: string): boolean;
-        set(path: string, value: any): void;
+        set<T extends any>(path: string, value: T): void;
         assign(props: Props): void;
         include(config: Configurable): void;
         merge(config: Configurable): void;
@@ -262,7 +266,7 @@ export declare namespace types {
     }
     type Execution = 'sequential' | 'concurrent';
     interface Message extends Serializable {
-        timestamp: Date;
+        timestamp?: Date;
         metadata?: Record<string, any>;
         getTimestamp(): Date;
         assignMetadata(props: Record<string, any>): void;
@@ -418,7 +422,6 @@ export declare namespace types {
         replayHistory(history: Event[]): void;
         assignMetadata(metadata: Record<string, any>): void;
         eventProps(): Record<keyof any, any>;
-        pickEventProps(...sources: Record<string, any>[]): Record<keyof any, any>[];
         incrementVersion(): void;
     }
     interface EventSourceableType {

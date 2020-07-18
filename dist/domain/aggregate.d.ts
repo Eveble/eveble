@@ -13,5 +13,5 @@ export declare class Aggregate extends EventSourceable {
     schemaVersion?: number;
     [COMMANDS_KEY]: types.Command[];
     [EVENTS_KEY]: types.Event[];
-    constructor(arg: History | Command | types.Props);
+    constructor(arg: History | Command<{}> | types.Props);
 }

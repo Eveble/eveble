@@ -7,8 +7,8 @@ export declare class AppConfig extends Config {
         useNewUrlParser: boolean;
         useUnifiedTopology: boolean;
     };
-    appId?: string;
-    workerId?: string;
+    appId?: string | types.Stringifiable;
+    workerId?: string | types.Stringifiable;
     logging?: LoggingConfig;
     conversion?: {
         type: 'manual' | 'runtime';

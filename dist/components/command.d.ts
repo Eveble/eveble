@@ -8,9 +8,13 @@ export declare class Assignment extends Serializable implements types.Assignment
     assignerId: Guid | string;
     assignerType: types.TypeName;
 }
-export declare class Command extends Message implements types.Command, types.Identifiable {
+export declare class Command<T extends {
+    [key: string]: any;
+}> extends Message implements types.Command, types.Identifiable {
     targetId: Guid | string;
-    constructor(props?: types.Props);
+    constructor(props: types.ConstructorType<T> & {
+        targetId: Guid | string;
+    });
     getId(): Guid | string;
     schedule(assignment: Assignment): void;
     getAssignment(): Assignment | undefined;

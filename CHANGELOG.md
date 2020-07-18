@@ -1,3 +1,18 @@
+# [2.0.0](https://github.com/eveble/eveble/compare/v1.0.0...v2.0.0) (2020-07-18)
+
+
+### Features
+
+* **components:** add generic constructor type to Command & Event ([3bd776f](https://github.com/eveble/eveble/commit/3bd776fe663ae774f1d6f7604783dee9d9c34dd6))
+
+
+* refactor!: remove PickableProperties ([fa50a88](https://github.com/eveble/eveble/commit/fa50a88afb2d790556d7a53ef3bdb04d35dac152))
+
+
+### BREAKING CHANGES
+
+* remove PickableProperties in favor of more explicit approach
+
 # 1.0.0 (2020-07-05)
 
 

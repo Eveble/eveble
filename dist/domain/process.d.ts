@@ -15,7 +15,7 @@ export declare class Process extends EventSourceable {
     schemaVersion?: number;
     [COMMANDS_KEY]: types.Command[];
     [EVENTS_KEY]: types.Event[];
-    constructor(arg: History | Command | Event | types.Props);
+    constructor(arg: History | Command<{}> | Event<{}> | types.Props);
     static getCorrelationKey(): string;
     static setCorrelationKey(key: string): void;
     getCorrelationKey(): string;
