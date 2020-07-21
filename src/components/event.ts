@@ -10,9 +10,9 @@ export class Event<
     [key: string]: any;
   }
 > extends Message implements types.Event, types.Identifiable {
-  sourceId: Guid | string;
+  public sourceId: Guid | string;
 
-  version?: number;
+  public version?: number;
 
   /**
    * Creates an instance of Event.
