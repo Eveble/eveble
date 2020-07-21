@@ -23,7 +23,7 @@ export class Command<
     [key: string]: any;
   }
 > extends Message implements types.Command, types.Identifiable {
-  targetId: Guid | string;
+  public targetId: Guid | string;
 
   /**
    * Creates an instance of Message.
