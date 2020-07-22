@@ -50,6 +50,7 @@
     "url": "git://github.com/eveble/eveble.git"
   },
   "dependencies": {
+    "@eveble/core": "latest",
     "@eveble/helpers": "latest",
     "@eveble/ejson": "latest",
     "typend": "latest",
