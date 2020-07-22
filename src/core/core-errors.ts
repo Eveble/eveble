@@ -1,26 +1,3 @@
-import { ExtendableError } from '../components/extendable-error';
-
-/*
-KERNEL ERRORS
-*/
-export class KernelError extends ExtendableError {}
-
-export class UnavailableSerializerError extends KernelError {
-  constructor() {
-    super(
-      `Serialization is unavailable outside on application environment.
-      Define application before using any features related to serialization or set serializer on kernel by using <kernel.setSerializer()>`
-    );
-  }
-}
-export class UnavailableAsserterError extends KernelError {
-  constructor() {
-    super(
-      `Assertion is unavailable outside on application environment. Define application before using any features related to assertion on entities or set asserter on kernel by using <kernel.setAsserter()>`
-    );
-  }
-}
-
 
 /*
   MODULE ERRORS
