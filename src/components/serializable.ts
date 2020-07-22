@@ -1,8 +1,8 @@
 import { classes } from 'polytype';
 import { pick } from 'lodash';
+import { define } from '@eveble/core';
 import { VersionableMixin } from '../mixins/versionable-mixin';
 import { Struct } from './struct';
-import { define } from '../decorators/define';
 import { types } from '../types';
 import { EjsonableMixin } from '../mixins/ejsonable-mixin';
 import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';

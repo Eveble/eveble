@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { classes } from 'polytype';
 import { PropTypes } from 'typend';
+import { define } from '@eveble/core';
 import { types } from '../../../src/types';
 import { version } from '../../../src/annotations/version';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
@@ -14,7 +15,6 @@ import {
   VersionableMixin,
   InvalidSchemaVersionError,
 } from '../../../src/mixins/versionable-mixin';
-import { define } from '../../../src/decorators/define';
 
 describe(`VersionableMixin`, function () {
   describe('prop types', () => {

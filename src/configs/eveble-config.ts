@@ -1,5 +1,5 @@
+import { define } from '@eveble/core';
 import { Config } from '../components/config';
-import { define } from '../decorators/define';
 
 @define()
 export class EvebleConfig extends Config {

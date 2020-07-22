@@ -2,8 +2,8 @@ import { isEmpty } from 'lodash';
 import { OneOf } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import { injectable } from '@parisholley/inversify-async';
-import { ExtendableError } from '../components/extendable-error';
-import { kernel } from '../core/kernel';
+import { kernel, ExtendableError } from '@eveble/core';
+
 import { types } from '../types';
 
 export class StateError extends ExtendableError {}

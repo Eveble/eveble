@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import { define } from '../decorators/define';
+import { define } from '@eveble/core';
 import { Command, Assignment } from '../components/command';
 import { types } from '../types';
 

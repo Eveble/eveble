@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
+import { kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
@@ -33,7 +34,6 @@ import { StatefulAssertion } from '../../../src/domain/assertions/stateful-asser
 import { Asserter } from '../../../src/domain/asserter';
 import { StatusfulAssertion } from '../../../src/domain/assertions/statusful-assertion';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
-import { kernel } from '../../../src/core/kernel';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);

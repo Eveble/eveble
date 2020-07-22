@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import { injectable } from '@parisholley/inversify-async';
+import { define } from '@eveble/core';
 import { Service } from '../../../src/infrastructure/service';
 import { CommandHandlingMixin } from '../../../src/mixins/command-handling-mixin';
 import { EventHandlingMixin } from '../../../src/mixins/event-handling-mixin';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
-import { define } from '../../../src/decorators/define';
 import { handle } from '../../../src/annotations/handle';
 import { Injector } from '../../../src/core/injector';
 import { subscribe } from '../../../src/annotations/subscribe';

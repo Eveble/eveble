@@ -4,7 +4,7 @@ import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
 import { postConstruct } from '@parisholley/inversify-async';
 import getenv from 'getenv';
-import { define } from '../decorators/define';
+import { define, kernel } from '@eveble/core';
 import { Entity } from './entity';
 import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
 import { types } from '../types';
@@ -12,7 +12,7 @@ import { Command, Assignment } from '../components/command';
 import { HandlerNotFoundError } from '../messaging/messaging-errors';
 import { EVENTS_KEY, COMMANDS_KEY } from '../constants/literal-keys';
 import { Event } from '../components/event';
-import { kernel } from '../core/kernel';
+
 import { isPlainRecord } from '../utils/helpers';
 import { EventIdMismatchError, InvalidEventError } from './domain-errors';
 import {

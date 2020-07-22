@@ -1,5 +1,5 @@
+import { define } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
-import { define } from '../../../src/decorators/define';
 import { StateError } from '../../../src/mixins/stateful-mixin';
 
 @define()

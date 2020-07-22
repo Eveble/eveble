@@ -1,7 +1,7 @@
+import { define } from '@eveble/core';
 import { taskTypes } from './task-types';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Command } from '../../../src/components/command';
-import { define } from '../../../src/decorators/define';
 
 /*
 TASK LIST

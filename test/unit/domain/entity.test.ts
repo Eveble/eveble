@@ -4,6 +4,7 @@ import { stubInterface } from 'ts-sinon';
 import { PropTypes, ValidationError } from 'typend';
 import { pull } from 'lodash';
 import sinon from 'sinon';
+import { define, UnavailableAsserterError, kernel } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
 import { Serializable } from '../../../src/components/serializable';
 import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
@@ -18,9 +19,6 @@ import {
   ROLLBACK_STATE_METHOD_KEY,
   SAVED_STATE_KEY,
 } from '../../../src/constants/literal-keys';
-import { define } from '../../../src/decorators/define';
-import { UnavailableAsserterError } from '../../../src/core/core-errors';
-import { kernel } from '../../../src/core/kernel';
 import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
 
 chai.use(sinonChai);

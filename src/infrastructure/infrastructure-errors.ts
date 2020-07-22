@@ -1,4 +1,4 @@
-import { define } from '../decorators/define';
+import { define } from '@eveble/core';
 import { SerializableError } from '../components/serializable-error';
 
 @define('InfrastructureError')

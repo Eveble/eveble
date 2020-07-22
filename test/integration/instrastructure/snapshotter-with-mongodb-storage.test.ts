@@ -3,17 +3,17 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
+import { define, kernel } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
 import { Snapshotter } from '../../../src/infrastructure/snapshotter';
-import { define } from '../../../src/decorators/define';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
 import { Injector } from '../../../src/core/injector';
 import { createEJSON } from '../../../src/utils/helpers';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
-import { kernel } from '../../../src/core/kernel';
+
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
 
 chai.use(sinonChai);

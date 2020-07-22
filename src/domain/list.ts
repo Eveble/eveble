@@ -1,7 +1,7 @@
 import { isFunction, pull, last } from 'lodash';
 import getenv from 'getenv';
+import { kernel } from '@eveble/core';
 import { types } from '../types';
-import { kernel } from '../core/kernel';
 import {
   ElementAlreadyExistsError,
   ElementNotFoundError,

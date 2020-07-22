@@ -2,11 +2,11 @@ import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
+import { define, kernel } from '@eveble/core';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Process } from '../../../src/domain/process';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
-import { define } from '../../../src/decorators/define';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -17,7 +17,7 @@ import { createEJSON } from '../../../src/utils/helpers';
 import { InvalidEventSourceableError } from '../../../src/core/core-errors';
 import { handle } from '../../../src/annotations/handle';
 import { route } from '../../../src/annotations/route';
-import { kernel } from '../../../src/core/kernel';
+
 import { Router } from '../../../src/infrastructure/router';
 import { initial } from '../../../src/annotations/initial';
 

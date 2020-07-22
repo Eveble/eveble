@@ -1,11 +1,10 @@
 import { expect } from 'chai';
 import { instanceOf, PropTypes, ValidationError } from 'typend';
-import { define } from '../../../src/decorators/define';
+import { define, ExtendableError } from '@eveble/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { SerializableError } from '../../../src/components/serializable-error';
 import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
-import { ExtendableError } from '../../../src/components/extendable-error';
 import { isDefinable } from '../../../src/utils/helpers';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';

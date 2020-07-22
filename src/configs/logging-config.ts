@@ -1,5 +1,5 @@
 import getenv from 'getenv';
-import { define } from '../decorators/define';
+import { define } from '@eveble/core';
 import { Config } from '../components/config';
 import { LogTransportConfig } from './log-transport-config';
 import { types } from '../types';

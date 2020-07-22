@@ -4,6 +4,7 @@ import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
 import sinon from 'sinon';
+import { kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
@@ -33,7 +34,6 @@ import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-t
 import { Asserter } from '../../../src/domain/asserter';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
-import { kernel } from '../../../src/core/kernel';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
 import { BINDINGS } from '../../../src/constants/bindings';

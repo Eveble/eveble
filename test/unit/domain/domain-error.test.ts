@@ -1,8 +1,8 @@
 import { expect } from 'chai';
+import { define } from '@eveble/core';
 import { DomainError } from '../../../src/domain/domain-error';
 import { SerializableError } from '../../../src/components/serializable-error';
 import { isDefinable } from '../../../src/utils/helpers';
-import { define } from '../../../src/decorators/define';
 
 describe('DomainError', function () {
   @define()

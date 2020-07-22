@@ -1,5 +1,5 @@
+import { define } from '@eveble/core';
 import { Message } from './message';
-import { define } from '../decorators/define';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
+import { define } from '@eveble/core';
 import { Log, LogMetadata } from '../../../src/components/log-entry';
-import { define } from '../../../src/decorators/define';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 
 describe('Log', function () {

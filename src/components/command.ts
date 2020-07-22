@@ -1,6 +1,6 @@
 import { has, get } from 'lodash';
+import { define } from '@eveble/core';
 import { Message } from './message';
-import { define } from '../decorators/define';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { Serializable } from './serializable';

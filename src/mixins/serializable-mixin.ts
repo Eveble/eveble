@@ -1,6 +1,6 @@
 import { getTypeName } from '@eveble/helpers';
+import { kernel } from '@eveble/core';
 import { types } from '../types';
-import { kernel } from '../core/kernel';
 
 export class SerializableMixin {
   /**

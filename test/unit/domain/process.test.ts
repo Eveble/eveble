@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define } from '../../../src/decorators/define';
+import { define } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Process } from '../../../src/domain/process';
 import { subscribe } from '../../../src/annotations/subscribe';

@@ -1,3 +1,4 @@
+import { define } from '@eveble/core';
 import { CancelEmployment, TerminateEmployee } from './employee-commands';
 import {
   // Canceling employment
@@ -17,7 +18,6 @@ import { TaskListClosed } from '../task-list/task-events';
 import { CloseTaskList } from '../task-list/task-commands';
 import { DomainError } from '../../../src/domain/domain-error';
 import { Process } from '../../../src/domain/process';
-import { define } from '../../../src/decorators/define';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { initial } from '../../../src/annotations/initial';

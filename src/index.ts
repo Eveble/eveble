@@ -21,7 +21,7 @@ export { MongoDBSnapshotStorageModule } from './app/modules/mongodb-snapshot-sto
 export { Command, Assignment } from './components/command';
 export { Config } from './components/config';
 export { Event } from './components/event';
-export { ExtendableError } from './components/extendable-error';
+export { ExtendableError } from '@eveble/core';
 export { Log, LogMetadata } from './components/log-entry';
 export { Message } from './components/message';
 export { SerializableError } from './components/serializable-error';
@@ -46,13 +46,6 @@ export { BaseApp } from './core/base-app';
 export {
   InjectorError,
   InvalidEventSourceableError,
-  KernelError,
-  UnavailableSerializerError,
-  UnavailableAsserterError,
-  TypeError,
-  TypeExistsError,
-  TypeNotFoundError,
-  UnregistrableTypeError,
   ModuleError,
   AppMissingError,
   InjectorMissingError,
@@ -65,14 +58,23 @@ export {
   InvalidTransportIdError,
   TransportExistsError,
 } from './core/core-errors';
+export {
+  KernelError,
+  UnavailableSerializerError,
+  UnavailableAsserterError,
+  TypeError,
+  TypeExistsError,
+  TypeNotFoundError,
+  UnregistrableTypeError,
+} from '@eveble/core';
 export { Injector } from './core/injector';
-export { Kernel, kernel } from './core/kernel';
-export { Library } from './core/library';
+export { Kernel, kernel } from '@eveble/core';
+export { Library } from '@eveble/core';
 export { LogTransport } from './core/log-transport';
 export { Logger } from './core/logger';
 export { Module } from './core/module';
 // Decorators
-export { define } from './decorators/define';
+export { define } from '@eveble/core';
 // Domain
 export { AbilityAssertion } from './domain/assertions/ability-assertion';
 export {
@@ -219,17 +221,16 @@ export {
 // Helpers
 export {
   isDefinable,
-  isSerializable,
   isRecord,
   isPlainRecord,
   hasPostConstruct,
   toPlainObject,
   convertObjectToCollection,
-  resolveSerializableFromPropType,
   createEJSON,
   isEventSourceableType,
   loadENV,
 } from './utils/helpers';
+export { isSerializable, resolveSerializableFromPropType } from '@eveble/core';
 // Types
 export { types } from './types';
 export { types as EvebleTypes } from './types';

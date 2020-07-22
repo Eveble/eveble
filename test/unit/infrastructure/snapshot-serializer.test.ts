@@ -1,12 +1,12 @@
 import { stubInterface } from 'ts-sinon';
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
+import { define } from '@eveble/core';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
-import { define } from '../../../src/decorators/define';
 
 chai.use(sinonChai);
 

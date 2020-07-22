@@ -1,5 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { kernel } from '@eveble/core';
 import { Injector } from '../../../src/core/injector';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-task-completion-policy';
@@ -22,7 +23,6 @@ import {
   TaskList,
 } from '../../domains/task-list/task-list';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
-import { kernel } from '../../../src/core/kernel';
 
 chai.use(chaiAsPromised);
 

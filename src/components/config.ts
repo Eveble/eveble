@@ -2,12 +2,12 @@ import { set, get, has, isEmpty } from 'lodash';
 import merge from 'deepmerge';
 import { InstanceOf, Collection, instanceOf, Optional } from 'typend';
 import { getTypeName } from '@eveble/helpers';
+import { define, kernel } from '@eveble/core';
 import { Struct } from './struct';
 import { types } from '../types';
 import { InvalidConfigError } from '../core/core-errors';
-import { kernel } from '../core/kernel';
+
 import { isPlainRecord, convertObjectToCollection } from '../utils/helpers';
-import { define } from '../decorators/define';
 import { delegate } from '../annotations/delegate';
 
 /*

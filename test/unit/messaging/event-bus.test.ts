@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import delay from 'delay';
+import { define } from '@eveble/core';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { OneToManyHandlingMixin } from '../../../src/mixins/one-to-many-handling-mixin';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
@@ -9,7 +10,6 @@ import {
   HandlerExistError,
   UnhandleableTypeError,
 } from '../../../src/messaging/messaging-errors';
-import { define } from '../../../src/decorators/define';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 

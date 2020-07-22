@@ -1,18 +1,18 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import {
+  define,
   TypeNotFoundError,
   TypeExistsError,
   UnregistrableTypeError,
   UnavailableSerializerError,
-} from '../../../src/core/core-errors';
-import { define } from '../../../src/decorators/define';
+  kernel,
+} from '@eveble/core';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
 import { Serializable } from '../../../src/components/serializable';
-import { kernel } from '../../../src/core/kernel';
 import { UnparsableValueError } from '../../../src/messaging/messaging-errors';
 import { TYPE_KEY } from '../../../src/constants/literal-keys';
 import { createEJSON } from '../../../src/utils/helpers';

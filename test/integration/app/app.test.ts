@@ -4,6 +4,7 @@ import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import Agenda from 'agenda';
 import { MongoClient, Collection, Db } from 'mongodb';
+import { define, kernel } from '@eveble/core';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -20,9 +21,7 @@ import { Injector } from '../../../src/core/injector';
 import { MongoDBCommitStorageModule } from '../../../src/app/modules/mongodb-commit-storage-module';
 import { MongoDBSnapshotStorageModule } from '../../../src/app/modules/mongodb-snapshot-storage-module';
 import { AgendaCommandSchedulerModule } from '../../../src/app/modules/agenda-command-scheduler-module';
-import { define } from '../../../src/decorators/define';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { kernel } from '../../../src/core/kernel';
 
 chai.use(sinonChai);
 

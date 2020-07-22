@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import getenv from 'getenv';
-import { define } from '../decorators/define';
+import { define } from '@eveble/core';
 import { Config } from '../components/config';
 import { LoggingConfig } from './logging-config';
 import { EvebleConfig } from './eveble-config';

@@ -1,6 +1,7 @@
 import { getTypeName } from '@eveble/helpers';
 import { isFunction } from 'lodash';
 import { postConstruct, injectable } from '@parisholley/inversify-async';
+import { kernel } from '@eveble/core';
 import { HandlingMixin } from './handling-mixin';
 import { types } from '../types';
 import {
@@ -10,7 +11,6 @@ import {
   UnsupportedExecutionTypeError,
   InvalidMessageableType,
 } from '../messaging/messaging-errors';
-import { kernel } from '../core/kernel';
 import { Event } from '../components/event';
 import { HANDLERS } from '../constants/literal-keys';
 import { Message } from '../components/message';

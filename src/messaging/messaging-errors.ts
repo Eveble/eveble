@@ -1,4 +1,4 @@
-import { ExtendableError } from '../components/extendable-error';
+import { ExtendableError } from '@eveble/core';
 
 /**
  * HANDLING ERRORS

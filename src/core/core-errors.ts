@@ -1,3 +1,4 @@
+import { ExtendableError } from '@eveble/core';
 
 /*
   MODULE ERRORS

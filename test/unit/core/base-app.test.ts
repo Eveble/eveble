@@ -12,10 +12,11 @@ import {
 import * as winston from 'winston';
 import chalk from 'chalk';
 import getenv from 'getenv';
+import { define, kernel } from '@eveble/core';
 import { BaseApp } from '../../../src/core/base-app';
 import { Module } from '../../../src/core/module';
 import { Log } from '../../../src/components/log-entry';
-import { kernel } from '../../../src/core/kernel';
+
 import { BINDINGS } from '../../../src/constants/bindings';
 import { AppConfig } from '../../../src/configs/app-config';
 import {
@@ -24,7 +25,6 @@ import {
 } from '../../../src/core/core-errors';
 import { types } from '../../../src/types';
 import { Config } from '../../../src/components/config';
-import { define } from '../../../src/decorators/define';
 import { LoggingConfig } from '../../../src/configs/logging-config';
 import { Logger } from '../../../src/core/logger';
 import { ConsoleTransport } from '../../../src/core/logging-transports/console-transport';

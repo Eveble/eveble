@@ -2,8 +2,8 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { PropTypes } from 'typend';
 import { stubInterface } from 'ts-sinon';
-import { kernel } from '../../../src/core/kernel';
-import { define } from '../../../src/decorators/define';
+import { define, kernel } from '@eveble/core';
+
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 import { types } from '../../../src/types';
 

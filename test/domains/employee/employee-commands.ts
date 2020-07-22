@@ -1,6 +1,6 @@
+import { define } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { define } from '../../../src/decorators/define';
 
 /*
 EMPLOYEE

@@ -3,6 +3,7 @@ import { getTypeName } from '@eveble/helpers';
 import { instanceOf } from 'typend';
 import { classes } from 'polytype';
 import getenv from 'getenv';
+import { kernel } from '@eveble/core';
 import { StatefulMixin } from '../mixins/stateful-mixin';
 import {
   AppMissingError,
@@ -16,7 +17,6 @@ import { types } from '../types';
 import { Log } from '../components/log-entry';
 import { BINDINGS } from '../constants/bindings';
 import { AppConfig } from '../configs/app-config';
-import { kernel } from './kernel';
 import { Config } from '../components/config';
 
 enum STATES {

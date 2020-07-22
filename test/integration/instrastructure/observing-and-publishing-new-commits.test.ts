@@ -5,6 +5,7 @@ import sinonChai from 'sinon-chai';
 import delay from 'delay';
 import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
+import { define, kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
 import { Command } from '../../../src/components/command';
@@ -15,7 +16,6 @@ import {
 } from '../../../src/infrastructure/structs/commit';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
-import { define } from '../../../src/decorators/define';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -25,7 +25,7 @@ import { createEJSON } from '../../../src/utils/helpers';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
-import { kernel } from '../../../src/core/kernel';
+
 import { Guid } from '../../../src/domain/value-objects/guid';
 
 chai.use(sinonChai);

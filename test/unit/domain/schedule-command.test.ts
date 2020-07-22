@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { PropTypes } from 'typend';
+import { define } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
 import { isDefinable } from '../../../src/utils/helpers';
-import { define } from '../../../src/decorators/define';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { Guid } from '../../../src/domain/value-objects/guid';
 

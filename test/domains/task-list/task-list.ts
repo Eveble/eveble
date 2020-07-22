@@ -1,4 +1,5 @@
 import { inject } from '@parisholley/inversify-async';
+import { define } from '@eveble/core';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Task } from './task';
 import {
@@ -35,7 +36,6 @@ import {
 } from './task-events';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { DomainError } from '../../../src/domain/domain-error';
-import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { initial } from '../../../src/annotations/initial';

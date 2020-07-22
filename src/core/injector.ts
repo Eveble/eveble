@@ -4,10 +4,10 @@ import {
   METADATA_KEY,
   Container as InversifyContainer,
 } from '@parisholley/inversify-async';
+import { kernel } from '@eveble/core';
 import { types } from '../types';
 import { hasPostConstruct, isEventSourceableType } from '../utils/helpers';
 import { BINDINGS } from '../constants/bindings';
-import { kernel } from './kernel';
 import { InvalidEventSourceableError } from './core-errors';
 
 type Mappings = Record<keyof any, inversifyTypes.Metadata[]>;

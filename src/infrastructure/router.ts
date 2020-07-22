@@ -1,4 +1,5 @@
 import { postConstruct, inject } from '@parisholley/inversify-async';
+import { kernel } from '@eveble/core';
 import { types } from '../types';
 import {
   CommitConcurrencyError,
@@ -11,7 +12,6 @@ import { BINDINGS } from '../constants/bindings';
 import { Log } from '../components/log-entry';
 import { Command } from '../components/command';
 import { Event } from '../components/event';
-import { kernel } from '../core/kernel';
 import { InvalidInitializingMessageError } from '../domain/domain-errors';
 import { Guid } from '../domain/value-objects/guid';
 import { DomainError } from '../domain/domain-error';

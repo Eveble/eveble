@@ -1,7 +1,7 @@
 import { isString } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
+import { ExtendableError } from '@eveble/core';
 import { types } from '../types';
-import { ExtendableError } from './extendable-error';
 
 export class UndefinedLoggableTargetError extends ExtendableError {
   constructor() {

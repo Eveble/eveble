@@ -2,7 +2,7 @@ import { isEmpty } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
 import { injectable } from '@parisholley/inversify-async';
 import getenv from 'getenv';
-import { kernel } from '../core/kernel';
+import { kernel } from '@eveble/core';
 import { types } from '../types';
 import { Message } from '../components/message';
 import { Command } from '../components/command';

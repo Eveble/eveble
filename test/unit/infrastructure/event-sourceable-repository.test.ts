@@ -2,11 +2,11 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
+import { define } from '@eveble/core';
 import {
   Commit,
   CommitReceiver,
 } from '../../../src/infrastructure/structs/commit';
-import { define } from '../../../src/decorators/define';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Process } from '../../../src/domain/process';

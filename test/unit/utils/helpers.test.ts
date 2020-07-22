@@ -3,17 +3,19 @@ import { Collection, PropTypes } from 'typend';
 import { postConstruct } from '@parisholley/inversify-async';
 import { stubInterface } from 'ts-sinon';
 import {
-  isDefinable,
+  define,
   isSerializable,
+  resolveSerializableFromPropType,
+} from '@eveble/core';
+import {
+  isDefinable,
   isRecord,
   hasPostConstruct,
   toPlainObject,
   convertObjectToCollection,
   isPlainRecord,
-  resolveSerializableFromPropType,
   isEventSourceableType,
 } from '../../../src/utils/helpers';
-import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
 import { Struct } from '../../../src/components/struct';
 

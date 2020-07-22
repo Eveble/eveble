@@ -2,10 +2,10 @@ import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import { define, kernel } from '@eveble/core';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
-import { kernel } from '../../../src/core/kernel';
+
 import { types } from '../../../src/types';
-import { define } from '../../../src/decorators/define';
 
 chai.use(sinonChai);
 

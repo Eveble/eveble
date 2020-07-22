@@ -4,8 +4,8 @@ import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
 import { injectable } from '@parisholley/inversify-async';
 import deepClone from '@jsbits/deep-clone';
+import { kernel } from '@eveble/core';
 import { types } from '../types';
-import { kernel } from '../core/kernel';
 import { toPlainObject, isPlainRecord } from '../utils/helpers';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 

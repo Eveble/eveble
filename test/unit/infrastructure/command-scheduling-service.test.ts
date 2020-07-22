@@ -1,8 +1,8 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
+import { define } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
-import { define } from '../../../src/decorators/define';
 import { CommandSchedulingService } from '../../../src/infrastructure/command-scheduling-service';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';

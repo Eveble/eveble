@@ -1,3 +1,4 @@
+import { define } from '@eveble/core';
 import { EstimateEmployeeProductivity } from './employee-commands';
 import { EmployeeProductivityEstimated } from './employee-events';
 import { DomainError } from '../../../src/domain/domain-error';
@@ -14,7 +15,6 @@ import { subscribe } from '../../../src/annotations/subscribe';
 import { DomainException } from '../../../src/domain/domain-exception';
 import { Task } from '../task-list/task';
 import { route } from '../../../src/annotations/route';
-import { define } from '../../../src/decorators/define';
 
 @define()
 export class ProductivityEstimationUnavailableForEmployeeError extends DomainError {

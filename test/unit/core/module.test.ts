@@ -7,12 +7,12 @@ import { PropTypes } from 'typend';
 import sinon from 'sinon';
 import { stubInterface } from 'ts-sinon';
 import getenv from 'getenv';
+import { define } from '@eveble/core';
 import { Module } from '../../../src/core/module';
 import { Config } from '../../../src/components/config';
 import { Log } from '../../../src/components/log-entry';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
-import { define } from '../../../src/decorators/define';
 import {
   AppMissingError,
   InvalidModuleError,

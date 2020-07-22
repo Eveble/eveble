@@ -1,5 +1,6 @@
 import { instanceOf } from 'typend';
 import { getTypeName } from '@eveble/helpers';
+import { kernel } from '@eveble/core';
 import {
   InvalidControllerError,
   UnhandleableTypeError,
@@ -7,7 +8,6 @@ import {
 } from '../messaging/messaging-errors';
 import { types } from '../types';
 import 'reflect-metadata';
-import { kernel } from '../core/kernel';
 import { Command } from '../components/command';
 import { Event } from '../components/event';
 import { INITIALIZING_MESSAGE_KEY } from '../constants/metadata-keys';

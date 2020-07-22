@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { define } from '../decorators/define';
+import { define } from '@eveble/core';
 import { Config } from '../components/config';
 import { types } from '../types';
 

@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { has, set, get, isEmpty } from 'lodash';
 import merge from 'deepmerge';
+import { define } from '@eveble/core';
 import { Serializable } from './serializable';
 import { isPlainRecord } from '../utils/helpers';
-import { define } from '../decorators/define';
 import { types } from '../types';
 
 @define('Message')

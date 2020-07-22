@@ -1,12 +1,12 @@
 import { instanceOf } from 'typend';
 import { getTypeName } from '@eveble/helpers';
+import { kernel } from '@eveble/core';
 import {
   InvalidControllerError,
   UnhandleableTypeError,
 } from '../messaging/messaging-errors';
 import { types } from '../types';
 import 'reflect-metadata';
-import { kernel } from '../core/kernel';
 import { Event } from '../components/event';
 import {
   SUBSCRIBER_KEY,
