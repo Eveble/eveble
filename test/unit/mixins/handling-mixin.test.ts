@@ -1,11 +1,11 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import { define } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { HandlingMixin } from '../../../src/mixins/handling-mixin';
 import { Message } from '../../../src/components/message';
-import { define } from '../../../src/decorators/define';
 import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 import { handle } from '../../../src/annotations/handle';
 import { subscribe } from '../../../src/annotations/subscribe';

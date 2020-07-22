@@ -1,8 +1,8 @@
 import { expect } from 'chai';
+import { define } from '@eveble/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { version } from '../../../src/annotations/version';
-import { define } from '../../../src/decorators/define';
 
 describe(`Versioning`, function () {
   describe('transforming legacy schema', () => {

@@ -1,9 +1,9 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { PropTypes, ValidationError } from 'typend';
+import { define } from '@eveble/core';
 import { Config } from '../../../src/components/config';
 import { Struct } from '../../../src/components/struct';
-import { define } from '../../../src/decorators/define';
 import { InvalidConfigError } from '../../../src/core/core-errors';
 import { isDefinable } from '../../../src/utils/helpers';
 

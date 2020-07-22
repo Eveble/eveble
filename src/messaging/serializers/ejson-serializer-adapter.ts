@@ -2,16 +2,16 @@ import { inject, injectable } from '@parisholley/inversify-async';
 import { isFunction, partial, isEmpty } from 'lodash';
 import { instanceOf } from 'typend';
 import {
+  kernel,
   TypeNotFoundError,
   TypeExistsError,
   UnregistrableTypeError,
-} from '../../core/core-errors';
+  isSerializable,
+} from '@eveble/core';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
-import { isSerializable } from '../../utils/helpers';
 import { UnparsableValueError } from '../messaging-errors';
 import { TYPE_KEY } from '../../constants/literal-keys';
-import { kernel } from '../../core/kernel';
 
 @injectable()
 export class EJSONSerializerAdapter implements types.Serializer {

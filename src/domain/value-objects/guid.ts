@@ -1,9 +1,9 @@
 import { isString, isPlainObject } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+import { define, kernel } from '@eveble/core';
 import { ValueObject } from '../value-object';
 import { types } from '../../types';
-import { kernel } from '../../core/kernel';
-import { define } from '../../decorators/define';
+
 import { ValueObjectError } from '../domain-errors';
 
 @define('InvalidGuidValueError')

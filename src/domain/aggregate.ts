@@ -1,9 +1,9 @@
-import { define } from '../decorators/define';
+import { define, kernel } from '@eveble/core';
 import { EventSourceable } from './event-sourceable';
 import { History } from './history';
 import { types } from '../types';
 import { Command } from '../components/command';
-import { kernel } from '../core/kernel';
+
 import { InvalidInitializingMessageError } from './domain-errors';
 import { Event } from '../components/event';
 import { COMMANDS_KEY, EVENTS_KEY } from '../constants/literal-keys';

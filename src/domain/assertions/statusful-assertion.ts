@@ -1,6 +1,6 @@
+import { define } from '@eveble/core';
 import { Assertion } from '../assertion';
 import { DomainError } from '../domain-error';
-import { define } from '../../decorators/define';
 import { types } from '../../types';
 import { UndefinedActionError, AssertionError } from '../domain-errors';
 

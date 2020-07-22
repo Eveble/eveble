@@ -1,11 +1,11 @@
 import { classes } from 'polytype';
 import { injectable } from '@parisholley/inversify-async';
+import { kernel } from '@eveble/core';
 import { InvalidTransportIdError, TransportExistsError } from './core-errors';
 import { StatefulMixin } from '../mixins/stateful-mixin';
 import { LOGGING_LEVELS } from '../constants/defaults';
 import { types } from '../types';
 import { RFC5424LoggingMixin } from '../mixins/rfc-5424-logging-mixin';
-import { kernel } from './kernel';
 
 enum STATES {
   constructed = 'constructed',

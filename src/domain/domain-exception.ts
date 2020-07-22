@@ -1,6 +1,6 @@
+import { define } from '@eveble/core';
 import { Event } from '../components/event';
 import { DomainError } from './domain-error';
-import { define } from '../decorators/define';
 
 @define('DomainException')
 export class DomainException extends Event<DomainException> {

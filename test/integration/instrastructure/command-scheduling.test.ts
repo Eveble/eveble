@@ -5,6 +5,7 @@ import Agenda from 'agenda';
 import delay from 'delay';
 import { Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
+import { define, kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
@@ -36,7 +37,7 @@ import { Asserter } from '../../../src/domain/asserter';
 import { StatefulAssertion } from '../../../src/domain/assertions/stateful-assertion';
 import { StatusfulAssertion } from '../../../src/domain/assertions/statusful-assertion';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
-import { kernel } from '../../../src/core/kernel';
+
 import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import {
@@ -50,7 +51,6 @@ import { AgendaScheduledJobTransformer } from '../../../src/infrastructure/trans
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { CommandSchedulingService } from '../../../src/infrastructure/command-scheduling-service';
-import { define } from '../../../src/decorators/define';
 import { createEJSON } from '../../../src/utils/helpers';
 
 chai.use(sinonChai);

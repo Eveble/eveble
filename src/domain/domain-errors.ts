@@ -1,4 +1,4 @@
-import { define } from '../decorators/define';
+import { define } from '@eveble/core';
 import { DomainError } from './domain-error';
 import { types } from '../types';
 import { SerializableError } from '../components/serializable-error';

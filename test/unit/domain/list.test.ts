@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define } from '../../../src/decorators/define';
+import { define } from '@eveble/core';
 import { Serializable } from '../../../src/components/serializable';
 import { List } from '../../../src/domain/list';
 import {

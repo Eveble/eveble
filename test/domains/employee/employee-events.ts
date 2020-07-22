@@ -1,4 +1,4 @@
-import { define } from '../../../src/decorators/define';
+import { define } from '@eveble/core';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { DomainException } from '../../../src/domain/domain-exception';
 import { Event } from '../../../src/components/event';

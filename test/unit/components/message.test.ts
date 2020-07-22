@@ -1,8 +1,8 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { PropTypes } from 'typend';
+import { define } from '@eveble/core';
 import { Message } from '../../../src/components/message';
-import { define } from '../../../src/decorators/define';
 import { Serializable } from '../../../src/components/serializable';
 import { isDefinable } from '../../../src/utils/helpers';
 

@@ -1,13 +1,12 @@
 import { isNumber } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
 import { injectable } from '@parisholley/inversify-async';
+import { kernel, ExtendableError } from '@eveble/core';
 import { types } from '../types';
 import {
   LEGACY_TRANSFORMERS_CONTAINER_KEY,
   VERSIONABLE_KEY,
 } from '../constants/metadata-keys';
-import { kernel } from '../core/kernel';
-import { ExtendableError } from '../components/extendable-error';
 
 export class VersionableError extends ExtendableError {}
 

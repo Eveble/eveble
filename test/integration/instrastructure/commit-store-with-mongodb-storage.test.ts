@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
+import { define, kernel } from '@eveble/core';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Process } from '../../../src/domain/process';
@@ -14,7 +15,6 @@ import {
   CommitReceiver,
 } from '../../../src/infrastructure/structs/commit';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
-import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Injector } from '../../../src/core/injector';
@@ -24,7 +24,6 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
 import { createEJSON } from '../../../src/utils/helpers';
-import { kernel } from '../../../src/core/kernel';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);

@@ -1,9 +1,9 @@
 import { classes } from 'polytype';
 import { pick } from 'lodash';
 import deepClone from '@jsbits/deep-clone';
+import { define, kernel } from '@eveble/core';
 import { StatefulMixin } from '../mixins/stateful-mixin';
 import { Serializable } from '../components/serializable';
-import { define } from '../decorators/define';
 import { Guid } from './value-objects/guid';
 import { types } from '../types';
 import { StatusfulMixin } from '../mixins/statusful-mixin';
@@ -13,7 +13,7 @@ import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
 } from '../constants/literal-keys';
-import { kernel } from '../core/kernel';
+
 import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
 import { List } from './list';
 

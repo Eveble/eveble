@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { ValidationError } from 'typend';
+import { define } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { Struct } from '../../../src/components/struct';
@@ -7,7 +8,6 @@ import {
   Commit,
   CommitReceiver,
 } from '../../../src/infrastructure/structs/commit';
-import { define } from '../../../src/decorators/define';
 
 describe(`Commit`, function () {
   @define('Commit.FirstCommand', { isRegistrable: false })

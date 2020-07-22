@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai';
 import { MongoClient, Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
 import getenv from 'getenv';
-import { define } from '../../../src/decorators/define';
+import { define } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import {

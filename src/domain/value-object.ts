@@ -1,4 +1,4 @@
-import { define } from '../decorators/define';
+import { define } from '@eveble/core';
 import { Serializable } from '../components/serializable';
 
 @define('ValueObject')

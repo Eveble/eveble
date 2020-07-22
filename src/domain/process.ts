@@ -1,12 +1,12 @@
+import { define, kernel } from '@eveble/core';
 import { EventSourceable } from './event-sourceable';
-import { define } from '../decorators/define';
 import { Command } from '../components/command';
 import { Event } from '../components/event';
 import { History } from './history';
 import { types } from '../types';
 import { Guid } from './value-objects/guid';
 import { InvalidInitializingMessageError } from './domain-errors';
-import { kernel } from '../core/kernel';
+
 import { COMMANDS_KEY, EVENTS_KEY } from '../constants/literal-keys';
 
 @define('Process')

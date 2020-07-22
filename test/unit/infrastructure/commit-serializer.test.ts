@@ -1,13 +1,13 @@
 import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinonChai from 'sinon-chai';
+import { define } from '@eveble/core';
 import {
   Commit,
   CommitReceiver,
 } from '../../../src/infrastructure/structs/commit';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
-import { define } from '../../../src/decorators/define';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';

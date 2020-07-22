@@ -1,3 +1,4 @@
+import { define } from '@eveble/core';
 import { route } from '../../../src/annotations/route';
 import { Aggregate } from '../../../src/domain/aggregate';
 import {
@@ -15,7 +16,6 @@ import {
 import { subscribe } from '../../../src/annotations/subscribe';
 import { initial } from '../../../src/annotations/initial';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { define } from '../../../src/decorators/define';
 import { DomainError } from '../../../src/domain/domain-error';
 
 @define()

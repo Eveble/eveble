@@ -1,11 +1,11 @@
 import chai, { expect } from 'chai';
 import { instanceOf, PropTypes } from 'typend';
 import sinonChai from 'sinon-chai';
+import { define } from '@eveble/core';
 import { Serializable } from '../../../src/components/serializable';
 import { Struct } from '../../../src/components/struct';
 import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
 import { types } from '../../../src/types';
-import { define } from '../../../src/decorators/define';
 import { isDefinable } from '../../../src/utils/helpers';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';

@@ -1,7 +1,7 @@
 import { set, has } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
+import { ExtendableError } from '@eveble/core';
 import { types } from '../types';
-import { ExtendableError } from '../components/extendable-error';
 
 export class AssertionApiAlreadyExistsError extends ExtendableError {
   constructor(asserterName: string, assertionName: string, path: string) {

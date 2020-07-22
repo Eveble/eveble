@@ -1,8 +1,8 @@
+import { define } from '@eveble/core';
 import { Task } from './task';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Event } from '../../../src/components/event';
 import { DomainException } from '../../../src/domain/domain-exception';
-import { define } from '../../../src/decorators/define';
 import { taskTypes } from './task-types';
 
 /*

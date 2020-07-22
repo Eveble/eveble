@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '../../../src/decorators/define';
+import { define } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { Injector } from '../../../src/core/injector';

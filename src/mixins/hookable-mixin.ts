@@ -4,10 +4,10 @@ import { getMatchingParentProto } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
 import { injectable } from '@parisholley/inversify-async';
+import { kernel, ExtendableError } from '@eveble/core';
 import { HOOKABLE_KEY, HOOKS_CONTAINER_KEY } from '../constants/metadata-keys';
-import { ExtendableError } from '../components/extendable-error';
+
 import { types } from '../types';
-import { kernel } from '../core/kernel';
 
 export class HookError extends ExtendableError {}
 

@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
+import { define } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { types } from '../../../src/types';
@@ -15,7 +16,6 @@ import {
   InvalidHandlerError,
   InvalidMessageableType,
 } from '../../../src/messaging/messaging-errors';
-import { define } from '../../../src/decorators/define';
 import { hasPostConstruct } from '../../../src/utils/helpers';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { HandlingMixin } from '../../../src/mixins/handling-mixin';

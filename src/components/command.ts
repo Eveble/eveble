@@ -1,6 +1,6 @@
 import { has, get } from 'lodash';
+import { define } from '@eveble/core';
 import { Message } from './message';
-import { define } from '../decorators/define';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { Serializable } from './serializable';
@@ -23,7 +23,7 @@ export class Command<
     [key: string]: any;
   }
 > extends Message implements types.Command, types.Identifiable {
-  targetId: Guid | string;
+  public targetId: Guid | string;
 
   /**
    * Creates an instance of Message.

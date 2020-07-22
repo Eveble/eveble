@@ -1,5 +1,6 @@
 import * as winston from 'winston';
 import chalk from 'chalk';
+import { kernel } from '@eveble/core';
 import { Injector } from './injector';
 import { Module } from './module';
 import { AppConfig } from '../configs/app-config';
@@ -11,7 +12,6 @@ import { RFC5424 } from '../constants/specifications';
 import { Logger } from './logger';
 import { LogTransportConfig } from '../configs/log-transport-config';
 import { ConsoleTransport } from './logging-transports/console-transport';
-import { kernel } from './kernel';
 import { StringifingConverter } from './logging-transports/formatters/converters/stringifing-converter';
 import { SimpleLogFormatter } from './logging-transports/formatters/simple-log-entry-formatter';
 import { DetailedLogFormatter } from './logging-transports/formatters/detailed-log-entry-formatter';

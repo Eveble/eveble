@@ -2,11 +2,11 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
 import { pull } from 'lodash';
+import { define, kernel } from '@eveble/core';
 import {
   StatefulAssertion,
   InvalidStateTransitionError,
 } from '../../../src/domain/assertions/stateful-assertion';
-import { define } from '../../../src/decorators/define';
 import { Entity } from '../../../src/domain/entity';
 
 import { Asserter } from '../../../src/domain/asserter';
@@ -15,7 +15,7 @@ import {
   StatusfulAssertion,
   InvalidStatusTransitionError,
 } from '../../../src/domain/assertions/statusful-assertion';
-import { kernel } from '../../../src/core/kernel';
+
 import { ValueObject } from '../../../src/domain/value-object';
 
 chai.use(sinonChai);

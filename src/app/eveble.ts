@@ -1,3 +1,4 @@
+import { kernel } from '@eveble/core';
 import { types } from '../types';
 import { Module } from '../core/module';
 import { Log } from '../components/log-entry';
@@ -10,7 +11,6 @@ import { CommitStore } from '../infrastructure/commit-store';
 import { CommitPublisher } from '../infrastructure/commit-publisher';
 import { CommandSchedulingService } from '../infrastructure/command-scheduling-service';
 import { Snapshotter } from '../infrastructure/snapshotter';
-import { kernel } from '../core/kernel';
 import { Router } from '../infrastructure/router';
 import { createEJSON } from '../utils/helpers';
 import { Asserter } from '../domain/asserter';

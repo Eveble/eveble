@@ -1,3 +1,4 @@
+import { CORE_METADATA_KEYS } from '@eveble/core';
 /*
 CORE
 */
@@ -7,9 +8,7 @@ export const HOOKS_CONTAINER_KEY: unique symbol = Symbol(
   'eveble:containers:hooks'
 );
 
-export const DEFAULT_PROPS_KEY: unique symbol = Symbol(
-  'eveble:containers:default-props'
-);
+export const DEFAULT_PROPS_KEY = CORE_METADATA_KEYS.DEFAULT_PROPS_KEY;
 
 export const DELEGATED_KEY: unique symbol = Symbol('eveble:flags:delegated');
 
@@ -51,9 +50,8 @@ export const INITIALIZING_MESSAGE_KEY: unique symbol = Symbol(
 /*
 SERIALIZABLE
 */
-export const SERIALIZABLE_LIST_PROPS_KEY: unique symbol = Symbol(
-  'eveble:container:serializable-list-props'
-);
+export const SERIALIZABLE_LIST_PROPS_KEY =
+  CORE_METADATA_KEYS.SERIALIZABLE_LIST_PROPS_KEY;
 
 export const METADATA_KEYS = {
   HOOKABLE_KEY,

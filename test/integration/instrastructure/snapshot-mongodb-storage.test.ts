@@ -3,9 +3,9 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
+import { define, kernel } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
-import { define } from '../../../src/decorators/define';
 import { types } from '../../../src/types';
 import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
@@ -14,7 +14,6 @@ import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
-import { kernel } from '../../../src/core/kernel';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);

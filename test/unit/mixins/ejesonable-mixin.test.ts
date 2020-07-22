@@ -2,9 +2,9 @@ import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { kernel } from '../../../src/core/kernel';
+import { define, kernel } from '@eveble/core';
+
 import { types } from '../../../src/types';
-import { define } from '../../../src/decorators/define';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
 
 chai.use(sinonChai);

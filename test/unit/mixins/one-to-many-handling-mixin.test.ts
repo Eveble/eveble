@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import delay from 'delay';
+import { define } from '@eveble/core';
 import { Event } from '../../../src/components/event';
 import { types } from '../../../src/types';
 import { OneToManyHandlingMixin } from '../../../src/mixins/one-to-many-handling-mixin';
@@ -15,7 +16,6 @@ import {
   HandlerNotFoundError,
   InvalidMessageableType,
 } from '../../../src/messaging/messaging-errors';
-import { define } from '../../../src/decorators/define';
 import { hasPostConstruct } from '../../../src/utils/helpers';
 import { HandlingMixin } from '../../../src/mixins/handling-mixin';
 

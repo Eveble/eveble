@@ -1,19 +1,30 @@
 import 'reflect-metadata';
 import { has, set, get, isEmpty } from 'lodash';
 import merge from 'deepmerge';
+import { define } from '@eveble/core';
 import { Serializable } from './serializable';
 import { isPlainRecord } from '../utils/helpers';
-import { define } from '../decorators/define';
 import { types } from '../types';
 
 @define('Message')
 export class Message extends Serializable implements types.Message {
+  /**
+   * @remarks
+   * Exposed as optional - but always assigned with use of
+   * `Message.prototype.processProps` for easier interaction.
+   */
   public timestamp?: Date;
 
-  /*
-  Since Command & Event are frozen after construction, metadata property must be assigning on construction. This ensures that content of message is immutable; however metadata as an object will be unaffected by Object.freeze - thus allowing for additional data;
-  to be assigned later on
-  */
+  /**
+   * @remarks
+   * Since Command & Event are frozen after construction, metadata
+   * property must be assigning on construction. This ensures that
+   * content of message is immutable; however metadata as an object will
+   * be unaffected by Object.freeze - thus allowing for additional data
+   * to be assigned later on.
+   * Exposed as optional - but always assigned with use of
+   * `Message.prototype.processProps` for easier interaction.
+   */
   public metadata?: Record<string, any>;
 
   /**

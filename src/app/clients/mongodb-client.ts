@@ -1,12 +1,12 @@
 import { MongoClient, Db, Collection, MongoClientOptions } from 'mongodb';
 import { inject } from '@parisholley/inversify-async';
 import { isEmpty } from 'lodash';
+import { define } from '@eveble/core';
 import { Client } from '../client';
 import { BINDINGS } from '../../constants/bindings';
 import { types } from '../../types';
 import { Config } from '../../components/config';
 import { Log } from '../../components/log-entry';
-import { define } from '../../decorators/define';
 import { Guid } from '../../domain/value-objects/guid';
 
 @define()
