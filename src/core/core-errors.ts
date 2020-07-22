@@ -21,27 +21,6 @@ export class UnavailableAsserterError extends KernelError {
   }
 }
 
-/*
-TYPE ERRORS
-*/
-export class TypeError extends ExtendableError {}
-
-export class TypeExistsError extends TypeError {
-  constructor(source: string, typeName: string) {
-    super(`${source}: type '${typeName}' is already registered`);
-  }
-}
-export class TypeNotFoundError extends TypeError {
-  constructor(source: string, typeName: string) {
-    super(`${source}: type '${typeName}' not found`);
-  }
-}
-
-export class UnregistrableTypeError extends TypeError {
-  constructor(got: string) {
-    super(`Type '${got}' must implement Serializable interface`);
-  }
-}
 
 /*
   MODULE ERRORS
