@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/eveble/eveble/compare/v2.0.0...v2.0.1) (2020-07-23)
+
+
+### Bug Fixes
+
+* update imports of exported elements to @eveble/core ([a7bef4d](https://github.com/eveble/eveble/commit/a7bef4d9c12487682905af4b715263838ba76c2f))
+
 # [2.0.0](https://github.com/eveble/eveble/compare/v1.0.0...v2.0.0) (2020-07-18)
 
 

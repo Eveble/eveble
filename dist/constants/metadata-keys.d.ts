@@ -1,6 +1,6 @@
 export declare const HOOKABLE_KEY: unique symbol;
 export declare const HOOKS_CONTAINER_KEY: unique symbol;
-export declare const DEFAULT_PROPS_KEY: unique symbol;
+export declare const DEFAULT_PROPS_KEY: symbol;
 export declare const DELEGATED_KEY: unique symbol;
 export declare const VERSIONABLE_KEY: unique symbol;
 export declare const LEGACY_TRANSFORMERS_CONTAINER_KEY: unique symbol;
@@ -11,7 +11,7 @@ export declare const SUBSCRIBER_KEY: unique symbol;
 export declare const EVENT_HANDLERS_CONTAINER_KEY: unique symbol;
 export declare const ROUTED_EVENTS_CONTAINER_KEY: unique symbol;
 export declare const INITIALIZING_MESSAGE_KEY: unique symbol;
-export declare const SERIALIZABLE_LIST_PROPS_KEY: unique symbol;
+export declare const SERIALIZABLE_LIST_PROPS_KEY: symbol;
 export declare const METADATA_KEYS: {
     HOOKABLE_KEY: symbol;
     HOOKS_CONTAINER_KEY: symbol;

@@ -1,5 +1,5 @@
+import { ExtendableError } from '@eveble/core';
 import { DefinableMixin } from '../mixins/definable-mixin';
-import { ExtendableError } from './extendable-error';
 import { types } from '../types';
 import { VersionableMixin } from '../mixins/versionable-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';

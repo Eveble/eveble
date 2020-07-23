@@ -1,16 +1,18 @@
 import 'reflect-metadata';
-import { getMatchingParentProto, instanceOf, isDefined, Collection, Optional, List as List$1, InstanceOf, typend, define, OneOf } from 'typend';
-export { InvalidDefinitionError, InvalidTypeError, InvalidValueError, NotAMemberError, PatternValidatorExistError, PatternValidatorNotFoundError, PropTypes, PropsOf, TypeConverterExists, TypeDescriberExistsError, TypeDescriberNotFoundError, TypeOf, UndefinableClassError, UnequalValueError, UnexpectedKeyError, UnknownError, UnmatchedTypeError, ValidationError, any, boolean, check, collection, collectionIncluding, collectionWithin, convert, converter, define, describer, eq, instanceOf, integer, internal, iof, is, isInstanceOf, isValid, list, maybe, never, number, oneOf, optional, propsOf, reflect, string, symbol, tuple, typeOf, typend, unknown, unrecognized, validable, validate, validator, voided, where } from 'typend';
-import { getTypeName, isClassInstance, isMocha, isMochaInWatchMode, setTypeName } from '@eveble/helpers';
-import { isObject, pick, isEqual, isString, has, get, isPlainObject, omit, isNumber, isEmpty, isFunction, pull, last, set, capitalize, intersection, partial, union } from 'lodash';
-import getenv from 'getenv';
+import { CORE_METADATA_KEYS, ExtendableError, kernel, define, isSerializable, UnregistrableTypeError, TypeExistsError, TypeNotFoundError } from '@eveble/core';
+export { ExtendableError, Kernel, KernelError, Library, TypeError, TypeExistsError, TypeNotFoundError, UnavailableAsserterError, UnavailableSerializerError, UnregistrableTypeError, define, isSerializable, kernel, resolveSerializableFromPropType } from '@eveble/core';
+import { instanceOf, isDefined, Collection, getMatchingParentProto, OneOf, InstanceOf, Optional, define as define$1 } from 'typend';
+export { InvalidDefinitionError, InvalidTypeError, InvalidValueError, NotAMemberError, PatternValidatorExistError, PatternValidatorNotFoundError, PropTypes, PropsOf, TypeConverterExists, TypeDescriberExistsError, TypeDescriberNotFoundError, TypeOf, UndefinableClassError, UnequalValueError, UnexpectedKeyError, UnknownError, UnmatchedTypeError, ValidationError, any, boolean, check, collection, collectionIncluding, collectionWithin, convert, converter, describer, eq, instanceOf, integer, internal, iof, is, isInstanceOf, isValid, list, maybe, never, number, oneOf, optional, propsOf, reflect, string, symbol, tuple, typeOf, typend, unknown, unrecognized, validable, validate, validator, voided, where } from 'typend';
+import { getTypeName, isClassInstance } from '@eveble/helpers';
+import { isNumber, isPlainObject, pick, isEqual, isString, has, get, omit, isFunction, pull, last, isEmpty, set, capitalize, intersection, partial, union } from 'lodash';
+import merge from 'deepmerge';
+import { classes } from 'polytype';
 import { injectable, METADATA_KEY, Container, inject, postConstruct } from '@parisholley/inversify-async';
 export { inject, injectable, postConstruct } from '@parisholley/inversify-async';
+import deepClone from '@jsbits/deep-clone';
 import decache from 'decache';
 import dotenv from 'dotenv-extended';
-import { classes } from 'polytype';
-import merge from 'deepmerge';
-import deepClone from '@jsbits/deep-clone';
+import getenv from 'getenv';
 import { v4 } from 'uuid';
 import Agenda from 'agenda';
 import { MongoClient } from 'mongodb';
@@ -77,7 +79,7 @@ const BINDINGS = {
 
 const HOOKABLE_KEY = Symbol('eveble:flags:hookable');
 const HOOKS_CONTAINER_KEY = Symbol('eveble:containers:hooks');
-const DEFAULT_PROPS_KEY = Symbol('eveble:containers:default-props');
+const DEFAULT_PROPS_KEY = CORE_METADATA_KEYS.DEFAULT_PROPS_KEY;
 const DELEGATED_KEY = Symbol('eveble:flags:delegated');
 const VERSIONABLE_KEY = Symbol('eveble:versionable');
 const LEGACY_TRANSFORMERS_CONTAINER_KEY = Symbol('eveble:container:legacy-transformers');
@@ -88,7 +90,7 @@ const SUBSCRIBER_KEY = Symbol('eveble:controller:subscriber');
 const EVENT_HANDLERS_CONTAINER_KEY = Symbol('eveble:container:event-handlers');
 const ROUTED_EVENTS_CONTAINER_KEY = Symbol('eveble:container:routed-events');
 const INITIALIZING_MESSAGE_KEY = Symbol('eveble:controller:initializing-message');
-const SERIALIZABLE_LIST_PROPS_KEY = Symbol('eveble:container:serializable-list-props');
+const SERIALIZABLE_LIST_PROPS_KEY = CORE_METADATA_KEYS.SERIALIZABLE_LIST_PROPS_KEY;
 const METADATA_KEYS = {
     HOOKABLE_KEY,
     HOOKS_CONTAINER_KEY,
@@ -110,57 +112,6 @@ function delegate() {
     return (target) => {
         Reflect.defineMetadata(DELEGATED_KEY, true, target);
     };
-}
-
-class ExtendableError extends Error {
-    constructor(messageOrProps) {
-        const props = isObject(messageOrProps)
-            ? messageOrProps
-            : { message: messageOrProps };
-        props.message = props.message
-            ? props.message
-            : ExtendableError.prototype.message || '';
-        const processedProps = props;
-        super();
-        this.initializeProperties(processedProps.message);
-        const errorProps = this.fillErrorProps(processedProps);
-        Object.assign(this, errorProps);
-    }
-    initializeProperties(message) {
-        Object.defineProperty(this, 'message', {
-            configurable: true,
-            enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
-            value: message,
-            writable: true,
-        });
-        Object.defineProperty(this, 'name', {
-            configurable: true,
-            enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
-            value: this.constructor.name,
-            writable: true,
-        });
-        if (Error.hasOwnProperty('captureStackTrace')) {
-            Error.captureStackTrace(this, this.constructor);
-            return;
-        }
-        Object.defineProperty(this, 'stack', {
-            configurable: true,
-            enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
-            value: new Error(message).stack,
-            writable: true,
-        });
-    }
-    fillErrorProps(props) {
-        const errorProps = props;
-        errorProps.message = props.message;
-        errorProps.name = this.constructor.name;
-        const error = Error.call(this, props.message);
-        error.name = this.constructor.name;
-        if (error.stack !== undefined) {
-            errorProps.stack = error.stack;
-        }
-        return errorProps;
-    }
 }
 
 class HandlingError extends ExtendableError {
@@ -243,88 +194,171 @@ function __metadata(metadataKey, metadataValue) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
 }
 
-class KernelError extends ExtendableError {
+class VersionableError extends ExtendableError {
 }
-class UnavailableSerializerError extends KernelError {
-    constructor() {
-        super(`Serialization is unavailable outside on application environment.
-      Define application before using any features related to serialization or set serializer on kernel by using <kernel.setSerializer()>`);
+class InvalidSchemaVersionError extends VersionableError {
+    constructor(typeName, got) {
+        super(`${typeName}: schema version must be a number, got ${got}`);
     }
 }
-class UnavailableAsserterError extends KernelError {
-    constructor() {
-        super(`Assertion is unavailable outside on application environment. Define application before using any features related to assertion on entities or set asserter on kernel by using <kernel.setAsserter()>`);
+class LegacyTransformerAlreadyExistsError extends VersionableError {
+    constructor(typeName, schemaVersion) {
+        super(`${typeName}: legacy transformer for schema version ${schemaVersion} already exists`);
     }
 }
-class TypeError extends ExtendableError {
-}
-class TypeExistsError extends TypeError {
-    constructor(source, typeName) {
-        super(`${source}: type '${typeName}' is already registered`);
+class LegacyTransformerNotFoundError extends VersionableError {
+    constructor(typeName, schemaVersion) {
+        super(`${typeName}: legacy transformer for schema version ${schemaVersion} was not found`);
     }
 }
-class TypeNotFoundError extends TypeError {
-    constructor(source, typeName) {
-        super(`${source}: type '${typeName}' not found`);
+class InvalidLegacyTransformerError extends VersionableError {
+    constructor(typeName, propertyKey, schemaVersion) {
+        super(`${typeName}: declared legacy transformer under key '${propertyKey}' for schema version of ${schemaVersion} must be annotating method`);
     }
 }
-class UnregistrableTypeError extends TypeError {
-    constructor(got) {
-        super(`Type '${got}' must implement Serializable interface`);
+class NotVersionableError extends VersionableError {
+    constructor(typeName) {
+        super(`${typeName}: class must implement Versionable and Hookable interfaces`);
     }
 }
-class ModuleError extends ExtendableError {
-}
-class AppMissingError extends ModuleError {
-    constructor() {
-        super(`Instance of App is required to initialize module`);
+let VersionableMixin = class VersionableMixin {
+    transformLegacyProps(props) {
+        const instanceSchemaVersion = props.schemaVersion || 0;
+        const currentSchemaVersion = this.getCurrentSchemaVersion();
+        if (this.isLegacySchemaVersion(instanceSchemaVersion, currentSchemaVersion)) {
+            const nextSchemaVersion = this.calculateNextSchemaVersion(instanceSchemaVersion);
+            for (let version = nextSchemaVersion; version <= currentSchemaVersion; version++) {
+                const transformerMethod = this.getLegacyTransformer(version);
+                transformerMethod(props);
+            }
+            props.schemaVersion = currentSchemaVersion;
+        }
+        return props;
     }
-}
-class InjectorMissingError extends ModuleError {
-    constructor() {
-        super(`Instance of Injector is required to initialize module`);
+    getCurrentSchemaVersion() {
+        const transformers = this.getLegacyTransformers();
+        if (transformers.size === 0) {
+            return 0;
+        }
+        const schemaVersions = Array.from(transformers.keys());
+        const sortedSchemaVersions = schemaVersions.sort((a, b) => b - a);
+        return sortedSchemaVersions[0];
     }
-}
-class InvalidModuleError extends ModuleError {
-    constructor(className, got) {
-        super(`${className}: dependent modules must be instance of Module, got ${got}`);
+    isLegacySchemaVersion(instanceVersion, currentVersion) {
+        return currentVersion > instanceVersion;
     }
-}
-class InvalidConfigError extends ModuleError {
-    constructor(className, got) {
-        super(`${className}: configuration must be an instance implementing Configurable interface, got ${got}`);
+    calculateNextSchemaVersion(instanceVersion = 0) {
+        return instanceVersion + 1;
     }
-}
-class InvalidEnvironmentError extends ModuleError {
-    constructor(action, currentEnv) {
-        super(`Trying to run action '${action}' on '${currentEnv}' environment`);
+    registerLegacyTransformer(schemaVersion, transformer, shouldOverride = false) {
+        if (!isNumber(schemaVersion)) {
+            throw new InvalidSchemaVersionError(getTypeName(this.constructor), kernel.describer.describe(schemaVersion));
+        }
+        if (this.hasLegacyTransformer(schemaVersion) && !shouldOverride) {
+            throw new LegacyTransformerAlreadyExistsError(getTypeName(this.constructor), schemaVersion);
+        }
+        const typeName = getTypeName(this.constructor);
+        const isVersionable = Reflect.getMetadata(VERSIONABLE_KEY, this.constructor) === typeName;
+        if (!isVersionable) {
+            Reflect.defineMetadata(LEGACY_TRANSFORMERS_CONTAINER_KEY, new Map(), this.constructor.prototype);
+            Reflect.defineMetadata(VERSIONABLE_KEY, typeName, this.constructor);
+        }
+        const transformers = this.getLegacyTransformers();
+        transformers.set(schemaVersion, transformer);
     }
-}
-class InjectorError extends ExtendableError {
-}
-class InvalidEventSourceableError extends InjectorError {
-    constructor(got) {
-        super(`Injector: expected EventSourceableType to be constructor type of EventSourceable, got ${got}`);
+    overrideLegacyTransformer(schemaVersion, transformer) {
+        this.registerLegacyTransformer(schemaVersion, transformer, true);
     }
-}
-class AppError extends ExtendableError {
-}
-class InvalidAppConfigError extends AppError {
-    constructor(got) {
-        super(`Configuration provided for application must be an instance of AppConfig, got ${got}`);
+    hasLegacyTransformer(schemaVersion) {
+        return this.getLegacyTransformers().has(schemaVersion);
     }
-}
-class LoggingError extends ExtendableError {
-}
-class InvalidTransportIdError extends LoggingError {
-    constructor(got) {
-        super(`Expected id argument to be string, got ${got}`);
+    getLegacyTransformers() {
+        const transformers = Reflect.getOwnMetadata(LEGACY_TRANSFORMERS_CONTAINER_KEY, this.constructor.prototype);
+        return transformers || new Map();
     }
-}
-class TransportExistsError extends LoggingError {
-    constructor(id) {
-        super(`Transport with id '${id}' would be overridden. To override existing mapping use <Logger.prototype.overrideTransport>`);
+    getLegacyTransformer(schemaVersion) {
+        const typeName = getTypeName(this.constructor) || '';
+        const transformers = this.getLegacyTransformers();
+        if (!transformers.has(schemaVersion)) {
+            throw new LegacyTransformerNotFoundError(typeName, schemaVersion);
+        }
+        return transformers.get(schemaVersion);
     }
+    getSchemaVersion() {
+        return this.schemaVersion;
+    }
+};
+VersionableMixin = __decorate([
+    injectable()
+], VersionableMixin);
+
+function isDefinable(arg) {
+    if (arg == null)
+        return false;
+    return ((arg instanceof Struct || instanceOf({ kind: 15, name: "Definable", properties: { "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(arg)) &&
+        isDefined(arg.constructor));
+}
+function isRecord(arg) {
+    return (isPlainObject(arg) || isClassInstance(arg) || arg instanceof Collection);
+}
+function isPlainRecord(arg) {
+    return isPlainObject(arg) || arg instanceof Collection;
+}
+function hasPostConstruct(target) {
+    return (target != null &&
+        Reflect.hasMetadata(METADATA_KEY.POST_CONSTRUCT, target.constructor));
+}
+function toPlainObject(arg) {
+    const plainObj = {};
+    for (const key of Reflect.ownKeys(arg)) {
+        const value = arg[key.toString()];
+        if (typeof (value === null || value === void 0 ? void 0 : value.toPlainObject) === 'function') {
+            plainObj[key] = value.toPlainObject();
+        }
+        else if (isPlainRecord(value)) {
+            plainObj[key] = toPlainObject(value);
+        }
+        else {
+            plainObj[key] = value;
+        }
+    }
+    return plainObj;
+}
+function convertObjectToCollection(obj) {
+    const converted = {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (isPlainObject(value)) {
+            converted[key] = new Collection(value);
+        }
+        else {
+            converted[key] = value;
+        }
+    }
+    return converted;
+}
+const createEJSON = function () {
+    decache('@eveble/ejson');
+    return require('@eveble/ejson');
+};
+function isEventSourceableType(arg) {
+    if (arg == null)
+        return false;
+    return (typeof arg.resolveInitializingMessage === 'function' &&
+        typeof arg.resolveRoutedCommands === 'function' &&
+        typeof arg.resolveRoutedEvents === 'function' &&
+        typeof arg.resolveRoutedMessages === 'function' &&
+        typeof arg.getTypeName === 'function' &&
+        typeof arg.from === 'function');
+}
+function loadENV(envFilePath) {
+    dotenv.load({
+        silent: false,
+        defaults: '.env.defaults',
+        schema: '.env.schema',
+        errorOnMissing: true,
+        errorOnExtra: true,
+        path: envFilePath,
+    });
 }
 
 let DefinableMixin = class DefinableMixin {
@@ -563,425 +597,6 @@ class Struct extends classes(DefinableMixin, HookableMixin) {
         return result;
     }
 }
-
-function isDefinable(arg) {
-    if (arg == null)
-        return false;
-    return ((arg instanceof Struct || instanceOf({ kind: 15, name: "Definable", properties: { "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(arg)) &&
-        isDefined(arg.constructor));
-}
-function isSerializable(arg) {
-    if (arg == null)
-        return false;
-    return instanceOf({ kind: 15, name: "Ejsonable", properties: { "typeName": { kind: 21 }, "toJSONValue": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } })(arg) && isDefined(arg.constructor);
-}
-function isRecord(arg) {
-    return (isPlainObject(arg) || isClassInstance(arg) || arg instanceof Collection);
-}
-function isPlainRecord(arg) {
-    return isPlainObject(arg) || arg instanceof Collection;
-}
-function hasPostConstruct(target) {
-    return (target != null &&
-        Reflect.hasMetadata(METADATA_KEY.POST_CONSTRUCT, target.constructor));
-}
-function toPlainObject(arg) {
-    const plainObj = {};
-    for (const key of Reflect.ownKeys(arg)) {
-        const value = arg[key.toString()];
-        if (typeof (value === null || value === void 0 ? void 0 : value.toPlainObject) === 'function') {
-            plainObj[key] = value.toPlainObject();
-        }
-        else if (isPlainRecord(value)) {
-            plainObj[key] = toPlainObject(value);
-        }
-        else {
-            plainObj[key] = value;
-        }
-    }
-    return plainObj;
-}
-function convertObjectToCollection(obj) {
-    const converted = {};
-    for (const [key, value] of Object.entries(obj)) {
-        if (isPlainObject(value)) {
-            converted[key] = new Collection(value);
-        }
-        else {
-            converted[key] = value;
-        }
-    }
-    return converted;
-}
-function resolveSerializableFromPropType(propType) {
-    if (propType == null)
-        return undefined;
-    let type = propType;
-    if (type instanceof Optional) {
-        type = type[0];
-    }
-    if (type instanceof List$1) {
-        type = type[0];
-    }
-    else {
-        return undefined;
-    }
-    if (type instanceof InstanceOf) {
-        if (type[0] != null &&
-            type[0].prototype !== undefined &&
-            isSerializable(type[0].prototype)) {
-            type = type[0];
-        }
-        else {
-            return undefined;
-        }
-    }
-    return type;
-}
-const createEJSON = function () {
-    decache('@eveble/ejson');
-    return require('@eveble/ejson');
-};
-function isEventSourceableType(arg) {
-    if (arg == null)
-        return false;
-    return (typeof arg.resolveInitializingMessage === 'function' &&
-        typeof arg.resolveRoutedCommands === 'function' &&
-        typeof arg.resolveRoutedEvents === 'function' &&
-        typeof arg.resolveRoutedMessages === 'function' &&
-        typeof arg.getTypeName === 'function' &&
-        typeof arg.from === 'function');
-}
-function loadENV(envFilePath) {
-    dotenv.load({
-        silent: false,
-        defaults: '.env.defaults',
-        schema: '.env.schema',
-        errorOnMissing: true,
-        errorOnExtra: true,
-        path: envFilePath,
-    });
-}
-
-var Library_1;
-let Library = Library_1 = class Library {
-    constructor() {
-        this.types = new Map();
-        this.setState(Library_1.STATES.default);
-    }
-    registerType(typeName, type, shouldOverride = false) {
-        if (!isSerializable(type.prototype)) {
-            throw new UnregistrableTypeError(typeName);
-        }
-        if (this.hasType(typeName)) {
-            if (!shouldOverride && !this.isInState(Library_1.STATES.override)) {
-                throw new TypeExistsError(getTypeName(this.constructor), typeName);
-            }
-        }
-        this.types.set(typeName, type);
-    }
-    overrideType(typeName, type) {
-        this.registerType(typeName, type, true);
-    }
-    getType(typeName) {
-        return this.types.get(typeName);
-    }
-    getTypeOrThrow(typeName) {
-        const type = this.types.get(typeName);
-        if (type === undefined) {
-            throw new TypeNotFoundError(getTypeName(this.constructor), typeName);
-        }
-        return type;
-    }
-    getTypes() {
-        return this.types;
-    }
-    hasType(typeName) {
-        return this.types.has(typeName);
-    }
-    removeType(typeName) {
-        this.types.delete(typeName);
-    }
-    isInState(state) {
-        return this.state === state;
-    }
-    setState(state) {
-        this.state = state;
-    }
-};
-Library.STATES = {
-    default: 'default',
-    override: 'override',
-};
-Library = Library_1 = __decorate([
-    injectable(),
-    __metadata("design:paramtypes", [])
-], Library);
-
-class Kernel {
-    constructor(converter, validator, describer, library, config) {
-        this._converter = converter;
-        this._validator = validator;
-        this._describer = describer;
-        this._library = library;
-        this._config = config;
-        this.describer.setFormatting(this._config.describer.formatting);
-    }
-    get converter() {
-        var _a, _b;
-        return ((_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.get(BINDINGS.Converter)) !== null && _b !== void 0 ? _b : this._converter);
-    }
-    get validator() {
-        var _a, _b;
-        return ((_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.get(BINDINGS.Validator)) !== null && _b !== void 0 ? _b : this._validator);
-    }
-    get describer() {
-        var _a, _b;
-        return ((_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.get(BINDINGS.Describer)) !== null && _b !== void 0 ? _b : this._describer);
-    }
-    get library() {
-        var _a, _b;
-        return (_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.get(BINDINGS.Library)) !== null && _b !== void 0 ? _b : this._library;
-    }
-    get serializer() {
-        var _a, _b;
-        if ((_a = this.injector) === null || _a === void 0 ? void 0 : _a.isBound(BINDINGS.Serializer)) {
-            return (_b = this.injector) === null || _b === void 0 ? void 0 : _b.get(BINDINGS.Serializer);
-        }
-        if (this._serializer !== undefined) {
-            return this._serializer;
-        }
-        throw new UnavailableSerializerError();
-    }
-    get asserter() {
-        var _a, _b;
-        if ((_a = this.injector) === null || _a === void 0 ? void 0 : _a.isBound(BINDINGS.Asserter)) {
-            return (_b = this.injector) === null || _b === void 0 ? void 0 : _b.get(BINDINGS.Asserter);
-        }
-        if (this._asserter !== undefined) {
-            return this._asserter;
-        }
-        throw new UnavailableAsserterError();
-    }
-    setConverter(converter) {
-        var _a, _b;
-        this._converter = converter;
-        (_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.rebind(BINDINGS.Converter)) === null || _b === void 0 ? void 0 : _b.toConstantValue(converter);
-    }
-    setValidator(validator) {
-        var _a, _b;
-        this._validator = validator;
-        (_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.rebind(BINDINGS.Validator)) === null || _b === void 0 ? void 0 : _b.toConstantValue(validator);
-    }
-    setDescriber(describer) {
-        var _a, _b;
-        this._describer = describer;
-        (_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.rebind(BINDINGS.Describer)) === null || _b === void 0 ? void 0 : _b.toConstantValue(describer);
-    }
-    setLibrary(library) {
-        var _a, _b;
-        this._library = library;
-        (_b = (_a = this.injector) === null || _a === void 0 ? void 0 : _a.rebind(BINDINGS.Library)) === null || _b === void 0 ? void 0 : _b.toConstantValue(library);
-    }
-    setSerializer(serializer) {
-        var _a, _b, _c;
-        this._serializer = serializer;
-        if ((_a = this.injector) === null || _a === void 0 ? void 0 : _a.isBound(BINDINGS.Serializer)) {
-            (_c = (_b = this.injector) === null || _b === void 0 ? void 0 : _b.rebind(BINDINGS.Serializer)) === null || _c === void 0 ? void 0 : _c.toConstantValue(serializer);
-        }
-    }
-    setAsserter(asserter) {
-        var _a, _b, _c;
-        this._asserter = asserter;
-        if ((_a = this.injector) === null || _a === void 0 ? void 0 : _a.isBound(BINDINGS.Asserter)) {
-            (_c = (_b = this.injector) === null || _b === void 0 ? void 0 : _b.rebind(BINDINGS.Asserter)) === null || _c === void 0 ? void 0 : _c.toConstantValue(asserter);
-        }
-    }
-    setInjector(injector) {
-        this.injector = injector;
-    }
-    isConverting() {
-        var _a, _b;
-        return ((_b = (_a = this._config) === null || _a === void 0 ? void 0 : _a.conversion) === null || _b === void 0 ? void 0 : _b.type) === 'runtime';
-    }
-    isValidating() {
-        var _a, _b;
-        return ((_b = (_a = this._config) === null || _a === void 0 ? void 0 : _a.validation) === null || _b === void 0 ? void 0 : _b.type) === 'runtime';
-    }
-    disableValidation() {
-        this._config.validation.type = 'manual';
-    }
-    enableValidation() {
-        this._config.validation.type = 'runtime';
-    }
-}
-const library = new Library();
-if (isMocha(global) && isMochaInWatchMode(process)) {
-    library.setState(Library.STATES.override);
-}
-const config = {
-    conversion: {
-        type: getenv.string('EVEBLE_CONVERSION_TYPE', 'runtime'),
-    },
-    validation: {
-        type: getenv.string('EVEBLE_VALIDATION_TYPE', 'runtime'),
-    },
-    describer: {
-        formatting: getenv.string('EVEBLE_DESCRIBER_FORMATTING', 'default'),
-    },
-};
-const kernel = new Kernel(typend.converter, typend, typend.describer, library, config);
-
-class VersionableError extends ExtendableError {
-}
-class InvalidSchemaVersionError extends VersionableError {
-    constructor(typeName, got) {
-        super(`${typeName}: schema version must be a number, got ${got}`);
-    }
-}
-class LegacyTransformerAlreadyExistsError extends VersionableError {
-    constructor(typeName, schemaVersion) {
-        super(`${typeName}: legacy transformer for schema version ${schemaVersion} already exists`);
-    }
-}
-class LegacyTransformerNotFoundError extends VersionableError {
-    constructor(typeName, schemaVersion) {
-        super(`${typeName}: legacy transformer for schema version ${schemaVersion} was not found`);
-    }
-}
-class InvalidLegacyTransformerError extends VersionableError {
-    constructor(typeName, propertyKey, schemaVersion) {
-        super(`${typeName}: declared legacy transformer under key '${propertyKey}' for schema version of ${schemaVersion} must be annotating method`);
-    }
-}
-class NotVersionableError extends VersionableError {
-    constructor(typeName) {
-        super(`${typeName}: class must implement Versionable and Hookable interfaces`);
-    }
-}
-let VersionableMixin = class VersionableMixin {
-    transformLegacyProps(props) {
-        const instanceSchemaVersion = props.schemaVersion || 0;
-        const currentSchemaVersion = this.getCurrentSchemaVersion();
-        if (this.isLegacySchemaVersion(instanceSchemaVersion, currentSchemaVersion)) {
-            const nextSchemaVersion = this.calculateNextSchemaVersion(instanceSchemaVersion);
-            for (let version = nextSchemaVersion; version <= currentSchemaVersion; version++) {
-                const transformerMethod = this.getLegacyTransformer(version);
-                transformerMethod(props);
-            }
-            props.schemaVersion = currentSchemaVersion;
-        }
-        return props;
-    }
-    getCurrentSchemaVersion() {
-        const transformers = this.getLegacyTransformers();
-        if (transformers.size === 0) {
-            return 0;
-        }
-        const schemaVersions = Array.from(transformers.keys());
-        const sortedSchemaVersions = schemaVersions.sort((a, b) => b - a);
-        return sortedSchemaVersions[0];
-    }
-    isLegacySchemaVersion(instanceVersion, currentVersion) {
-        return currentVersion > instanceVersion;
-    }
-    calculateNextSchemaVersion(instanceVersion = 0) {
-        return instanceVersion + 1;
-    }
-    registerLegacyTransformer(schemaVersion, transformer, shouldOverride = false) {
-        if (!isNumber(schemaVersion)) {
-            throw new InvalidSchemaVersionError(getTypeName(this.constructor), kernel.describer.describe(schemaVersion));
-        }
-        if (this.hasLegacyTransformer(schemaVersion) && !shouldOverride) {
-            throw new LegacyTransformerAlreadyExistsError(getTypeName(this.constructor), schemaVersion);
-        }
-        const typeName = getTypeName(this.constructor);
-        const isVersionable = Reflect.getMetadata(VERSIONABLE_KEY, this.constructor) === typeName;
-        if (!isVersionable) {
-            Reflect.defineMetadata(LEGACY_TRANSFORMERS_CONTAINER_KEY, new Map(), this.constructor.prototype);
-            Reflect.defineMetadata(VERSIONABLE_KEY, typeName, this.constructor);
-        }
-        const transformers = this.getLegacyTransformers();
-        transformers.set(schemaVersion, transformer);
-    }
-    overrideLegacyTransformer(schemaVersion, transformer) {
-        this.registerLegacyTransformer(schemaVersion, transformer, true);
-    }
-    hasLegacyTransformer(schemaVersion) {
-        return this.getLegacyTransformers().has(schemaVersion);
-    }
-    getLegacyTransformers() {
-        const transformers = Reflect.getOwnMetadata(LEGACY_TRANSFORMERS_CONTAINER_KEY, this.constructor.prototype);
-        return transformers || new Map();
-    }
-    getLegacyTransformer(schemaVersion) {
-        const typeName = getTypeName(this.constructor) || '';
-        const transformers = this.getLegacyTransformers();
-        if (!transformers.has(schemaVersion)) {
-            throw new LegacyTransformerNotFoundError(typeName, schemaVersion);
-        }
-        return transformers.get(schemaVersion);
-    }
-    getSchemaVersion() {
-        return this.schemaVersion;
-    }
-};
-VersionableMixin = __decorate([
-    injectable()
-], VersionableMixin);
-
-class InvalidTypeNameError extends ExtendableError {
-    constructor(invalidTypeName) {
-        super(`Expected type name argument to be a String, got ${invalidTypeName}`);
-    }
-}
-define.beforeDefine = function (_target, _reflectedType, ...args) {
-    const name = args[0];
-    if (name !== undefined && !isString(name)) {
-        throw new InvalidTypeNameError(kernel.describer.describe(name));
-    }
-};
-define.afterDefine = function (target, reflectedType, ...args) {
-    const name = args[0];
-    let typeName;
-    if (name !== undefined) {
-        typeName = name;
-        setTypeName(target, name);
-    }
-    else {
-        typeName = target.name;
-    }
-    const options = args[1];
-    const isRegistrable = options === undefined || (options === null || options === void 0 ? void 0 : options.isRegistrable) !== false;
-    if (isRegistrable && instanceOf({ kind: 15, name: "Serializable", properties: { "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } })(target.prototype)) {
-        kernel.library.registerType(typeName, target);
-    }
-    if (reflectedType.type === undefined) {
-        reflectedType.type = target;
-    }
-    const defaults = {};
-    const classPattern = kernel.converter.convert(reflectedType);
-    if (classPattern === undefined && classPattern.properties === undefined) {
-        return;
-    }
-    const propTypes = classPattern.properties;
-    for (const [key, propType] of Object.entries(propTypes)) {
-        if (typeof propType.hasInitializer === 'function' &&
-            propType.hasInitializer()) {
-            defaults[key] = propType.getInitializer();
-        }
-    }
-    if (!isEmpty(defaults)) {
-        Reflect.defineMetadata(DEFAULT_PROPS_KEY, defaults, target);
-    }
-    const serializableListProps = {};
-    for (const key of Object.keys(propTypes)) {
-        const serializable = resolveSerializableFromPropType(propTypes[key]);
-        if (serializable !== undefined)
-            serializableListProps[key] = serializable;
-    }
-    Reflect.defineMetadata(SERIALIZABLE_LIST_PROPS_KEY, serializableListProps, target);
-};
 
 class SerializableMixin {
     getTypeName() {
@@ -1698,6 +1313,60 @@ function version(schemaVersion) {
         }
         proto.registerLegacyTransformer(schemaVersion, descriptor === null || descriptor === void 0 ? void 0 : descriptor.value);
     };
+}
+
+class ModuleError extends ExtendableError {
+}
+class AppMissingError extends ModuleError {
+    constructor() {
+        super(`Instance of App is required to initialize module`);
+    }
+}
+class InjectorMissingError extends ModuleError {
+    constructor() {
+        super(`Instance of Injector is required to initialize module`);
+    }
+}
+class InvalidModuleError extends ModuleError {
+    constructor(className, got) {
+        super(`${className}: dependent modules must be instance of Module, got ${got}`);
+    }
+}
+class InvalidConfigError extends ModuleError {
+    constructor(className, got) {
+        super(`${className}: configuration must be an instance implementing Configurable interface, got ${got}`);
+    }
+}
+class InvalidEnvironmentError extends ModuleError {
+    constructor(action, currentEnv) {
+        super(`Trying to run action '${action}' on '${currentEnv}' environment`);
+    }
+}
+class InjectorError extends ExtendableError {
+}
+class InvalidEventSourceableError extends InjectorError {
+    constructor(got) {
+        super(`Injector: expected EventSourceableType to be constructor type of EventSourceable, got ${got}`);
+    }
+}
+class AppError extends ExtendableError {
+}
+class InvalidAppConfigError extends AppError {
+    constructor(got) {
+        super(`Configuration provided for application must be an instance of AppConfig, got ${got}`);
+    }
+}
+class LoggingError extends ExtendableError {
+}
+class InvalidTransportIdError extends LoggingError {
+    constructor(got) {
+        super(`Expected id argument to be string, got ${got}`);
+    }
+}
+class TransportExistsError extends LoggingError {
+    constructor(id) {
+        super(`Transport with id '${id}' would be overridden. To override existing mapping use <Logger.prototype.overrideTransport>`);
+    }
 }
 
 function executePostConstruct(target) {
@@ -4125,7 +3794,7 @@ CommitReceiver.STATES = {
     failed: 'failed',
 };
 CommitReceiver = CommitReceiver_1 = __decorate([
-    define('CommitReceiver')({ kind: 19, name: "CommitReceiver", properties: { "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "appId": { kind: 2 }, "workerId": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "receivedAt": { kind: 18, type: Date, arguments: [] }, "publishedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, extends: { kind: 999 } }),
+    define$1('CommitReceiver')({ kind: 19, name: "CommitReceiver", properties: { "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "appId": { kind: 2 }, "workerId": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "receivedAt": { kind: 18, type: Date, arguments: [] }, "publishedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], CommitReceiver);
 let Commit = class Commit extends Serializable {
@@ -4153,7 +3822,7 @@ let Commit = class Commit extends Serializable {
     }
 };
 Commit = __decorate([
-    define('Commit')({ kind: 19, name: "Commit", properties: { "id": { kind: 2 }, "sourceId": { kind: 2 }, "version": { kind: 3 }, "eventSourceableType": { kind: 2 }, "commands": { kind: 18, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "getId": { kind: 21 }, "isDeliverable": { kind: 21 }, "isScheduled": { kind: 21 }, "schedule": { kind: 21 }, "getAssignment": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, "events": { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "version": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, "insertedAt": { kind: 18, type: Date, arguments: [] }, "sentBy": { kind: 2 }, "receivers": { kind: 18, type: Array, arguments: [{ kind: 18, type: CommitReceiver, arguments: [] }] } }, extends: { kind: 18, type: Serializable, arguments: [] } })
+    define$1('Commit')({ kind: 19, name: "Commit", properties: { "id": { kind: 2 }, "sourceId": { kind: 2 }, "version": { kind: 3 }, "eventSourceableType": { kind: 2 }, "commands": { kind: 18, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "getId": { kind: 21 }, "isDeliverable": { kind: 21 }, "isScheduled": { kind: 21 }, "schedule": { kind: 21 }, "getAssignment": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, "events": { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "version": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, "insertedAt": { kind: 18, type: Date, arguments: [] }, "sentBy": { kind: 2 }, "receivers": { kind: 18, type: Array, arguments: [{ kind: 18, type: CommitReceiver, arguments: [] }] } }, extends: { kind: 18, type: Serializable, arguments: [] } })
 ], Commit);
 
 let CommitStore = class CommitStore {
@@ -7628,4 +7297,4 @@ function loggerLoader(injector, level, consoleTransportConfig = new LogTransport
     return logger;
 }
 
-export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, AgendaClient, AgendaCommandScheduler, AgendaCommandSchedulerModule, AgendaScheduledJobTransformer, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingMixin, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, DefinableMixin, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableMixin, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingMixin, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, ExtendableError, Guid, HandlerExistError, HandlerNotFoundError, HandlingError, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableMixin, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, Kernel, KernelError, LITERAL_KEYS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, Library, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingMixin, OneToOneHandlingMixin, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, RFC5424LoggingMixin, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableMixin, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulMixin, StatusError, StatusfulAssertion, StatusfulMixin, StorageNotFoundError, StringifingConverter, Struct, TransportExistsError, TypeError, TypeExistsError, TypeNotFoundError, UnavailableAsserterError, UnavailableSerializerError, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnregistrableTypeError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, VersionableError, VersionableMixin, convertObjectToCollection, createEJSON, delegate, handle, hasPostConstruct, initial, isDefinable, isEventSourceableType, isPlainRecord, isRecord, isSerializable, kernel, loadENV, loggerLoader, resolveSerializableFromPropType, route, subscribe, toPlainObject, version };
+export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, AgendaClient, AgendaCommandScheduler, AgendaCommandSchedulerModule, AgendaScheduledJobTransformer, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingMixin, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, DefinableMixin, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableMixin, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingMixin, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, HandlerExistError, HandlerNotFoundError, HandlingError, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableMixin, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingMixin, OneToOneHandlingMixin, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, RFC5424LoggingMixin, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableMixin, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulMixin, StatusError, StatusfulAssertion, StatusfulMixin, StorageNotFoundError, StringifingConverter, Struct, TransportExistsError, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, VersionableError, VersionableMixin, convertObjectToCollection, createEJSON, delegate, handle, hasPostConstruct, initial, isDefinable, isEventSourceableType, isPlainRecord, isRecord, loadENV, loggerLoader, route, subscribe, toPlainObject, version };

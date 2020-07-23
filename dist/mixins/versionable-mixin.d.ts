@@ -1,5 +1,5 @@
+import { ExtendableError } from '@eveble/core';
 import { types } from '../types';
-import { ExtendableError } from '../components/extendable-error';
 export declare class VersionableError extends ExtendableError {
 }
 export declare class InvalidSchemaVersionError extends VersionableError {

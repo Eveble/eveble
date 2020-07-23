@@ -1,5 +1,5 @@
+import { ExtendableError } from '@eveble/core';
 import { types } from '../types';
-import { ExtendableError } from './extendable-error';
 export declare class UndefinedLoggableTargetError extends ExtendableError {
     constructor();
 }

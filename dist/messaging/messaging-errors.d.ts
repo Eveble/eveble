@@ -1,4 +1,4 @@
-import { ExtendableError } from '../components/extendable-error';
+import { ExtendableError } from '@eveble/core';
 export declare class HandlingError extends ExtendableError {
 }
 export declare class UnhandleableTypeError extends HandlingError {

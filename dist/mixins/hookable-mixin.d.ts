@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ExtendableError } from '../components/extendable-error';
+import { ExtendableError } from '@eveble/core';
 import { types } from '../types';
 export declare class HookError extends ExtendableError {
 }
