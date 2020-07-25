@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/eveble/eveble/compare/v2.0.1...v2.0.2) (2020-07-25)
+
+
+### Bug Fixes
+
+* **messaging:** support serialization and deserialization of nested objects on types ([536e305](https://github.com/eveble/eveble/commit/536e305213802e210b7e9ebe4967c83187f7de46))
+
 ## [2.0.1](https://github.com/eveble/eveble/compare/v2.0.0...v2.0.1) (2020-07-23)
 
 

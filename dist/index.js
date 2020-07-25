@@ -3024,13 +3024,29 @@ exports.EJSONSerializerAdapter = class EJSONSerializerAdapter {
             const value = serializable[key];
             if (Array.isArray(value)) {
                 data[key] = value.map((item) => {
-                    return typend.instanceOf({ kind: 15, name: "Serializable", properties: { "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } })(item)
-                        ? this.toData(item)
-                        : item;
+                    return core.isSerializable(item) ? this.toData(item) : item;
                 });
             }
-            else if (typend.instanceOf({ kind: 15, name: "Serializable", properties: { "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } })(value)) {
+            else if (core.isSerializable(value)) {
                 data[key] = this.toData(value);
+            }
+            else if (lodash.isPlainObject(value)) {
+                data[key] = this.processNestedObjToData(value);
+            }
+            else {
+                data[key] = value;
+            }
+        }
+        return data;
+    }
+    processNestedObjToData(obj) {
+        const data = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (core.isSerializable(value)) {
+                data[key] = this.toData(value);
+            }
+            else if (!key.includes('correlation') && lodash.isPlainObject(value)) {
+                data[key] = this.processNestedObjToData(obj);
             }
             else {
                 data[key] = value;
@@ -3056,11 +3072,29 @@ exports.EJSONSerializerAdapter = class EJSONSerializerAdapter {
                     return item;
                 });
             }
+            else if (lodash.isPlainObject(value)) {
+                props[key] = this.processNestedObjFromData(value);
+            }
             else {
                 props[key] = value;
             }
         }
         return new Type(props);
+    }
+    processNestedObjFromData(data) {
+        const props = {};
+        for (const [key, value] of Object.entries(data)) {
+            if (value !== undefined && value[this.getTypeKey()] !== undefined) {
+                props[key] = this.fromData(value);
+            }
+            else if (lodash.isPlainObject(value)) {
+                props[key] = this.processNestedObjFromData(value);
+            }
+            else {
+                props[key] = value;
+            }
+        }
+        return props;
     }
 };
 __decorate([

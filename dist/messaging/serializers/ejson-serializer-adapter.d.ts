@@ -30,5 +30,7 @@ export declare class EJSONSerializerAdapter implements types.Serializer {
         keyOrderSensitive: boolean;
     }): boolean;
     toData(serializable: types.Serializable): Record<string, any>;
+    protected processNestedObjToData(obj: Record<string, any>): Record<string, any>;
     fromData<T extends types.Serializable>(data: Record<string, any>): T;
+    protected processNestedObjFromData(data: Record<string, any>): Record<string, any>;
 }
