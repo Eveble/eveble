@@ -8,7 +8,7 @@ HANDLING ERRORS
 
 ## Hierarchy
 
-  ↳ [ExtendableError](extendableerror.md)
+* ExtendableError
 
 * ExtendableError
 
@@ -53,9 +53,9 @@ HANDLING ERRORS
 
 \+ **new HandlingError**(`messageOrProps?`: string | [ErrorProps](../modules/types.md#errorprops)): *[HandlingError](handlingerror.md)*
 
-*Inherited from [ExtendableError](extendableerror.md).[constructor](extendableerror.md#constructor)*
+*Inherited from [StateError](stateerror.md).[constructor](stateerror.md#constructor)*
 
-*Overrides void*
+*Overrides [StateError](stateerror.md).[constructor](stateerror.md#constructor)*
 
 **Parameters:**
 
@@ -71,9 +71,9 @@ Name | Type |
 
 • **code**? : *number*
 
-*Inherited from [ExtendableError](extendableerror.md).[code](extendableerror.md#optional-code)*
+*Inherited from [StateError](stateerror.md).[code](stateerror.md#optional-code)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[code](noquittingfoolerror.md#optional-code)*
+*Overrides [StateError](stateerror.md).[code](stateerror.md#optional-code)*
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 • **message**: *string*
 
-*Inherited from [ExtendableError](extendableerror.md).[message](extendableerror.md#message)*
+*Inherited from [StateError](stateerror.md).[message](stateerror.md#message)*
 
 *Overrides void*
 
@@ -91,7 +91,7 @@ ___
 
 • **name**: *string*
 
-*Inherited from [ExtendableError](extendableerror.md).[name](extendableerror.md#name)*
+*Inherited from [StateError](stateerror.md).[name](stateerror.md#name)*
 
 *Overrides void*
 
@@ -101,7 +101,7 @@ ___
 
 • **stack**? : *string*
 
-*Inherited from [ExtendableError](extendableerror.md).[stack](extendableerror.md#optional-stack)*
+*Inherited from [StateError](stateerror.md).[stack](stateerror.md#optional-stack)*
 
 *Overrides void*
 
@@ -111,9 +111,9 @@ ___
 
 ▸ **fillErrorProps**(`props`: [ErrorProps](../modules/types.md#errorprops)): *[ErrorProps](../modules/types.md#errorprops)*
 
-*Inherited from [ExtendableError](extendableerror.md).[fillErrorProps](extendableerror.md#fillerrorprops)*
+*Inherited from [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[fillErrorProps](noquittingfoolerror.md#fillerrorprops)*
+*Overrides [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
 **Parameters:**
 

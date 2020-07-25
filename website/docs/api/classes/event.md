@@ -6,7 +6,11 @@ sidebar_label: "Event"
 
 ## Type parameters
 
+▪ **T**: *object*
+
 ▪ **T**: *SuperConstructor*
+
+▪ **T**: *object*
 
 ▪ **T**: *SuperConstructor*
 
@@ -43,10 +47,10 @@ sidebar_label: "Event"
 
 ### Properties
 
-* [metadata](event.md#metadata)
+* [metadata](event.md#optional-metadata)
 * [schemaVersion](event.md#optional-schemaversion)
 * [sourceId](event.md#sourceid)
-* [timestamp](event.md#timestamp)
+* [timestamp](event.md#optional-timestamp)
 * [version](event.md#optional-version)
 
 ### Methods
@@ -99,9 +103,9 @@ sidebar_label: "Event"
 
 ###  constructor
 
-\+ **new Event**(`props?`: [Props](../modules/types.md#props)): *[Event](event.md)*
+\+ **new Event**(`props`: [ConstructorType](../modules/types.md#constructortype)‹T› & object): *[Event](event.md)*
 
-*Overrides [Serializable](serializable.md).[constructor](serializable.md#constructor)*
+*Overrides [Message](message.md).[constructor](message.md#constructor)*
 
 Creates an instance of Event.
 Creates an instance of Event.
@@ -110,21 +114,21 @@ Creates an instance of Event.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`props?` | [Props](../modules/types.md#props) | Properties of the type required for construction.  |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹T› & object | Properties matching generic `T` with `sourceId` as `Guid|string` and optional `version` as `number`.  |
 
 **Returns:** *[Event](event.md)*
 
 ## Properties
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
 *Implementation of [Event](../interfaces/types.event.md).[metadata](../interfaces/types.event.md#optional-metadata)*
 
-*Inherited from [Message](message.md).[metadata](message.md#metadata)*
+*Inherited from [Message](message.md).[metadata](message.md#optional-metadata)*
 
-*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
 
 ___
 
@@ -146,15 +150,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Implementation of [Event](../interfaces/types.event.md).[timestamp](../interfaces/types.event.md#timestamp)*
+*Implementation of [Event](../interfaces/types.event.md).[timestamp](../interfaces/types.event.md#optional-timestamp)*
 
-*Inherited from [Message](message.md).[timestamp](message.md#timestamp)*
+*Inherited from [Message](message.md).[timestamp](message.md#optional-timestamp)*
 
-*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
 
 ___
 

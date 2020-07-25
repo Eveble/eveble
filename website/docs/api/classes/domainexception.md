@@ -12,9 +12,9 @@ sidebar_label: "DomainException"
 
 ## Hierarchy
 
-  ↳ [Event](event.md)
+  ↳ [Event](event.md)‹[DomainException](domainexception.md)›
 
-* Event
+* Event‹DomainException›
 
   ↳ **DomainException**
 
@@ -42,11 +42,11 @@ sidebar_label: "DomainException"
 ### Properties
 
 * [error](domainexception.md#error)
-* [metadata](domainexception.md#metadata)
+* [metadata](domainexception.md#optional-metadata)
 * [schemaVersion](domainexception.md#optional-schemaversion)
 * [sourceId](domainexception.md#sourceid)
 * [thrower](domainexception.md#thrower)
-* [timestamp](domainexception.md#timestamp)
+* [timestamp](domainexception.md#optional-timestamp)
 * [version](domainexception.md#optional-version)
 
 ### Methods
@@ -99,17 +99,17 @@ sidebar_label: "DomainException"
 
 ###  constructor
 
-\+ **new DomainException**(`props?`: [Props](../modules/types.md#props)): *[DomainException](domainexception.md)*
+\+ **new DomainException**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[DomainException](domainexception.md)› & object): *[DomainException](domainexception.md)*
 
 *Inherited from [Event](event.md).[constructor](event.md#constructor)*
 
-*Overrides [Serializable](serializable.md).[constructor](serializable.md#constructor)*
+*Overrides [Message](message.md).[constructor](message.md#constructor)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`props?` | [Props](../modules/types.md#props) |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[DomainException](domainexception.md)› & object |
 
 **Returns:** *[DomainException](domainexception.md)*
 
@@ -121,15 +121,15 @@ Name | Type |
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
 *Implementation of [Event](../interfaces/types.event.md).[metadata](../interfaces/types.event.md#optional-metadata)*
 
-*Inherited from [Message](message.md).[metadata](message.md#metadata)*
+*Inherited from [Message](message.md).[metadata](message.md#optional-metadata)*
 
-*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
 
 ___
 
@@ -161,15 +161,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Implementation of [Event](../interfaces/types.event.md).[timestamp](../interfaces/types.event.md#timestamp)*
+*Implementation of [Event](../interfaces/types.event.md).[timestamp](../interfaces/types.event.md#optional-timestamp)*
 
-*Inherited from [Message](message.md).[timestamp](message.md#timestamp)*
+*Inherited from [Message](message.md).[timestamp](message.md#optional-timestamp)*
 
-*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
 
 ___
 

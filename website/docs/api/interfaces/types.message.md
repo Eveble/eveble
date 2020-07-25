@@ -30,7 +30,7 @@ sidebar_label: "Message"
 ### Properties
 
 * [metadata](types.message.md#optional-metadata)
-* [timestamp](types.message.md#timestamp)
+* [timestamp](types.message.md#optional-timestamp)
 
 ### Methods
 
@@ -64,9 +64,9 @@ sidebar_label: "Message"
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
 ## Methods
 

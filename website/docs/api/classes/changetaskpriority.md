@@ -10,7 +10,7 @@ sidebar_label: "ChangeTaskPriority"
 
 ## Hierarchy
 
-* Command
+* Command‹[ChangeTaskPriority](changetaskpriority.md)›
 
   ↳ **ChangeTaskPriority**
 
@@ -32,11 +32,11 @@ sidebar_label: "ChangeTaskPriority"
 ### Properties
 
 * [id](changetaskpriority.md#id)
-* [metadata](changetaskpriority.md#metadata)
+* [metadata](changetaskpriority.md#optional-metadata)
 * [priority](changetaskpriority.md#priority)
 * [schemaVersion](changetaskpriority.md#optional-schemaversion)
 * [targetId](changetaskpriority.md#targetid)
-* [timestamp](changetaskpriority.md#timestamp)
+* [timestamp](changetaskpriority.md#optional-timestamp)
 
 ### Methods
 
@@ -92,7 +92,7 @@ sidebar_label: "ChangeTaskPriority"
 
 ###  constructor
 
-\+ **new ChangeTaskPriority**(`props`: [Props](../modules/types.md#props)): *[ChangeTaskPriority](changetaskpriority.md)*
+\+ **new ChangeTaskPriority**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[ChangeTaskPriority](changetaskpriority.md)› & object): *[ChangeTaskPriority](changetaskpriority.md)*
 
 *Inherited from [CreateEmployee](createemployee.md).[constructor](createemployee.md#constructor)*
 
@@ -102,9 +102,9 @@ Creates an instance of Message.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[ChangeTaskPriority](changetaskpriority.md)› & object | Properties matching generic `T` with `targetId` as `Guid|string`.  |
 
 **Returns:** *[ChangeTaskPriority](changetaskpriority.md)*
 
@@ -116,11 +116,20 @@ Name | Type | Default | Description |
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -148,11 +157,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ## Methods
 

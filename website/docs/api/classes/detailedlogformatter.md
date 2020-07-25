@@ -27,7 +27,7 @@ sidebar_label: "DetailedLogFormatter"
 
 ###  constructor
 
-\+ **new DetailedLogFormatter**(`converter`: [LogConverter](../interfaces/types.logconverter.md)): *[DetailedLogFormatter](detailedlogformatter.md)*
+\+ **new DetailedLogFormatter**(`converter`: [LogConverter](../interfaces/types.logconverter.md), `chalk`: any): *[DetailedLogFormatter](detailedlogformatter.md)*
 
 Creates an instance of SimpleLogFormatter.
 Creates an instance of SimpleLogFormatter.
@@ -37,6 +37,7 @@ Creates an instance of SimpleLogFormatter.
 Name | Type | Description |
 ------ | ------ | ------ |
 `converter` | [LogConverter](../interfaces/types.logconverter.md) | LogEntry converter instance.  |
+`chalk` | any | - |
 
 **Returns:** *[DetailedLogFormatter](detailedlogformatter.md)*
 

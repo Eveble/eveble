@@ -12,9 +12,9 @@ sidebar_label: "UnscheduleCommand"
 
 ## Hierarchy
 
-  ↳ [Command](command.md)
+  ↳ [Command](command.md)‹[UnscheduleCommand](unschedulecommand.md)›
 
-* Command
+* Command‹UnscheduleCommand›
 
   ↳ **UnscheduleCommand**
 
@@ -45,10 +45,10 @@ sidebar_label: "UnscheduleCommand"
 * [assignerType](unschedulecommand.md#assignertype)
 * [assignmentId](unschedulecommand.md#assignmentid)
 * [commandType](unschedulecommand.md#commandtype)
-* [metadata](unschedulecommand.md#metadata)
+* [metadata](unschedulecommand.md#optional-metadata)
 * [schemaVersion](unschedulecommand.md#optional-schemaversion)
 * [targetId](unschedulecommand.md#targetid)
-* [timestamp](unschedulecommand.md#timestamp)
+* [timestamp](unschedulecommand.md#optional-timestamp)
 
 ### Methods
 
@@ -104,17 +104,17 @@ sidebar_label: "UnscheduleCommand"
 
 ###  constructor
 
-\+ **new UnscheduleCommand**(`props?`: [Props](../modules/types.md#props)): *[UnscheduleCommand](unschedulecommand.md)*
+\+ **new UnscheduleCommand**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[UnscheduleCommand](unschedulecommand.md)› & object): *[UnscheduleCommand](unschedulecommand.md)*
 
 *Inherited from [Command](command.md).[constructor](command.md#constructor)*
 
-*Overrides [Serializable](serializable.md).[constructor](serializable.md#constructor)*
+*Overrides [Message](message.md).[constructor](message.md#constructor)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`props?` | [Props](../modules/types.md#props) |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[UnscheduleCommand](unschedulecommand.md)› & object |
 
 **Returns:** *[UnscheduleCommand](unschedulecommand.md)*
 
@@ -144,15 +144,15 @@ ___
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
 *Implementation of [Command](../interfaces/types.command.md).[metadata](../interfaces/types.command.md#optional-metadata)*
 
-*Inherited from [Message](message.md).[metadata](message.md#metadata)*
+*Inherited from [Message](message.md).[metadata](message.md#optional-metadata)*
 
-*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
 
 ___
 
@@ -178,15 +178,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Implementation of [Command](../interfaces/types.command.md).[timestamp](../interfaces/types.command.md#timestamp)*
+*Implementation of [Command](../interfaces/types.command.md).[timestamp](../interfaces/types.command.md#optional-timestamp)*
 
-*Inherited from [Message](message.md).[timestamp](message.md#timestamp)*
+*Inherited from [Message](message.md).[timestamp](message.md#optional-timestamp)*
 
-*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
 
 ## Methods
 

@@ -23,7 +23,7 @@ sidebar_label: "Event"
 
 * [metadata](types.event.md#optional-metadata)
 * [sourceId](types.event.md#sourceid)
-* [timestamp](types.event.md#timestamp)
+* [timestamp](types.event.md#optional-timestamp)
 * [version](types.event.md#optional-version)
 
 ### Methods
@@ -69,11 +69,11 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [Message](types.message.md).[timestamp](types.message.md#timestamp)*
+*Inherited from [Message](types.message.md).[timestamp](types.message.md#optional-timestamp)*
 
 *Overrides void*
 

@@ -74,6 +74,7 @@ sidebar_label: "EventSourceable"
 * [[ROLLBACK_STATE_METHOD_KEY]](eventsourceable.md#[rollback_state_method_key])
 * [[SAVE_STATE_METHOD_KEY]](eventsourceable.md#[save_state_method_key])
 * [assignMetadata](eventsourceable.md#assignmetadata)
+* [commandProps](eventsourceable.md#commandprops)
 * [ensureHandleability](eventsourceable.md#ensurehandleability)
 * [equals](eventsourceable.md#equals)
 * [eventProps](eventsourceable.md#eventprops)
@@ -127,7 +128,6 @@ sidebar_label: "EventSourceable"
 * [overrideHandler](eventsourceable.md#overridehandler)
 * [overrideHook](eventsourceable.md#overridehook)
 * [overrideLegacyTransformer](eventsourceable.md#overridelegacytransformer)
-* [pickEventProps](eventsourceable.md#pickeventprops)
 * [processSerializableList](eventsourceable.md#processserializablelist)
 * [record](eventsourceable.md#record)
 * [registerHandler](eventsourceable.md#registerhandler)
@@ -352,6 +352,30 @@ Name | Type |
 
 ___
 
+###  commandProps
+
+▸ **commandProps**(): *object*
+
+Picks base properties(`timestamp` & `metadata`) for new `Command` instance.
+
+**`example`** 
+```ts
+this.trigger(new MyCommand({
+  ...this.commandProps(),
+  customerName: command.customerName,
+}));
+```
+
+**Returns:** *object*
+
+Returns properties for `Command` instance.
+
+* **metadata**: *Record‹string, any›*
+
+* **timestamp**: *Date*
+
+___
+
 ###  ensureHandleability
 
 ▸ **ensureHandleability**(`messageType`: [MessageType](../interfaces/types.messagetype.md)‹[Message](../interfaces/types.message.md)›, `handleableTypes?`: [MessageType](../interfaces/types.messagetype.md)‹[Message](../interfaces/types.message.md)› | [MessageType](../interfaces/types.messagetype.md)‹[Message](../interfaces/types.message.md)›[]): *boolean*
@@ -393,11 +417,11 @@ ___
 
 ###  eventProps
 
-▸ **eventProps**(): *Record‹keyof any, any›*
+▸ **eventProps**(): *object*
 
 *Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
 
-Picks base properties(`sourceId` & `version`) for new `Event` instance.
+Picks base properties(`sourceId`, `timestamp`, `metadata`, `version`) for new `Event` instance.
 
 **`example`** 
 ```ts
@@ -407,9 +431,17 @@ this.record(new MyEvent({
 }));
 ```
 
-**Returns:** *Record‹keyof any, any›*
+**Returns:** *object*
 
 Returns properties for `Event` instance.
+
+* **metadata**: *Record‹string, any›*
+
+* **sourceId**: *[Guid](guid.md) | string*
+
+* **timestamp**: *Date*
+
+* **version**: *number*
 
 ___
 
@@ -1252,36 +1284,6 @@ Name | Type |
 
 ___
 
-###  pickEventProps
-
-▸ **pickEventProps**(...`sources`: Record‹string, any›[]): *[PickableProperties](pickableproperties.md)*
-
-*Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
-
-Generates pickable properties for new `Event` instance as  `PickableProperties`
-instance with all necessary sources for `Event`.
-
-**`example`** 
-```ts
-this.record(new MyEvent(this.pickEventProps(command)));
-this.record(new MyEvent(this.pickEventProps(
-  command,
-  {key: 'value'}
-)));
-```
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`...sources` | Record‹string, any›[] | One or more source of properties. |
-
-**Returns:** *[PickableProperties](pickableproperties.md)*
-
-Returns properties for `Event` instance as `PickableProperties`.
-
-___
-
 ###  processSerializableList
 
 ▸ **processSerializableList**(`props?`: [Props](../modules/types.md#props)): *[Props](../modules/types.md#props)*
@@ -1318,11 +1320,6 @@ this.record(new MyEvent({
   ...this.eventProps(),
   customerName: command.customerName,
 }));
-this.record(new MyEvent(this.pickEventProps(command)));
-this.record(new MyEvent(this.pickEventProps(
-  command,
-  {key: 'value'}
-)));
 ```
 
 **Parameters:**
@@ -1706,7 +1703,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
 
@@ -1719,7 +1716,7 @@ ___
 Name | Type |
 ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] |
-`error?` | [Error](extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*
 
@@ -1727,7 +1724,7 @@ ___
 
 ###  validateStatus
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 *Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
 
@@ -1740,7 +1737,7 @@ ___
 Name | Type |
 ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] |
-`error?` | [Error](extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*
 

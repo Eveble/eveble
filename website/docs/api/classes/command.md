@@ -6,7 +6,11 @@ sidebar_label: "Command"
 
 ## Type parameters
 
+▪ **T**: *object*
+
 ▪ **T**: *SuperConstructor*
+
+▪ **T**: *object*
 
 ▪ **T**: *SuperConstructor*
 
@@ -45,10 +49,10 @@ sidebar_label: "Command"
 
 ### Properties
 
-* [metadata](command.md#metadata)
+* [metadata](command.md#optional-metadata)
 * [schemaVersion](command.md#optional-schemaversion)
 * [targetId](command.md#targetid)
-* [timestamp](command.md#timestamp)
+* [timestamp](command.md#optional-timestamp)
 
 ### Methods
 
@@ -104,9 +108,9 @@ sidebar_label: "Command"
 
 ###  constructor
 
-\+ **new Command**(`props?`: [Props](../modules/types.md#props)): *[Command](command.md)*
+\+ **new Command**(`props`: [ConstructorType](../modules/types.md#constructortype)‹T› & object): *[Command](command.md)*
 
-*Overrides [Serializable](serializable.md).[constructor](serializable.md#constructor)*
+*Overrides [Message](message.md).[constructor](message.md#constructor)*
 
 Creates an instance of Message.
 Creates an instance of Message.
@@ -115,21 +119,21 @@ Creates an instance of Message.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`props?` | [Props](../modules/types.md#props) | Properties of the type required for construction.  |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹T› & object | Properties matching generic `T` with `targetId` as `Guid|string`.  |
 
 **Returns:** *[Command](command.md)*
 
 ## Properties
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
 *Implementation of [Command](../interfaces/types.command.md).[metadata](../interfaces/types.command.md#optional-metadata)*
 
-*Inherited from [Message](message.md).[metadata](message.md#metadata)*
+*Inherited from [Message](message.md).[metadata](message.md#optional-metadata)*
 
-*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Overrides [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
 
 ___
 
@@ -151,15 +155,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Implementation of [Command](../interfaces/types.command.md).[timestamp](../interfaces/types.command.md#timestamp)*
+*Implementation of [Command](../interfaces/types.command.md).[timestamp](../interfaces/types.command.md#optional-timestamp)*
 
-*Inherited from [Message](message.md).[timestamp](message.md#timestamp)*
+*Inherited from [Message](message.md).[timestamp](message.md#optional-timestamp)*
 
-*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Overrides [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
 
 ## Methods
 

@@ -41,9 +41,9 @@ sidebar_label: "Message"
 
 ### Properties
 
-* [metadata](message.md#metadata)
+* [metadata](message.md#optional-metadata)
 * [schemaVersion](message.md#optional-schemaversion)
-* [timestamp](message.md#timestamp)
+* [timestamp](message.md#optional-timestamp)
 
 ### Methods
 
@@ -96,25 +96,47 @@ sidebar_label: "Message"
 
 \+ **new Message**(`props?`: [Props](../modules/types.md#props)): *[Message](message.md)*
 
-*Inherited from [Serializable](serializable.md).[constructor](serializable.md#constructor)*
+*Overrides [Serializable](serializable.md).[constructor](serializable.md#constructor)*
 
-*Overrides [Struct](struct.md).[constructor](struct.md#constructor)*
+Creates an instance of Message.
+Creates an instance of Message.
+
+**`remarks`** 
+Since were dealing with special cases, mixins and limits of TypeScript, we
+use of "invoking multiple base constructors" from polytype to pass props to Struct's
+constructor:
+https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
+
+**`remarks`** 
+Since were dealing with special cases, mixins and limits of TypeScript, we
+use of "invoking multiple base constructors" from polytype to pass props to Struct's
+constructor:
+https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`props?` | [Props](../modules/types.md#props) |
+Name | Type | Description |
+------ | ------ | ------ |
+`props?` | [Props](../modules/types.md#props) | Properties of the type required for construction. |
 
 **Returns:** *[Message](message.md)*
 
 ## Properties
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
 *Implementation of [Message](../interfaces/types.message.md).[metadata](../interfaces/types.message.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -128,11 +150,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Implementation of [Message](../interfaces/types.message.md).[timestamp](../interfaces/types.message.md#timestamp)*
+*Implementation of [Message](../interfaces/types.message.md).[timestamp](../interfaces/types.message.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ## Methods
 

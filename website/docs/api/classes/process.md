@@ -67,6 +67,7 @@ sidebar_label: "Process"
 * [[ROLLBACK_STATE_METHOD_KEY]](process.md#[rollback_state_method_key])
 * [[SAVE_STATE_METHOD_KEY]](process.md#[save_state_method_key])
 * [assignMetadata](process.md#assignmetadata)
+* [commandProps](process.md#commandprops)
 * [ensureHandleability](process.md#ensurehandleability)
 * [equals](process.md#equals)
 * [eventProps](process.md#eventprops)
@@ -121,7 +122,6 @@ sidebar_label: "Process"
 * [overrideHandler](process.md#overridehandler)
 * [overrideHook](process.md#overridehook)
 * [overrideLegacyTransformer](process.md#overridelegacytransformer)
-* [pickEventProps](process.md#pickeventprops)
 * [processSerializableList](process.md#processserializablelist)
 * [record](process.md#record)
 * [registerHandler](process.md#registerhandler)
@@ -166,7 +166,7 @@ sidebar_label: "Process"
 
 ###  constructor
 
-\+ **new Process**(`arg`: [History](history.md) | [Command](command.md) | [Event](event.md) | [Props](../modules/types.md#props)): *[Process](process.md)*
+\+ **new Process**(`arg`: [History](history.md) | [Command](command.md)‹object› | [Event](event.md)‹object› | [Props](../modules/types.md#props)): *[Process](process.md)*
 
 *Overrides [EventSourceable](eventsourceable.md).[constructor](eventsourceable.md#constructor)*
 
@@ -217,7 +217,7 @@ Thrown if provided initializing message is not instance of `Command` or `Event`.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`arg` | [History](history.md) &#124; [Command](command.md) &#124; [Event](event.md) &#124; [Props](../modules/types.md#props) | Instance of: `History`, `Command`, `Event` or properties. |
+`arg` | [History](history.md) &#124; [Command](command.md)‹object› &#124; [Event](event.md)‹object› &#124; [Props](../modules/types.md#props) | Instance of: `History`, `Command`, `Event` or properties. |
 
 **Returns:** *[Process](process.md)*
 
@@ -393,6 +393,22 @@ Name | Type |
 
 ___
 
+###  commandProps
+
+▸ **commandProps**(): *object*
+
+*Inherited from [EventSourceable](eventsourceable.md).[commandProps](eventsourceable.md#commandprops)*
+
+*Overrides [CancelingEmployment](cancelingemployment.md).[commandProps](cancelingemployment.md#commandprops)*
+
+**Returns:** *object*
+
+* **metadata**: *Record‹string, any›*
+
+* **timestamp**: *Date*
+
+___
+
 ###  ensureHandleability
 
 ▸ **ensureHandleability**(`messageType`: [MessageType](../interfaces/types.messagetype.md)‹[Message](../interfaces/types.message.md)›, `handleableTypes?`: [MessageType](../interfaces/types.messagetype.md)‹[Message](../interfaces/types.message.md)› | [MessageType](../interfaces/types.messagetype.md)‹[Message](../interfaces/types.message.md)›[]): *boolean*
@@ -434,7 +450,7 @@ ___
 
 ###  eventProps
 
-▸ **eventProps**(): *Record‹keyof any, any›*
+▸ **eventProps**(): *object*
 
 *Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
 
@@ -442,7 +458,15 @@ ___
 
 *Overrides [CancelingEmployment](cancelingemployment.md).[eventProps](cancelingemployment.md#eventprops)*
 
-**Returns:** *Record‹keyof any, any›*
+**Returns:** *object*
+
+* **metadata**: *Record‹string, any›*
+
+* **sourceId**: *[Guid](guid.md) | string*
+
+* **timestamp**: *Date*
+
+* **version**: *number*
 
 ___
 
@@ -1292,26 +1316,6 @@ Name | Type |
 
 ___
 
-###  pickEventProps
-
-▸ **pickEventProps**(...`sources`: Record‹string, any›[]): *[PickableProperties](pickableproperties.md)*
-
-*Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
-
-*Inherited from [EventSourceable](eventsourceable.md).[pickEventProps](eventsourceable.md#pickeventprops)*
-
-*Overrides [CancelingEmployment](cancelingemployment.md).[pickEventProps](cancelingemployment.md#pickeventprops)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...sources` | Record‹string, any›[] |
-
-**Returns:** *[PickableProperties](pickableproperties.md)*
-
-___
-
 ###  processSerializableList
 
 ▸ **processSerializableList**(`props?`: [Props](../modules/types.md#props)): *[Props](../modules/types.md#props)*
@@ -1745,7 +1749,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
 
@@ -1758,7 +1762,7 @@ ___
 Name | Type |
 ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] |
-`error?` | [Error](extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*
 
@@ -1766,7 +1770,7 @@ ___
 
 ###  validateStatus
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 *Implementation of [EventSourceable](../interfaces/types.eventsourceable.md)*
 
@@ -1779,7 +1783,7 @@ ___
 Name | Type |
 ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] |
-`error?` | [Error](extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*
 

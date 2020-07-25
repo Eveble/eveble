@@ -96,7 +96,7 @@ ___
 
 ###  handleSaveErrors
 
-▸ **handleSaveErrors**(`error`: [Error](extendableerror.md#static-error), `message`: [Command](../interfaces/types.command.md) | [Event](../interfaces/types.event.md), `eventSourceableId`: string | [Guid](guid.md)): *Promise‹void›*
+▸ **handleSaveErrors**(`error`: Error, `message`: [Command](../interfaces/types.command.md) | [Event](../interfaces/types.event.md), `eventSourceableId`: string | [Guid](guid.md)): *Promise‹void›*
 
 Handles errors related to persisting event sourceable.
 
@@ -109,7 +109,7 @@ Thrown if the error is not a instance of `CommitConcurrencyError`.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`error` | [Error](extendableerror.md#static-error) | Instance of `Error` not related to domain. |
+`error` | Error | Instance of `Error` not related to domain. |
 `message` | [Command](../interfaces/types.command.md) &#124; [Event](../interfaces/types.event.md) | Instance of `Command` or `Event`. |
 `eventSourceableId` | string &#124; [Guid](guid.md) | Event sourceable identifier as string or instance of `Guid` |
 

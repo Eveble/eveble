@@ -10,7 +10,7 @@ sidebar_label: "EmployeeCreated"
 
 ## Hierarchy
 
-* Event
+* Event‹[EmployeeCreated](employeecreated.md)›
 
   ↳ **EmployeeCreated**
 
@@ -33,12 +33,12 @@ sidebar_label: "EmployeeCreated"
 
 * [firstName](employeecreated.md#firstname)
 * [lastName](employeecreated.md#lastname)
-* [metadata](employeecreated.md#metadata)
+* [metadata](employeecreated.md#optional-metadata)
 * [points](employeecreated.md#points)
 * [schemaVersion](employeecreated.md#optional-schemaversion)
 * [sourceId](employeecreated.md#sourceid)
 * [taskListsIds](employeecreated.md#tasklistsids)
-* [timestamp](employeecreated.md#timestamp)
+* [timestamp](employeecreated.md#optional-timestamp)
 * [version](employeecreated.md#optional-version)
 
 ### Methods
@@ -91,7 +91,7 @@ sidebar_label: "EmployeeCreated"
 
 ###  constructor
 
-\+ **new EmployeeCreated**(`props`: [Props](../modules/types.md#props)): *[EmployeeCreated](employeecreated.md)*
+\+ **new EmployeeCreated**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[EmployeeCreated](employeecreated.md)› & object): *[EmployeeCreated](employeecreated.md)*
 
 *Inherited from [EmployeeCreated](employeecreated.md).[constructor](employeecreated.md#constructor)*
 
@@ -101,9 +101,9 @@ Creates an instance of Event.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[EmployeeCreated](employeecreated.md)› & object | Properties matching generic `T` with `sourceId` as `Guid|string` and optional `version` as `number`.  |
 
 **Returns:** *[EmployeeCreated](employeecreated.md)*
 
@@ -121,11 +121,20 @@ ___
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -159,11 +168,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 

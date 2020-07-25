@@ -12,9 +12,9 @@ sidebar_label: "SerializableError"
 
 ## Hierarchy
 
-* SuperPrototypeSelector‹[ExtendableError](extendableerror.md) | [DefinableMixin](definablemixin.md) | [HookableMixin](hookablemixin.md) | [EjsonableMixin](ejsonablemixin.md) | [VersionableMixin](versionablemixin.md), this› & [DefinableMixin](definablemixin.md)‹this› & [HookableMixin](hookablemixin.md)‹this› & [EjsonableMixin](ejsonablemixin.md)‹this› & [VersionableMixin](versionablemixin.md)‹this› & [ExtendableError](extendableerror.md)‹this›
+* SuperPrototypeSelector‹ExtendableError | [DefinableMixin](definablemixin.md) | [HookableMixin](hookablemixin.md) | [EjsonableMixin](ejsonablemixin.md) | [VersionableMixin](versionablemixin.md), this› & [DefinableMixin](definablemixin.md)‹this› & [HookableMixin](hookablemixin.md)‹this› & [EjsonableMixin](ejsonablemixin.md)‹this› & [VersionableMixin](versionablemixin.md)‹this› & ExtendableError‹this›
 
-* SuperPrototypeSelector‹ExtendableError | DefinableMixin | HookableMixin | EjsonableMixin | VersionableMixin, this› & DefinableMixin‹this› & HookableMixin‹this› & ExtendableError‹this› & EjsonableMixin‹this› & VersionableMixin‹this›
+* SuperPrototypeSelector‹ExtendableError | DefinableMixin | HookableMixin | EjsonableMixin | VersionableMixin, this› & ExtendableError‹this› & DefinableMixin‹this› & HookableMixin‹this› & EjsonableMixin‹this› & VersionableMixin‹this›
 
   ↳ **SerializableError**
 
@@ -89,7 +89,7 @@ sidebar_label: "SerializableError"
 
 \+ **new SerializableError**(`propsOrMessage?`: [Props](../modules/types.md#props) | string): *[SerializableError](serializableerror.md)*
 
-*Overrides [ExtendableError](extendableerror.md).[constructor](extendableerror.md#constructor)*
+*Overrides [StateError](stateerror.md).[constructor](stateerror.md#constructor)*
 
 Creates an instance of SerializableError.
 Creates an instance of SerializableError.
@@ -108,7 +108,7 @@ Name | Type |
 
 • **code**? : *number*
 
-*Overrides [ExtendableError](extendableerror.md).[code](extendableerror.md#optional-code)*
+*Overrides [StateError](stateerror.md).[code](stateerror.md#optional-code)*
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 • **message**: *string*
 
-*Overrides [ExtendableError](extendableerror.md).[message](extendableerror.md#message)*
+*Overrides [StateError](stateerror.md).[message](stateerror.md#message)*
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 • **name**: *string*
 
-*Overrides [ExtendableError](extendableerror.md).[name](extendableerror.md#name)*
+*Overrides [StateError](stateerror.md).[name](stateerror.md#name)*
 
 ___
 
@@ -140,7 +140,7 @@ ___
 
 • **stack**? : *string*
 
-*Overrides [ExtendableError](extendableerror.md).[stack](extendableerror.md#optional-stack)*
+*Overrides [StateError](stateerror.md).[stack](stateerror.md#optional-stack)*
 
 ## Methods
 
@@ -168,9 +168,9 @@ ___
 
 ▸ **fillErrorProps**(`props`: [ErrorProps](../modules/types.md#errorprops)): *[ErrorProps](../modules/types.md#errorprops)*
 
-*Inherited from [ExtendableError](extendableerror.md).[fillErrorProps](extendableerror.md#fillerrorprops)*
+*Inherited from [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[fillErrorProps](noquittingfoolerror.md#fillerrorprops)*
+*Overrides [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
 **Parameters:**
 

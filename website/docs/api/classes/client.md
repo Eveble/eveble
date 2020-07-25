@@ -210,7 +210,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Implementation of [Stateful](../interfaces/types.stateful.md)*
 
@@ -223,7 +223,7 @@ ___
 Name | Type |
 ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] |
-`error?` | [Error](extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*
 

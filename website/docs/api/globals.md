@@ -105,7 +105,6 @@ sidebar_label: "Globals"
 * [EventsNotFoundError](classes/eventsnotfounderror.md)
 * [ExpireTask](classes/expiretask.md)
 * [ExpiringTaskCompletionPolicy](classes/expiringtaskcompletionpolicy.md)
-* [ExtendableError](classes/extendableerror.md)
 * [Guid](classes/guid.md)
 * [HandlerExistError](classes/handlerexisterror.md)
 * [HandlerNotFoundError](classes/handlernotfounderror.md)
@@ -147,12 +146,8 @@ sidebar_label: "Globals"
 * [InvalidStatusError](classes/invalidstatuserror.md)
 * [InvalidStatusTransitionError](classes/invalidstatustransitionerror.md)
 * [InvalidTransportIdError](classes/invalidtransportiderror.md)
-* [InvalidTypeNameError](classes/invalidtypenameerror.md)
-* [Kernel](classes/kernel.md)
-* [KernelError](classes/kernelerror.md)
 * [LegacyTransformerAlreadyExistsError](classes/legacytransformeralreadyexistserror.md)
 * [LegacyTransformerNotFoundError](classes/legacytransformernotfounderror.md)
-* [Library](classes/library.md)
 * [List](classes/list.md)
 * [ListError](classes/listerror.md)
 * [Log](classes/log.md)
@@ -177,7 +172,6 @@ sidebar_label: "Globals"
 * [OneToManyHandlingMixin](classes/onetomanyhandlingmixin.md)
 * [OneToOneHandlingMixin](classes/onetoonehandlingmixin.md)
 * [OpenTaskList](classes/opentasklist.md)
-* [PickableProperties](classes/pickableproperties.md)
 * [PostponeTask](classes/postponetask.md)
 * [Process](classes/process.md)
 * [ProductivityEstimation](classes/productivityestimation.md)
@@ -241,11 +235,6 @@ sidebar_label: "Globals"
 * [TaskStarted](classes/taskstarted.md)
 * [TerminateEmployee](classes/terminateemployee.md)
 * [TransportExistsError](classes/transportexistserror.md)
-* [TypeError](classes/typeerror.md)
-* [TypeExistsError](classes/typeexistserror.md)
-* [TypeNotFoundError](classes/typenotfounderror.md)
-* [UnavailableAsserterError](classes/unavailableassertererror.md)
-* [UnavailableSerializerError](classes/unavailableserializererror.md)
 * [UndefinedActionError](classes/undefinedactionerror.md)
 * [UndefinedLoggableTargetError](classes/undefinedloggabletargeterror.md)
 * [UndefinedSnapshotterError](classes/undefinedsnapshottererror.md)
@@ -254,7 +243,6 @@ sidebar_label: "Globals"
 * [UndefinedStatusesError](classes/undefinedstatuseserror.md)
 * [UnhandleableTypeError](classes/unhandleabletypeerror.md)
 * [UnparsableValueError](classes/unparsablevalueerror.md)
-* [UnregistrableTypeError](classes/unregistrabletypeerror.md)
 * [UnresolvableIdentifierFromMessageError](classes/unresolvableidentifierfrommessageerror.md)
 * [UnscheduleCommand](classes/unschedulecommand.md)
 * [UnsupportedExecutionTypeError](classes/unsupportedexecutiontypeerror.md)
@@ -311,8 +299,6 @@ sidebar_label: "Globals"
 * [VERSIONABLE_KEY](globals.md#const-versionable_key)
 * [env](globals.md#const-env)
 * [envFile](globals.md#const-envfile)
-* [kernel](globals.md#const-kernel)
-* [library](globals.md#const-library)
 
 ### Functions
 
@@ -336,10 +322,8 @@ sidebar_label: "Globals"
 * [isPlainRecord](globals.md#isplainrecord)
 * [isRecord](globals.md#isrecord)
 * [isSSL](globals.md#const-isssl)
-* [isSerializable](globals.md#isserializable)
 * [loadENV](globals.md#loadenv)
 * [loggerLoader](globals.md#loggerloader)
-* [resolveSerializableFromPropType](globals.md#resolveserializablefromproptype)
 * [route](globals.md#route)
 * [setupCommitStoreMongo](globals.md#const-setupcommitstoremongo)
 * [setupInjector](globals.md#setupinjector)
@@ -359,7 +343,6 @@ sidebar_label: "Globals"
 * [METADATA_KEYS](globals.md#const-metadata_keys)
 * [RFC5424](globals.md#const-rfc5424)
 * [SPECIFICATIONS](globals.md#const-specifications)
-* [config](globals.md#const-config)
 
 ## Type aliases
 
@@ -397,9 +380,7 @@ ___
 
 ### `Const` DEFAULT_PROPS_KEY
 
-• **DEFAULT_PROPS_KEY**: *keyof symbol* = Symbol(
-  'eveble:containers:default-props'
-)
+• **DEFAULT_PROPS_KEY**: *symbol* = CORE_METADATA_KEYS.DEFAULT_PROPS_KEY
 
 ___
 
@@ -553,9 +534,7 @@ ___
 
 ### `Const` SERIALIZABLE_LIST_PROPS_KEY
 
-• **SERIALIZABLE_LIST_PROPS_KEY**: *keyof symbol* = Symbol(
-  'eveble:container:serializable-list-props'
-)
+• **SERIALIZABLE_LIST_PROPS_KEY**: *symbol* = CORE_METADATA_KEYS.SERIALIZABLE_LIST_PROPS_KEY
 
 ___
 
@@ -589,7 +568,7 @@ ___
 
 ### `Const` SerializableError_base
 
-• **SerializableError_base**: *object & SuperConstructorSelector‹[ExtendableError](classes/extendableerror.md) | [DefinableMixin](classes/definablemixin.md) | [HookableMixin](classes/hookablemixin.md) | [EjsonableMixin](classes/ejsonablemixin.md) | [VersionableMixin](classes/versionablemixin.md)› & object & object & object & object & object & object*
+• **SerializableError_base**: *object & SuperConstructorSelector‹ExtendableError | [DefinableMixin](classes/definablemixin.md) | [HookableMixin](classes/hookablemixin.md) | [EjsonableMixin](classes/ejsonablemixin.md) | [VersionableMixin](classes/versionablemixin.md)› & object & object & object & object & object & object*
 
 ___
 
@@ -632,24 +611,6 @@ ___
 ### `Const` envFile
 
 • **envFile**: *string* = process.env.NODE_ENV ? `.env.${env}` : '.env'
-
-___
-
-### `Const` kernel
-
-• **kernel**: *Kernel‹›* = new Kernel(
-  typend.converter,
-  typend,
-  typend.describer,
-  library,
-  config
-)
-
-___
-
-### `Const` library
-
-• **library**: *Library‹›* = new Library()
 
 ## Functions
 
@@ -868,7 +829,7 @@ Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandl
 **`example`** 
 ```ts
 @define('MyCommand')
-class MyCommand extends Command {
+class MyCommand extends Command<MyCommand> {
  key: string;
 }
 
@@ -936,7 +897,7 @@ Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandl
 **`example`** 
 ```ts
 @define('MyCommand')
-class MyCommand extends Command {
+class MyCommand extends Command<MyCommand> {
  key: string;
 }
 
@@ -954,7 +915,7 @@ expect(MyClass.resolveInitializingMessage()).to.be.equal(
 **`example`** 
 ```ts
 @define('MyEvent')
-class MyEvent extends Event {
+class MyEvent extends Event<MyEvent> {
  key: string;
 }
 
@@ -1067,24 +1028,6 @@ Name | Type |
 
 ___
 
-###  isSerializable
-
-▸ **isSerializable**(`arg`: any): *boolean*
-
-Evaluates if provided argument is serialziable i.e. at current time implements  `Ejsonable` implementation.
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`arg` | any | **Instance** of evaluated argument. |
-
-**Returns:** *boolean*
-
-Returns `true` if provided argument is implementing `Ejsonable` interface, else `false`.
-
-___
-
 ###  loadENV
 
 ▸ **loadENV**(`envFilePath`: string): *void*
@@ -1122,24 +1065,6 @@ Name | Type | Description |
 
 ___
 
-###  resolveSerializableFromPropType
-
-▸ **resolveSerializableFromPropType**(`propType`: any): *[Serializable](interfaces/types.serializable.md) | undefined*
-
-Resolves `Serializable` from prop type.
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`propType` | any | Property type for converted class type. |
-
-**Returns:** *[Serializable](interfaces/types.serializable.md) | undefined*
-
-`Serializable` from prop type, else if not present - `undefined`.
-
-___
-
 ###  route
 
 ▸ **route**(`target`: Record‹string, any›, `methodName`: string, `index`: number): *void*
@@ -1163,7 +1088,7 @@ Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandl
 **`example`** 
 ```ts
 @define('MyCommand')
-class MyCommand extends Command {
+class MyCommand extends Command<MyCommand> {
  key: string;
 }
 
@@ -1179,7 +1104,7 @@ expect(instance.resolveRoutedCommands()).to.be.eql([MyCommand]);
 **`example`** 
 ```ts
 @define('MyEvent')
-class MyEvent extends Event {
+class MyEvent extends Event<MyEvent> {
  key: string;
 }
 
@@ -1302,7 +1227,7 @@ Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandl
 **`example`** 
 ```ts
 @define('MyEvent')
-class MyEvent extends Event {
+class MyEvent extends Event<MyEvent> {
  key: string;
 }
 
@@ -1801,28 +1726,3 @@ ___
 * **notice**: *number* = 5
 
 * **warning**: *number* = 4
-
-___
-
-### `Const` config
-
-### ▪ **config**: *object*
-
-▪ **conversion**: *object*
-
-* **type**: *"manual" | "runtime"* = getenv.string('EVEBLE_CONVERSION_TYPE', 'runtime') as
-      | 'runtime'
-      | 'manual'
-
-▪ **describer**: *object*
-
-* **formatting**: *"compact" | "debug" | "default"* = getenv.string('EVEBLE_DESCRIBER_FORMATTING', 'default') as
-      | 'default'
-      | 'compact'
-      | 'debug'
-
-▪ **validation**: *object*
-
-* **type**: *"manual" | "runtime"* = getenv.string('EVEBLE_VALIDATION_TYPE', 'runtime') as
-      | 'runtime'
-      | 'manual'

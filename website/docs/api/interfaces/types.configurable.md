@@ -88,7 +88,11 @@ ___
 
 ###  get
 
-▸ **get**(`path`: string, `runtimeDefaultValue?`: any): *any*
+▸ **get**‹**T**›(`path`: string, `runtimeDefaultValue?`: any): *T*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
@@ -97,9 +101,13 @@ Name | Type |
 `path` | string |
 `runtimeDefaultValue?` | any |
 
-**Returns:** *any*
+**Returns:** *T*
 
-▸ **get**(`path`: string, `runtimeDefaultValue?`: any): *any*
+▸ **get**‹**T**›(`path`: string, `runtimeDefaultValue?`: any): *T*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
@@ -108,13 +116,17 @@ Name | Type |
 `path` | string |
 `runtimeDefaultValue?` | any |
 
-**Returns:** *any*
+**Returns:** *T*
 
 ___
 
 ###  getDefault
 
-▸ **getDefault**(`path`: string): *any*
+▸ **getDefault**‹**T**›(`path`: string): *T*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
@@ -122,9 +134,13 @@ Name | Type |
 ------ | ------ |
 `path` | string |
 
-**Returns:** *any*
+**Returns:** *T*
 
-▸ **getDefault**(`path`: string): *any*
+▸ **getDefault**‹**T**›(`path`: string): *T*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
@@ -132,13 +148,17 @@ Name | Type |
 ------ | ------ |
 `path` | string |
 
-**Returns:** *any*
+**Returns:** *T*
 
 ___
 
 ###  getExact
 
-▸ **getExact**(`path`: string): *any*
+▸ **getExact**‹**T**›(`path`: string): *T*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
@@ -146,9 +166,13 @@ Name | Type |
 ------ | ------ |
 `path` | string |
 
-**Returns:** *any*
+**Returns:** *T*
 
-▸ **getExact**(`path`: string): *any*
+▸ **getExact**‹**T**›(`path`: string): *T*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
@@ -156,7 +180,7 @@ Name | Type |
 ------ | ------ |
 `path` | string |
 
-**Returns:** *any*
+**Returns:** *T*
 
 ___
 
@@ -306,25 +330,33 @@ ___
 
 ###  set
 
-▸ **set**(`path`: string, `value`: any): *void*
+▸ **set**‹**T**›(`path`: string, `value`: T): *void*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `path` | string |
-`value` | any |
+`value` | T |
 
 **Returns:** *void*
 
-▸ **set**(`path`: string, `value`: any): *void*
+▸ **set**‹**T**›(`path`: string, `value`: T): *void*
+
+**Type parameters:**
+
+▪ **T**: *any*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `path` | string |
-`value` | any |
+`value` | T |
 
 **Returns:** *void*
 

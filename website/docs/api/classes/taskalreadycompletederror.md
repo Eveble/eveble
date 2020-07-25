@@ -33,7 +33,7 @@ sidebar_label: "TaskAlreadyCompletedError"
 
 \+ **new TaskAlreadyCompletedError**(`id`: any): *[TaskAlreadyCompletedError](taskalreadycompletederror.md)*
 
-*Overrides void*
+*Overrides [StateError](stateerror.md).[constructor](stateerror.md#constructor)*
 
 **Parameters:**
 
@@ -49,7 +49,7 @@ Name | Type |
 
 • **code**? : *number*
 
-*Inherited from [NoQuittingFoolError](noquittingfoolerror.md).[code](noquittingfoolerror.md#optional-code)*
+*Inherited from [StateError](stateerror.md).[code](stateerror.md#optional-code)*
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 • **message**: *string*
 
-*Inherited from [NoQuittingFoolError](noquittingfoolerror.md).[message](noquittingfoolerror.md#message)*
+*Inherited from [StateError](stateerror.md).[message](stateerror.md#message)*
 
 *Overrides void*
 
@@ -67,7 +67,7 @@ ___
 
 • **name**: *string*
 
-*Inherited from [NoQuittingFoolError](noquittingfoolerror.md).[name](noquittingfoolerror.md#name)*
+*Inherited from [StateError](stateerror.md).[name](stateerror.md#name)*
 
 *Overrides void*
 
@@ -77,7 +77,7 @@ ___
 
 • **stack**? : *string*
 
-*Inherited from [NoQuittingFoolError](noquittingfoolerror.md).[stack](noquittingfoolerror.md#optional-stack)*
+*Inherited from [StateError](stateerror.md).[stack](stateerror.md#optional-stack)*
 
 *Overrides void*
 
@@ -87,16 +87,12 @@ ___
 
 ▸ **fillErrorProps**(`props`: [ErrorProps](../modules/types.md#errorprops)): *[ErrorProps](../modules/types.md#errorprops)*
 
-*Inherited from [NoQuittingFoolError](noquittingfoolerror.md).[fillErrorProps](noquittingfoolerror.md#fillerrorprops)*
-
-Fills missing error properties.
+*Inherited from [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`props` | [ErrorProps](../modules/types.md#errorprops) | Provided properties durning construction of error. |
+Name | Type |
+------ | ------ |
+`props` | [ErrorProps](../modules/types.md#errorprops) |
 
 **Returns:** *[ErrorProps](../modules/types.md#errorprops)*
-
-Filled properties Object for ExtendableError instance.

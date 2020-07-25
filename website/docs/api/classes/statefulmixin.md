@@ -153,7 +153,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Implementation of [Stateful](../interfaces/types.stateful.md)*
 
@@ -167,7 +167,7 @@ Thrown if target is not in correct(one of allowed) state.
 Name | Type | Description |
 ------ | ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] | Expected states list in one of which instance should be. |
-`error?` | [Error](extendableerror.md#static-error) | Optional error instance for case where state does not match expected one. |
+`error?` | Error | Optional error instance for case where state does not match expected one. |
 
 **Returns:** *boolean*
 

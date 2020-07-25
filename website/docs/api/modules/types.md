@@ -88,6 +88,7 @@ sidebar_label: "README"
 * [Class](types.md#class)
 * [ClassDecorator](types.md#classdecorator)
 * [ConfigProps](types.md#configprops)
+* [ConstructorType](types.md#constructortype)
 * [Describer](types.md#describer)
 * [ErrorProps](types.md#errorprops)
 * [Execution](types.md#execution)
@@ -101,6 +102,7 @@ sidebar_label: "README"
 * [MethodDecorator](types.md#methoddecorator)
 * [ModuleProps](types.md#moduleprops)
 * [MongoDBSerializedType](types.md#mongodbserializedtype)
+* [NonMethodKeys](types.md#nonmethodkeys)
 * [ParameterDecorator](types.md#parameterdecorator)
 * [Primitive](types.md#primitive)
 * [Priority](types.md#priority)
@@ -185,6 +187,12 @@ ___
 #### Type declaration:
 
 * \[ **path**: *string*\]: any
+
+___
+
+###  ConstructorType
+
+Ƭ **ConstructorType**: *Pick‹T, [NonMethodKeys](types.md#nonmethodkeys)‹T››*
 
 ___
 
@@ -337,6 +345,12 @@ ___
 * \[ **key**: *string*\]: any
 
 * **_type**: *string*
+
+___
+
+###  NonMethodKeys
+
+Ƭ **NonMethodKeys**: *object[keyof T]*
 
 ___
 

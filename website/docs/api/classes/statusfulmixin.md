@@ -147,7 +147,7 @@ ___
 
 ###  validateStatus
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 *Implementation of [Statusful](../interfaces/types.statusful.md)*
 
@@ -161,7 +161,7 @@ Thrown if target is not in correct(one of allowed) status.
 Name | Type | Description |
 ------ | ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] | Expected status list in one of which instance should be. |
-`error?` | [Error](extendableerror.md#static-error) | Optional error instance for case where status does not match expected one. |
+`error?` | Error | Optional error instance for case where status does not match expected one. |
 
 **Returns:** *boolean*
 

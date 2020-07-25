@@ -10,7 +10,7 @@ sidebar_label: "CancelEmployment"
 
 ## Hierarchy
 
-* Command
+* Command‹[CancelEmployment](cancelemployment.md)›
 
   ↳ **CancelEmployment**
 
@@ -32,10 +32,10 @@ sidebar_label: "CancelEmployment"
 ### Properties
 
 * [employeeId](cancelemployment.md#employeeid)
-* [metadata](cancelemployment.md#metadata)
+* [metadata](cancelemployment.md#optional-metadata)
 * [schemaVersion](cancelemployment.md#optional-schemaversion)
 * [targetId](cancelemployment.md#targetid)
-* [timestamp](cancelemployment.md#timestamp)
+* [timestamp](cancelemployment.md#optional-timestamp)
 
 ### Methods
 
@@ -91,7 +91,7 @@ sidebar_label: "CancelEmployment"
 
 ###  constructor
 
-\+ **new CancelEmployment**(`props`: [Props](../modules/types.md#props)): *[CancelEmployment](cancelemployment.md)*
+\+ **new CancelEmployment**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[CancelEmployment](cancelemployment.md)› & object): *[CancelEmployment](cancelemployment.md)*
 
 *Inherited from [CreateEmployee](createemployee.md).[constructor](createemployee.md#constructor)*
 
@@ -101,9 +101,9 @@ Creates an instance of Message.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[CancelEmployment](cancelemployment.md)› & object | Properties matching generic `T` with `targetId` as `Guid|string`.  |
 
 **Returns:** *[CancelEmployment](cancelemployment.md)*
 
@@ -115,11 +115,20 @@ Name | Type | Default | Description |
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -141,11 +150,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ## Methods
 

@@ -93,7 +93,7 @@ Name | Type |
 
 *Inherited from [CancelingEmploymentUnavailableForEmployee](cancelingemploymentunavailableforemployee.md).[code](cancelingemploymentunavailableforemployee.md#optional-code)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[code](noquittingfoolerror.md#optional-code)*
+*Overrides [StateError](stateerror.md).[code](stateerror.md#optional-code)*
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 *Inherited from [CancelingEmploymentUnavailableForEmployee](cancelingemploymentunavailableforemployee.md).[message](cancelingemploymentunavailableforemployee.md#message)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[message](noquittingfoolerror.md#message)*
+*Overrides [StateError](stateerror.md).[message](stateerror.md#message)*
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 *Inherited from [CancelingEmploymentUnavailableForEmployee](cancelingemploymentunavailableforemployee.md).[name](cancelingemploymentunavailableforemployee.md#name)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[name](noquittingfoolerror.md#name)*
+*Overrides [StateError](stateerror.md).[name](stateerror.md#name)*
 
 ___
 
@@ -133,7 +133,7 @@ ___
 
 *Inherited from [CancelingEmploymentUnavailableForEmployee](cancelingemploymentunavailableforemployee.md).[stack](cancelingemploymentunavailableforemployee.md#optional-stack)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[stack](noquittingfoolerror.md#optional-stack)*
+*Overrides [StateError](stateerror.md).[stack](stateerror.md#optional-stack)*
 
 ## Methods
 
@@ -194,19 +194,15 @@ ___
 
 ▸ **fillErrorProps**(`props`: [ErrorProps](../modules/types.md#errorprops)): *[ErrorProps](../modules/types.md#errorprops)*
 
-*Inherited from [NoQuittingFoolError](noquittingfoolerror.md).[fillErrorProps](noquittingfoolerror.md#fillerrorprops)*
-
-Fills missing error properties.
+*Inherited from [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`props` | [ErrorProps](../modules/types.md#errorprops) | Provided properties durning construction of error. |
+Name | Type |
+------ | ------ |
+`props` | [ErrorProps](../modules/types.md#errorprops) |
 
 **Returns:** *[ErrorProps](../modules/types.md#errorprops)*
-
-Filled properties Object for ExtendableError instance.
 
 ___
 

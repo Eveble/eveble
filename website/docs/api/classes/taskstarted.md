@@ -10,7 +10,7 @@ sidebar_label: "TaskStarted"
 
 ## Hierarchy
 
-* Event
+* Event‹[TaskStarted](taskstarted.md)›
 
   ↳ **TaskStarted**
 
@@ -32,11 +32,11 @@ sidebar_label: "TaskStarted"
 ### Properties
 
 * [employeeId](taskstarted.md#optional-employeeid)
-* [metadata](taskstarted.md#metadata)
+* [metadata](taskstarted.md#optional-metadata)
 * [schemaVersion](taskstarted.md#optional-schemaversion)
 * [sourceId](taskstarted.md#sourceid)
 * [task](taskstarted.md#task)
-* [timestamp](taskstarted.md#timestamp)
+* [timestamp](taskstarted.md#optional-timestamp)
 * [version](taskstarted.md#optional-version)
 
 ### Methods
@@ -89,7 +89,7 @@ sidebar_label: "TaskStarted"
 
 ###  constructor
 
-\+ **new TaskStarted**(`props`: [Props](../modules/types.md#props)): *[TaskStarted](taskstarted.md)*
+\+ **new TaskStarted**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[TaskStarted](taskstarted.md)› & object): *[TaskStarted](taskstarted.md)*
 
 *Inherited from [EmployeeCreated](employeecreated.md).[constructor](employeecreated.md#constructor)*
 
@@ -99,9 +99,9 @@ Creates an instance of Event.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[TaskStarted](taskstarted.md)› & object | Properties matching generic `T` with `sourceId` as `Guid|string` and optional `version` as `number`.  |
 
 **Returns:** *[TaskStarted](taskstarted.md)*
 
@@ -113,11 +113,20 @@ Name | Type | Default | Description |
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -145,11 +154,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 

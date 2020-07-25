@@ -74,7 +74,6 @@ sidebar_label: "EventSourceable"
 * [on](types.eventsourceable.md#on)
 * [overrideHandler](types.eventsourceable.md#overridehandler)
 * [overrideLegacyTransformer](types.eventsourceable.md#overridelegacytransformer)
-* [pickEventProps](types.eventsourceable.md#pickeventprops)
 * [record](types.eventsourceable.md#record)
 * [registerHandler](types.eventsourceable.md#registerhandler)
 * [registerLegacyTransformer](types.eventsourceable.md#registerlegacytransformer)
@@ -757,30 +756,6 @@ Name | Type |
 
 ___
 
-###  pickEventProps
-
-▸ **pickEventProps**(...`sources`: Record‹string, any›[]): *Record‹keyof any, any›[]*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...sources` | Record‹string, any›[] |
-
-**Returns:** *Record‹keyof any, any›[]*
-
-▸ **pickEventProps**(...`sources`: Record‹string, any›[]): *Record‹keyof any, any›[]*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...sources` | Record‹string, any›[] |
-
-**Returns:** *Record‹keyof any, any›[]*
-
-___
-
 ###  record
 
 ▸ **record**(`event`: [Event](types.event.md)): *void*
@@ -1095,7 +1070,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](../classes/extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Inherited from [Stateful](types.stateful.md).[validateState](types.stateful.md#validatestate)*
 
@@ -1106,7 +1081,7 @@ ___
 Name | Type |
 ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] |
-`error?` | [Error](../classes/extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*
 
@@ -1114,7 +1089,7 @@ ___
 
 ###  validateStatus
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](../classes/extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 *Inherited from [Statusful](types.statusful.md).[validateStatus](types.statusful.md#validatestatus)*
 
@@ -1125,6 +1100,6 @@ ___
 Name | Type |
 ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] |
-`error?` | [Error](../classes/extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*

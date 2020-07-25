@@ -10,7 +10,7 @@ sidebar_label: "DeclineTask"
 
 ## Hierarchy
 
-* Command
+* Command‹[DeclineTask](declinetask.md)›
 
   ↳ **DeclineTask**
 
@@ -32,11 +32,11 @@ sidebar_label: "DeclineTask"
 ### Properties
 
 * [id](declinetask.md#id)
-* [metadata](declinetask.md#metadata)
+* [metadata](declinetask.md#optional-metadata)
 * [reason](declinetask.md#reason)
 * [schemaVersion](declinetask.md#optional-schemaversion)
 * [targetId](declinetask.md#targetid)
-* [timestamp](declinetask.md#timestamp)
+* [timestamp](declinetask.md#optional-timestamp)
 
 ### Methods
 
@@ -92,7 +92,7 @@ sidebar_label: "DeclineTask"
 
 ###  constructor
 
-\+ **new DeclineTask**(`props`: [Props](../modules/types.md#props)): *[DeclineTask](declinetask.md)*
+\+ **new DeclineTask**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[DeclineTask](declinetask.md)› & object): *[DeclineTask](declinetask.md)*
 
 *Inherited from [CreateEmployee](createemployee.md).[constructor](createemployee.md#constructor)*
 
@@ -102,9 +102,9 @@ Creates an instance of Message.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[DeclineTask](declinetask.md)› & object | Properties matching generic `T` with `targetId` as `Guid|string`.  |
 
 **Returns:** *[DeclineTask](declinetask.md)*
 
@@ -116,11 +116,20 @@ Name | Type | Default | Description |
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -148,11 +157,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ## Methods
 

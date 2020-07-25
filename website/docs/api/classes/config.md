@@ -763,6 +763,8 @@ ___
 
 ▸ **set**‹**T**›(`path`: string, `value`: T): *void*
 
+*Implementation of [Configurable](../interfaces/types.configurable.md)*
+
 Sets a value on configuration.
 
 **`throws`** {ValidationError}

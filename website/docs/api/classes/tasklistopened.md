@@ -10,7 +10,7 @@ sidebar_label: "TaskListOpened"
 
 ## Hierarchy
 
-* Event
+* Event‹[TaskListOpened](tasklistopened.md)›
 
   ↳ **TaskListOpened**
 
@@ -31,11 +31,11 @@ sidebar_label: "TaskListOpened"
 
 ### Properties
 
-* [metadata](tasklistopened.md#metadata)
+* [metadata](tasklistopened.md#optional-metadata)
 * [schemaVersion](tasklistopened.md#optional-schemaversion)
 * [sourceId](tasklistopened.md#sourceid)
 * [tasks](tasklistopened.md#tasks)
-* [timestamp](tasklistopened.md#timestamp)
+* [timestamp](tasklistopened.md#optional-timestamp)
 * [title](tasklistopened.md#title)
 * [version](tasklistopened.md#optional-version)
 
@@ -89,7 +89,7 @@ sidebar_label: "TaskListOpened"
 
 ###  constructor
 
-\+ **new TaskListOpened**(`props`: [Props](../modules/types.md#props)): *[TaskListOpened](tasklistopened.md)*
+\+ **new TaskListOpened**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[TaskListOpened](tasklistopened.md)› & object): *[TaskListOpened](tasklistopened.md)*
 
 *Inherited from [EmployeeCreated](employeecreated.md).[constructor](employeecreated.md#constructor)*
 
@@ -99,19 +99,28 @@ Creates an instance of Event.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[TaskListOpened](tasklistopened.md)› & object | Properties matching generic `T` with `sourceId` as `Guid|string` and optional `version` as `number`.  |
 
 **Returns:** *[TaskListOpened](tasklistopened.md)*
 
 ## Properties
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -139,11 +148,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 

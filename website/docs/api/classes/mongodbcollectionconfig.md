@@ -546,6 +546,8 @@ ___
 
 ▸ **set**‹**T**›(`path`: string, `value`: T): *void*
 
+*Implementation of [Configurable](../interfaces/types.configurable.md)*
+
 *Inherited from [Config](config.md).[set](config.md#set)*
 
 *Overrides void*

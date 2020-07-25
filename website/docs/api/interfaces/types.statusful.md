@@ -152,24 +152,24 @@ ___
 
 ###  validateStatus
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](../classes/extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] |
-`error?` | [Error](../classes/extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](../classes/extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] |
-`error?` | [Error](../classes/extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*

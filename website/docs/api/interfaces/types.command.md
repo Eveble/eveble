@@ -24,7 +24,7 @@ sidebar_label: "Command"
 
 * [metadata](types.command.md#optional-metadata)
 * [targetId](types.command.md#targetid)
-* [timestamp](types.command.md#timestamp)
+* [timestamp](types.command.md#optional-timestamp)
 
 ### Methods
 
@@ -73,11 +73,11 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [Message](types.message.md).[timestamp](types.message.md#timestamp)*
+*Inherited from [Message](types.message.md).[timestamp](types.message.md#optional-timestamp)*
 
 *Overrides void*
 

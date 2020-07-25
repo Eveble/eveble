@@ -103,7 +103,7 @@ Name | Type |
 
 *Inherited from [SerializableError](serializableerror.md).[code](serializableerror.md#optional-code)*
 
-*Overrides [ExtendableError](extendableerror.md).[code](extendableerror.md#optional-code)*
+*Overrides [StateError](stateerror.md).[code](stateerror.md#optional-code)*
 
 ___
 
@@ -113,7 +113,7 @@ ___
 
 *Inherited from [SerializableError](serializableerror.md).[message](serializableerror.md#message)*
 
-*Overrides [ExtendableError](extendableerror.md).[message](extendableerror.md#message)*
+*Overrides [StateError](stateerror.md).[message](stateerror.md#message)*
 
 ___
 
@@ -123,7 +123,7 @@ ___
 
 *Inherited from [SerializableError](serializableerror.md).[name](serializableerror.md#name)*
 
-*Overrides [ExtendableError](extendableerror.md).[name](extendableerror.md#name)*
+*Overrides [StateError](stateerror.md).[name](stateerror.md#name)*
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 *Inherited from [SerializableError](serializableerror.md).[stack](serializableerror.md#optional-stack)*
 
-*Overrides [ExtendableError](extendableerror.md).[stack](extendableerror.md#optional-stack)*
+*Overrides [StateError](stateerror.md).[stack](stateerror.md#optional-stack)*
 
 ## Methods
 
@@ -171,9 +171,9 @@ ___
 
 ▸ **fillErrorProps**(`props`: [ErrorProps](../modules/types.md#errorprops)): *[ErrorProps](../modules/types.md#errorprops)*
 
-*Inherited from [ExtendableError](extendableerror.md).[fillErrorProps](extendableerror.md#fillerrorprops)*
+*Inherited from [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
-*Overrides [NoQuittingFoolError](noquittingfoolerror.md).[fillErrorProps](noquittingfoolerror.md#fillerrorprops)*
+*Overrides [StateError](stateerror.md).[fillErrorProps](stateerror.md#fillerrorprops)*
 
 **Parameters:**
 

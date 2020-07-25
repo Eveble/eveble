@@ -502,7 +502,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](../classes/extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Inherited from [Stateful](types.stateful.md).[validateState](types.stateful.md#validatestate)*
 
@@ -513,6 +513,6 @@ ___
 Name | Type |
 ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] |
-`error?` | [Error](../classes/extendableerror.md#static-error) |
+`error?` | Error |
 
 **Returns:** *boolean*

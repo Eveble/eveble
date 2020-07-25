@@ -86,6 +86,7 @@ sidebar_label: "TaskList"
 * [[ROLLBACK_STATE_METHOD_KEY]](tasklist.md#[rollback_state_method_key])
 * [[SAVE_STATE_METHOD_KEY]](tasklist.md#[save_state_method_key])
 * [assignMetadata](tasklist.md#assignmetadata)
+* [commandProps](tasklist.md#commandprops)
 * [ensureHandleability](tasklist.md#ensurehandleability)
 * [equals](tasklist.md#equals)
 * [eventProps](tasklist.md#eventprops)
@@ -139,7 +140,6 @@ sidebar_label: "TaskList"
 * [overrideHandler](tasklist.md#overridehandler)
 * [overrideHook](tasklist.md#overridehook)
 * [overrideLegacyTransformer](tasklist.md#overridelegacytransformer)
-* [pickEventProps](tasklist.md#pickeventprops)
 * [processSerializableList](tasklist.md#processserializablelist)
 * [record](tasklist.md#record)
 * [registerHandler](tasklist.md#registerhandler)
@@ -185,7 +185,7 @@ sidebar_label: "TaskList"
 
 ###  constructor
 
-\+ **new TaskList**(`arg`: History | Command | [Props](../modules/types.md#props)): *[TaskList](tasklist.md)*
+\+ **new TaskList**(`arg`: History | Command‹object› | [Props](../modules/types.md#props)): *[TaskList](tasklist.md)*
 
 *Inherited from [Employee](employee.md).[constructor](employee.md#constructor)*
 
@@ -216,7 +216,7 @@ Thrown if provided initializing message is not instance of `Command`.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`arg` | History &#124; Command &#124; [Props](../modules/types.md#props) | Instance of: `History`, `Command` or properties. |
+`arg` | History &#124; Command‹object› &#124; [Props](../modules/types.md#props) | Instance of: `History`, `Command` or properties. |
 
 **Returns:** *[TaskList](tasklist.md)*
 
@@ -463,13 +463,13 @@ ___
 
 ###  CloseTaskList
 
-▸ **CloseTaskList**(`command`: [CloseTaskList](closetasklist.md)): *void*
+▸ **CloseTaskList**(`_command`: [CloseTaskList](closetasklist.md)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`command` | [CloseTaskList](closetasklist.md) |
+`_command` | [CloseTaskList](closetasklist.md) |
 
 **Returns:** *void*
 
@@ -561,13 +561,13 @@ ___
 
 ###  OpenTaskList
 
-▸ **OpenTaskList**(`command`: [OpenTaskList](opentasklist.md)): *void*
+▸ **OpenTaskList**(`_command`: [OpenTaskList](opentasklist.md)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`command` | [OpenTaskList](opentasklist.md) |
+`_command` | [OpenTaskList](opentasklist.md) |
 
 **Returns:** *void*
 
@@ -856,6 +856,32 @@ Name | Type |
 
 ___
 
+###  commandProps
+
+▸ **commandProps**(): *object*
+
+*Inherited from [CancelingEmployment](cancelingemployment.md).[commandProps](cancelingemployment.md#commandprops)*
+
+Picks base properties(`timestamp` & `metadata`) for new `Command` instance.
+
+**`example`** 
+```ts
+this.trigger(new MyCommand({
+  ...this.commandProps(),
+  customerName: command.customerName,
+}));
+```
+
+**Returns:** *object*
+
+Returns properties for `Command` instance.
+
+* **metadata**: *Record‹string, any›*
+
+* **timestamp**: *Date*
+
+___
+
 ###  ensureHandleability
 
 ▸ **ensureHandleability**(`messageType`: MessageType‹Message›, `handleableTypes`: MessageType‹Message› | MessageType‹Message›[]): *boolean*
@@ -904,11 +930,11 @@ ___
 
 ###  eventProps
 
-▸ **eventProps**(): *Record‹keyof any, any›*
+▸ **eventProps**(): *object*
 
 *Inherited from [CancelingEmployment](cancelingemployment.md).[eventProps](cancelingemployment.md#eventprops)*
 
-Picks base properties(`sourceId` & `version`) for new `Event` instance.
+Picks base properties(`sourceId`, `timestamp`, `metadata`, `version`) for new `Event` instance.
 
 **`example`** 
 ```ts
@@ -918,9 +944,17 @@ this.record(new MyEvent({
 }));
 ```
 
-**Returns:** *Record‹keyof any, any›*
+**Returns:** *object*
 
 Returns properties for `Event` instance.
+
+* **metadata**: *Record‹string, any›*
+
+* **sourceId**: *Guid | string*
+
+* **timestamp**: *Date*
+
+* **version**: *number*
 
 ___
 
@@ -1891,36 +1925,6 @@ Name | Type | Description |
 
 ___
 
-###  pickEventProps
-
-▸ **pickEventProps**(...`sources`: Record‹string, any›[]): *PickableProperties*
-
-*Inherited from [CancelingEmployment](cancelingemployment.md).[pickEventProps](cancelingemployment.md#pickeventprops)*
-
-Generates pickable properties for new `Event` instance as  `PickableProperties`
-instance with all necessary sources for `Event`.
-
-**`example`** 
-```ts
-this.record(new MyEvent(this.pickEventProps(command)));
-this.record(new MyEvent(this.pickEventProps(
-  command,
-  {key: 'value'}
-)));
-```
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`...sources` | Record‹string, any›[] | One or more source of properties. |
-
-**Returns:** *PickableProperties*
-
-Returns properties for `Event` instance as `PickableProperties`.
-
-___
-
 ###  processSerializableList
 
 ▸ **processSerializableList**(`props`: [Props](../modules/types.md#props)): *[Props](../modules/types.md#props)*
@@ -1960,11 +1964,6 @@ this.record(new MyEvent({
   ...this.eventProps(),
   customerName: command.customerName,
 }));
-this.record(new MyEvent(this.pickEventProps(command)));
-this.record(new MyEvent(this.pickEventProps(
-  command,
-  {key: 'value'}
-)));
 ```
 
 **Parameters:**
@@ -1999,11 +1998,11 @@ Thrown if handler would overridden without explicit call.
 **`example`** 
 ```ts
 @define('MyCommand')
-class MyCommand extends Command {
+class MyCommand extends Command<MyCommand> {
   key: string;
 }
 define('MyOtherCommand')
-class MyOtherCommand extends Command {
+class MyOtherCommand extends Command<MyOtherCommand> {
   key: string;
 }
 
@@ -2561,7 +2560,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Inherited from [Task](task.md).[validateState](task.md#validatestate)*
 
@@ -2575,7 +2574,7 @@ Thrown if target is not in correct(one of allowed) state.
 Name | Type | Description |
 ------ | ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] | Expected states list in one of which instance should be. |
-`error?` | [Error](extendableerror.md#static-error) | Optional error instance for case where state does not match expected one. |
+`error?` | Error | Optional error instance for case where state does not match expected one. |
 
 **Returns:** *boolean*
 
@@ -2585,7 +2584,7 @@ ___
 
 ###  validateStatus
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 *Inherited from [Task](task.md).[validateStatus](task.md#validatestatus)*
 
@@ -2599,7 +2598,7 @@ Thrown if target is not in correct(one of allowed) status.
 Name | Type | Description |
 ------ | ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] | Expected status list in one of which instance should be. |
-`error?` | [Error](extendableerror.md#static-error) | Optional error instance for case where status does not match expected one. |
+`error?` | Error | Optional error instance for case where status does not match expected one. |
 
 **Returns:** *boolean*
 

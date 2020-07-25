@@ -1410,7 +1410,7 @@ ___
 
 ###  validateState
 
-▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateState**(`stateOrStates`: [State](../modules/types.md#state) | [State](../modules/types.md#state)[], `error?`: Error): *boolean*
 
 *Inherited from [Task](task.md).[validateState](task.md#validatestate)*
 
@@ -1424,7 +1424,7 @@ Thrown if target is not in correct(one of allowed) state.
 Name | Type | Description |
 ------ | ------ | ------ |
 `stateOrStates` | [State](../modules/types.md#state) &#124; [State](../modules/types.md#state)[] | Expected states list in one of which instance should be. |
-`error?` | [Error](extendableerror.md#static-error) | Optional error instance for case where state does not match expected one. |
+`error?` | Error | Optional error instance for case where state does not match expected one. |
 
 **Returns:** *boolean*
 
@@ -1434,7 +1434,7 @@ ___
 
 ###  validateStatus
 
-▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: [Error](extendableerror.md#static-error)): *boolean*
+▸ **validateStatus**(`statusOrStatuses`: [Status](../modules/types.md#status) | [Status](../modules/types.md#status)[], `error?`: Error): *boolean*
 
 *Inherited from [Task](task.md).[validateStatus](task.md#validatestatus)*
 
@@ -1448,7 +1448,7 @@ Thrown if target is not in correct(one of allowed) status.
 Name | Type | Description |
 ------ | ------ | ------ |
 `statusOrStatuses` | [Status](../modules/types.md#status) &#124; [Status](../modules/types.md#status)[] | Expected status list in one of which instance should be. |
-`error?` | [Error](extendableerror.md#static-error) | Optional error instance for case where status does not match expected one. |
+`error?` | Error | Optional error instance for case where status does not match expected one. |
 
 **Returns:** *boolean*
 

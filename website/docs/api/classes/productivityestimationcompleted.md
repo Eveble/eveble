@@ -10,7 +10,7 @@ sidebar_label: "ProductivityEstimationCompleted"
 
 ## Hierarchy
 
-* Event
+* Event‹[ProductivityEstimationCompleted](productivityestimationcompleted.md)›
 
   ↳ **ProductivityEstimationCompleted**
 
@@ -31,10 +31,10 @@ sidebar_label: "ProductivityEstimationCompleted"
 
 ### Properties
 
-* [metadata](productivityestimationcompleted.md#metadata)
+* [metadata](productivityestimationcompleted.md#optional-metadata)
 * [schemaVersion](productivityestimationcompleted.md#optional-schemaversion)
 * [sourceId](productivityestimationcompleted.md#sourceid)
-* [timestamp](productivityestimationcompleted.md#timestamp)
+* [timestamp](productivityestimationcompleted.md#optional-timestamp)
 * [version](productivityestimationcompleted.md#optional-version)
 
 ### Methods
@@ -87,7 +87,7 @@ sidebar_label: "ProductivityEstimationCompleted"
 
 ###  constructor
 
-\+ **new ProductivityEstimationCompleted**(`props`: [Props](../modules/types.md#props)): *[ProductivityEstimationCompleted](productivityestimationcompleted.md)*
+\+ **new ProductivityEstimationCompleted**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[ProductivityEstimationCompleted](productivityestimationcompleted.md)› & object): *[ProductivityEstimationCompleted](productivityestimationcompleted.md)*
 
 *Inherited from [EmployeeCreated](employeecreated.md).[constructor](employeecreated.md#constructor)*
 
@@ -97,19 +97,28 @@ Creates an instance of Event.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[ProductivityEstimationCompleted](productivityestimationcompleted.md)› & object | Properties matching generic `T` with `sourceId` as `Guid|string` and optional `version` as `number`.  |
 
 **Returns:** *[ProductivityEstimationCompleted](productivityestimationcompleted.md)*
 
 ## Properties
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -131,11 +140,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 

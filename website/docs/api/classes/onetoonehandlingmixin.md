@@ -395,11 +395,11 @@ Thrown if handler would overridden without explicit call.
 **`example`** 
 ```ts
 @define('MyCommand')
-class MyCommand extends Command {
+class MyCommand extends Command<MyCommand> {
   key: string;
 }
 define('MyOtherCommand')
-class MyOtherCommand extends Command {
+class MyOtherCommand extends Command<MyOtherCommand> {
   key: string;
 }
 

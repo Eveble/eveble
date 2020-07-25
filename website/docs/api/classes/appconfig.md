@@ -104,7 +104,7 @@ Name | Type | Description |
 
 ### `Optional` appId
 
-• **appId**? : *string* = getenv.string(
+• **appId**? : *string | Stringifiable* = getenv.string(
     'APP_ID',
     AppConfig.generateId() as string
   )
@@ -145,7 +145,7 @@ ___
 
 ### `Optional` workerId
 
-• **workerId**? : *string* = getenv.string(
+• **workerId**? : *string | Stringifiable* = getenv.string(
     'WORKER_ID',
     AppConfig.generateId() as string
   )
@@ -577,6 +577,8 @@ ___
 ###  set
 
 ▸ **set**‹**T**›(`path`: string, `value`: T): *void*
+
+*Implementation of [Configurable](../interfaces/types.configurable.md)*
 
 *Inherited from [Config](config.md).[set](config.md#set)*
 

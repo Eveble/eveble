@@ -10,7 +10,7 @@ sidebar_label: "EmployeeTerminationCompleted"
 
 ## Hierarchy
 
-* Event
+* Event‹[EmployeeTerminationCompleted](employeeterminationcompleted.md)›
 
   ↳ **EmployeeTerminationCompleted**
 
@@ -32,11 +32,11 @@ sidebar_label: "EmployeeTerminationCompleted"
 ### Properties
 
 * [employeeId](employeeterminationcompleted.md#employeeid)
-* [metadata](employeeterminationcompleted.md#metadata)
+* [metadata](employeeterminationcompleted.md#optional-metadata)
 * [schemaVersion](employeeterminationcompleted.md#optional-schemaversion)
 * [sourceId](employeeterminationcompleted.md#sourceid)
 * [taskListsIds](employeeterminationcompleted.md#tasklistsids)
-* [timestamp](employeeterminationcompleted.md#timestamp)
+* [timestamp](employeeterminationcompleted.md#optional-timestamp)
 * [version](employeeterminationcompleted.md#optional-version)
 
 ### Methods
@@ -89,7 +89,7 @@ sidebar_label: "EmployeeTerminationCompleted"
 
 ###  constructor
 
-\+ **new EmployeeTerminationCompleted**(`props`: [Props](../modules/types.md#props)): *[EmployeeTerminationCompleted](employeeterminationcompleted.md)*
+\+ **new EmployeeTerminationCompleted**(`props`: [ConstructorType](../modules/types.md#constructortype)‹[EmployeeTerminationCompleted](employeeterminationcompleted.md)› & object): *[EmployeeTerminationCompleted](employeeterminationcompleted.md)*
 
 *Inherited from [EmployeeCreated](employeecreated.md).[constructor](employeecreated.md#constructor)*
 
@@ -99,9 +99,9 @@ Creates an instance of Event.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`props` | [Props](../modules/types.md#props) | {} | Properties of the type required for construction.  |
+Name | Type | Description |
+------ | ------ | ------ |
+`props` | [ConstructorType](../modules/types.md#constructortype)‹[EmployeeTerminationCompleted](employeeterminationcompleted.md)› & object | Properties matching generic `T` with `sourceId` as `Guid|string` and optional `version` as `number`.  |
 
 **Returns:** *[EmployeeTerminationCompleted](employeeterminationcompleted.md)*
 
@@ -113,11 +113,20 @@ Name | Type | Default | Description |
 
 ___
 
-###  metadata
+### `Optional` metadata
 
-• **metadata**: *Record‹string, any›*
+• **metadata**? : *Record‹string, any›*
 
-*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#metadata)*
+*Inherited from [CreateEmployee](createemployee.md).[metadata](createemployee.md#optional-metadata)*
+
+**`remarks`** 
+Since Command & Event are frozen after construction, metadata
+property must be assigning on construction. This ensures that
+content of message is immutable; however metadata as an object will
+be unaffected by Object.freeze - thus allowing for additional data
+to be assigned later on.
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
@@ -145,11 +154,15 @@ ___
 
 ___
 
-###  timestamp
+### `Optional` timestamp
 
-• **timestamp**: *Date*
+• **timestamp**? : *Date*
 
-*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#timestamp)*
+*Inherited from [CreateEmployee](createemployee.md).[timestamp](createemployee.md#optional-timestamp)*
+
+**`remarks`** 
+Exposed as optional - but always assigned with use of
+`Message.prototype.processProps` for easier interaction.
 
 ___
 
