@@ -1,12 +1,11 @@
 import { inject, injectable } from '@parisholley/inversify-async';
-import { isFunction, partial, isEmpty } from 'lodash';
-import { instanceOf } from 'typend';
+import { isFunction, partial, isEmpty, isPlainObject } from 'lodash';
 import {
-  kernel,
   TypeNotFoundError,
   TypeExistsError,
   UnregistrableTypeError,
   isSerializable,
+  kernel,
 } from '@eveble/core';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
@@ -568,13 +567,34 @@ export class EJSONSerializerAdapter implements types.Serializer {
       if (Array.isArray(value)) {
         // This is an array of sub values / Serializable
         data[key] = value.map((item) => {
-          return instanceOf<types.Serializable>(item)
-            ? this.toData(item)
-            : item;
+          return isSerializable(item) ? this.toData(item) : item;
         });
-      } else if (instanceOf<types.Serializable>(value)) {
+      } else if (isSerializable(value)) {
         // This is another type
         data[key] = this.toData(value);
+      } else if (isPlainObject(value)) {
+        data[key] = this.processNestedObjToData(value);
+      } else {
+        data[key] = value;
+      }
+    }
+    return data;
+  }
+
+  /**
+   * Processes nested object to data.
+   * @obj - Nested object.
+   * @returns Processed object to data.
+   */
+  protected processNestedObjToData(
+    obj: Record<string, any>
+  ): Record<string, any> {
+    const data = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (isSerializable(value)) {
+        data[key] = this.toData(value as types.Serializable);
+      } else if (!key.includes('correlation') && isPlainObject(value)) {
+        data[key] = this.processNestedObjToData(obj);
       } else {
         data[key] = value;
       }
@@ -626,10 +646,33 @@ export class EJSONSerializerAdapter implements types.Serializer {
           }
           return item;
         });
+      } else if (isPlainObject(value)) {
+        props[key] = this.processNestedObjFromData(value);
       } else {
         props[key] = value;
       }
     }
     return new Type(props);
+  }
+
+  /**
+   * Processes nested object from data.
+   * @param data - Data as an object.
+   * @returns Processed object from data.
+   */
+  protected processNestedObjFromData(
+    data: Record<string, any>
+  ): Record<string, any> {
+    const props = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined && value[this.getTypeKey()] !== undefined) {
+        props[key] = this.fromData(value as types.Serializable);
+      } else if (isPlainObject(value)) {
+        props[key] = this.processNestedObjFromData(value);
+      } else {
+        props[key] = value;
+      }
+    }
+    return props;
   }
 }

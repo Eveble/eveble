@@ -16,6 +16,7 @@ import { Serializable } from '../../../src/components/serializable';
 import { UnparsableValueError } from '../../../src/messaging/messaging-errors';
 import { TYPE_KEY } from '../../../src/constants/literal-keys';
 import { createEJSON } from '../../../src/utils/helpers';
+import { Guid } from '../../../src';
 
 chai.use(sinonChai);
 
@@ -50,6 +51,14 @@ describe(`EJSONSerializerAdapter`, function () {
     lastName: string;
 
     address?: Address;
+  }
+
+  @define('Legal', { isRegistrable: false })
+  class Legal extends Serializable {
+    tos?: {
+      id: Guid;
+      isAccepted: boolean;
+    };
   }
 
   @define('Car', { isRegistrable: false })
@@ -648,8 +657,34 @@ describe(`EJSONSerializerAdapter`, function () {
         });
       });
 
+      context('with nested optional types', () => {
+        it('converts data object while preserving its type and optional nested types', () => {
+          serializer.registerType('Legal', Legal);
+          serializer.registerType('Guid', Guid);
+
+          const id = new Guid();
+          const legal = new Legal({
+            tos: {
+              id,
+              isAccepted: true,
+            },
+          });
+
+          expect(serializer.toData(legal)).to.be.eql({
+            _type: 'Legal',
+            tos: {
+              id: {
+                _type: 'Guid',
+                id: id.toString(),
+              },
+              isAccepted: true,
+            },
+          });
+        });
+      });
+
       context('with nested types', () => {
-        it('converts serializable types to data object while preserving its type and nested types', () => {
+        it('converts data object while preserving its type and nested types', () => {
           serializer.registerType('Person', Person);
           serializer.registerType('Address', Address);
 
@@ -693,7 +728,7 @@ describe(`EJSONSerializerAdapter`, function () {
       });
 
       context('without nested types', () => {
-        it('converts serializable type to data object while preserving its type', () => {
+        it('converts data object to serializable type', () => {
           serializer.registerType('Car', Car);
 
           const data = {
@@ -712,7 +747,7 @@ describe(`EJSONSerializerAdapter`, function () {
       });
 
       context('with list of nested types', () => {
-        it('converts serializable type to data object while preserving its type and types in lists', () => {
+        it('converts data object to serializable type', () => {
           serializer.registerType('Car', Car);
           serializer.registerType('Garage', Garage);
 
@@ -741,8 +776,35 @@ describe(`EJSONSerializerAdapter`, function () {
         });
       });
 
+      context('with nested optional types', () => {
+        it('converts data object to serializable type', () => {
+          serializer.registerType('Legal', Legal);
+          serializer.registerType('Guid', Guid);
+
+          const id = new Guid();
+          const data = {
+            _type: 'Legal',
+            tos: {
+              id: {
+                _type: 'Guid',
+                id: id.toString(),
+              },
+              isAccepted: true,
+            },
+          };
+          expect(serializer.fromData<Legal>(data)).to.be.eql(
+            new Legal({
+              tos: {
+                id,
+                isAccepted: true,
+              },
+            })
+          );
+        });
+      });
+
       context('with nested types', () => {
-        it('reconstructs data object to serializable types', () => {
+        it('converts data object to serializable type', () => {
           serializer.registerType('Person', Person);
           serializer.registerType('Address', Address);
 
