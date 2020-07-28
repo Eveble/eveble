@@ -448,7 +448,7 @@ describe(`Config`, function () {
           config.assign({ key: 10 });
         }).to.throw(
           ValidationError,
-          `Config.MyConfig: (Key 'key': Expected Number(10) to be a String in {"key":Number(10)})`
+          `Config.MyConfig: (Key 'key': Expected Number(10) to be a String in Config.MyConfig({"key":10}))`
         );
       });
 
@@ -706,10 +706,89 @@ describe(`Config`, function () {
           key: 'first-key',
         });
       });
+
+      it('merges two deeply nested configurations together while keeping parent properties precedence', () => {
+        @define('Config.First')
+        class First extends Config {
+          key = 'first-key';
+
+          foo: MyFirst;
+
+          constructor(props: Partial<First>) {
+            super();
+            Object.assign(this, this.processProps(props));
+          }
+        }
+
+        @define('Config.Second')
+        class Second extends Config {
+          I: {
+            II: {
+              III: {
+                IV: {
+                  V: MySecond;
+                };
+              };
+            };
+          };
+
+          constructor(props: Partial<Second>) {
+            super();
+            Object.assign(this, this.processProps(props));
+          }
+        }
+
+        const first = new First({
+          key: 'first-key',
+          foo: new MyFirst('first-foo'),
+        });
+        const second = new Second({
+          I: {
+            II: {
+              III: {
+                IV: {
+                  V: new MySecond('second'),
+                },
+              },
+            },
+          },
+        });
+
+        first.merge(second);
+        expect(first.getPropTypes()).to.be.eql({
+          included: PropTypes.interface({}).isOptional,
+          merged: PropTypes.interface({}).isOptional,
+          foo: PropTypes.instanceOf(MyFirst),
+          key: PropTypes.instanceOf(String),
+          I: PropTypes.shape({
+            II: {
+              III: {
+                IV: {
+                  V: PropTypes.instanceOf(MySecond),
+                },
+              },
+            },
+          }),
+        });
+        expect(first).to.be.eql({
+          merged: { 'Config.Second': second },
+          foo: new MyFirst('first-foo'),
+          key: 'first-key',
+          I: {
+            II: {
+              III: {
+                IV: {
+                  V: new MySecond('second'),
+                },
+              },
+            },
+          },
+        });
+      });
     });
 
     describe('complex', () => {
-      it('merges complex nested nested prop types and properties with parent config', () => {
+      it('merges complex nested prop types and properties with parent config that takes explicit precedence', () => {
         @define('Config.First')
         class First extends Config {
           I = 'first-I';

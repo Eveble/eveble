@@ -1,5 +1,6 @@
 import { set, get, has, isEmpty } from 'lodash';
 import merge from 'deepmerge';
+import { diff } from 'deep-diff';
 import { InstanceOf, Collection, instanceOf, Optional } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import { define, kernel } from '@eveble/core';
@@ -7,11 +8,7 @@ import deepClone from '@jsbits/deep-clone';
 import { Struct } from './struct';
 import { types } from '../types';
 import { InvalidConfigError } from '../core/core-errors';
-import {
-  isPlainRecord,
-  convertObjectToCollection,
-  isRecord,
-} from '../utils/helpers';
+import { isPlainRecord, convertObjectToCollection } from '../utils/helpers';
 import { delegate } from '../annotations/delegate';
 
 /*
@@ -383,18 +380,10 @@ export class Config extends Struct implements types.Configurable {
    * ```
    */
   public assign(props: types.Props): void {
-    let copy: any = deepClone(this);
-    copy = merge(copy, props, {
-      isMergeableObject: isRecord,
-    });
-    this.validateProps(copy, this.getPropTypes());
-
-    Object.assign(
-      this,
-      merge(this as Record<string, any>, props, {
-        isMergeableObject: isRecord,
-      })
-    );
+    const configCopy: any = deepClone(this);
+    this.findDiffAndUpdate(configCopy, configCopy, props);
+    this.validateProps(configCopy, this.getPropTypes());
+    this.findDiffAndUpdate(this, props, this);
   }
 
   /**
@@ -544,54 +533,37 @@ export class Config extends Struct implements types.Configurable {
         kernel.describer.describe(config)
       );
     }
-    const configCopy = deepClone(config);
-    delete (configCopy as any).included;
+    const configCopy: any = deepClone(config);
+    delete configCopy.included;
 
-    /*
-    There is bug with `merge` that will result losing configuration type
-    on complex applications that uses multiple modules:
+    this.findDiffAndUpdate(this, this, configCopy);
 
-    For example lets take:
-    `allows to set deeply nested app configuration on app runtime`
-    from base-app.test.ts:
-
-    First configuration merge with `ChildModule` will result with `this.merged` to be:
-
-    {
-      ChildModuleConfig: ChildModuleConfig {
-        root: 'child-root',
-        child: { change: 'child-change', keep: 'child-keep' }
-      }
-    }
-
-    However second configuration merge with `GrandchildModuleConfig` will result in losing the type with use of `merge` as:
-
-    {
-      ChildModuleConfig { <<<<<<<<<<<<< TYPE IS LOST
-        root: 'child-root',
-        child: { change: 'child-change', keep: 'child-keep' }
-      },
-      GrandchildModuleConfig: GrandchildModuleConfig {
-        root: 'grandchild-root',
-        grandchild: { change: 'grandchild-change', keep: 'grandchild-keep' }
-      }
-    }
-
-    We store the current state of `this.merged` before merging -> merge ->
-    and then rebuild the whole `this.merged` object again.
-    */
-    const merged = [...Object.values(this.merged || {}), config];
-    Object.assign(
-      this,
-      // AppConfig configurations should have precedence
-      merge(configCopy, this as Record<string, any>, {
-        isMergeableObject: isRecord,
-      })
-    );
     if (this.merged === undefined) this.merged = {};
+    this.merged[getTypeName(config) as string] = config;
+  }
 
-    for (const mergedConfig of merged) {
-      this.merged[getTypeName(mergedConfig as any) as string] = mergedConfig;
+  /**
+   * Finds differences between two objects and update's the target.
+   * @param target - Target of assignment as an object.
+   * @param left - Left source of assignment as an object.
+   * @param right - Left source of assignment as an object.
+   */
+  protected findDiffAndUpdate(
+    target: Record<string, any>,
+    left: Record<string, any>,
+    right: Record<string, any>
+  ): void {
+    const differences = diff(left, right);
+    for (const difference of differences) {
+      if (difference.path.includes('merged')) {
+        continue;
+      }
+      if (['E'].includes(difference.kind)) {
+        set(target, difference.path, difference.lhs);
+      }
+      if (['N'].includes(difference.kind)) {
+        set(target, difference.path, difference.rhs);
+      }
     }
   }
 }
