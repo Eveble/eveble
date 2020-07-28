@@ -1603,14 +1603,17 @@ exports.Config = Config_1 = class Config extends Struct {
         return lodash.has(this.getPropTypes(), path);
     }
     getPropTypes() {
-        var _a;
         const instancePropTypes = super.getPropTypes();
         let propTypes = {};
         for (const key of Reflect.ownKeys(instancePropTypes)) {
             const value = instancePropTypes[key.toString()];
-            if (value instanceof typend.InstanceOf &&
-                typeof ((_a = value[0]) === null || _a === void 0 ? void 0 : _a.getPropTypes) === 'function') {
-                propTypes[key] = new typend.Collection(value[0].getPropTypes());
+            if (value instanceof typend.InstanceOf) {
+                if (value[0].prototype instanceof Config_1) {
+                    propTypes[key] = new typend.Collection(value[0].getPropTypes());
+                }
+                else {
+                    propTypes[key] = value;
+                }
             }
             else {
                 propTypes[key] = value;
@@ -1711,13 +1714,13 @@ exports.Config = Config_1 = class Config extends Struct {
         lodash.set(this, path, value);
     }
     assign(props) {
-        let copy = this.toPlainObject();
+        let copy = deepClone(this);
         copy = merge(copy, props, {
-            isMergeableObject: isPlainRecord,
+            isMergeableObject: isRecord,
         });
         this.validateProps(copy, this.getPropTypes());
         Object.assign(this, merge(this, props, {
-            isMergeableObject: isPlainRecord,
+            isMergeableObject: isRecord,
         }));
     }
     include(config) {
@@ -1756,14 +1759,17 @@ exports.Config = Config_1 = class Config extends Struct {
         if (!typend.instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21 }, "has": { kind: 21 }, "get": { kind: 21 }, "getExact": { kind: 21 }, "getDefault": { kind: 21 }, "hasDefault": { kind: 21 }, "set": { kind: 21 }, "assign": { kind: 21 }, "include": { kind: 21 }, "merge": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(config)) {
             throw new InvalidConfigError(helpers.getTypeName(this), core.kernel.describer.describe(config));
         }
-        const configCopy = config.toPlainObject();
+        const configCopy = deepClone(config);
         delete configCopy.included;
+        const merged = [...Object.values(this.merged || {}), config];
         Object.assign(this, merge(configCopy, this, {
-            isMergeableObject: isPlainRecord,
+            isMergeableObject: isRecord,
         }));
         if (this.merged === undefined)
             this.merged = {};
-        this.merged[helpers.getTypeName(config)] = config;
+        for (const mergedConfig of merged) {
+            this.merged[helpers.getTypeName(mergedConfig)] = mergedConfig;
+        }
     }
 };
 exports.Config = Config_1 = __decorate([

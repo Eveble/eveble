@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/eveble/eveble/compare/v2.0.2...v2.0.3) (2020-07-28)
+
+
+### Bug Fixes
+
+* using Structs on configuration ([ab5be83](https://github.com/eveble/eveble/commit/ab5be8316cfba35a127a1ac5dce122826a517832))
+
 ## [2.0.2](https://github.com/eveble/eveble/compare/v2.0.1...v2.0.2) (2020-07-25)
 
 
