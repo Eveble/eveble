@@ -3,11 +3,15 @@ import merge from 'deepmerge';
 import { InstanceOf, Collection, instanceOf, Optional } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import { define, kernel } from '@eveble/core';
+import deepClone from '@jsbits/deep-clone';
 import { Struct } from './struct';
 import { types } from '../types';
 import { InvalidConfigError } from '../core/core-errors';
-
-import { isPlainRecord, convertObjectToCollection } from '../utils/helpers';
+import {
+  isPlainRecord,
+  convertObjectToCollection,
+  isRecord,
+} from '../utils/helpers';
 import { delegate } from '../annotations/delegate';
 
 /*
@@ -92,11 +96,14 @@ export class Config extends Struct implements types.Configurable {
     let propTypes = {};
     for (const key of Reflect.ownKeys(instancePropTypes)) {
       const value = instancePropTypes[key.toString()];
-      if (
-        value instanceof InstanceOf &&
-        typeof value[0]?.getPropTypes === 'function'
-      ) {
-        propTypes[key] = new Collection(value[0].getPropTypes());
+
+      if (value instanceof InstanceOf) {
+        // Instance of `Config` prop type
+        if (value[0].prototype instanceof Config) {
+          propTypes[key] = new Collection((value[0] as any).getPropTypes());
+        } else {
+          propTypes[key] = value;
+        }
       } else {
         propTypes[key] = value;
       }
@@ -376,16 +383,16 @@ export class Config extends Struct implements types.Configurable {
    * ```
    */
   public assign(props: types.Props): void {
-    let copy = this.toPlainObject();
+    let copy: any = deepClone(this);
     copy = merge(copy, props, {
-      isMergeableObject: isPlainRecord,
+      isMergeableObject: isRecord,
     });
     this.validateProps(copy, this.getPropTypes());
 
     Object.assign(
       this,
       merge(this as Record<string, any>, props, {
-        isMergeableObject: isPlainRecord,
+        isMergeableObject: isRecord,
       })
     );
   }
@@ -537,17 +544,54 @@ export class Config extends Struct implements types.Configurable {
         kernel.describer.describe(config)
       );
     }
+    const configCopy = deepClone(config);
+    delete (configCopy as any).included;
 
-    const configCopy = config.toPlainObject();
-    delete configCopy.included;
+    /*
+    There is bug with `merge` that will result losing configuration type
+    on complex applications that uses multiple modules:
+
+    For example lets take:
+    `allows to set deeply nested app configuration on app runtime`
+    from base-app.test.ts:
+
+    First configuration merge with `ChildModule` will result with `this.merged` to be:
+
+    {
+      ChildModuleConfig: ChildModuleConfig {
+        root: 'child-root',
+        child: { change: 'child-change', keep: 'child-keep' }
+      }
+    }
+
+    However second configuration merge with `GrandchildModuleConfig` will result in losing the type with use of `merge` as:
+
+    {
+      ChildModuleConfig { <<<<<<<<<<<<< TYPE IS LOST
+        root: 'child-root',
+        child: { change: 'child-change', keep: 'child-keep' }
+      },
+      GrandchildModuleConfig: GrandchildModuleConfig {
+        root: 'grandchild-root',
+        grandchild: { change: 'grandchild-change', keep: 'grandchild-keep' }
+      }
+    }
+
+    We store the current state of `this.merged` before merging -> merge ->
+    and then rebuild the whole `this.merged` object again.
+    */
+    const merged = [...Object.values(this.merged || {}), config];
     Object.assign(
       this,
       // AppConfig configurations should have precedence
       merge(configCopy, this as Record<string, any>, {
-        isMergeableObject: isPlainRecord,
+        isMergeableObject: isRecord,
       })
     );
     if (this.merged === undefined) this.merged = {};
-    this.merged[getTypeName(config) as string] = config;
+
+    for (const mergedConfig of merged) {
+      this.merged[getTypeName(mergedConfig as any) as string] = mergedConfig;
+    }
   }
 }

@@ -639,6 +639,75 @@ describe(`Config`, function () {
       });
     });
 
+    describe('simple with nested structs', () => {
+      @define('MyFirst', { isRegistrable: false })
+      class MyFirst extends Struct {
+        value: string;
+
+        constructor(value: string) {
+          super({ value });
+        }
+      }
+      @define('MySecond', { isRegistrable: false })
+      class MySecond extends Struct {
+        value: string;
+
+        constructor(value: string) {
+          super({ value });
+        }
+      }
+
+      it('merges two configurations together while keeping parent properties precedence', () => {
+        @define('Config.First')
+        class First extends Config {
+          key = 'first-key';
+
+          foo: MyFirst;
+
+          constructor(props: Partial<First>) {
+            super();
+            Object.assign(this, this.processProps(props));
+          }
+        }
+
+        @define('Config.Second')
+        class Second extends Config {
+          key = 'second-key';
+
+          baz: MySecond;
+
+          constructor(props: Partial<Second>) {
+            super();
+            Object.assign(this, this.processProps(props));
+          }
+        }
+
+        const first = new First({
+          key: 'first-key',
+          foo: new MyFirst('first-foo'),
+        });
+        const second = new Second({
+          key: 'second-key',
+          baz: new MySecond('second-baz'),
+        });
+
+        first.merge(second);
+        expect(first.getPropTypes()).to.be.eql({
+          included: PropTypes.interface({}).isOptional,
+          merged: PropTypes.interface({}).isOptional,
+          foo: PropTypes.instanceOf(MyFirst),
+          key: PropTypes.instanceOf(String),
+          baz: PropTypes.instanceOf(MySecond),
+        });
+        expect(first).to.be.eql({
+          merged: { 'Config.Second': second },
+          foo: new MyFirst('first-foo'),
+          baz: new MySecond('second-baz'),
+          key: 'first-key',
+        });
+      });
+    });
+
     describe('complex', () => {
       it('merges complex nested nested prop types and properties with parent config', () => {
         @define('Config.First')
