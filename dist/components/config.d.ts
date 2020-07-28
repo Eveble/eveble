@@ -16,4 +16,5 @@ export declare class Config extends Struct implements types.Configurable {
     include(config: types.Configurable): void;
     static from<T>(props: Record<string, any>): T;
     merge(config: types.Configurable): void;
+    protected findDiffAndUpdate(target: Record<string, any>, left: Record<string, any>, right: Record<string, any>): void;
 }

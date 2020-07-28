@@ -18,6 +18,7 @@ import Agenda from 'agenda';
 import { MongoClient } from 'mongodb';
 import * as winston from 'winston';
 import chalk from 'chalk';
+import { diff } from 'deep-diff';
 import { ReflectParams } from 'reflect-params';
 import { inspect } from 'util';
 import hasAnsi from 'has-ansi';
@@ -1710,14 +1711,10 @@ let Config = Config_1 = class Config extends Struct {
         set(this, path, value);
     }
     assign(props) {
-        let copy = deepClone(this);
-        copy = merge(copy, props, {
-            isMergeableObject: isRecord,
-        });
-        this.validateProps(copy, this.getPropTypes());
-        Object.assign(this, merge(this, props, {
-            isMergeableObject: isRecord,
-        }));
+        const configCopy = deepClone(this);
+        this.findDiffAndUpdate(configCopy, configCopy, props);
+        this.validateProps(configCopy, this.getPropTypes());
+        this.findDiffAndUpdate(this, props, this);
     }
     include(config) {
         if (!instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21 }, "has": { kind: 21 }, "get": { kind: 21 }, "getExact": { kind: 21 }, "getDefault": { kind: 21 }, "hasDefault": { kind: 21 }, "set": { kind: 21 }, "assign": { kind: 21 }, "include": { kind: 21 }, "merge": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(config)) {
@@ -1757,14 +1754,23 @@ let Config = Config_1 = class Config extends Struct {
         }
         const configCopy = deepClone(config);
         delete configCopy.included;
-        const merged = [...Object.values(this.merged || {}), config];
-        Object.assign(this, merge(configCopy, this, {
-            isMergeableObject: isRecord,
-        }));
+        this.findDiffAndUpdate(this, this, configCopy);
         if (this.merged === undefined)
             this.merged = {};
-        for (const mergedConfig of merged) {
-            this.merged[getTypeName(mergedConfig)] = mergedConfig;
+        this.merged[getTypeName(config)] = config;
+    }
+    findDiffAndUpdate(target, left, right) {
+        const differences = diff(left, right);
+        for (const difference of differences) {
+            if (difference.path.includes('merged')) {
+                continue;
+            }
+            if (['E'].includes(difference.kind)) {
+                set(target, difference.path, difference.lhs);
+            }
+            if (['N'].includes(difference.kind)) {
+                set(target, difference.path, difference.rhs);
+            }
         }
     }
 };
