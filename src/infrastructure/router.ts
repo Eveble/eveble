@@ -7,6 +7,7 @@ import {
   MissingInitializingMessageError,
   CannotRouteMessageError,
   UnresolvableIdentifierFromMessageError,
+  InitializingIdentifierAlreadyExistsError,
 } from './infrastructure-errors';
 import { BINDINGS } from '../constants/bindings';
 import { Log } from '../components/log-entry';
@@ -171,6 +172,26 @@ export class Router implements types.Router {
       message
     ) as string | Guid;
 
+    // Does not apply for processes that initializes with Event
+    if (eventSourceableId !== undefined) {
+      const isInitializable = await this.isInitializable(eventSourceableId);
+      if (isInitializable === false) {
+        const error = new InitializingIdentifierAlreadyExistsError(
+          this.EventSourceableType.getTypeName(),
+          message.getId().toString()
+        );
+        this.log.error(
+          new Log(
+            `failed handling message '${message.getTypeName()}' do to error: ${error}`
+          )
+            .on(this)
+            .in(this.initializingMessageHandler)
+            .with('message', message)
+        );
+        throw error;
+      }
+    }
+
     this.log.debug(
       new Log(
         `creating '${this.EventSourceableType.getTypeName()}' with message '${message.getTypeName()}'`
@@ -220,6 +241,16 @@ export class Router implements types.Router {
         await this.handleSaveErrors(error, message, eventSourceableId);
       }
     }
+  }
+
+  /**
+   * Evaluates whether identifier already exists.
+   * @async
+   * @param eventSourceableId - Identifier as string or `Guid` instance.
+   * @returns Returns `true` if identifier is initializable(does not exists), else `false`.
+   */
+  async isInitializable(eventSourceableId: string | Guid): Promise<boolean> {
+    return (await this.repository.hasBySourceId(eventSourceableId)) === false;
   }
 
   /**

@@ -3,7 +3,6 @@ import merge from 'deepmerge';
 import { pick } from 'lodash';
 import { define, ExtendableError } from '@eveble/core';
 import { DefinableMixin } from '../mixins/definable-mixin';
-
 import { types } from '../types';
 import { VersionableMixin } from '../mixins/versionable-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';

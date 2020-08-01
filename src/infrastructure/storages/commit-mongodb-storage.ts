@@ -119,6 +119,19 @@ export class CommitMongoDBStorage implements types.CommitStorage {
   }
 
   /**
+   * Evaluates whether event sourceable with id already exists.
+   * @async
+   * @param eventSourceableId - Identifier as string or `Guid` instance.
+   * @returns Returns `true` if event sourceable exists, else `false`.
+   */
+  public async hasBySourceId(
+    eventSourceableId: string | Guid
+  ): Promise<boolean> {
+    const query = { sourceId: eventSourceableId.toString() };
+    return (await this.collection.findOne(query)) != null;
+  }
+
+  /**
    * Returns commit from MongoDB collection if exists by event sourceable's id for specific version offset.
    * @async
    * @param eventSourceableId - Identifier as string or `Guid` instance.

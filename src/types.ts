@@ -716,6 +716,7 @@ export namespace types {
       EventSourceableType: EventSourceableType,
       eventSourceableId: string | Stringifiable
     ): Promise<EventSourceable | undefined>;
+    hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
     makeSnapshotOf(
       eventSourceable: EventSourceable
     ): Promise<string | undefined>;
@@ -736,6 +737,7 @@ export namespace types {
     ): Promise<Event[] | undefined>;
     getAllEvents(): Promise<Event[]>;
     findById(commitId: string): Promise<Commit | undefined>;
+    hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
   }
 
   export interface CommitStorage {
@@ -745,6 +747,7 @@ export namespace types {
     ): Promise<number | undefined>;
     generateId(): Promise<string>;
     findById(commitId: string): Promise<Commit | undefined>;
+    hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
     getCommits(
       eventSourceableId: string | Stringifiable,
       versionOffset: number
