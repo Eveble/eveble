@@ -124,6 +124,13 @@ export class UnresolvableIdentifierFromMessageError extends RouterError {
   }
 }
 
+@define('InitializingIdentifierAlreadyExistsError')
+export class InitializingIdentifierAlreadyExistsError extends RouterError {
+  constructor(routerName: string, id: string) {
+    super(`${routerName}: provided identifier ${id} is already in use`);
+  }
+}
+
 /*
 SNAPSHOOTING ERRORS
 */

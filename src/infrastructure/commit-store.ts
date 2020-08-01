@@ -191,6 +191,18 @@ export class CommitStore implements types.CommitStore {
   }
 
   /**
+   * Evaluates whether event sourceable with id already exists.
+   * @async
+   * @param eventSourceableId - Identifier as string or `Guid` instance.
+   * @returns Returns `true` if event sourceable exists, else `false`.
+   */
+  public async hasBySourceId(
+    eventSourceableId: string | Guid
+  ): Promise<boolean> {
+    return this.storage.hasBySourceId(eventSourceableId);
+  }
+
+  /**
    * Extracts all published events from `Commit`.
    * @param commits - List of instances implementing `Commit` interface.
    * @return List of all published events from commits.

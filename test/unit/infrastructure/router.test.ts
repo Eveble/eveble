@@ -17,6 +17,7 @@ import {
   UnresolvableIdentifierFromMessageError,
   CannotRouteMessageError,
   CommitConcurrencyError,
+  InitializingIdentifierAlreadyExistsError,
 } from '../../../src/infrastructure/infrastructure-errors';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Injector } from '../../../src/core/injector';
@@ -52,6 +53,8 @@ describe(`Router`, function () {
     commandBus = stubInterface<types.CommandBus>();
     eventBus = stubInterface<types.EventBus>();
     repository = stubInterface<types.EventSourceableRepository>();
+
+    repository.hasBySourceId.returns(false);
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -439,6 +442,49 @@ describe(`Router`, function () {
           this.name = (message as any).name;
           return this;
         };
+      });
+
+      it(`throws InitializingIdentifierAlreadyExistsError for initializing Command if provided identifier is already in use`, async () => {
+        repository.hasBySourceId.returns(true);
+
+        await expect(
+          router.initializingMessageHandler(commands.MyCommand)
+        ).to.eventually.be.rejectedWith(
+          InitializingIdentifierAlreadyExistsError,
+          `MyEventSourceable: provided identifier my-event-sourceable-id is already in use`
+        );
+
+        expect(handler).to.be.not.called;
+      });
+
+      it(`ensures that InitializingIdentifierAlreadyExistsError is not thrown upon initializing Event`, async () => {
+        repository.hasBySourceId.returns(true);
+
+        await expect(
+          router.initializingMessageHandler(commands.Event)
+        ).to.not.eventually.be.rejectedWith(
+          InitializingIdentifierAlreadyExistsError
+        );
+      });
+
+      it(`logs thrown InitializingIdentifierAlreadyExistsError`, async () => {
+        repository.hasBySourceId.returns(true);
+
+        await expect(
+          router.initializingMessageHandler(commands.MyCommand)
+        ).to.eventually.be.rejectedWith(
+          InitializingIdentifierAlreadyExistsError
+        );
+
+        expect(log.error).to.be.calledOnce;
+        expect(log.error).to.be.calledWith(
+          new Log(
+            `failed handling message 'MyCommand' do to error: InitializingIdentifierAlreadyExistsError: MyEventSourceable: provided identifier my-event-sourceable-id is already in use`
+          )
+            .on(router)
+            .in('initializingMessageHandler')
+            .with('message', commands.MyCommand)
+        );
       });
 
       it(`logs handled message for debugging`, async () => {

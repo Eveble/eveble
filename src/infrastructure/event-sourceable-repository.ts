@@ -121,6 +121,18 @@ export class EventSourceableRepository
   }
 
   /**
+   * Evaluates whether event sourceable with id already exists.
+   * @async
+   * @param eventSourceableId - Identifier as string or `Guid` instance.
+   * @returns Returns `true` if event sourceable exists, else `false`.
+   */
+  public async hasBySourceId(
+    eventSourceableId: string | Guid
+  ): Promise<boolean> {
+    return this.commitStore.hasBySourceId(eventSourceableId);
+  }
+
+  /**
    * Makes a snapshot of `EventSourceable`.
    * @async
    * @param eventSourceable - Instance implementing `EventSourceable` interface.
