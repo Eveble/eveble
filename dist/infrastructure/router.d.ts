@@ -14,6 +14,7 @@ export declare class Router implements types.Router {
     initialize(): void;
     protected setupInitializingMessageHandler(handler: (message: types.Command | types.Event) => void): void;
     initializingMessageHandler(message: types.Command | types.Event): Promise<void>;
+    isInitializable(eventSourceableId: string | Guid): Promise<boolean>;
     protected getIdForEventSourceableFromMessage(message: types.Command | types.Event): string | Guid | undefined;
     protected handleOrThrowDomainError(fn: () => Promise<types.EventSourceable>, message: types.Command | types.Event): Promise<types.EventSourceable>;
     messageHandler(message: types.Command | types.Event): Promise<void>;

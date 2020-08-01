@@ -8,6 +8,7 @@ export declare class CommitMongoDBStorage implements types.CommitStorage {
     generateId(): Promise<string>;
     findLastVersionById(eventSourceableId: string | Guid): Promise<number | undefined>;
     findById(commitId: string): Promise<types.Commit | undefined>;
+    hasBySourceId(eventSourceableId: string | Guid): Promise<boolean>;
     getCommits(eventSourceableId: string | types.Stringifiable, versionOffset: number): Promise<types.Commit[]>;
     getAllCommits(): Promise<types.Commit[]>;
     flagCommitAsPublished(commitId: string, appId: string, workerId: string, publishedAt: Date): Promise<boolean>;

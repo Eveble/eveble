@@ -477,6 +477,7 @@ export declare namespace types {
     interface EventSourceableRepository {
         save(eventSourceable: EventSourceable): Promise<StorageIdentifiers>;
         find(EventSourceableType: EventSourceableType, eventSourceableId: string | Stringifiable): Promise<EventSourceable | undefined>;
+        hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
         makeSnapshotOf(eventSourceable: EventSourceable): Promise<string | undefined>;
         getSnapshotOf(EventSourceableType: EventSourceableType, eventSourceableId: string | Stringifiable): Promise<EventSourceable | undefined>;
         isSnapshotting(): boolean;
@@ -488,12 +489,14 @@ export declare namespace types {
         getEvents(eventSourceableId: string | Stringifiable, versionOffset?: number): Promise<Event[] | undefined>;
         getAllEvents(): Promise<Event[]>;
         findById(commitId: string): Promise<Commit | undefined>;
+        hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
     }
     interface CommitStorage {
         save(commit: Commit): Promise<string>;
         findLastVersionById(eventSourceableId: string | Stringifiable): Promise<number | undefined>;
         generateId(): Promise<string>;
         findById(commitId: string): Promise<Commit | undefined>;
+        hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
         getCommits(eventSourceableId: string | Stringifiable, versionOffset: number): Promise<Commit[]>;
         getAllCommits(): Promise<Commit[]>;
         flagCommitAsPublished(commitId: string, appId: string, workerId: string, publishedAt: Date): Promise<boolean>;

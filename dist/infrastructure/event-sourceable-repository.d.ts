@@ -7,6 +7,7 @@ export declare class EventSourceableRepository implements types.EventSourceableR
     protected commitStore: types.CommitStore;
     save(eventSourceable: types.EventSourceable): Promise<types.StorageIdentifiers>;
     find(EventSourceableType: types.EventSourceableType, eventSourceableId: string | Guid): Promise<types.EventSourceable | undefined>;
+    hasBySourceId(eventSourceableId: string | Guid): Promise<boolean>;
     makeSnapshotOf(eventSourceable: types.EventSourceable): Promise<string | undefined>;
     getSnapshotOf(EventSourceableType: types.EventSourceableType, eventSourceableId: string | Guid): Promise<types.EventSourceable | undefined>;
     isSnapshotting(): boolean;

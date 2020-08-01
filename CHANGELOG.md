@@ -1,3 +1,10 @@
+## [2.0.5](https://github.com/eveble/eveble/compare/v2.0.4...v2.0.5) (2020-08-01)
+
+
+### Bug Fixes
+
+* disallow initializing event sourceable with already existing id ([dc6cadc](https://github.com/eveble/eveble/commit/dc6cadc96d370621a55f7bb66674eec4220112a7))
+
 ## [2.0.4](https://github.com/eveble/eveble/compare/v2.0.3...v2.0.4) (2020-07-28)
 
 

@@ -11,6 +11,7 @@ export declare class CommitStore implements types.CommitStore {
     getEvents(eventSourceableId: string | Guid, versionOffset?: number): Promise<types.Event[]>;
     getAllEvents(): Promise<types.Event[]>;
     findById(commitId: string): Promise<types.Commit | undefined>;
+    hasBySourceId(eventSourceableId: string | Guid): Promise<boolean>;
     protected getEventsFromCommits(commits?: types.Commit[]): types.Event[];
     protected resolveEventsWithNewVersion(events: types.Event[], newVersion: number): types.Event[];
 }

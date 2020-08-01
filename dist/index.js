@@ -3571,6 +3571,15 @@ exports.UnresolvableIdentifierFromMessageError = __decorate([
     core.define('UnresolvableIdentifierFromMessageError')({ kind: 19, name: "UnresolvableIdentifierFromMessageError", properties: {}, extends: { kind: 18, type: exports.RouterError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], exports.UnresolvableIdentifierFromMessageError);
+let InitializingIdentifierAlreadyExistsError = class InitializingIdentifierAlreadyExistsError extends exports.RouterError {
+    constructor(routerName, id) {
+        super(`${routerName}: provided identifier ${id} is already in use`);
+    }
+};
+InitializingIdentifierAlreadyExistsError = __decorate([
+    core.define('InitializingIdentifierAlreadyExistsError')({ kind: 19, name: "InitializingIdentifierAlreadyExistsError", properties: {}, extends: { kind: 18, type: exports.RouterError, arguments: [] } }),
+    __metadata("design:paramtypes", [String, String])
+], InitializingIdentifierAlreadyExistsError);
 let SnapshotterError = class SnapshotterError extends exports.InfrastructureError {
 };
 SnapshotterError = __decorate([
@@ -3711,6 +3720,9 @@ exports.EventSourceableRepository = class EventSourceableRepository {
                 .in(this.find));
         }
         return eventSourceable;
+    }
+    async hasBySourceId(eventSourceableId) {
+        return this.commitStore.hasBySourceId(eventSourceableId);
     }
     async makeSnapshotOf(eventSourceable) {
         if (!this.isSnapshotting()) {
@@ -3967,6 +3979,9 @@ exports.CommitStore = class CommitStore {
     }
     async findById(commitId) {
         return this.storage.findById(commitId);
+    }
+    async hasBySourceId(eventSourceableId) {
+        return this.storage.hasBySourceId(eventSourceableId);
     }
     getEventsFromCommits(commits = []) {
         const events = [];
@@ -4502,6 +4517,17 @@ class Router {
     }
     async initializingMessageHandler(message) {
         const eventSourceableId = this.getIdForEventSourceableFromMessage(message);
+        if (eventSourceableId !== undefined) {
+            const isInitializable = await this.isInitializable(eventSourceableId);
+            if (isInitializable === false) {
+                const error = new InitializingIdentifierAlreadyExistsError(this.EventSourceableType.getTypeName(), message.getId().toString());
+                this.log.error(new Log(`failed handling message '${message.getTypeName()}' do to error: ${error}`)
+                    .on(this)
+                    .in(this.initializingMessageHandler)
+                    .with('message', message));
+                throw error;
+            }
+        }
         this.log.debug(new Log(`creating '${this.EventSourceableType.getTypeName()}' with message '${message.getTypeName()}'`)
             .on(this)
             .in(this.initializingMessageHandler)
@@ -4528,6 +4554,9 @@ class Router {
                 await this.handleSaveErrors(error, message, eventSourceableId);
             }
         }
+    }
+    async isInitializable(eventSourceableId) {
+        return (await this.repository.hasBySourceId(eventSourceableId)) === false;
     }
     getIdForEventSourceableFromMessage(message) {
         if (message instanceof exports.Command) {
@@ -6002,6 +6031,10 @@ exports.CommitMongoDBStorage = class CommitMongoDBStorage {
             return this.commitSerializer.deserialize(foundSerializedCommit);
         }
         return undefined;
+    }
+    async hasBySourceId(eventSourceableId) {
+        const query = { sourceId: eventSourceableId.toString() };
+        return (await this.collection.findOne(query)) != null;
     }
     async getCommits(eventSourceableId, versionOffset) {
         const query = {

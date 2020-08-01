@@ -36,6 +36,9 @@ export declare class CannotRouteMessageError extends RouterError {
 export declare class UnresolvableIdentifierFromMessageError extends RouterError {
     constructor(routerName: string, eventTypeName: string, esTypeName: string);
 }
+export declare class InitializingIdentifierAlreadyExistsError extends RouterError {
+    constructor(routerName: string, id: string);
+}
 declare class SnapshotterError extends InfrastructureError {
 }
 export declare class UndefinedSnapshotterFrequencyError extends SnapshotterError {
