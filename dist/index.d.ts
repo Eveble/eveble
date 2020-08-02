@@ -1,3 +1,4 @@
+import { types } from './types';
 import { BINDINGS } from './constants/bindings';
 export { delegate } from './annotations/delegate';
 export { handle } from './annotations/handle';
@@ -102,6 +103,8 @@ export { isDefinable, isRecord, isPlainRecord, hasPostConstruct, toPlainObject, 
 export { isSerializable, resolveSerializableFromPropType } from '@eveble/core';
 export { types } from './types';
 export { types as EvebleTypes } from './types';
+export declare type ConstructorType<T> = types.ConstructorType<T>;
+export declare type EntityType<T> = types.EntityType<T>;
 export { postConstruct, injectable, inject, } from '@parisholley/inversify-async';
 export { loggerLoader } from './utils/logger-loader';
 export { BINDINGS, BINDINGS as EVEBLE_BINDINGS };

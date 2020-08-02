@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/eveble/eveble/compare/v2.0.5...v2.1.0) (2020-08-02)
+
+
+### Features
+
+* **types:** add EntityType ([eedbcd5](https://github.com/eveble/eveble/commit/eedbcd54d967c352a48826aa2bb95713b19363e4))
+
 ## [2.0.5](https://github.com/eveble/eveble/compare/v2.0.4...v2.0.5) (2020-08-01)
 
 

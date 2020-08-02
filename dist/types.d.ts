@@ -410,6 +410,16 @@ export declare namespace types {
         [ROLLBACK_STATE_METHOD_KEY](): void;
         isStateSaved(): boolean;
     }
+    type EntityType<T> = Omit<Pick<T, NonMethodKeys<T>>, 'state' | 'status' | 'can' | 'is' | 'schemaVersion' | 'ensure' | 'ableTo'> & {
+        id: string | Stringifiable;
+        state?: State;
+        status?: Status;
+        schemaVersion?: number;
+        is?: never;
+        can?: never;
+        ableTo?: never;
+        ensure?: never;
+    };
     interface EventSourceable extends Entity, Controller {
         getVersion(): number;
         getEvents(): Event[];
