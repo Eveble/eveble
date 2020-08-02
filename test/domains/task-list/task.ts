@@ -1,6 +1,7 @@
 import { define } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
 import { StateError } from '../../../src/mixins/stateful-mixin';
+import { types } from '../../../src/types';
 
 @define()
 export class NoQuittingFoolError extends StateError {
@@ -42,7 +43,7 @@ export class Task extends Entity {
 
   expireAt?: Date;
 
-  constructor(props: Partial<Task>) {
+  constructor(props: types.EntityType<Task>) {
     super(props);
     if (props.state === undefined) {
       this.setState(Task.STATES.created);

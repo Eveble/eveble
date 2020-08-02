@@ -17,6 +17,7 @@ import {
 } from '../../../src/domain/assertions/statusful-assertion';
 
 import { ValueObject } from '../../../src/domain/value-object';
+import { types } from '../../../src/types';
 
 chai.use(sinonChai);
 
@@ -581,7 +582,7 @@ describe(`Entity BDD assertions`, function () {
 
       declineReason?: string;
 
-      constructor(props: Partial<MyEntity>) {
+      constructor(props: types.EntityType<MyEntity>) {
         super(props);
         this.setState(MyEntity.STATES.created);
       }
@@ -693,7 +694,7 @@ describe(`Entity BDD assertions`, function () {
 
       declineReason?: string;
 
-      constructor(props: Partial<MyEntity>) {
+      constructor(props: types.EntityType<MyEntity>) {
         super(props);
         this.setState(MyEntity.STATES.created);
       }

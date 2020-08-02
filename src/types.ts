@@ -624,6 +624,20 @@ export namespace types {
     isStateSaved(): boolean;
   }
 
+  export type EntityType<T> = Omit<
+    Pick<T, NonMethodKeys<T>>,
+    'state' | 'status' | 'can' | 'is' | 'schemaVersion' | 'ensure' | 'ableTo'
+  > & {
+    id: string | Stringifiable;
+    state?: State;
+    status?: Status;
+    schemaVersion?: number;
+    is?: never;
+    can?: never;
+    ableTo?: never;
+    ensure?: never;
+  };
+
   export interface EventSourceable extends Entity, Controller {
     getVersion(): number;
     getEvents(): Event[];
