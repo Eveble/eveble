@@ -1771,6 +1771,9 @@ let Config = Config_1 = class Config extends Struct {
             if (['N'].includes(difference.kind)) {
                 set(target, difference.path, difference.rhs);
             }
+            if (['D'].includes(difference.kind)) {
+                set(target, difference.path, difference.lhs);
+            }
         }
     }
 };

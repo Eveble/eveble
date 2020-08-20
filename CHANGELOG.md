@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/eveble/eveble/compare/v2.1.0...v2.1.1) (2020-08-20)
+
+
+### Bug Fixes
+
+* **app:** assigning new properties that are optional on Config construction ([d6e44a5](https://github.com/eveble/eveble/commit/d6e44a5917ec7956a7af2f323b3433298eef508c))
+
 # [2.1.0](https://github.com/eveble/eveble/compare/v2.0.5...v2.1.0) (2020-08-02)
 
 

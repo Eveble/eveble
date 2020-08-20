@@ -1775,6 +1775,9 @@ exports.Config = Config_1 = class Config extends Struct {
             if (['N'].includes(difference.kind)) {
                 lodash.set(target, difference.path, difference.rhs);
             }
+            if (['D'].includes(difference.kind)) {
+                lodash.set(target, difference.path, difference.lhs);
+            }
         }
     }
 };
