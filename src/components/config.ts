@@ -381,8 +381,11 @@ export class Config extends Struct implements types.Configurable {
    */
   public assign(props: types.Props): void {
     const configCopy: any = deepClone(this);
+    // Prepare config copy for validation
     this.findDiffAndUpdate(configCopy, configCopy, props);
+    // Validate copied config against prop types
     this.validateProps(configCopy, this.getPropTypes());
+    // Update actual config to the newest source
     this.findDiffAndUpdate(this, props, this);
   }
 
@@ -563,6 +566,9 @@ export class Config extends Struct implements types.Configurable {
       }
       if (['N'].includes(difference.kind)) {
         set(target, difference.path, difference.rhs);
+      }
+      if (['D'].includes(difference.kind)) {
+        set(target, difference.path, difference.lhs);
       }
     }
   }

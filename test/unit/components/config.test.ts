@@ -489,6 +489,35 @@ describe(`Config`, function () {
 
         expect(config).to.be.eql(assignableConfig);
       });
+
+      it(`assigns matching new properties that are optional on construction`, () => {
+        @define('Config.MyConfig')
+        class MyConfig extends Config {
+          separator: string;
+
+          transliterations?: Record<string, string>;
+
+          constructor(props: Partial<MyConfig>) {
+            super();
+            Object.assign(this, this.processProps(props));
+          }
+        }
+
+        const config = new MyConfig({
+          separator: '-',
+        });
+        config.assign({
+          transliterations: {
+            '*': 'star',
+          },
+        });
+        expect(config).to.be.eql({
+          separator: '-',
+          transliterations: {
+            '*': 'star',
+          },
+        });
+      });
     });
   });
 
