@@ -5,6 +5,7 @@ import merge from 'deepmerge';
 import { postConstruct } from '@parisholley/inversify-async';
 import getenv from 'getenv';
 import { define, kernel } from '@eveble/core';
+import deepClone from '@jsbits/deep-clone';
 import { Entity } from './entity';
 import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
 import { types } from '../types';
@@ -276,7 +277,14 @@ export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
       event.assignMetadata(this.metadata);
     }
 
-    this[EVENTS_KEY].push(event);
+    /*
+    Lose any reference properties(like arrays, objects) in case multiple events are fired from one command that keeps references to same property
+
+    @event-sourceable.test.ts
+    `ensures that each event fired from single handler does not leak n+x state on referenceable properties(like arrays, objects)`
+    */
+    this[EVENTS_KEY].push(deepClone(event));
+    // this[EVENTS_KEY].push(deepClone(event));
     if (this.hasHandler(event.constructor as types.MessageType<types.Event>)) {
       this.handle(event);
     }

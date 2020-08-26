@@ -57,12 +57,19 @@ describe(`EventSourceable`, function () {
   @define('FulfillOrder')
   class FulfillOrder extends Command<FulfillOrder> {}
 
+  @define('AddItem')
+  class AddItem extends Command<AddItem> {
+    item: string;
+  }
+
   /*
   EVENTS
   */
   @define('OrderCreated')
   class OrderCreated extends Event<OrderCreated> {
     customerName: string;
+
+    items: string[];
   }
 
   @define('OrderPaid')
@@ -75,6 +82,13 @@ describe(`EventSourceable`, function () {
     customerName: string;
 
     discountCode: string;
+  }
+
+  @define('ItemAdded')
+  class ItemAdded extends Event<ItemAdded> {
+    item: string;
+
+    items: string[];
   }
 
   before(() => {
@@ -115,6 +129,7 @@ describe(`EventSourceable`, function () {
       OrderCreated: new OrderCreated({
         sourceId: orderProps.id,
         customerName: orderProps.customerName,
+        items: [],
         timestamp: now,
         version: 0,
       }),
@@ -157,6 +172,8 @@ describe(`EventSourceable`, function () {
 
     customerName: string;
 
+    items: string[];
+
     constructor(props: Partial<Order>) {
       super(props);
       this.setState(Order.STATES.pending);
@@ -169,6 +186,7 @@ describe(`EventSourceable`, function () {
         new OrderCreated({
           ...this.eventProps(),
           customerName: command.customerName,
+          items: [],
         })
       );
       handlers.CreateOrder(command);
@@ -195,6 +213,16 @@ describe(`EventSourceable`, function () {
       handlers.FulfillOrder(command);
     }
 
+    AddItem(@route command: AddItem): void {
+      this.record(
+        new ItemAdded({
+          ...this.eventProps(),
+          item: command.item,
+          items: this.items,
+        })
+      );
+    }
+
     // Subscribes
 
     OrderCreated(@subscribe event: OrderCreated): void {
@@ -219,6 +247,10 @@ describe(`EventSourceable`, function () {
       this.assign(event);
       this.setState(Order.STATES.fulfilled);
       handlers.OrderFulfilled(event);
+    }
+
+    ItemAdded(@subscribe event: ItemAdded): void {
+      this.items.push(event.item);
     }
   }
 
@@ -508,6 +540,39 @@ describe(`EventSourceable`, function () {
       }).to.throw(InvalidEventError);
       expect(instance.getEvents()).to.eql([]);
     });
+
+    it('ensures that each event fired from single handler does not leak n+x state on referenceable properties(like arrays, objects)', async () => {
+      const instance = new Order({ id: orderProps.id, items: [] });
+      instance.initialize();
+
+      // Simulate handling multiple events referencing to same array
+      await instance.handle(
+        new AddItem({
+          targetId: orderProps.id,
+          item: 'first',
+        })
+      );
+      await instance.handle(
+        new AddItem({
+          targetId: orderProps.id,
+          item: 'second',
+        })
+      );
+      expect(instance.getEvents()).to.eql([
+        new ItemAdded({
+          sourceId: orderProps.id,
+          item: 'first',
+          items: [],
+          version: 0,
+        }),
+        new ItemAdded({
+          sourceId: orderProps.id,
+          item: 'second',
+          items: ['first'],
+          version: 0,
+        }),
+      ]);
+    });
   });
 
   describe('working with state', () => {
@@ -596,6 +661,7 @@ describe(`EventSourceable`, function () {
       const event = new OrderCreated({
         sourceId: orderProps.id,
         customerName: orderProps.customerName,
+        items: [],
         version: 5,
       });
       const instance = new Order({ id: orderProps.id });
@@ -619,6 +685,7 @@ describe(`EventSourceable`, function () {
         new OrderCreated({
           sourceId: orderProps.id,
           customerName: orderProps.customerName,
+          items: [],
         })
       );
       expect(instance.getVersion()).to.equal(0);
@@ -628,6 +695,7 @@ describe(`EventSourceable`, function () {
       const event = new OrderCreated({
         sourceId: 'other-id',
         customerName: orderProps.customerName,
+        items: [],
       });
 
       const instance = new Order({ id: orderProps.id });
@@ -722,6 +790,7 @@ describe(`EventSourceable`, function () {
       const event = new OrderCreated({
         sourceId: orderProps.id,
         customerName: orderProps.customerName,
+        items: [],
         version: 10,
       });
       const instance = new Order({ id: orderProps.id });
@@ -734,6 +803,7 @@ describe(`EventSourceable`, function () {
       const event = new OrderCreated({
         sourceId: orderProps.id,
         customerName: orderProps.customerName,
+        items: [],
       });
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
@@ -746,6 +816,7 @@ describe(`EventSourceable`, function () {
       const event = new OrderCreated({
         sourceId: 'other-id',
         customerName: orderProps.customerName,
+        items: [],
       });
 
       const instance = new Order({ id });
