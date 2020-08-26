@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/eveble/eveble/compare/v2.1.1...v2.1.2) (2020-08-26)
+
+
+### Bug Fixes
+
+* **domain:** ensure referenceable properties on recorded events at EventSourceable are lost ([105ee26](https://github.com/eveble/eveble/commit/105ee26bbc7397b57f54c1aaf07a68ab730b31b9))
+
 ## [2.1.1](https://github.com/eveble/eveble/compare/v2.1.0...v2.1.1) (2020-08-20)
 
 

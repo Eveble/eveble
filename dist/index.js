@@ -6965,7 +6965,7 @@ exports.EventSourceable = class EventSourceable extends polytype.classes(exports
         if (this.metadata !== undefined) {
             event.assignMetadata(this.metadata);
         }
-        this[EVENTS_KEY].push(event);
+        this[EVENTS_KEY].push(deepClone(event));
         if (this.hasHandler(event.constructor)) {
             this.handle(event);
         }
