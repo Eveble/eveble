@@ -34,6 +34,7 @@ import { StatefulAssertion } from '../../../src/domain/assertions/stateful-asser
 import { Asserter } from '../../../src/domain/asserter';
 import { StatusfulAssertion } from '../../../src/domain/assertions/statusful-assertion';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
+import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-task-completion-policy';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -138,6 +139,13 @@ describe(`Restoring event sourceable state from storage`, function () {
     );
   };
 
+  const setupDomainDependencies = function (): void {
+    injector
+      .bind<any>('TaskList.TaskCompletionPolicy')
+      .to(InfiniteTaskCompletionPolicy)
+      .inSingletonScope();
+  };
+
   const setupTypes = function (): void {
     for (const [typeName, type] of kernel.library.getTypes()) {
       serializer.registerType(typeName, type);
@@ -159,6 +167,7 @@ describe(`Restoring event sourceable state from storage`, function () {
     await setupSnapshotterMongo(injector, clients, collections);
     setupDefaultConfiguration();
     setupEvebleDependencies();
+    setupDomainDependencies();
     setupTypes();
     setupKernel();
   });

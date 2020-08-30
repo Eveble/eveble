@@ -353,6 +353,7 @@ export class Router implements types.Router {
         .with('message', message)
     );
 
+    // Dependencies are injected into Event Sourceable on repository level so initialization(@postConstruct) can be done while using 3d party dependencies
     const foundEventSourceable = await this.repository.find(
       this.EventSourceableType,
       eventSourceableId
@@ -371,8 +372,6 @@ export class Router implements types.Router {
         message.getTypeName()
       );
     }
-    // Inject dependencies into Event Sourceable
-    await this.injector.injectIntoAsync(foundEventSourceable);
 
     const fn = async (): Promise<types.EventSourceable> => {
       const handledEventSourceable = await foundEventSourceable.handle(message);

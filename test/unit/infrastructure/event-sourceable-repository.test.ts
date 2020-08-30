@@ -321,6 +321,25 @@ describe(`EventSourceableRepository`, function () {
           expect(commitStore.getEvents).to.be.calledWithExactly(props.id);
         });
 
+        it('ensures that injector is injecting async dependencies and initializes aggregate', async () => {
+          const injectorStub = stubInterface<Injector>();
+          injector
+            .rebind<types.Injector>(BINDINGS.Injector)
+            .toConstantValue(injectorStub);
+          injector.injectInto(repository);
+
+          commitStore.getEvents
+            .withArgs(props.id)
+            .returns([events.initEvent, events.otherEvent]);
+
+          const aggregate = (await repository.find(
+            MyAggregate,
+            props.id
+          )) as MyAggregate;
+          expect(injectorStub.injectIntoAsync).to.be.calledOnce;
+          expect(injectorStub.injectIntoAsync).to.be.calledWith(aggregate);
+        });
+
         it(`logs fetching event history for aggregate`, async () => {
           const eventHistory = [events.initEvent, events.otherEvent];
           commitStore.getEvents.withArgs(props.id).returns(eventHistory);
@@ -364,6 +383,25 @@ describe(`EventSourceableRepository`, function () {
           expect(process.name).to.be.equal('Foo');
           expect(process.age).to.be.equal(20);
           expect(commitStore.getEvents).to.be.calledWithExactly(props.id);
+        });
+
+        it('ensures that injector is injecting async dependencies and initializes process', async () => {
+          const injectorStub = stubInterface<Injector>();
+          injector
+            .rebind<types.Injector>(BINDINGS.Injector)
+            .toConstantValue(injectorStub);
+          injector.injectInto(repository);
+
+          commitStore.getEvents
+            .withArgs(props.id)
+            .returns([events.initEvent, events.otherEvent]);
+
+          const process = (await repository.find(
+            MyProcess,
+            props.id
+          )) as MyProcess;
+          expect(injectorStub.injectIntoAsync).to.be.calledOnce;
+          expect(injectorStub.injectIntoAsync).to.be.calledWith(process);
         });
       });
     });
@@ -476,6 +514,27 @@ describe(`EventSourceableRepository`, function () {
           expect(commitStore.getEvents).to.be.calledWithExactly(props.id, 2);
         });
 
+        it('ensures that injector is injecting async dependencies and initializes aggregate', async () => {
+          const injectorStub = stubInterface<Injector>();
+          injector
+            .rebind<types.Injector>(BINDINGS.Injector)
+            .toConstantValue(injectorStub);
+
+          injectorStub.isBound.withArgs(BINDINGS.Snapshotter).returns(true);
+          injectorStub.get.withArgs(BINDINGS.Snapshotter).returns(snapshotter);
+          injector.injectInto(repository);
+
+          config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
+          snapshotter.getSnapshotOf.returns(snapshotedEs);
+
+          const foundEs = (await repository.find(
+            MyAggregate,
+            props.id
+          )) as MyAggregate;
+          expect(injectorStub.injectIntoAsync).to.be.calledOnce;
+          expect(injectorStub.injectIntoAsync).to.be.calledWith(foundEs);
+        });
+
         it('logs restored event sourceable from snapshot with replayed remaining events from commit store', async () => {
           injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
@@ -539,6 +598,27 @@ describe(`EventSourceableRepository`, function () {
             MyProcess,
             props.id
           );
+        });
+
+        it('ensures that injector is injecting async dependencies and initializes process', async () => {
+          const injectorStub = stubInterface<Injector>();
+          injector
+            .rebind<types.Injector>(BINDINGS.Injector)
+            .toConstantValue(injectorStub);
+
+          injectorStub.isBound.withArgs(BINDINGS.Snapshotter).returns(true);
+          injectorStub.get.withArgs(BINDINGS.Snapshotter).returns(snapshotter);
+          injector.injectInto(repository);
+
+          config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
+          snapshotter.getSnapshotOf.returns(snapshotedEs);
+
+          const foundEs = (await repository.find(
+            MyProcess,
+            props.id
+          )) as MyProcess;
+          expect(injectorStub.injectIntoAsync).to.be.calledOnce;
+          expect(injectorStub.injectIntoAsync).to.be.calledWith(foundEs);
         });
 
         it(`returns process restored from snapshot with replayed remaining eventSourceable events from commit store`, async () => {

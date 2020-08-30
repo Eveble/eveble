@@ -857,33 +857,11 @@ describe(`Router`, function () {
         );
       });
 
-      describe(`injects dependencies in to event sourceable`, () => {
-        it(`for handled command`, async () => {
-          repository.find.returns(eventSourceable);
-          injector.injectIntoAsync = sinon.stub();
-          await router.messageHandler(commands.MyCommand);
-          expect(injector.injectIntoAsync).to.be.calledOnce;
-          expect(injector.injectIntoAsync).to.be.calledWithExactly(
-            eventSourceable
-          );
-        });
-
-        it(`for handled event with correlation id`, async () => {
-          repository.find.returns(eventSourceable);
-          injector.injectIntoAsync = sinon.stub();
-          await router.messageHandler(events.CorrelationEvent);
-          expect(injector.injectIntoAsync).to.be.calledOnce;
-          expect(injector.injectIntoAsync).to.be.calledWithExactly(
-            eventSourceable
-          );
-        });
-
-        it(`does not inject dependencies for events without correlation id`, async () => {
-          repository.find.returns(eventSourceable);
-          injector.injectIntoAsync = sinon.stub();
-          await router.messageHandler(events.MyEvent);
-          expect(injector.injectIntoAsync).to.be.not.called;
-        });
+      it(`does not inject dependencies for event sourceable on message handling(leave it up to repository)`, async () => {
+        repository.find.returns(eventSourceable);
+        injector.injectIntoAsync = sinon.stub();
+        await router.messageHandler(events.MyEvent);
+        expect(injector.injectIntoAsync).to.be.not.called;
       });
 
       describe(`handles errors`, () => {

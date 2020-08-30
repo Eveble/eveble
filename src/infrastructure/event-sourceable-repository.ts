@@ -211,6 +211,7 @@ export class EventSourceableRepository
       EventSourceableType,
       eventSourceableId
     );
+
     if (eventSourceable !== undefined) {
       this.log.debug(
         new Log(
@@ -226,7 +227,9 @@ export class EventSourceableRepository
         eventSourceableId,
         nextVersion
       );
-      eventSourceable.initialize();
+      // Inject dependencies into Event Sourceable on repository so initialization(@postConstruct) can be done while using 3d party dependencies
+      await this.injector.injectIntoAsync(eventSourceable);
+
       if (remainingEvents !== undefined && remainingEvents.length > 0) {
         this.log.debug(
           new Log(
@@ -268,11 +271,13 @@ export class EventSourceableRepository
     if (!Array.isArray(eventHistory)) {
       return eventSourceable;
     }
-
     if (eventHistory.length > 0) {
       const history = new History(eventHistory);
       eventSourceable = new EventSourceableType(history);
-      eventSourceable.initialize();
+
+      // Inject dependencies into Event Sourceable on repository so initialization(@postConstruct) can be done while using 3d party dependencies
+      await this.injector.injectIntoAsync(eventSourceable);
+
       eventSourceable.replayHistory(eventHistory);
     } else {
       const error = new EventsNotFoundError(
