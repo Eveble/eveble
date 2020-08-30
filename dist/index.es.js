@@ -3754,7 +3754,7 @@ let EventSourceableRepository = class EventSourceableRepository {
                 .with('event sourceable', eventSourceable));
             const nextVersion = eventSourceable.getVersion() + 1;
             const remainingEvents = await this.commitStore.getEvents(eventSourceableId, nextVersion);
-            eventSourceable.initialize();
+            await this.injector.injectIntoAsync(eventSourceable);
             if (remainingEvents !== undefined && remainingEvents.length > 0) {
                 this.log.debug(new Log(`replaying history on snapshot of '${EventSourceableType.getTypeName()}' with id '${eventSourceableId}'`)
                     .on(this)
@@ -3779,7 +3779,7 @@ let EventSourceableRepository = class EventSourceableRepository {
         if (eventHistory.length > 0) {
             const history = new History(eventHistory);
             eventSourceable = new EventSourceableType(history);
-            eventSourceable.initialize();
+            await this.injector.injectIntoAsync(eventSourceable);
             eventSourceable.replayHistory(eventHistory);
         }
         else {
@@ -4611,7 +4611,6 @@ class Router {
                 .in(this.messageHandler));
             throw new CannotRouteMessageError(this.constructor.name, message.getTypeName());
         }
-        await this.injector.injectIntoAsync(foundEventSourceable);
         const fn = async () => {
             const handledEventSourceable = await foundEventSourceable.handle(message);
             handledEventSourceable.validateProps(handledEventSourceable, handledEventSourceable.getPropTypes());

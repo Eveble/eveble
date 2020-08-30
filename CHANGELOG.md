@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/eveble/eveble/compare/v2.1.2...v2.1.3) (2020-08-30)
+
+
+### Bug Fixes
+
+* **infrastructure:** inject dependencies on repository level on handled non-initializing message ([873db13](https://github.com/eveble/eveble/commit/873db13e6ecc52dcab5f8933d06a7ade5fae2123))
+
 ## [2.1.2](https://github.com/eveble/eveble/compare/v2.1.1...v2.1.2) (2020-08-26)
 
 
