@@ -72,6 +72,16 @@ describe(`Injector`, () => {
         initialize(): void {
           return undefined;
         }
+
+        setupCommandHandler(
+          _CommandType: types.MessageType<types.Command>
+        ): void {
+          return undefined;
+        }
+
+        setupEventHandler(_EventType: types.MessageType<types.Event>) {
+          return undefined;
+        }
       }
 
       const injector = new Injector();
@@ -107,6 +117,16 @@ describe(`Injector`, () => {
         initialize(): void {
           initializeSpy();
         }
+
+        setupCommandHandler(
+          _CommandType: types.MessageType<types.Command>
+        ): void {
+          return undefined;
+        }
+
+        setupEventHandler(_EventType: types.MessageType<types.Event>) {
+          return undefined;
+        }
       }
 
       const injector = new Injector();
@@ -136,6 +156,16 @@ describe(`Injector`, () => {
         @postConstruct()
         initialize(): void {
           this.log.debug('my-message');
+        }
+
+        setupCommandHandler(
+          _CommandType: types.MessageType<types.Command>
+        ): void {
+          return undefined;
+        }
+
+        setupEventHandler(_EventType: types.MessageType<types.Event>) {
+          return undefined;
         }
       }
 

@@ -679,6 +679,8 @@ export namespace types {
     routedCommands: MessageType<Command>[];
     routedEvents: MessageType<Event>[];
     initialize(): void;
+    setupCommandHandler(CommandType: MessageType<Command>): void;
+    setupEventHandler(EventType: MessageType<Event>): void;
   }
 
   export interface RouterType {

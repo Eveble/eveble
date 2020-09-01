@@ -122,10 +122,10 @@ export class Router implements types.Router {
     );
 
     for (const EventType of this.routedEvents) {
-      this.setupEventHandlers(EventType);
+      this.setupEventHandler(EventType);
     }
     for (const CommandType of this.routedCommands) {
-      this.setupCommandHandlers(CommandType);
+      this.setupCommandHandler(CommandType);
     }
   }
 
@@ -451,7 +451,7 @@ export class Router implements types.Router {
    * Registers default message handler for routed command on command bus.
    * @param CommandType - `Command` type constructor.
    */
-  protected setupCommandHandlers(
+  public setupCommandHandler(
     CommandType: types.MessageType<types.Command>
   ): void {
     const boundHandler = this.messageHandler.bind(this);
@@ -464,9 +464,7 @@ export class Router implements types.Router {
    * Registers default message handler for routed event on event bus.
    * @param EventType - `Event` type constructor.
    */
-  protected setupEventHandlers(
-    EventType: types.MessageType<types.Event>
-  ): void {
+  public setupEventHandler(EventType: types.MessageType<types.Event>): void {
     const boundHandler = this.messageHandler.bind(this);
     boundHandler.original = this.messageHandler;
 
