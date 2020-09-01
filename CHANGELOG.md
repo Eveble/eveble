@@ -1,3 +1,10 @@
+## [2.1.4](https://github.com/eveble/eveble/compare/v2.1.3...v2.1.4) (2020-09-01)
+
+
+### Bug Fixes
+
+* **infrastructure:** expose as public setup of message handler on Router ([7e338d2](https://github.com/eveble/eveble/commit/7e338d2eaedc4bbb099dc9968326a35a6205f403))
+
 ## [2.1.3](https://github.com/eveble/eveble/compare/v2.1.2...v2.1.3) (2020-08-30)
 
 

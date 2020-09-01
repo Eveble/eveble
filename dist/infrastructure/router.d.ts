@@ -22,7 +22,7 @@ export declare class Router implements types.Router {
     protected resolveInitializingMessage(): types.MessageType<types.Command | types.Event>;
     protected resolveRoutedCommands(): types.MessageType<types.Command>[];
     protected resolveRoutedEvents(): types.MessageType<types.Event>[];
-    protected setupCommandHandlers(CommandType: types.MessageType<types.Command>): void;
-    protected setupEventHandlers(EventType: types.MessageType<types.Event>): void;
+    setupCommandHandler(CommandType: types.MessageType<types.Command>): void;
+    setupEventHandler(EventType: types.MessageType<types.Event>): void;
     handleSaveErrors(error: Error, message: types.Command | types.Event, eventSourceableId: string | Guid): Promise<void>;
 }

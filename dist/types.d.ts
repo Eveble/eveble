@@ -449,6 +449,8 @@ export declare namespace types {
         routedCommands: MessageType<Command>[];
         routedEvents: MessageType<Event>[];
         initialize(): void;
+        setupCommandHandler(CommandType: MessageType<Command>): void;
+        setupEventHandler(EventType: MessageType<Event>): void;
     }
     interface RouterType {
         new (EventSourceableType?: EventSourceableType, InitializingMessageType?: MessageType<Command | Event>, routedCommands?: MessageType<Command>[], routedEvents?: MessageType<Event>[]): Router;

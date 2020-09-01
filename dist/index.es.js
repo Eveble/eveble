@@ -4493,10 +4493,10 @@ class Router {
             .on(this)
             .in(this.initialize));
         for (const EventType of this.routedEvents) {
-            this.setupEventHandlers(EventType);
+            this.setupEventHandler(EventType);
         }
         for (const CommandType of this.routedCommands) {
-            this.setupCommandHandlers(CommandType);
+            this.setupCommandHandler(CommandType);
         }
     }
     setupInitializingMessageHandler(handler) {
@@ -4643,12 +4643,12 @@ class Router {
     resolveRoutedEvents() {
         return this.EventSourceableType.resolveRoutedEvents();
     }
-    setupCommandHandlers(CommandType) {
+    setupCommandHandler(CommandType) {
         const boundHandler = this.messageHandler.bind(this);
         boundHandler.original = this.messageHandler;
         this.commandBus.registerHandler(CommandType, boundHandler);
     }
-    setupEventHandlers(EventType) {
+    setupEventHandler(EventType) {
         const boundHandler = this.messageHandler.bind(this);
         boundHandler.original = this.messageHandler;
         this.eventBus.subscribeTo(EventType, boundHandler);
