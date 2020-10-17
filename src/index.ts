@@ -233,6 +233,7 @@ export {
 export { isSerializable, resolveSerializableFromPropType } from '@eveble/core';
 // Types
 export { types } from './types';
+export type Strintifiable = types.Stringifiable;
 export { types as EvebleTypes } from './types';
 export type ConstructorType<T> = types.ConstructorType<T>;
 export type EntityType<T> = types.EntityType<T>;
