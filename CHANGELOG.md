@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/eveble/eveble/compare/v2.1.4...v2.2.0) (2020-10-17)
+
+
+### Features
+
+* **types:** export Strintifiable interface directly ([8be9ea7](https://github.com/eveble/eveble/commit/8be9ea74a820826bfb9d2abfff8c3f8ae2e6f238))
+
 ## [2.1.4](https://github.com/eveble/eveble/compare/v2.1.3...v2.1.4) (2020-09-01)
 
 
