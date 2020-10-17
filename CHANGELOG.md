@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/eveble/eveble/compare/v2.2.0...v2.2.1) (2020-10-17)
+
+
+### Bug Fixes
+
+* Stringifiable typo ([5b2805a](https://github.com/eveble/eveble/commit/5b2805af850d2b88e703e4ece8e4ed2a5e0ed180))
+
 # [2.2.0](https://github.com/eveble/eveble/compare/v2.1.4...v2.2.0) (2020-10-17)
 
 

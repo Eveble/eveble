@@ -102,7 +102,7 @@ export { VersionableMixin, VersionableError, InvalidSchemaVersionError, LegacyTr
 export { isDefinable, isRecord, isPlainRecord, hasPostConstruct, toPlainObject, convertObjectToCollection, createEJSON, isEventSourceableType, loadENV, } from './utils/helpers';
 export { isSerializable, resolveSerializableFromPropType } from '@eveble/core';
 export { types } from './types';
-export declare type Strintifiable = types.Stringifiable;
+export declare type Stringifiable = types.Stringifiable;
 export { types as EvebleTypes } from './types';
 export declare type ConstructorType<T> = types.ConstructorType<T>;
 export declare type EntityType<T> = types.EntityType<T>;
