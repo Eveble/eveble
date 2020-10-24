@@ -115,7 +115,7 @@ import { LogTransportConfig } from '../../src/configs/log-transport-config';
 // Constants
 import { BINDINGS } from '../../src/constants/bindings';
 import { LITERAL_KEYS } from '../../src/constants/literal-keys';
-import { DEFAULTS } from '../../src/constants/defaults';
+import { DEFAULTS, LOGGING_LEVELS } from '../../src/constants/defaults';
 import { METADATA_KEYS } from '../../src/constants/metadata-keys';
 import { SPECIFICATIONS } from '../../src/constants/specifications';
 // Core
@@ -413,6 +413,7 @@ import {
   // eslint-disable-next-line camelcase
   EVEBLE_BINDINGS as EVEBLE_BINDINGSExported,
   DEFAULTS as DEFAULTSExported,
+  LOGGING_LEVELS as LOGGING_LEVELSExported,
   LITERAL_KEYS as LITERAL_KEYS_EXPORTED,
   METADATA_KEYS as METADATA_KEYS_EXPORTED,
   SPECIFICATIONS as SPECIFICATIONSExported,
@@ -903,6 +904,9 @@ describe(`exports`, function () {
       });
       it('DEFAULTS', () => {
         expect(DEFAULTSExported).to.be.equal(DEFAULTS);
+      });
+      it('LOGGING_LEVELS', () => {
+        expect(LOGGING_LEVELSExported).to.be.equal(LOGGING_LEVELS);
       });
       it('LITERAL_KEYS', () => {
         expect(LITERAL_KEYS_EXPORTED).to.be.equal(LITERAL_KEYS);

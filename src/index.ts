@@ -35,6 +35,7 @@ export { LogTransportConfig } from './configs/log-transport-config';
 // Prettier does not like export * as SOMETHING from '..';
 export { LITERAL_KEYS } from './constants/literal-keys';
 export { DEFAULTS } from './constants/defaults';
+export { LOGGING_LEVELS } from './constants/defaults';
 export { METADATA_KEYS } from './constants/metadata-keys';
 export { SPECIFICATIONS } from './constants/specifications';
 // Core
