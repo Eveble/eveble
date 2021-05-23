@@ -850,6 +850,14 @@ class List extends Array {
             this.push(...serializables);
         }
     }
+    toPlainObject() {
+        return this.map((value) => {
+            if (typeof (value === null || value === void 0 ? void 0 : value.toPlainObject) === 'function') {
+                return value.toPlainObject();
+            }
+            return value.valueOf();
+        });
+    }
     create(...sources) {
         const element = this[SERIALIZABLE_TYPE_KEY].from(...sources);
         this.add(element);
@@ -7858,6 +7866,7 @@ exports.InvalidStateError = InvalidStateError;
 exports.InvalidStatusError = InvalidStatusError;
 exports.InvalidTransportIdError = InvalidTransportIdError;
 exports.LITERAL_KEYS = LITERAL_KEYS;
+exports.LOGGING_LEVELS = LOGGING_LEVELS;
 exports.LegacyTransformerAlreadyExistsError = LegacyTransformerAlreadyExistsError;
 exports.LegacyTransformerNotFoundError = LegacyTransformerNotFoundError;
 exports.List = List;

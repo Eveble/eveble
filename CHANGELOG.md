@@ -1,3 +1,15 @@
+# [2.3.0](https://github.com/eveble/eveble/compare/v2.2.1...v2.3.0) (2021-05-23)
+
+
+### Bug Fixes
+
+* conversion of List to plain object ([b15c894](https://github.com/eveble/eveble/commit/b15c894aa9cbc1c422429327a68ac920dba36801))
+
+
+### Features
+
+* export LOGGING_LEVELS on root ([329c9cc](https://github.com/eveble/eveble/commit/329c9cc83f287fee6bb04bea2fb6b23997937306))
+
 ## [2.2.1](https://github.com/eveble/eveble/compare/v2.2.0...v2.2.1) (2020-10-17)
 
 

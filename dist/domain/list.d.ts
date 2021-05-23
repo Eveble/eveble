@@ -5,6 +5,7 @@ export declare class List<T extends types.Serializable> extends Array {
     protected [LIST_KEY]: string;
     protected [SERIALIZABLE_TYPE_KEY]: T;
     constructor(source: types.Serializable, listKey: string, serializableType: types.Type, serializables: any[]);
+    toPlainObject(): any[];
     create(...sources: Record<string, any>[]): T;
     add(element: T): void;
     overrideBy(key: string, value: any, element: T): void;

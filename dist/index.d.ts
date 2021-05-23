@@ -26,6 +26,7 @@ export { LoggingConfig } from './configs/logging-config';
 export { LogTransportConfig } from './configs/log-transport-config';
 export { LITERAL_KEYS } from './constants/literal-keys';
 export { DEFAULTS } from './constants/defaults';
+export { LOGGING_LEVELS } from './constants/defaults';
 export { METADATA_KEYS } from './constants/metadata-keys';
 export { SPECIFICATIONS } from './constants/specifications';
 export { StringifingConverter } from './core/logging-transports/formatters/converters/stringifing-converter';
