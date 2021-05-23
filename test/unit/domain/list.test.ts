@@ -74,6 +74,48 @@ describe('List', function () {
     });
   });
 
+  describe('conversion', () => {
+    describe('toPlainObject', () => {
+      it('converting other serializables', () => {
+        const id = 'my-order-id';
+        const items = [
+          new Item({ name: 'first' }),
+          new Item({ name: 'second' }),
+        ];
+        const source = new Order({ id, items });
+        const result = source.toPlainObject();
+        expect(result.items).to.be.eql([{ name: 'first' }, { name: 'second' }]);
+        expect(result.items[0]).to.not.be.instanceof(Item);
+        expect(result.items[1]).to.not.be.instanceof(Item);
+      });
+
+      it('converting other values', () => {
+        @define('MyString', { isRegistrable: false })
+        class MyString extends String {
+          typeName() {
+            return 'MyString';
+          }
+
+          toJSONValue() {
+            return sinon.stub();
+          }
+        }
+
+        @define('MyStringContainer', { isRegistrable: false })
+        class MyStringContainer extends Serializable {
+          items: MyString[];
+        }
+
+        const items = [new MyString('first'), new MyString('second')];
+        const source = new MyStringContainer({ items });
+        const result = source.toPlainObject();
+        expect(result.items).to.be.eql(['first', 'second']);
+        expect(result.items[0]).to.not.be.instanceof(MyString);
+        expect(result.items[1]).to.not.be.instanceof(MyString);
+      });
+    });
+  });
+
   describe('create', () => {
     it('creates new serializable on the list', () => {
       const source = new Order({ id: 'my-order-id', items: [] });

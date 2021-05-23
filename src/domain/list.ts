@@ -56,6 +56,19 @@ export class List<T extends types.Serializable> extends Array {
   }
 
   /**
+   * Converts list to array with plain objects.
+   * @returns Array with items converted to plain object.
+   */
+  public toPlainObject(): any[] {
+    return this.map((value: any) => {
+      if (typeof value?.toPlainObject === 'function') {
+        return value.toPlainObject();
+      }
+      return value.valueOf();
+    });
+  }
+
+  /**
    * Creates `Serializable` from multiple data sources and adds it to list.
    * @param sources - Source(s) of properties(like Object.assign).
    * @returns Instance of newly created and added `Serializable`.
