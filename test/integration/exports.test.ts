@@ -413,7 +413,7 @@ import {
   // eslint-disable-next-line camelcase
   EVEBLE_BINDINGS as EVEBLE_BINDINGSExported,
   DEFAULTS as DEFAULTSExported,
-  LOGGING_LEVELS as LOGGING_LEVELSExported,
+  LOGGING_LEVELS as LOGGING_LEVELS_EXPORTED,
   LITERAL_KEYS as LITERAL_KEYS_EXPORTED,
   METADATA_KEYS as METADATA_KEYS_EXPORTED,
   SPECIFICATIONS as SPECIFICATIONSExported,
@@ -906,7 +906,7 @@ describe(`exports`, function () {
         expect(DEFAULTSExported).to.be.equal(DEFAULTS);
       });
       it('LOGGING_LEVELS', () => {
-        expect(LOGGING_LEVELSExported).to.be.equal(LOGGING_LEVELS);
+        expect(LOGGING_LEVELS_EXPORTED).to.be.equal(LOGGING_LEVELS);
       });
       it('LITERAL_KEYS', () => {
         expect(LITERAL_KEYS_EXPORTED).to.be.equal(LITERAL_KEYS);
