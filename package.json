@@ -155,7 +155,7 @@
     "clean": "./node_modules/.bin/rimraf dist",
     "lint": "./node_modules/.bin/eslint --fix 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
     "test:lint": "./node_modules/.bin/eslint 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
-    "format": "node_modules/.bin/tsc --noEmit && ./node_modules/.bin/prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
+    "format": "node_modules/.bin/tsc --noEmit --skipLibCheck && ./node_modules/.bin/prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
     "format:staged": "./node_modules/.bin/pretty-quick --staged --no-restage --bail",
     "test:format": "./node_modules/.bin/prettier --check 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
     "coverage:ci": "./node_modules/.bin/cross-env CI=true nyc report --reporter=text-lcov > coverage.lcov",
