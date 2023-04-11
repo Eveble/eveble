@@ -17,7 +17,7 @@ import { Module } from '../../../src/core/module';
 
 chai.use(sinonChai);
 
-describe(`MongoDBSnapshotStorageModule`, function () {
+describe(`MongoDBSnapshotStorageModule`, () => {
   // Props
   const appConfig = new AppConfig({
     appId: 'my-app-id',
@@ -183,9 +183,10 @@ describe(`MongoDBSnapshotStorageModule`, function () {
       await module.initialize(app, injector);
 
       expect(injector.isBound(BINDINGS.SnapshotSerializer)).to.be.true;
-      const commitSerializer = await injector.getAsync<
-        types.SnapshotSerializer
-      >(BINDINGS.SnapshotSerializer);
+      const commitSerializer =
+        await injector.getAsync<types.SnapshotSerializer>(
+          BINDINGS.SnapshotSerializer
+        );
       expect(commitSerializer).to.be.instanceof(SnapshotSerializer);
     });
 

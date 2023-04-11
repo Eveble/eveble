@@ -19,7 +19,7 @@ import { Injector } from '../../../src/core/injector';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`MongoDBClient`, function () {
+describe(`MongoDBClient`, () => {
   let props: Record<string, any>;
 
   before(() => {

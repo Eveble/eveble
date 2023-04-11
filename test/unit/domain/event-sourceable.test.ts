@@ -35,7 +35,7 @@ import { route } from '../../../src/annotations/route';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`EventSourceable`, function () {
+describe(`EventSourceable`, () => {
   let now: Date;
   let clock: any;
   let handlers: Record<string, Function>;
@@ -491,7 +491,7 @@ describe(`EventSourceable`, function () {
       };
       const instance = new Order({ id: 'my-id' });
       expect(() => {
-        instance.record((nonEvent as any) as Event<{}>);
+        instance.record(nonEvent as any as Event<{}>);
       }).to.throw(
         InvalidEventError,
         `Order: event must be instance of Event, got {"type":String("Test"), "eventSourceableId":String("my-id")}`
@@ -536,7 +536,7 @@ describe(`EventSourceable`, function () {
       };
       const instance = new MyEventSourceable({ id: 'my-id' });
       expect(() => {
-        instance.record((nonEvent as any) as Event<{}>);
+        instance.record(nonEvent as any as Event<{}>);
       }).to.throw(InvalidEventError);
       expect(instance.getEvents()).to.eql([]);
     });
@@ -650,7 +650,7 @@ describe(`EventSourceable`, function () {
       };
       const instance = new Order({ id: orderProps.id });
       expect(() => {
-        instance.record((nonEvent as any) as Event<{}>);
+        instance.record(nonEvent as any as Event<{}>);
       }).to.throw(
         InvalidEventError,
         `Order: event must be instance of Event, got {"type":String("Test"), "eventSourceableId":String("my-id")}`

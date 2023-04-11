@@ -55,7 +55,7 @@ import { DomainException } from '../../../src/domain/domain-exception';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Routing with initializing Event on Process`, function () {
+describe(`Routing with initializing Event on Process`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
 

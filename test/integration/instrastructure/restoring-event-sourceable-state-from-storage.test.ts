@@ -39,7 +39,7 @@ import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-t
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Restoring event sourceable state from storage`, function () {
+describe(`Restoring event sourceable state from storage`, () => {
   // Props
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';

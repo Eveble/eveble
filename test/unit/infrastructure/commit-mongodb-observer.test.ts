@@ -15,7 +15,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitMongoDBObserver`, function () {
+describe(`CommitMongoDBObserver`, () => {
   const now = new Date();
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';
@@ -85,9 +85,7 @@ describe(`CommitMongoDBObserver`, function () {
     it(`observes commits for changes`, async () => {
       const stream: any = stubInterface<Cursor>();
       const findResult = {
-        stream: (): Cursor => {
-          return stream;
-        },
+        stream: (): Cursor => stream,
       };
 
       commitPublisher.getHandledEventTypes.returns(['MyEvent']);
@@ -165,21 +163,13 @@ describe(`CommitMongoDBObserver`, function () {
 
     it('changes state to paused when observer pauses observing commit changes', async () => {
       const stream = {
-        on: (): void => {
-          return undefined;
-        },
-        pause: (): void => {
-          return undefined;
-        },
-        close: (): void => {
-          return undefined;
-        },
+        on: (): void => undefined,
+        pause: (): void => undefined,
+        close: (): void => undefined,
       };
       const streamMock = sinon.mock(stream);
       const findResult = {
-        stream: (): Record<string, any> => {
-          return stream;
-        },
+        stream: (): Record<string, any> => stream,
       };
       collectionMock.expects('find').resolves(findResult);
       streamMock.expects('pause');
@@ -195,21 +185,13 @@ describe(`CommitMongoDBObserver`, function () {
 
     it('changes state to closed when observer stops observing commit changes', async () => {
       const stream = {
-        on: (): void => {
-          return undefined;
-        },
-        pause: (): void => {
-          return undefined;
-        },
-        close: (): void => {
-          return undefined;
-        },
+        on: (): void => undefined,
+        pause: (): void => undefined,
+        close: (): void => undefined,
       };
       const streamMock = sinon.mock(stream);
       const findResult = {
-        stream: (): Record<string, any> => {
-          return stream;
-        },
+        stream: (): Record<string, any> => stream,
       };
       collectionMock.expects('find').resolves(findResult);
       streamMock.expects('close');

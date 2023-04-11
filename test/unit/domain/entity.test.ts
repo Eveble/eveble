@@ -23,7 +23,7 @@ import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
 
 chai.use(sinonChai);
 
-describe('Entity', function () {
+describe('Entity', () => {
   let asserter: any;
 
   @define('Account', { isRegistrable: false })
@@ -289,7 +289,7 @@ describe('Entity', function () {
         id: 'my-id',
         name: 'Foo',
       });
-      expect(() => entity.changeName((1 as any) as string)).to.throw(
+      expect(() => entity.changeName(1 as any as string)).to.throw(
         ValidationError,
         `Account: (Key 'name': Expected Number(1) to be a String in {"id":String("my-id"), "name":Number(1)})`
       );
@@ -319,7 +319,7 @@ describe('Entity', function () {
 
         it('sets the action as a Command on asserter', () => {
           @define('MyCommand', { isRegistrable: false })
-          class MyCommand extends Command<MyCommand> {}
+          class MyCommand extends Command<MyCommand> { }
 
           const entity = new Account({ id: 'my-id', name: 'my-name' });
           entity.on(MyCommand);

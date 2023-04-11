@@ -13,16 +13,12 @@ export class CreateEmployee extends Command<CreateEmployee> {
 }
 
 @define()
-export class AssignTaskListToEmployee extends Command<
-  AssignTaskListToEmployee
-> {
+export class AssignTaskListToEmployee extends Command<AssignTaskListToEmployee> {
   taskListId: Guid;
 }
 
 @define()
-export class EstimateEmployeeProductivity extends Command<
-  EstimateEmployeeProductivity
-> {
+export class EstimateEmployeeProductivity extends Command<EstimateEmployeeProductivity> {
   estimatedPoints: number;
 }
 

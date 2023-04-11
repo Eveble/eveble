@@ -23,7 +23,7 @@ function sleep(ms: number): Promise<any> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe(`CommitPublisher`, function () {
+describe(`CommitPublisher`, () => {
   @define('CommitPublisher.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {}
   @define('CommitPublisher.MyEvent', { isRegistrable: false })
@@ -231,9 +231,7 @@ describe(`CommitPublisher`, function () {
       serializer.hasType.withArgs('CommitPublisher.MyCommand').returns(true);
       commandBus.hasHandler.withArgs(MyCommand).returns(true);
       // Simulate that handling command takes more time then allowed timeout
-      commandBus.send = async (): Promise<void> => {
-        return clock.tick(timeout + 5);
-      };
+      commandBus.send = async (): Promise<void> => clock.tick(timeout + 5);
       storage.flagAndResolveCommitAsTimeouted.returns(commit);
 
       const expectedCommitStateAfterTimeout = new Commit({
@@ -319,9 +317,7 @@ describe(`CommitPublisher`, function () {
     });
 
     it(`stores each commit's publishing timeout using the id as a the key`, async () => {
-      commitPublisher.commandBus.send = (): any => {
-        return clock.tick(5);
-      };
+      commitPublisher.commandBus.send = (): any => clock.tick(5);
       serializer.hasType.withArgs('CommitPublisher.MyCommand').returns(true);
       commandBus.hasHandler.withArgs(MyCommand).returns(true);
 
@@ -343,9 +339,7 @@ describe(`CommitPublisher`, function () {
       serializer.hasType.withArgs('CommitPublisher.MyCommand').returns(true);
       commandBus.hasHandler.withArgs(MyCommand).returns(true);
       // Simulate that handling command takes more time then allowed timeout
-      commitPublisher.commandBus.send = (): any => {
-        return clock.tick(timeout + 5);
-      };
+      commitPublisher.commandBus.send = (): any => clock.tick(timeout + 5);
       storage.flagAndResolveCommitAsTimeouted.returns(commit);
 
       await commitPublisher.publishChanges(commit);
@@ -375,9 +369,7 @@ describe(`CommitPublisher`, function () {
       serializer.hasType.withArgs('CommitPublisher.MyCommand').returns(true);
       commandBus.hasHandler.withArgs(MyCommand).returns(true);
       // Simulate that handling command takes more time then allowed timeout
-      commandBus.send = async (): Promise<any> => {
-        return clock.tick(timeout + 5);
-      };
+      commandBus.send = async (): Promise<any> => clock.tick(timeout + 5);
 
       commitPublisher.publishChanges(commit);
       expect(commitPublisher.isInProgress(commitId)).to.be.true;

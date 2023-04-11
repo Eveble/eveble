@@ -17,7 +17,7 @@ import { initial } from '../../../src/annotations/initial';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Process`, function () {
+describe(`Process`, () => {
   let now: Date;
   let clock: any;
   let handlers: Record<string, Function>;

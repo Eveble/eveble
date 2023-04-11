@@ -11,7 +11,7 @@ import { HookableMixin } from '../../../src/mixins/hookable-mixin';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 
-describe('SerializableError', function () {
+describe('SerializableError', () => {
   @define('MySerializable', { isRegistrable: false })
   class MySerializable extends Serializable {
     foo: string;

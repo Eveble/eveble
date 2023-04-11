@@ -25,7 +25,7 @@ import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`AgendaCommandScheduler`, function () {
+describe(`AgendaCommandScheduler`, () => {
   @define('AgendaCommandScheduler.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;

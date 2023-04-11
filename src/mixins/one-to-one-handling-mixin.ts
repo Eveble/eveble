@@ -17,8 +17,10 @@ import { HANDLERS } from '../constants/literal-keys';
 import { Message } from '../components/message';
 
 @injectable()
-export class OneToOneHandlingMixin extends HandlingMixin
-  implements types.Controller {
+export class OneToOneHandlingMixin
+  extends HandlingMixin
+  implements types.Controller
+{
   protected [HANDLERS]: Map<types.MessageType<types.Message>, types.Handler>;
 
   /**

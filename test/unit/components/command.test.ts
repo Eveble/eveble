@@ -8,7 +8,7 @@ import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { types } from '../../../src/types';
 
-describe('Command', function () {
+describe('Command', () => {
   let now: Date;
   let clock: any;
 

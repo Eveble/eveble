@@ -18,8 +18,10 @@ import { Guid } from '../../domain/value-objects/guid';
 import { AgendaClient } from '../../app/clients/agenda-client';
 
 @injectable()
-export class AgendaCommandScheduler extends StatefulMixin
-  implements types.CommandScheduler {
+export class AgendaCommandScheduler
+  extends StatefulMixin
+  implements types.CommandScheduler
+{
   static STATES = {
     constructed: 'constructed',
     initialized: 'initialized',
@@ -186,12 +188,8 @@ export class AgendaCommandScheduler extends StatefulMixin
   public async unschedule(
     unscheduleCommand: UnscheduleCommand
   ): Promise<boolean> {
-    const {
-      assignmentId,
-      commandType,
-      assignerId,
-      assignerType,
-    } = unscheduleCommand;
+    const { assignmentId, commandType, assignerId, assignerType } =
+      unscheduleCommand;
 
     const mongoQuery = {
       'data.commandType': commandType,

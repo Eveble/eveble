@@ -31,7 +31,7 @@ import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/comm
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Adding and publishing new commits`, function () {
+describe(`Adding and publishing new commits`, () => {
   @define('AddingAndPublishingNewCommits.MyCommand')
   class MyCommand extends Command<MyCommand> {}
   @define('AddingAndPublishingNewCommits.MyEvent')

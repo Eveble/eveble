@@ -26,7 +26,7 @@ import {
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitMongoDBStorage`, function () {
+describe(`CommitMongoDBStorage`, () => {
   @define('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;

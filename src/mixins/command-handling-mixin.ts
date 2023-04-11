@@ -9,8 +9,10 @@ import { Command } from '../components/command';
 import { BINDINGS } from '../constants/bindings';
 
 @injectable()
-export class CommandHandlingMixin extends OneToOneHandlingMixin
-  implements types.Sender {
+export class CommandHandlingMixin
+  extends OneToOneHandlingMixin
+  implements types.Sender
+{
   @inject(BINDINGS.CommandBus)
   public commandBus: types.CommandBus;
 

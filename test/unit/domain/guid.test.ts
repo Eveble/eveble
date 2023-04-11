@@ -6,7 +6,7 @@ import {
 import { ValueObject } from '../../../src/domain/value-object';
 import { isDefinable } from '../../../src/utils/helpers';
 
-describe('Guid', function () {
+describe('Guid', () => {
   it(`extends ValueObject`, () => {
     expect(Guid.prototype).to.be.instanceof(ValueObject);
   });
@@ -84,7 +84,7 @@ describe('Guid', function () {
     });
 
     it(`returns false if value is not provided`, () => {
-      expect(Guid.isValid((1234 as any) as string)).to.be.false;
+      expect(Guid.isValid(1234 as any as string)).to.be.false;
     });
   });
 });

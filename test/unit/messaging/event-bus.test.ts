@@ -15,7 +15,7 @@ import { Event } from '../../../src/components/event';
 
 chai.use(sinonChai);
 
-describe('EventBus', function () {
+describe('EventBus', () => {
   @define('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;

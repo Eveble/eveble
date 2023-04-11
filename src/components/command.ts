@@ -19,10 +19,13 @@ export class Assignment extends Serializable implements types.Assignment {
 
 @define('Command')
 export class Command<
-  T extends {
-    [key: string]: any;
-  }
-> extends Message implements types.Command, types.Identifiable {
+    T extends {
+      [key: string]: any;
+    }
+  >
+  extends Message
+  implements types.Command, types.Identifiable
+{
   public targetId: Guid | string;
 
   /**

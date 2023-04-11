@@ -10,7 +10,7 @@ import {
 
 chai.use(sinonChai);
 
-describe(`StatefulMixin`, function () {
+describe(`StatefulMixin`, () => {
   class BaseClass {}
 
   class MyClass extends classes(BaseClass, StatefulMixin) {

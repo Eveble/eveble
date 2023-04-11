@@ -16,7 +16,7 @@ import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 
 chai.use(sinonChai);
 
-describe(`CommandHandlingMixin`, function () {
+describe(`CommandHandlingMixin`, () => {
   let injector: types.Injector;
   let commandBus: any;
 

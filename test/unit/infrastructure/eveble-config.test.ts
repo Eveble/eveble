@@ -3,7 +3,7 @@ import { PropTypes } from 'typend';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
 import { Config } from '../../../src/components/config';
 
-describe(`EvebleConfig`, function () {
+describe(`EvebleConfig`, () => {
   it(`extends Config`, () => {
     expect(EvebleConfig.prototype).to.be.instanceof(Config);
   });

@@ -26,7 +26,7 @@ import { AbilityAssertion } from '../../../src/domain/assertions/ability-asserti
 
 chai.use(chaiAsPromised);
 
-describe(`EventSourceable BDD assertions`, function () {
+describe(`EventSourceable BDD assertions`, () => {
   let injector: Injector;
   let asserter: Asserter;
 

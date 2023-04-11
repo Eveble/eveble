@@ -16,7 +16,7 @@ import { Injector } from '../../../src/core/injector';
 
 chai.use(sinonChai);
 
-describe(`CommitSerializer`, function () {
+describe(`CommitSerializer`, () => {
   @define('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;

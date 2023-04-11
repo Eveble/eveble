@@ -14,7 +14,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 
 chai.use(sinonChai);
 
-describe(`CommandSchedulingService`, function () {
+describe(`CommandSchedulingService`, () => {
   @define('CommandSchedulingService.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;

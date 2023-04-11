@@ -24,7 +24,7 @@ import { initial } from '../../../src/annotations/initial';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Mapping Router with routing provider on Injector`, function () {
+describe(`Mapping Router with routing provider on Injector`, () => {
   @define('RoutesProvider.MyCommand')
   class MyCommand extends Command<MyCommand> {}
   @define('RoutesProvider.MyOtherCommand')

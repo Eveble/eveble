@@ -6,10 +6,13 @@ import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
 @define('Event')
 export class Event<
-  T extends {
-    [key: string]: any;
-  }
-> extends Message implements types.Event, types.Identifiable {
+    T extends {
+      [key: string]: any;
+    }
+  >
+  extends Message
+  implements types.Event, types.Identifiable
+{
   public sourceId: Guid | string;
 
   public version?: number;

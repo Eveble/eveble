@@ -74,7 +74,8 @@ export class Guid extends ValueObject implements types.Stringifiable {
   }
 
   // Checks valid 128-bit UUIDs version 4
-  static pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  static pattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
   /**
    * Evaluates if provided guid is matching UUID v4 pattern.

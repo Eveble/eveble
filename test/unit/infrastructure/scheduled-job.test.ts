@@ -4,7 +4,7 @@ import { ScheduledJob } from '../../../src/infrastructure/structs/scheduled-job'
 import { Struct } from '../../../src/components/struct';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
-describe(`ScheduledJob`, function () {
+describe(`ScheduledJob`, () => {
   let now: any;
   before(() => {
     now = new Date();

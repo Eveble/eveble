@@ -12,7 +12,8 @@ import { InvalidListError } from '../domain/domain-errors';
 @define('Serializable')
 export class Serializable
   extends classes(Struct, EjsonableMixin, VersionableMixin)
-  implements types.Ejsonable {
+  implements types.Ejsonable
+{
   public schemaVersion?: number;
 
   /**

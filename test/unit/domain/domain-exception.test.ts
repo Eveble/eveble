@@ -5,7 +5,7 @@ import { isDefinable } from '../../../src/utils/helpers';
 import { DomainError } from '../../../src/domain/domain-error';
 import { Event } from '../../../src/components/event';
 
-describe('DomainException', function () {
+describe('DomainException', () => {
   it(`extends Event`, () => {
     expect(DomainException.prototype).to.be.instanceof(Event);
   });

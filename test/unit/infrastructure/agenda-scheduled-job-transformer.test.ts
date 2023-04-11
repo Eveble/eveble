@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { AgendaScheduledJobTransformer } from '../../../src/infrastructure/transformers/agenda-scheduled-job-transformer';
 import { ScheduledJob } from '../../../src/infrastructure/structs/scheduled-job';
 
-describe('AgendaScheduledJobTransformer', function () {
+describe('AgendaScheduledJobTransformer', () => {
   let now: any;
   let job: any;
   let transformer: AgendaScheduledJobTransformer;

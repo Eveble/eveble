@@ -21,7 +21,7 @@ import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Projection`, function () {
+describe(`Projection`, () => {
   @define('Projection.MyEvent')
   class MyEvent extends Event<MyEvent> {}
   @define('Projection.MyCommand')

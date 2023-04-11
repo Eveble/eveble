@@ -31,7 +31,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Observing and publishing new commits`, function () {
+describe(`Observing and publishing new commits`, () => {
   @define('ObservingAndPublishingNewCommits.MyCommand')
   class MyCommand extends Command<MyCommand> {}
   @define('ObservingAndPublishingNewCommits.MyEvent')

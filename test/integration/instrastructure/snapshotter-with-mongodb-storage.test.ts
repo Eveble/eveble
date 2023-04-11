@@ -19,7 +19,7 @@ import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`SnapshotMongoDBStorage with MongoDB storage`, function () {
+describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
   @define('SnapshotterWithMongoDBStorage.MyEventSourceable')
   class MyEventSourceable extends EventSourceable {
     name: string;

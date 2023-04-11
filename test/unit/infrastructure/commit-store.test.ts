@@ -24,7 +24,7 @@ import { BINDINGS } from '../../../src/constants/bindings';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitStore`, function () {
+describe(`CommitStore`, () => {
   @define('CommitStore.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {}
   @define('CommitStore.MyAggregate', { isRegistrable: false })

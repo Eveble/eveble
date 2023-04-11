@@ -14,7 +14,7 @@ import { LogMetadata, Log } from '../../../src/components/log-entry';
 
 chai.use(sinonChai);
 
-describe('ConsoleTransport', function () {
+describe('ConsoleTransport', () => {
   let injector: types.Injector;
   let config: LogTransportConfig;
   let converter: types.LogConverter;

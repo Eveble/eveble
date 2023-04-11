@@ -21,7 +21,7 @@ import { types } from '../../../src/types';
 
 chai.use(sinonChai);
 
-describe(`Entity BDD assertions`, function () {
+describe(`Entity BDD assertions`, () => {
   describe(`validating state assertion`, () => {
     @define('MyEntity', { isRegistrable: false })
     class MyEntity extends Entity {

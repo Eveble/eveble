@@ -602,7 +602,7 @@ import {
   inject as injectExported,
 } from '../../src/index';
 
-describe(`exports`, function () {
+describe(`exports`, () => {
   /*
   TYPEND
   */

@@ -7,7 +7,7 @@ import { isDefinable } from '../../../src/utils/helpers';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
-describe('ScheduleCommand', function () {
+describe('ScheduleCommand', () => {
   let now: Date;
   let clock: any;
 

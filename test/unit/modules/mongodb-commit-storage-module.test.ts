@@ -22,7 +22,7 @@ import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/comm
 
 chai.use(sinonChai);
 
-describe(`MongoDBCommitStorageModule`, function () {
+describe(`MongoDBCommitStorageModule`, () => {
   // Props
   const appConfig = new AppConfig({
     appId: 'my-app-id',

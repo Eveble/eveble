@@ -11,7 +11,8 @@ import { Guid } from '../domain/value-objects/guid';
 
 @injectable()
 export class EventSourceableRepository
-  implements types.EventSourceableRepository {
+  implements types.EventSourceableRepository
+{
   @inject(BINDINGS.Injector)
   protected injector: types.Injector;
 

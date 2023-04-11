@@ -25,7 +25,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 
 chai.use(sinonChai);
 
-describe(`App`, function () {
+describe(`App`, () => {
   let injector: Injector;
   let log: any;
   let originalProcessOn: any;

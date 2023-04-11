@@ -56,7 +56,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Routing with initializing Command on Process`, function () {
+describe(`Routing with initializing Command on Process`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
 

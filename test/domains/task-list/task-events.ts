@@ -117,9 +117,7 @@ export class TaskExpired extends Event<TaskExpired> {
 PRODUCTIVITY REWARDING
 */
 @define()
-export class ProductivityEstimationInitiated extends Event<
-  ProductivityEstimationInitiated
-> {
+export class ProductivityEstimationInitiated extends Event<ProductivityEstimationInitiated> {
   taskId: Guid;
 
   employeeId: Guid;
@@ -128,13 +126,9 @@ export class ProductivityEstimationInitiated extends Event<
 }
 
 @define()
-export class ProductivityEstimationCompleted extends Event<
-  ProductivityEstimationCompleted
-> {}
+export class ProductivityEstimationCompleted extends Event<ProductivityEstimationCompleted> {}
 
 @define()
-export class ProductivityEstimationFailed extends Event<
-  ProductivityEstimationFailed
-> {
+export class ProductivityEstimationFailed extends Event<ProductivityEstimationFailed> {
   exception: DomainException;
 }

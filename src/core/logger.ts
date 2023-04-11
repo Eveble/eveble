@@ -14,8 +14,10 @@ enum STATES {
 }
 
 @injectable()
-export class Logger extends classes(StatefulMixin, RFC5424LoggingMixin)
-  implements types.Logger {
+export class Logger
+  extends classes(StatefulMixin, RFC5424LoggingMixin)
+  implements types.Logger
+{
   static STATES = STATES;
 
   public readonly levels: types.LogLevels;

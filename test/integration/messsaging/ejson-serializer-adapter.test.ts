@@ -20,7 +20,7 @@ import { Guid } from '../../../src';
 
 chai.use(sinonChai);
 
-describe(`EJSONSerializerAdapter`, function () {
+describe(`EJSONSerializerAdapter`, () => {
   let injector: types.Injector;
   let serializer: EJSONSerializerAdapter;
 
@@ -352,7 +352,7 @@ describe(`EJSONSerializerAdapter`, function () {
 
     describe('parse', () => {
       it('throws UnparsableValueError if provided argument is not a string', () => {
-        expect(() => serializer.parse((1234 as any) as string)).to.throw(
+        expect(() => serializer.parse(1234 as any as string)).to.throw(
           UnparsableValueError,
           `Value must be parsable string, got 1234`
         );

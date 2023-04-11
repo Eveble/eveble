@@ -33,7 +33,7 @@ describe('HookableMixin', () => {
 
       expect(() => {
         MyClass.prototype.registerHook(
-          (undefined as any) as string,
+          undefined as any as string,
           'my-id',
           sinon.spy()
         );
@@ -43,7 +43,7 @@ describe('HookableMixin', () => {
       );
       expect(() => {
         MyClass.prototype.registerHook(
-          (null as any) as string,
+          null as any as string,
           'my-id',
           sinon.spy()
         );
@@ -59,7 +59,7 @@ describe('HookableMixin', () => {
       expect(() => {
         MyClass.prototype.registerHook(
           'my-action',
-          (undefined as any) as string,
+          undefined as any as string,
           sinon.spy()
         );
       }).to.throw(
@@ -69,7 +69,7 @@ describe('HookableMixin', () => {
       expect(() => {
         MyClass.prototype.registerHook(
           'my-action',
-          (null as any) as string,
+          null as any as string,
           sinon.spy()
         );
       }).to.throw(

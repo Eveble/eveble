@@ -34,7 +34,7 @@ import { Injector } from '../../../src/core/injector';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('BaseApp', function () {
+describe('BaseApp', () => {
   class MyApp extends BaseApp {
     beforeInitialize(): any {
       return undefined;

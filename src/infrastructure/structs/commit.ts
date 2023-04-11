@@ -5,8 +5,10 @@ import { StatefulMixin } from '../../mixins/stateful-mixin';
 import { Serializable } from '../../components/serializable';
 
 @define('CommitReceiver')
-export class CommitReceiver extends classes(Serializable, StatefulMixin)
-  implements types.CommitReceiver {
+export class CommitReceiver
+  extends classes(Serializable, StatefulMixin)
+  implements types.CommitReceiver
+{
   static STATES = {
     received: 'received',
     published: 'published',
@@ -149,8 +151,8 @@ export class Commit extends Serializable implements types.Commit {
    * @returns Instance of `CommitReceiver`, else `undefined`.
    */
   public getReceiver(appId: string): CommitReceiver | undefined {
-    return this.receivers.find((receiver) => {
-      return receiver.appId.toString() === appId.toString();
-    });
+    return this.receivers.find(
+      (receiver) => receiver.appId.toString() === appId.toString()
+    );
   }
 }

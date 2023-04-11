@@ -16,12 +16,14 @@ import {
   InvalidSchemaVersionError,
 } from '../../../src/mixins/versionable-mixin';
 
-describe(`VersionableMixin`, function () {
+describe(`VersionableMixin`, () => {
   describe('prop types', () => {
     it('enforces with Versionable schemaVersion prop type as optional number', () => {
       @define('MyClass', { isRegistrable: false })
-      class MyClass extends classes(DefinableMixin, VersionableMixin)
-        implements types.Versionable {
+      class MyClass
+        extends classes(DefinableMixin, VersionableMixin)
+        implements types.Versionable
+      {
         schemaVersion: number | undefined;
       }
 

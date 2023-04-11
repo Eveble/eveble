@@ -15,7 +15,7 @@ import { RFC5424LoggingMixin } from '../../../src/mixins/rfc-5424-logging-mixin'
 
 chai.use(sinonChai);
 
-describe('Logger', function () {
+describe('Logger', () => {
   let levels: types.LogLevels;
   let transport: types.LogTransport;
 
@@ -100,7 +100,7 @@ describe('Logger', function () {
       it('throws InvalidTransportIdError if provided id is not a string on registering transport', () => {
         expect(() =>
           new Logger(levels).registerTransport(
-            (undefined as any) as string,
+            undefined as any as string,
             transport
           )
         ).to.throw(

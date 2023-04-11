@@ -19,7 +19,7 @@ import { Log } from '../../../src/components/log-entry';
 
 chai.use(sinonChai);
 
-describe(`AgendaCommandSchedulerModule`, function () {
+describe(`AgendaCommandSchedulerModule`, () => {
   // Props
   const appConfig = new AppConfig({
     appId: 'my-app-id',

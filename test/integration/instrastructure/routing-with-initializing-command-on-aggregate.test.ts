@@ -51,7 +51,7 @@ import { EventBus } from '../../../src/messaging/event-bus';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Routing with initializing Command on Aggregate`, function () {
+describe(`Routing with initializing Command on Aggregate`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
 

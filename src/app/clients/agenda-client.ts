@@ -219,59 +219,44 @@ export class AgendaClient extends Client implements types.Client {
    * @async
    */
   protected async initializeEventHandlers(): Promise<void> {
-    this._library?.on(
-      'ready',
-      async (): Promise<void> => {
-        this.log.debug(
-          new Log(`activated client '${this.getId()}'`)
-            .on(this)
-            .in(this.initializeEventHandlers)
-        );
-      }
-    );
+    this._library?.on('ready', async (): Promise<void> => {
+      this.log.debug(
+        new Log(`activated client '${this.getId()}'`)
+          .on(this)
+          .in(this.initializeEventHandlers)
+      );
+    });
 
-    this._library?.on(
-      'start',
-      async (job: Job): Promise<void> => {
-        this.log.debug(
-          new Log(`started job '${job.attrs.name}'`)
-            .on(this)
-            .in(this.initializeEventHandlers)
-        );
-      }
-    );
+    this._library?.on('start', async (job: Job): Promise<void> => {
+      this.log.debug(
+        new Log(`started job '${job.attrs.name}'`)
+          .on(this)
+          .in(this.initializeEventHandlers)
+      );
+    });
 
-    this._library?.on(
-      'complete',
-      async (job: Job): Promise<void> => {
-        this.log.debug(
-          new Log(`completed job '${job.attrs.name}'`)
-            .on(this)
-            .in(this.initializeEventHandlers)
-        );
-      }
-    );
+    this._library?.on('complete', async (job: Job): Promise<void> => {
+      this.log.debug(
+        new Log(`completed job '${job.attrs.name}'`)
+          .on(this)
+          .in(this.initializeEventHandlers)
+      );
+    });
 
-    this._library?.on(
-      'success',
-      async (job: Job): Promise<void> => {
-        this.log.debug(
-          new Log(`successful job '${job.attrs.name}'`)
-            .on(this)
-            .in(this.initializeEventHandlers)
-        );
-      }
-    );
+    this._library?.on('success', async (job: Job): Promise<void> => {
+      this.log.debug(
+        new Log(`successful job '${job.attrs.name}'`)
+          .on(this)
+          .in(this.initializeEventHandlers)
+      );
+    });
 
-    this._library?.on(
-      'fail',
-      async (error: Error, job: Job): Promise<void> => {
-        this.log.error(
-          new Log(`failed job '${job.attrs.name}' do to error: ${error}`)
-            .on(this)
-            .in(this.initializeEventHandlers)
-        );
-      }
-    );
+    this._library?.on('fail', async (error: Error, job: Job): Promise<void> => {
+      this.log.error(
+        new Log(`failed job '${job.attrs.name}' do to error: ${error}`)
+          .on(this)
+          .in(this.initializeEventHandlers)
+      );
+    });
   }
 }

@@ -7,8 +7,10 @@ import { types } from '../../types';
 import { LogTransport } from '../log-transport';
 import { Log } from '../../components/log-entry';
 
-export class ConsoleTransport extends LogTransport
-  implements types.LogTransport {
+export class ConsoleTransport
+  extends LogTransport
+  implements types.LogTransport
+{
   public readonly level: types.LogLevel;
 
   public readonly config: LogTransportConfig;
@@ -55,9 +57,8 @@ export class ConsoleTransport extends LogTransport
     };
     this.client = this.createWinstonLogger(props);
 
-    const logColors: Record<string, string> = this.config.get<
-      Record<string, string>
-    >(`logColors`);
+    const logColors: Record<string, string> =
+      this.config.get<Record<string, string>>(`logColors`);
     if (logColors !== undefined) {
       this.initializeColors(this.config.get(`logColors`));
     }
@@ -110,11 +111,7 @@ export class ConsoleTransport extends LogTransport
       );
     }
     // Message formatting
-    formatArgs.push(
-      format.printf((log) => {
-        return this.formatEntry(log);
-      })
-    );
+    formatArgs.push(format.printf((log) => this.formatEntry(log)));
     return format.combine(...formatArgs);
   }
 

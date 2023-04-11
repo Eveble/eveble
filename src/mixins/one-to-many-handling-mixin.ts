@@ -16,8 +16,10 @@ import { HANDLERS } from '../constants/literal-keys';
 import { Message } from '../components/message';
 
 @injectable()
-export class OneToManyHandlingMixin extends HandlingMixin
-  implements types.Controller {
+export class OneToManyHandlingMixin
+  extends HandlingMixin
+  implements types.Controller
+{
   protected [HANDLERS]: Map<types.MessageType<types.Message>, types.Handler[]>;
 
   /**
@@ -144,9 +146,9 @@ export class OneToManyHandlingMixin extends HandlingMixin
    */
   public getTypeByHandler(handlerReference: types.Handler): any | undefined {
     for (const [messageType, handlers] of this[HANDLERS].entries()) {
-      const unboundHandlers = handlers.map((handler) => {
-        return (handler as any).original || handler;
-      });
+      const unboundHandlers = handlers.map(
+        (handler) => (handler as any).original || handler
+      );
       // Compare original function and bound ones as a fallback
       if (
         unboundHandlers.includes(handlerReference) ||
@@ -207,9 +209,7 @@ export class OneToManyHandlingMixin extends HandlingMixin
       this.getHandler(
         message.constructor as types.MessageType<types.Message>
       ) || [];
-    const promises = handlers.map((handler) => {
-      return handler(message);
-    });
+    const promises = handlers.map((handler) => handler(message));
     return Promise.all(promises);
   }
 }

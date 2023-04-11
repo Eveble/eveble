@@ -182,12 +182,9 @@ export class HookableMixin implements types.Hookable {
    * @returns Collection of hooks.
    */
   public getHooks(action: string): types.hooks.Mappings {
-    const matcher = (proto: types.Prototype): boolean => {
-      return (
-        typeof proto.getHooks === 'function' &&
-        proto.constructor !== HookableMixin
-      );
-    };
+    const matcher = (proto: types.Prototype): boolean =>
+      typeof proto.getHooks === 'function' &&
+      proto.constructor !== HookableMixin;
     const parentProto: types.Prototype | undefined = getMatchingParentProto(
       this,
       matcher
@@ -216,12 +213,9 @@ export class HookableMixin implements types.Hookable {
    * @returns Collection of actions(key) with matching registered hooks as nested collection(value).
    */
   public getActions(): types.hooks.Actions {
-    const matcher = (proto: types.Prototype): boolean => {
-      return (
-        typeof proto.getActions === 'function' &&
-        proto.constructor !== HookableMixin
-      );
-    };
+    const matcher = (proto: types.Prototype): boolean =>
+      typeof proto.getActions === 'function' &&
+      proto.constructor !== HookableMixin;
     const parentProto: types.Prototype | undefined = getMatchingParentProto(
       this,
       matcher

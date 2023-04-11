@@ -28,7 +28,7 @@ import {
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`EventSourceableRepository`, function () {
+describe(`EventSourceableRepository`, () => {
   @define('MyInitEvent', { isRegistrable: false })
   class MyInitEvent extends Event<MyInitEvent> {
     name: string;

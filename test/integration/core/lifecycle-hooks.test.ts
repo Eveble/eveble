@@ -11,7 +11,7 @@ import { BINDINGS } from '../../../src/constants/bindings';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('app lifecycle hooks', function () {
+describe('app lifecycle hooks', () => {
   // ================================= TEST HELPERS ================================= //
 
   const createLifeCycleHookSpies = function (): Record<string, Function> {

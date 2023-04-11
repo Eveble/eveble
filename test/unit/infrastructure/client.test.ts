@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { Client } from '../../../src/app/client';
 import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
 
-describe(`Client`, function () {
+describe(`Client`, () => {
   it(`has StatefulMixin mixin on prototype chain applied`, () => {
     expect(Client.prototype).to.be.instanceof(StatefulMixin);
   });

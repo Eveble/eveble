@@ -4,7 +4,7 @@ import { PropTypes } from 'typend';
 import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { Config } from '../../../src/components/config';
 
-describe('LogTransportConfig', function () {
+describe('LogTransportConfig', () => {
   it('extends Config', () => {
     expect(LogTransportConfig.prototype).to.be.instanceof(Config);
   });

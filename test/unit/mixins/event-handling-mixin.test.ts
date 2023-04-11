@@ -15,7 +15,7 @@ import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 
 chai.use(sinonChai);
 
-describe(`EventHandlingMixin`, function () {
+describe(`EventHandlingMixin`, () => {
   let injector: types.Injector;
   let eventBus: any;
 

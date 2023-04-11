@@ -3,7 +3,7 @@ import { define } from '@eveble/core';
 import { Log, LogMetadata } from '../../../src/components/log-entry';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 
-describe('Log', function () {
+describe('Log', () => {
   @define('MyClass')
   class MyClass extends DefinableMixin {
     myMethod(first: string, second: string, third: string): void {

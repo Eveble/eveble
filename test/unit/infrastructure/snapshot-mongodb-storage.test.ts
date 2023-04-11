@@ -20,7 +20,7 @@ import {
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`SnapshotMongoDBStorage`, function () {
+describe(`SnapshotMongoDBStorage`, () => {
   @define('SnapshotMongoDBStorage.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {
     name: string;

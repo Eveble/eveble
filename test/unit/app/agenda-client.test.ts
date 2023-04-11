@@ -17,7 +17,7 @@ import { InvalidStateError } from '../../../src/mixins/stateful-mixin';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`AgendaClient`, function () {
+describe(`AgendaClient`, () => {
   let props: Record<string, any>;
 
   before(() => {

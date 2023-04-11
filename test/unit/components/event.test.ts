@@ -8,7 +8,7 @@ import { isDefinable } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { types } from '../../../src';
 
-describe('Event', function () {
+describe('Event', () => {
   let now: Date;
   let clock: any;
 

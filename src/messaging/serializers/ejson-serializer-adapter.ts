@@ -566,9 +566,9 @@ export class EJSONSerializerAdapter implements types.Serializer {
       const value = serializable[key];
       if (Array.isArray(value)) {
         // This is an array of sub values / Serializable
-        data[key] = value.map((item) => {
-          return isSerializable(item) ? this.toData(item) : item;
-        });
+        data[key] = value.map((item) =>
+          isSerializable(item) ? this.toData(item) : item
+        );
       } else if (isSerializable(value)) {
         // This is another type
         data[key] = this.toData(value);

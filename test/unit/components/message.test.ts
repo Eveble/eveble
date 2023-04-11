@@ -6,7 +6,7 @@ import { Message } from '../../../src/components/message';
 import { Serializable } from '../../../src/components/serializable';
 import { isDefinable } from '../../../src/utils/helpers';
 
-describe('Message', function () {
+describe('Message', () => {
   let now: Date;
   let clock: any;
 

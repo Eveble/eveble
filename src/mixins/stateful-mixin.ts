@@ -49,9 +49,8 @@ export class StatefulMixin implements types.Stateful {
       throw new UndefinedStatesError(typeName);
     }
 
-    const oneOfSelectableStates: types.State[] = Object.values(
-      selectableStates
-    );
+    const oneOfSelectableStates: types.State[] =
+      Object.values(selectableStates);
 
     if (kernel.isValidating()) {
       const pattern = new OneOf(...oneOfSelectableStates);

@@ -29,8 +29,10 @@ enum STATES {
   shutdown = 'shutdown',
 }
 
-export abstract class Module extends classes(StatefulMixin)
-  implements types.Stateful, types.Module {
+export abstract class Module
+  extends classes(StatefulMixin)
+  implements types.Stateful, types.Module
+{
   static STATES = STATES;
 
   public config: types.Configurable;

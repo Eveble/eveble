@@ -9,8 +9,10 @@ import { types } from '../types';
 import { Event } from '../components/event';
 
 @injectable()
-export class EventHandlingMixin extends OneToManyHandlingMixin
-  implements types.Publisher {
+export class EventHandlingMixin
+  extends OneToManyHandlingMixin
+  implements types.Publisher
+{
   @inject(BINDINGS.EventBus)
   public eventBus: types.EventBus;
 

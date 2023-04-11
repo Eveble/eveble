@@ -46,9 +46,7 @@ CANCELING EMPLOYMENT
 */
 // Process
 @define()
-export class CancelingEmploymentInitiated extends Event<
-  CancelingEmploymentInitiated
-> {
+export class CancelingEmploymentInitiated extends Event<CancelingEmploymentInitiated> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -57,9 +55,7 @@ export class CancelingEmploymentInitiated extends Event<
 }
 
 @define()
-export class CancelingEmploymentCompleted extends Event<
-  CancelingEmploymentCompleted
-> {
+export class CancelingEmploymentCompleted extends Event<CancelingEmploymentCompleted> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -68,25 +64,19 @@ export class CancelingEmploymentCompleted extends Event<
 }
 
 @define()
-export class CancelingEmploymentFailed extends Event<
-  CancelingEmploymentFailed
-> {
+export class CancelingEmploymentFailed extends Event<CancelingEmploymentFailed> {
   employeeId: Guid;
 
   exception: DomainException;
 }
 // Employee Termination
 @define()
-export class EmployeeTerminationInitiated extends Event<
-  EmployeeTerminationInitiated
-> {
+export class EmployeeTerminationInitiated extends Event<EmployeeTerminationInitiated> {
   employeeId: Guid;
 }
 
 @define()
-export class EmployeeTerminationCompleted extends Event<
-  EmployeeTerminationCompleted
-> {
+export class EmployeeTerminationCompleted extends Event<EmployeeTerminationCompleted> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -94,9 +84,7 @@ export class EmployeeTerminationCompleted extends Event<
 
 // Closing task lists
 @define()
-export class ClosingEmployeeTaskListsInitiated extends Event<
-  ClosingEmployeeTaskListsInitiated
-> {
+export class ClosingEmployeeTaskListsInitiated extends Event<ClosingEmployeeTaskListsInitiated> {
   employeeId: Guid;
 
   taskListsIds: Guid[];
@@ -105,18 +93,14 @@ export class ClosingEmployeeTaskListsInitiated extends Event<
 }
 
 @define()
-export class AddedClosedEmployeeTaskList extends Event<
-  AddedClosedEmployeeTaskList
-> {
+export class AddedClosedEmployeeTaskList extends Event<AddedClosedEmployeeTaskList> {
   employeeId: Guid;
 
   taskListId: Guid;
 }
 
 @define()
-export class ClosingEmployeeTaskListsCompleted extends Event<
-  ClosingEmployeeTaskListsCompleted
-> {
+export class ClosingEmployeeTaskListsCompleted extends Event<ClosingEmployeeTaskListsCompleted> {
   taskListsIds: Guid[];
 
   closedTaskListsIds: Guid[];

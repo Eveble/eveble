@@ -3,8 +3,8 @@ import sinon from 'sinon';
 import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';
 
-describe('requiring modules', function () {
-  it('allows multiple modules to require the same sub module', function () {
+describe('requiring modules', () => {
+  it('allows multiple modules to require the same sub module', () => {
     class SubModule extends Module {
       // Regression test -> this was invoked twice at some point
       afterInitialize(): void {

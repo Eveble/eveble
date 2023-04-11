@@ -28,7 +28,7 @@ import { createEJSON } from '../../../src/utils/helpers';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitStore with MongoDB storage`, function () {
+describe(`CommitStore with MongoDB storage`, () => {
   @define('CommitStoreWithMongoDBStorage.MyEventSourceable')
   class MyEventSourceable extends EventSourceable {}
   @define('CommitStoreWithMongoDBStorage.MyAggregate')

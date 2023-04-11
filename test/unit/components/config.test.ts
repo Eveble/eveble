@@ -9,7 +9,7 @@ import { isDefinable } from '../../../src/utils/helpers';
 
 chai.use(sinonChai);
 
-describe(`Config`, function () {
+describe(`Config`, () => {
   const simpleProps = {
     first: 'first-value',
     second: 2,

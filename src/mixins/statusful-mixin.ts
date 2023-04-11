@@ -49,9 +49,8 @@ export class StatusfulMixin implements types.Statusful {
       throw new UndefinedStatusesError(typeName);
     }
 
-    const oneOfSelectableStatuses: types.Status[] = Object.values(
-      selectableStatuses
-    );
+    const oneOfSelectableStatuses: types.Status[] =
+      Object.values(selectableStatuses);
 
     if (kernel.isValidating()) {
       const pattern = new OneOf(...oneOfSelectableStatuses);

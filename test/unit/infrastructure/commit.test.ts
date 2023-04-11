@@ -9,7 +9,7 @@ import {
   CommitReceiver,
 } from '../../../src/infrastructure/structs/commit';
 
-describe(`Commit`, function () {
+describe(`Commit`, () => {
   @define('Commit.FirstCommand', { isRegistrable: false })
   class FirstCommand extends Command<FirstCommand> {}
   @define('Commit.SecondCommand', { isRegistrable: false })
@@ -187,7 +187,7 @@ describe(`Commit`, function () {
   });
 });
 
-describe(`CommitReceiver`, function () {
+describe(`CommitReceiver`, () => {
   let now: Date;
 
   before(() => {

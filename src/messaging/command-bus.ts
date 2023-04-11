@@ -6,8 +6,10 @@ import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';
 
 @injectable()
-export class CommandBus extends classes(HookableMixin, OneToOneHandlingMixin)
-  implements types.CommandBus {
+export class CommandBus
+  extends classes(HookableMixin, OneToOneHandlingMixin)
+  implements types.CommandBus
+{
   /**
    * Creates an instance of CommandBus.
    */

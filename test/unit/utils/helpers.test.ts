@@ -21,7 +21,7 @@ import { Struct } from '../../../src/components/struct';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-describe('helpers', function () {
+describe('helpers', () => {
   @define('SerializableStub')
   class SerializableStub {
     getPropTypes(): void {}
@@ -280,8 +280,9 @@ describe('helpers', function () {
     });
 
     it('resolves serializable type from root-level optional list with nested instance of', () => {
-      const propType = PropTypes.arrayOf(PropTypes.instanceOf(SerializableStub))
-        .isOptional;
+      const propType = PropTypes.arrayOf(
+        PropTypes.instanceOf(SerializableStub)
+      ).isOptional;
       expect(resolveSerializableFromPropType(propType)).to.be.equal(
         SerializableStub
       );

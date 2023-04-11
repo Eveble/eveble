@@ -22,7 +22,7 @@ import { HandlingMixin } from '../../../src/mixins/handling-mixin';
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-describe('OneToManyHandlingMixin', function () {
+describe('OneToManyHandlingMixin', () => {
   @define('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
@@ -115,7 +115,7 @@ describe('OneToManyHandlingMixin', function () {
       const controller = new MyController();
 
       expect(() =>
-        controller.registerHandler(MyEvent, (undefined as any) as types.Handler)
+        controller.registerHandler(MyEvent, undefined as any as types.Handler)
       ).to.throw(
         InvalidHandlerError,
         `MyController: provided handler for 'MyEvent' must be a function, got undefined`

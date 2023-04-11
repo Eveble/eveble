@@ -13,7 +13,7 @@ import { subscribe } from '../../../src/annotations/subscribe';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 
-describe(`Service`, function () {
+describe(`Service`, () => {
   @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {}
 

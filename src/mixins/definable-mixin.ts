@@ -86,9 +86,8 @@ export class DefinableMixin implements types.Definable {
    */
   protected getParentInitializers(): types.Props {
     // Support 'classes' from 'polytype' for multi inheritance(mixin/traits etc.)
-    const matcher = (evaluatedProto: types.Prototype): boolean => {
-      return typeof evaluatedProto.getInstanceInitializers === 'function';
-    };
+    const matcher = (evaluatedProto: types.Prototype): boolean =>
+      typeof evaluatedProto.getInstanceInitializers === 'function';
     const parentProto: types.Prototype | undefined = getMatchingParentProto(
       this.constructor.prototype,
       matcher

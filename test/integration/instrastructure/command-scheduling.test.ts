@@ -56,7 +56,7 @@ import { createEJSON } from '../../../src/utils/helpers';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Command scheduling`, function () {
+describe(`Command scheduling`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
 

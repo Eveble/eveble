@@ -130,9 +130,9 @@ export class StringifingConverter implements types.LogConverter {
       metadata.keys instanceof Array ? metadata.keys : argNames;
 
     const obj = {};
-    const argsIndexes = requiredArgNames.map((argName) => {
-      return argNames.indexOf(argName);
-    });
+    const argsIndexes = requiredArgNames.map((argName) =>
+      argNames.indexOf(argName)
+    );
 
     for (const index of argsIndexes) {
       if (index === -1 || index >= metadata.value.length) continue;

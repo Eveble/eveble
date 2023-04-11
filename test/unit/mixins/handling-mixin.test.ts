@@ -13,7 +13,7 @@ import { HANDLERS } from '../../../src/constants/literal-keys';
 
 chai.use(sinonChai);
 
-describe('HandlingMixing', function () {
+describe('HandlingMixing', () => {
   @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;

@@ -29,7 +29,7 @@ import { Router } from '../../../src/infrastructure/router';
 
 chai.use(sinonChai);
 
-describe(`Eveble Module`, function () {
+describe(`Eveble Module`, () => {
   // Props
   const appId = 'my-app-id';
   let appConfig: AppConfig;
@@ -373,9 +373,8 @@ describe(`Eveble Module`, function () {
         });
 
         it('does not bound EventSourceableRepository on Injector if its already bound prior to initialization', async () => {
-          const eventSourceableRepository = stubInterface<
-            types.EventSourceableRepository
-          >();
+          const eventSourceableRepository =
+            stubInterface<types.EventSourceableRepository>();
           const eveble = new Eveble();
           injector
             .bind<types.EventSourceableRepository>(
@@ -561,9 +560,10 @@ describe(`Eveble Module`, function () {
       });
       await eveble.initialize(app, injector);
 
-      const repository = await eveble.injector.getAsync<
-        types.EventSourceableRepository
-      >(BINDINGS.EventSourceableRepository);
+      const repository =
+        await eveble.injector.getAsync<types.EventSourceableRepository>(
+          BINDINGS.EventSourceableRepository
+        );
       expect(repository.isSnapshotting()).to.be.true;
       expect(log.debug).to.be.calledWithExactly(
         new Log(`enabling snapshotting`).on(eveble).in('bindSnapshotter')
@@ -588,9 +588,10 @@ describe(`Eveble Module`, function () {
       });
       await eveble.initialize(app, injector);
 
-      const repository = await eveble.injector.getAsync<
-        types.EventSourceableRepository
-      >(BINDINGS.EventSourceableRepository);
+      const repository =
+        await eveble.injector.getAsync<types.EventSourceableRepository>(
+          BINDINGS.EventSourceableRepository
+        );
       expect(repository.isSnapshotting()).to.be.false;
     });
   });

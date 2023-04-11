@@ -10,7 +10,7 @@ import { EventSourceable } from '../../../src/domain/event-sourceable';
 
 chai.use(sinonChai);
 
-describe(`SnapshotSerializer`, function () {
+describe(`SnapshotSerializer`, () => {
   @define('MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {
     key: string;

@@ -18,7 +18,8 @@ export abstract class SerializableError
     EjsonableMixin,
     VersionableMixin
   )
-  implements types.Versionable, types.Ejsonable {
+  implements types.Versionable, types.Ejsonable
+{
   public name: string;
 
   public message: string;

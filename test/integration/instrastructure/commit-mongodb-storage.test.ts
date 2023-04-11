@@ -24,7 +24,7 @@ import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`CommitMongoDBStorage`, function () {
+describe(`CommitMongoDBStorage`, () => {
   @define('IntegrationCommitMongoDBStorage.MyCommand')
   class MyCommand extends Command<MyCommand> {
     name: string;

@@ -38,7 +38,7 @@ import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Saving Event Sourceable state to storage`, function () {
+describe(`Saving Event Sourceable state to storage`, () => {
   // Props
   const appId = 'my-app-id';
   const workerId = 'my-worker-id';

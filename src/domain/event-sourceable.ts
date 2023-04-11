@@ -27,7 +27,8 @@ import { UnscheduleCommand } from './unschedule-command';
 import { History } from './history';
 
 @define('EventSourceable')
-export class EventSourceable extends classes(Entity, OneToOneHandlingMixin)
+export class EventSourceable
+  extends classes(Entity, OneToOneHandlingMixin)
   implements types.EventSourceable {
   public id: string | Guid;
 

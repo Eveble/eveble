@@ -4,7 +4,7 @@ import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { version } from '../../../src/annotations/version';
 
-describe(`Versioning`, function () {
+describe(`Versioning`, () => {
   describe('transforming legacy schema', () => {
     @define('CustomerV0', { isRegistrable: false })
     class CustomerV0 extends Serializable {

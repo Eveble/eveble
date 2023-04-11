@@ -74,9 +74,8 @@ export class VersionableMixin {
         version <= currentSchemaVersion;
         version++
       ) {
-        const transformerMethod: types.Hook = this.getLegacyTransformer(
-          version
-        );
+        const transformerMethod: types.Hook =
+          this.getLegacyTransformer(version);
         transformerMethod(props);
       }
       props.schemaVersion = currentSchemaVersion;

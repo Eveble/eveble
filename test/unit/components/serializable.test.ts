@@ -14,7 +14,7 @@ import { InvalidListError } from '../../../src/domain/domain-errors';
 
 chai.use(sinonChai);
 
-describe('Serializable', function () {
+describe('Serializable', () => {
   @define('Person', { isRegistrable: false })
   class Person extends Serializable {
     firstName: string;

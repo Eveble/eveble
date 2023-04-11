@@ -93,9 +93,10 @@ export class Eveble extends Module {
    */
   protected async beforeStart(): Promise<void> {
     if (this.isCommandScheduling()) {
-      this.commandScheduler = await this.injector.getAsync<
-        types.CommandScheduler
-      >(BINDINGS.CommandScheduler);
+      this.commandScheduler =
+        await this.injector.getAsync<types.CommandScheduler>(
+          BINDINGS.CommandScheduler
+        );
     }
   }
 

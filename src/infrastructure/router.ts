@@ -142,8 +142,8 @@ export class Router implements types.Router {
     const boundHandler = handler.bind(this);
     boundHandler.original = handler;
 
-    const MessageType: types.MessageType<types.Command | types.Event> = this
-      .InitializingMessageType;
+    const MessageType: types.MessageType<types.Command | types.Event> =
+      this.InitializingMessageType;
     if (this.InitializingMessageType.prototype instanceof Event) {
       this.eventBus.subscribeTo(MessageType, boundHandler);
     } else if (this.InitializingMessageType.prototype instanceof Command) {

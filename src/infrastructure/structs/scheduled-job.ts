@@ -6,8 +6,10 @@ import { Guid } from '../../domain/value-objects/guid';
 import { Struct } from '../../components/struct';
 
 @define()
-export class ScheduledJob extends classes(Struct, StatefulMixin)
-  implements types.ScheduledJob {
+export class ScheduledJob
+  extends classes(Struct, StatefulMixin)
+  implements types.ScheduledJob
+{
   static STATES = {
     enqueued: 'enqueued',
     started: 'started',

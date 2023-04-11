@@ -11,8 +11,10 @@ import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { Log } from '../components/log-entry';
 
-export class Projection extends classes(EventHandlingMixin, StatefulMixin)
-  implements types.Projection {
+export class Projection
+  extends classes(EventHandlingMixin, StatefulMixin)
+  implements types.Projection
+{
   @inject(BINDINGS.EventBus)
   public eventBus: types.EventBus;
 

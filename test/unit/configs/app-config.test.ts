@@ -6,7 +6,7 @@ import { Config } from '../../../src/components/config';
 import { LoggingConfig } from '../../../src/configs/logging-config';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
 
-describe('AppConfig', function () {
+describe('AppConfig', () => {
   let generateId: any;
   const id = 'my-id';
 

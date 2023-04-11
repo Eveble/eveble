@@ -32,7 +32,7 @@ import { SerializableError } from '../../../src/components/serializable-error';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Router`, function () {
+describe(`Router`, () => {
   let now: any;
   let clock: any;
   let injector: Injector;
@@ -72,7 +72,7 @@ describe(`Router`, function () {
   });
 
   @define('InvalidMessage', { isRegistrable: false })
-  class InvalidMessage extends Message {}
+  class InvalidMessage extends Message { }
 
   @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
@@ -100,7 +100,7 @@ describe(`Router`, function () {
 
   describe(`construction`, () => {
     @define('MyEventSourceable', { isRegistrable: false })
-    class MyEventSourceable extends EventSourceable {}
+    class MyEventSourceable extends EventSourceable { }
 
     it(`throws MissingEventSourceableError if event sourceable is not set`, () => {
       const router = new Router(undefined as any, undefined as any);
@@ -170,7 +170,7 @@ describe(`Router`, function () {
   });
 
   describe(`initializing message handler`, () => {
-    class MyEventSourceable extends EventSourceable {}
+    class MyEventSourceable extends EventSourceable { }
 
     it(`throws UnresolvableIdentifierFromMessageError if provided message to initializing handler is invalid `, async () => {
       @define('MyMessage', { isRegistrable: false })
@@ -286,7 +286,7 @@ describe(`Router`, function () {
   });
 
   describe(`routes messages`, () => {
-    class MyEventSourceable extends EventSourceable {}
+    class MyEventSourceable extends EventSourceable { }
 
     it(`registers routed commands with command bus`, async () => {
       class MyRouter extends Router {
@@ -599,7 +599,7 @@ describe(`Router`, function () {
       });
 
       describe(`handles errors`, () => {
-        class MyDomainError extends DomainError {}
+        class MyDomainError extends DomainError { }
 
         it(`logs thrown error`, async () => {
           const error = new MyDomainError('my-error');
@@ -655,7 +655,7 @@ describe(`Router`, function () {
         });
 
         it(`re-throws error if its not an instance of MyDomainError`, async () => {
-          class MySerializableError extends SerializableError {}
+          class MySerializableError extends SerializableError { }
           const error = new MySerializableError('my-not-domain-error');
           handler.throws(error);
 
@@ -865,7 +865,7 @@ describe(`Router`, function () {
       });
 
       describe(`handles errors`, () => {
-        class MyDomainError extends DomainError {}
+        class MyDomainError extends DomainError { }
 
         it(`logs thrown error`, async () => {
           const error = new MyDomainError('my-error');
@@ -920,7 +920,7 @@ describe(`Router`, function () {
         });
 
         it(`re-throws error if its not an instance of DomainError or CommitConcurrencyError`, async () => {
-          class MySerializableError extends SerializableError {}
+          class MySerializableError extends SerializableError { }
           const error = new MySerializableError('my-not-domain-error');
           handler.throws(error);
 
