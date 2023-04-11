@@ -136,7 +136,7 @@
     "@types/getenv": "^1.0.0",
     "@types/lodash": "^4.14.149",
     "@types/mongodb": "^3.5.25",
-    "delay": "^4.3.0"
+    "delay": "^5.0.0"
   },
   "scripts": {
     "explain": "./node_modules/.bin/npm-scripts-info",
