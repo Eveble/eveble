@@ -42,7 +42,7 @@
   "bugs": "https://github.com/eveble/eveble/issues",
   "license": "MIT",
   "engines": {
-    "node": ">= 14.0.0",
+    "node": ">= 18.13.0",
     "npm": ">= 6.0.0"
   },
   "repository": {
