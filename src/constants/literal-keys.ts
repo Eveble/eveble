@@ -18,6 +18,19 @@ export const SAVE_STATE_METHOD_KEY: unique symbol = Symbol('eveble:save-state');
 
 export const SAVED_STATE_KEY: unique symbol = Symbol('eveble:saved-state');
 
+export const ENABLE_ACTION_VALIDATION_METHOD_KEY: unique symbol = Symbol(
+  'eveble:enable-action-validation'
+);
+export const DISABLE_ACTION_VALIDATION_METHOD_KEY: unique symbol = Symbol(
+  'eveble:disable-action-validation'
+);
+export const IS_ACTION_VALIDATED_METHOD_KEY: unique symbol = Symbol(
+  'eveble:is-action-validated'
+);
+export const ACTION_VALIDATION_KEY: unique symbol = Symbol(
+  'eveble:action-validation'
+);
+
 export const ROLLBACK_STATE_METHOD_KEY: unique symbol = Symbol(
   'eveble:rollback-state'
 );
