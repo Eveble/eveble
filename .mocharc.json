@@ -3,12 +3,19 @@
   "ui": "bdd",
   "opts": false,
   "package": "./package.json",
-  "extension": ["ts"],
+  "extension": [
+    "ts"
+  ],
   "recursive": true,
   "colors": true,
   "timeout": 6000,
   "slow": 100,
-  "watch-files": ["src/**/*.ts", "test/**/*.ts"],
-  "require": ["ts-node/register"],
+  "watch-files": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "require": [
+    "ts-node/register"
+  ],
   "file": "./test/common.ts"
 }
