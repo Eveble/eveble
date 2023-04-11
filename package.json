@@ -99,7 +99,7 @@
     "ts-node": "^8.10.1",
     "ts-sinon": "^1.2.0",
     "typescript": "^3.9.3",
-    "@commitlint/cli": "^8.3.5",
+    "@commitlint/cli": "^17.5.1",
     "@commitlint/config-conventional": "^17.4.4",
     "commitizen": "^4.3.0",
     "cz-customizable": "^7.0.0",
