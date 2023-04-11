@@ -17,7 +17,6 @@ import { ValueObject } from '../../../src/domain/value-object';
 import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
-  SAVED_STATE_KEY,
 } from '../../../src/constants/literal-keys';
 import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
 
@@ -106,13 +105,12 @@ describe('Entity', () => {
   });
 
   describe('prop types', () => {
-    it('have prop types set for: id, schemaVersion, state, status, SAVED_STATE_KEY', () => {
+    it('have prop types set for: id, schemaVersion, state, status', () => {
       expect(Entity.getPropTypes()).to.contain.all.keys([
         'id',
         'schemaVersion',
         'state',
         'status',
-        SAVED_STATE_KEY,
       ]);
     });
 
@@ -149,12 +147,6 @@ describe('Entity', () => {
           PropTypes.instanceOf(Number),
         ])
       );
-    });
-
-    it('has optional SAVED_STATE_KEY property as a symbol', () => {
-      // https://github.com/microsoft/TypeScript/issues/1863
-      const propTypes: any = Entity.getPropTypes();
-      expect(propTypes[SAVED_STATE_KEY]).to.be.eql(PropTypes.object.isOptional);
     });
   });
 

@@ -30,8 +30,6 @@ export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
 
   public schemaVersion?: number;
 
-  protected [SAVED_STATE_KEY]?: Record<keyof any, any>;
-
   /**
    * Creates an instance of `Entity`.
    * @param props - Properties of the type required for construction.
