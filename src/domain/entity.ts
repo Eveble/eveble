@@ -12,6 +12,10 @@ import {
   SAVED_STATE_KEY,
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
+  ACTION_VALIDATION_KEY,
+  ENABLE_ACTION_VALIDATION_METHOD_KEY,
+  DISABLE_ACTION_VALIDATION_METHOD_KEY,
+  IS_ACTION_VALIDATED_METHOD_KEY,
 } from '../constants/literal-keys';
 
 import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
@@ -165,16 +169,9 @@ export class Entity
         if (typeof target[propKey] === 'function') {
           const proxifiedMethod = new Proxy(target[propKey], {
             apply(_targetMethod, _thisArg, args): any {
-              target[SAVE_STATE_METHOD_KEY]();
-              let result: any;
-              let error: Error | undefined;
-              try {
-                result = target[propKey](...args);
-              } catch (e) {
-                error = e;
-              }
-              target[ROLLBACK_STATE_METHOD_KEY]();
-              if (error !== undefined) throw error;
+              target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
+              const result: any = target[propKey](...args);
+              target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
               return result;
             },
           });
@@ -219,14 +216,14 @@ export class Entity
       get(target: any, propKey: string): any {
         const proxifiedMethod = new Proxy(target[propKey], {
           apply(_targetMethod, _thisArg, args): any {
-            target[SAVE_STATE_METHOD_KEY]();
+            target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
             let isAble = true;
             try {
               target[propKey](...args);
             } catch (e) {
               isAble = false;
             }
-            target[ROLLBACK_STATE_METHOD_KEY]();
+            target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
             return isAble;
           },
         });
@@ -246,6 +243,35 @@ export class Entity
         (this as any)[SAVED_STATE_KEY][key] = deepClone(this[key]);
       }
     }
+  }
+
+  /**
+   * Enables action validation.
+   */
+  public [ENABLE_ACTION_VALIDATION_METHOD_KEY](): void {
+    Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+      value: true,
+      enumerable: false,
+      writable: true,
+    });
+  }
+
+  /**
+   * Disables action validation.
+   */
+  public [DISABLE_ACTION_VALIDATION_METHOD_KEY](): void {
+    Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+      value: false,
+      enumerable: false,
+      writable: true,
+    });
+  }
+
+  /**
+   * Returns current state of action validation.
+   */
+  public [IS_ACTION_VALIDATED_METHOD_KEY](): boolean {
+    return this[ACTION_VALIDATION_KEY] || false;
   }
 
   /**

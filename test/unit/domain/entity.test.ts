@@ -19,6 +19,7 @@ import {
   ROLLBACK_STATE_METHOD_KEY,
 } from '../../../src/constants/literal-keys';
 import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
+import { can } from '../../../src/decorators/can';
 
 chai.use(sinonChai);
 
@@ -47,10 +48,21 @@ describe('Entity', () => {
       this.setState(Account.STATES.disabled);
     }
 
+    @can((_account: Account, name: string) => {
+      if (name.length > 20) {
+        throw new Error('name-to-long');
+      }
+    })
     changeName(name: string): void {
       this.assign({ name });
     }
 
+    @can((_account: Account, props: Partial<Account>) => {
+      // do validation
+      if (props.name !== undefined && props.name.length > 20) {
+        throw new Error('name-to-long');
+      }
+    })
     updateProfile(props: types.Props): void {
       this.assign(props);
     }
@@ -367,7 +379,7 @@ describe('Entity', () => {
           expect(entity.updateProfile).to.be.calledWithMatch(props);
         });
 
-        it('ensures that state of entity is rollbacked after invocation of non-assertion method', () => {
+        it('ensures that state of entity is not changed after invocation of assertion method', () => {
           asserter.hasApi.withArgs('updateProfile.').returns(false);
           const entity = new Account({ id: 'my-id', name: 'my-name' });
           const props = {

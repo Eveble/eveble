@@ -8,16 +8,15 @@ import {
   InvalidStateTransitionError,
 } from '../../../src/domain/assertions/stateful-assertion';
 import { Entity } from '../../../src/domain/entity';
-
 import { Asserter } from '../../../src/domain/asserter';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
 import {
   StatusfulAssertion,
   InvalidStatusTransitionError,
 } from '../../../src/domain/assertions/statusful-assertion';
-
 import { ValueObject } from '../../../src/domain/value-object';
 import { types } from '../../../src/types';
+import { can } from '../../../src/decorators/can';
 
 chai.use(sinonChai);
 
@@ -672,7 +671,7 @@ describe(`Entity BDD assertions`, () => {
       const item = order.ensure.is.ableTo.in<Item>('items').create(itemProps);
       expect(item).to.be.instanceof(Item);
       expect(item).to.be.eql(itemProps);
-      expect(order.items).to.be.empty;
+      expect(order.items).to.have.length(1);
     });
   });
 
@@ -699,13 +698,17 @@ describe(`Entity BDD assertions`, () => {
         this.setState(MyEntity.STATES.created);
       }
 
+      @can((entity: MyEntity) => {
+        entity.on('complete').ensure.is.inState('created');
+      })
       complete(): void {
-        this.on('complete').ensure.is.inState('created');
         this.setState(MyEntity.STATES.completed);
       }
 
+      @can((entity: MyEntity) => {
+        entity.on('expire').ensure.is.inState('created');
+      })
       expire(): void {
-        this.on('expire').ensure.is.inState('created');
         this.setState(MyEntity.STATES.expired);
       }
 

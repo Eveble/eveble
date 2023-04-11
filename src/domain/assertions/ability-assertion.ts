@@ -1,7 +1,7 @@
 import { Assertion } from '../assertion';
 import {
-  SAVE_STATE_METHOD_KEY,
-  ROLLBACK_STATE_METHOD_KEY,
+  DISABLE_ACTION_VALIDATION_METHOD_KEY,
+  ENABLE_ACTION_VALIDATION_METHOD_KEY,
 } from '../../constants/literal-keys';
 
 export class AbilityAssertion extends Assertion {
@@ -44,9 +44,9 @@ export class AbilityAssertion extends Assertion {
           if (typeof entity[propKey] === 'function') {
             const proxifiedMethod = new Proxy(entity[propKey], {
               apply(_targetMethod, _thisArg, args): any {
-                entity[SAVE_STATE_METHOD_KEY]();
+                entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                 const result = entity[propKey](...args);
-                entity[ROLLBACK_STATE_METHOD_KEY]();
+                entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                 target.asserter.clearAction();
                 return result;
               },
@@ -66,14 +66,14 @@ export class AbilityAssertion extends Assertion {
           if (typeof entity[propKey] === 'function') {
             const proxifiedMethod = new Proxy(entity[propKey], {
               apply(_targetMethod, _thisArg, args): any {
-                entity[SAVE_STATE_METHOD_KEY]();
+                entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                 let isAble = true;
                 try {
                   entity[propKey](...args);
                 } catch (e) {
                   isAble = false;
                 }
-                entity[ROLLBACK_STATE_METHOD_KEY]();
+                entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                 return isAble;
               },
             });

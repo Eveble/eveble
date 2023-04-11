@@ -6,8 +6,8 @@ import { types } from '../../../../src/types';
 import { AbilityAssertion } from '../../../../src/domain/assertions/ability-assertion';
 import { Asserter } from '../../../../src/domain/asserter';
 import {
-  SAVE_STATE_METHOD_KEY,
-  ROLLBACK_STATE_METHOD_KEY,
+  ENABLE_ACTION_VALIDATION_METHOD_KEY,
+  DISABLE_ACTION_VALIDATION_METHOD_KEY,
 } from '../../../../src/constants/literal-keys';
 
 chai.use(sinonChai);
@@ -47,11 +47,13 @@ describe(`AbilityAssertion`, () => {
       entity.myAction = sinon.stub();
       entity.myAction.returns('result');
 
-      entity[SAVE_STATE_METHOD_KEY] = sinon.stub();
+      entity[ENABLE_ACTION_VALIDATION_METHOD_KEY] = sinon.stub();
       expect(asserter.ensure.is.ableTo.myAction(...args)).to.be.equal('result');
       expect(entity.myAction).to.be.calledOnce;
       expect(entity.myAction).to.be.calledWithExactly(...args);
-      expect(entity[SAVE_STATE_METHOD_KEY]).to.be.calledBefore(entity.myAction);
+      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledBefore(
+        entity.myAction
+      );
     });
 
     it('ensures that state of entity is being rollbacked after validation', () => {
@@ -65,7 +67,7 @@ describe(`AbilityAssertion`, () => {
       expect(asserter.ensure.is.ableTo.myAction(...args)).to.be.equal('result');
       expect(entity.myAction).to.be.calledOnce;
       expect(entity.myAction).to.be.calledWithExactly(...args);
-      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(
+      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledAfter(
         entity.myAction
       );
     });
@@ -92,10 +94,12 @@ describe(`AbilityAssertion`, () => {
 
       entity.myAction = sinon.stub();
       entity.myAction.returns(true);
-      entity[SAVE_STATE_METHOD_KEY] = sinon.stub();
+      entity[ENABLE_ACTION_VALIDATION_METHOD_KEY] = sinon.stub();
 
       expect(asserter.is.ableTo.myAction(...args)).to.be.true;
-      expect(entity[SAVE_STATE_METHOD_KEY]).to.be.calledBefore(entity.myAction);
+      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledBefore(
+        entity.myAction
+      );
     });
 
     it('ensures that state of entity is being rollbacked after validation', () => {
@@ -107,7 +111,7 @@ describe(`AbilityAssertion`, () => {
       entity.myAction.returns(true);
 
       expect(asserter.is.ableTo.myAction(...args)).to.be.true;
-      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(
+      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledAfter(
         entity.myAction
       );
     });
@@ -134,7 +138,7 @@ describe(`AbilityAssertion`, () => {
       entity.myAction.throws(new Error());
 
       expect(asserter.is.ableTo.myAction(...args)).to.be.false;
-      expect(entity[ROLLBACK_STATE_METHOD_KEY]).to.be.calledAfter(
+      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledAfter(
         entity.myAction
       );
     });

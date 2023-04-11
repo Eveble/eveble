@@ -1,7 +1,9 @@
 import { define } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
+import { can } from '../../../src/decorators/can';
 import { StateError } from '../../../src/mixins/stateful-mixin';
 import { types } from '../../../src/types';
+// import { PriorityOutOfRangeError } from './task-errors';
 
 @define()
 export class NoQuittingFoolError extends StateError {
@@ -50,71 +52,96 @@ export class Task extends Entity {
     }
   }
 
+  @can((_task: Task, priority: number) => {
+    if (priority > 3) {
+      throw new Error('priority');
+    }
+  })
   changePriority(priority: 0 | 1 | 2 | 3): void {
     this.priority = priority;
   }
 
+  @can((task: Task) => {
+    task.on('expire').ensure.is.not.inState(Task.STATES.completed);
+    task.on('expire').ensure.is.not.inState(Task.STATES.completed);
+  })
   expire(): void {
-    this.on('accept').ensure.is.not.inState(Task.STATES.completed);
-
     this.setState(Task.STATES.expired);
   }
 
+  @can((task: Task) => {
+    task
+      .on('accept')
+      .ensure.is.not.inOneOfStates([
+        Task.STATES.completed,
+        Task.STATES.declined,
+      ]);
+  })
   accept(): void {
-    this.on('accept').ensure.is.inState(Task.STATES.created);
-
     this.setState(Task.STATES.accepted);
   }
 
+  @can((task: Task) => {
+    task.on('decline').ensure.is.inState(Task.STATES.created);
+  })
   decline(declineReason: string): void {
-    this.on('decline').ensure.is.inState(Task.STATES.created);
-
     this.declineReason = declineReason;
     this.setState(Task.STATES.declined);
   }
 
+  @can((task: Task) => {
+    task
+      .on('start')
+      .ensure.is.inOneOfStates([Task.STATES.accepted, Task.STATES.postponed]);
+  })
   start(): void {
-    this.on('start').ensure.is.inOneOfStates([
-      Task.STATES.accepted,
-      Task.STATES.postponed,
-    ]);
-
     this.setState(Task.STATES.started);
   }
 
+  @can((task: Task) => {
+    task
+      .on('complete')
+      .ensure.is.not.inState(
+        'completed',
+        new TaskAlreadyCompletedError(task.getId())
+      );
+  })
   complete(): void {
-    this.on('complete').ensure.is.not.inState(
-      'completed',
-      new TaskAlreadyCompletedError(this.getId())
-    );
-
     this.setState(Task.STATES.completed);
   }
 
+  @can((task: Task) => {
+    task
+      .on('postpone')
+      .ensure.is.not.inOneOfStates([
+        Task.STATES.postponed,
+        Task.STATES.completed,
+      ]);
+  })
   postpone(postponedAt: Date): void {
-    this.on('postpone').ensure.is.not.inOneOfStates([
-      Task.STATES.postponed,
-      Task.STATES.completed,
-    ]);
-
     this.postponedAt = postponedAt;
     this.setState(Task.STATES.postponed);
   }
 
+  @can((task: Task) => {
+    task
+      .on('quit')
+      .ensure.is.not.inOneOfStates(
+        [Task.STATES.started, Task.STATES.postponed],
+        NoQuittingFoolError
+      );
+  })
   quit(): void {
-    this.on('quit').ensure.is.not.inOneOfStates(
-      [Task.STATES.started, Task.STATES.postponed],
-      NoQuittingFoolError
-    );
-
     this.setState(Task.STATES.quitted);
   }
 
-  hold(): void {
-    this.on('hold')
+  @can((task: Task) => {
+    task
+      .on('hold')
       .ensure.is.not.inState(Task.STATES.created)
       .ensure.is.not.inState('completed');
-
+  })
+  hold(): void {
     this.setState(Task.STATES.hold);
   }
 }

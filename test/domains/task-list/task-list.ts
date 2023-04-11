@@ -36,7 +36,6 @@ import {
 } from './task-events';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { DomainError } from '../../../src/domain/domain-error';
-import { types } from '../../../src/types';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { initial } from '../../../src/annotations/initial';
 import { route } from '../../../src/annotations/route';
@@ -157,7 +156,7 @@ export class TaskList extends Aggregate {
     }
 
     const foundTask = this.in<Task>('tasks').findById(command.id);
-    foundTask.ensure.is.ableTo.expire();
+    foundTask.ensure.expire();
 
     this.record(
       new TaskExpired({
@@ -171,7 +170,7 @@ export class TaskList extends Aggregate {
     this.on(AcceptTask).ensure.is.not.inState(TaskList.STATES.closed);
 
     const foundTask = this.in<Task>('tasks').findById(command.id);
-    foundTask.ensure.is.ableTo.accept();
+    foundTask.ensure.accept();
 
     this.record(
       new TaskAccepted({
@@ -185,7 +184,7 @@ export class TaskList extends Aggregate {
     this.on(ChangeTaskPriority).ensure.is.not.inState(TaskList.STATES.closed);
 
     const foundTask = this.in<Task>('tasks').findById(command.id);
-    foundTask.ensure.is.ableTo.changePriority(command.priority);
+    foundTask.ensure.changePriority(command.priority);
 
     this.record(
       new TaskAccepted({
@@ -236,13 +235,13 @@ export class TaskList extends Aggregate {
    * @param props - Optional properties that will attached to event
    */
   protected recordTask(
-    EventType: types.MessageType<types.Event>,
+    EventType: any,
     actionName: string,
     taskId: Guid,
     props?: Record<string, any>
   ): void {
     const foundTask = this.in<Task>('tasks').findById(taskId);
-    foundTask.ensure.is.ableTo[actionName]();
+    foundTask.ensure[actionName]();
     const eventProps: Record<string, any> = {
       ...this.eventProps(),
       task: foundTask,

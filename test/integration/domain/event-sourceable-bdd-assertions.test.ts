@@ -152,7 +152,7 @@ describe(`EventSourceable BDD assertions`, () => {
       await taskList.handle(declineTask);
       await expect(taskList.handle(acceptTask)).to.eventually.be.rejectedWith(
         InvalidStateTransitionError,
-        `Task: cannot 'accept' when in 'declined' state(expected states: 'created')`
+        `Task: cannot 'accept' when in 'declined' state(expected states: 'completed, declined')`
       );
     });
   });
