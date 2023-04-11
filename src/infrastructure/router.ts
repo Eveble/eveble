@@ -344,8 +344,7 @@ export class Router implements types.Router {
 
     this.log.debug(
       new Log(
-        `handling message '${message.getTypeName()}' for '${
-          this.EventSourceableType.name
+        `handling message '${message.getTypeName()}' for '${this.EventSourceableType.name
         }@${eventSourceableId}'`
       )
         .on(this)
@@ -389,8 +388,7 @@ export class Router implements types.Router {
     );
     this.log.debug(
       new Log(
-        `handled message '${message.getTypeName()}' for '${
-          this.EventSourceableType.name
+        `handled message '${message.getTypeName()}' for '${this.EventSourceableType.name
         }@${eventSourceableId}'`
       )
         .on(this)

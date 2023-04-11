@@ -842,9 +842,7 @@ export namespace types {
   }
 
   export interface ProjectionRebuilder {
-    rebuild(
-      projections: Projection[]
-    ): {
+    rebuild(projections: Projection[]): {
       projectionsNames: string[];
       duration: number;
       message: string;

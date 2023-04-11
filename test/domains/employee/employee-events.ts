@@ -15,16 +15,12 @@ export class EmployeeCreated extends Event<EmployeeCreated> {
 }
 
 @define()
-export class TaskListAssignedToEmployee extends Event<
-  TaskListAssignedToEmployee
-> {
+export class TaskListAssignedToEmployee extends Event<TaskListAssignedToEmployee> {
   taskListId: Guid;
 }
 
 @define()
-export class EmployeeProductivityEstimated extends Event<
-  EmployeeProductivityEstimated
-> {
+export class EmployeeProductivityEstimated extends Event<EmployeeProductivityEstimated> {
   estimatedPoints: number;
 
   points: number;

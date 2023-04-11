@@ -140,7 +140,7 @@ export class List<T extends types.Serializable> extends Array {
     kernel.validator.validate(element, this[SERIALIZABLE_TYPE_KEY]);
 
     if (typeof (element as any).getId === 'function') {
-      const identifiable = (element as any) as types.Identifiable;
+      const identifiable = element as any as types.Identifiable;
       if (this.hasById(identifiable.getId())) {
         throw new IdentifiableAlreadyExistsError({
           sourceName: this[SOURCE_KEY].getTypeName(),
@@ -387,9 +387,7 @@ export class List<T extends types.Serializable> extends Array {
    *```
    */
   public hasSame(element: T): boolean {
-    return this.some((serializable) => {
-      return serializable.equals(element);
-    });
+    return this.some((serializable) => serializable.equals(element));
   }
 
   /**
@@ -630,7 +628,7 @@ export class List<T extends types.Serializable> extends Array {
    */
   protected getSourceIdAsString(): string | undefined {
     if (typeof (this[SOURCE_KEY] as any).getId === 'function') {
-      const identifiable = (this[SOURCE_KEY] as any) as types.Identifiable;
+      const identifiable = this[SOURCE_KEY] as any as types.Identifiable;
       return identifiable.getId().toString();
     }
     return undefined;
