@@ -72,7 +72,7 @@
     "mongodb": "^3.5.9",
     "saslprep": "^1.0.3",
     "dotenv": "^8.2.0",
-    "dotenv-expand": "^5.1.0",
+    "dotenv-expand": "^10.0.0",
     "dotenv-extended": "^2.9.0",
     "@jsbits/deep-clone": "^1.1.1",
     "abbreviate": "^0.0.3",
