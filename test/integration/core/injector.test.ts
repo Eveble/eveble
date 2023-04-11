@@ -332,9 +332,9 @@ describe(`Injector`, () => {
   describe('bindings', () => {
     it('returns service identifiers as a string matching singleton scope', () => {
       @injectable()
-      class FirstSingleton {}
+      class FirstSingleton { }
       @injectable()
-      class SecondSingleton {}
+      class SecondSingleton { }
 
       const injector = new Injector();
       injector
@@ -354,9 +354,9 @@ describe(`Injector`, () => {
 
     it('returns service identifiers as a string matching singleton scope', () => {
       @injectable()
-      class FirstSingleton {}
+      class FirstSingleton { }
       @injectable()
-      class SecondSingleton {}
+      class SecondSingleton { }
 
       const injector = new Injector();
       injector
@@ -376,9 +376,9 @@ describe(`Injector`, () => {
 
     it('returns service identifiers as a symbol matching singleton scope', () => {
       @injectable()
-      class FirstSingleton {}
+      class FirstSingleton { }
       @injectable()
-      class SecondSingleton {}
+      class SecondSingleton { }
 
       const first = Symbol.for('FirstSingleton');
       const second = Symbol.for('SecondSingleton');
@@ -398,13 +398,13 @@ describe(`Injector`, () => {
 
     it('returns service identifiers only matching provided scope', () => {
       @injectable()
-      class TransientScope {}
+      class TransientScope { }
       @injectable()
-      class RequestScope {}
+      class RequestScope { }
       @injectable()
-      class ConstantValue {}
+      class ConstantValue { }
       @injectable()
-      class Singleton {}
+      class Singleton { }
 
       const injector = new Injector();
       injector
@@ -431,11 +431,11 @@ describe(`Injector`, () => {
 
     it('ensure that order of resolved service identifiers is consistent with the order of bindings', () => {
       @injectable()
-      class First {}
+      class First { }
       @injectable()
-      class Second {}
+      class Second { }
       @injectable()
-      class Third {}
+      class Third { }
 
       const injector = new Injector();
       injector.bind<Third>('3').to(Third).inSingletonScope();

@@ -44,11 +44,7 @@ describe('ConsoleTransport', () => {
 
     // Simplify testing for time being
     chalk = {
-      keyword: (_color: string) => {
-        return (str: string) => {
-          return str;
-        };
-      },
+      keyword: (_color: string) => (str: string) => str,
     };
 
     converter = new StringifingConverter();
@@ -230,8 +226,8 @@ describe('ConsoleTransport', () => {
 
         expect(str).to.be.equal(
           '$ 2019-10-07T02:51:35│my-app-id│info: my-message \n' +
-            "MyClass { first: 'first-value' } \n" +
-            "{ second: 'second-value' }"
+          "MyClass { first: 'first-value' } \n" +
+          "{ second: 'second-value' }"
         );
       });
     });
@@ -310,13 +306,13 @@ describe('ConsoleTransport', () => {
         const str = transport.formatEntry(logEntry);
         expect(str).to.be.equal(
           '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
-            'function arguments:\n' +
-            "  first: 'first-value',\n" +
-            "  second: 'second-value',\n" +
-            "  third: 'third-value',\n" +
-            "  fourth: 'fourth-value'\n" +
-            'class properties:\n' +
-            "  first: 'first-value', second: [Object]"
+          'function arguments:\n' +
+          "  first: 'first-value',\n" +
+          "  second: 'second-value',\n" +
+          "  third: 'third-value',\n" +
+          "  fourth: 'fourth-value'\n" +
+          'class properties:\n' +
+          "  first: 'first-value', second: [Object]"
         );
       });
 
@@ -352,7 +348,7 @@ describe('ConsoleTransport', () => {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
-              "result:  'my-result'"
+            "result:  'my-result'"
           );
         });
 
@@ -366,7 +362,7 @@ describe('ConsoleTransport', () => {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
-              "my-title:  MyClass { first: 'first-value', second: { '1': 'one' } }"
+            "my-title:  MyClass { first: 'first-value', second: { '1': 'one' } }"
           );
         });
       });
@@ -377,11 +373,11 @@ describe('ConsoleTransport', () => {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
-              'function arguments:\n' +
-              "  first: 'first-value',\n" +
-              "  second: 'second-value',\n" +
-              "  third: 'third-value',\n" +
-              "  fourth: 'fourth-value'"
+            'function arguments:\n' +
+            "  first: 'first-value',\n" +
+            "  second: 'second-value',\n" +
+            "  third: 'third-value',\n" +
+            "  fourth: 'fourth-value'"
           );
         });
 
@@ -391,8 +387,8 @@ describe('ConsoleTransport', () => {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
-              'function arguments:\n' +
-              "  first: 'first-value', second: 'second-value'"
+            'function arguments:\n' +
+            "  first: 'first-value', second: 'second-value'"
           );
         });
 
@@ -412,8 +408,8 @@ describe('ConsoleTransport', () => {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
-              'class properties:\n' +
-              "  first: 'first-value', second: [Object]"
+            'class properties:\n' +
+            "  first: 'first-value', second: [Object]"
           );
         });
 
@@ -423,16 +419,16 @@ describe('ConsoleTransport', () => {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
-              'class properties:\n' +
-              "  first: 'first-value', second: [Object]"
+            'class properties:\n' +
+            "  first: 'first-value', second: [Object]"
           );
         });
 
         it('does not log class properties if target transport does not contain any', () => {
           logEntry.metadata.delete('arguments');
-          delete myClassInstance.first;
-          delete myClassInstance.second;
-          delete myClassInstance.third;
+          delete (myClassInstance as any).first;
+          delete (myClassInstance as any).second;
+          delete (myClassInstance as any).third;
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message '
@@ -448,13 +444,13 @@ describe('ConsoleTransport', () => {
           const str = transport.formatEntry(logEntry);
           expect(str).to.be.equal(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyC::myM: my-message \n' +
-              'function arguments:\n' +
-              "  first: 'first-value',\n" +
-              "  second: 'second-value',\n" +
-              "  third: 'third-value',\n" +
-              "  fourth: 'fourth-value'\n" +
-              'class properties:\n' +
-              "  first: 'first-value', second: [Object]"
+            'function arguments:\n' +
+            "  first: 'first-value',\n" +
+            "  second: 'second-value',\n" +
+            "  third: 'third-value',\n" +
+            "  fourth: 'fourth-value'\n" +
+            'class properties:\n' +
+            "  first: 'first-value', second: [Object]"
           );
         });
       });

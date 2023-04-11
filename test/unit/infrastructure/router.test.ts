@@ -72,7 +72,7 @@ describe(`Router`, () => {
   });
 
   @define('InvalidMessage', { isRegistrable: false })
-  class InvalidMessage extends Message { }
+  class InvalidMessage extends Message {}
 
   @define('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
@@ -100,7 +100,7 @@ describe(`Router`, () => {
 
   describe(`construction`, () => {
     @define('MyEventSourceable', { isRegistrable: false })
-    class MyEventSourceable extends EventSourceable { }
+    class MyEventSourceable extends EventSourceable {}
 
     it(`throws MissingEventSourceableError if event sourceable is not set`, () => {
       const router = new Router(undefined as any, undefined as any);
@@ -170,7 +170,7 @@ describe(`Router`, () => {
   });
 
   describe(`initializing message handler`, () => {
-    class MyEventSourceable extends EventSourceable { }
+    class MyEventSourceable extends EventSourceable {}
 
     it(`throws UnresolvableIdentifierFromMessageError if provided message to initializing handler is invalid `, async () => {
       @define('MyMessage', { isRegistrable: false })
@@ -286,7 +286,7 @@ describe(`Router`, () => {
   });
 
   describe(`routes messages`, () => {
-    class MyEventSourceable extends EventSourceable { }
+    class MyEventSourceable extends EventSourceable {}
 
     it(`registers routed commands with command bus`, async () => {
       class MyRouter extends Router {
@@ -533,8 +533,8 @@ describe(`Router`, () => {
         const expectedProps = {
           id: props.id,
           name: 'foo',
-          state: undefined,
           version: 0,
+          metadata: {},
         };
         const expectedPropTypes = {
           id: PropTypes.oneOf([
@@ -555,8 +555,9 @@ describe(`Router`, () => {
           schemaVersion: PropTypes.instanceOf(Number).isOptional,
           metadata: PropTypes.object.isOptional,
           name: PropTypes.instanceOf(String),
-          [COMMANDS_KEY]: PropTypes.arrayOf(PropTypes.instanceOf(Command)),
-          [EVENTS_KEY]: PropTypes.arrayOf(PropTypes.instanceOf(Event)),
+          // Kind of wonky solution
+          [COMMANDS_KEY]: MyEventSourceable.getPropTypes()[COMMANDS_KEY],
+          [EVENTS_KEY]: MyEventSourceable.getPropTypes()[EVENTS_KEY],
         };
         expect(MyEventSourceable.prototype.validateProps).to.be.calledWithMatch(
           expectedProps,
@@ -599,7 +600,7 @@ describe(`Router`, () => {
       });
 
       describe(`handles errors`, () => {
-        class MyDomainError extends DomainError { }
+        class MyDomainError extends DomainError {}
 
         it(`logs thrown error`, async () => {
           const error = new MyDomainError('my-error');
@@ -655,7 +656,7 @@ describe(`Router`, () => {
         });
 
         it(`re-throws error if its not an instance of MyDomainError`, async () => {
-          class MySerializableError extends SerializableError { }
+          class MySerializableError extends SerializableError {}
           const error = new MySerializableError('my-not-domain-error');
           handler.throws(error);
 
@@ -750,8 +751,9 @@ describe(`Router`, () => {
             schemaVersion: PropTypes.instanceOf(Number).isOptional,
             metadata: PropTypes.object.isOptional,
             name: PropTypes.instanceOf(String),
-            [COMMANDS_KEY]: PropTypes.arrayOf(PropTypes.instanceOf(Command)),
-            [EVENTS_KEY]: PropTypes.arrayOf(PropTypes.instanceOf(Event)),
+            // Kind of wonky solution
+            [COMMANDS_KEY]: MyEventSourceable.getPropTypes()[COMMANDS_KEY],
+            [EVENTS_KEY]: MyEventSourceable.getPropTypes()[EVENTS_KEY],
           };
           expect(
             MyEventSourceable.prototype.validateProps
@@ -865,7 +867,7 @@ describe(`Router`, () => {
       });
 
       describe(`handles errors`, () => {
-        class MyDomainError extends DomainError { }
+        class MyDomainError extends DomainError {}
 
         it(`logs thrown error`, async () => {
           const error = new MyDomainError('my-error');
@@ -920,7 +922,7 @@ describe(`Router`, () => {
         });
 
         it(`re-throws error if its not an instance of DomainError or CommitConcurrencyError`, async () => {
-          class MySerializableError extends SerializableError { }
+          class MySerializableError extends SerializableError {}
           const error = new MySerializableError('my-not-domain-error');
           handler.throws(error);
 

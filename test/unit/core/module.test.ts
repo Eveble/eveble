@@ -32,35 +32,35 @@ chai.use(chaiAsPromised);
 describe('Module', () => {
   class MyModule extends Module {
     // All available custom hooks that developer can define on App/Modules
-    beforeInitialize(): any { }
+    beforeInitialize(): any {}
 
-    onInitialize(): any { }
+    onInitialize(): any {}
 
-    afterInitialize(): any { }
+    afterInitialize(): any {}
 
-    beforeStart(): any { }
+    beforeStart(): any {}
 
-    onStart(): any { }
+    onStart(): any {}
 
-    afterStart(): any { }
+    afterStart(): any {}
 
-    beforeStop(): any { }
+    beforeStop(): any {}
 
-    onStop(): any { }
+    onStop(): any {}
 
-    afterStop(): any { }
+    afterStop(): any {}
 
-    beforeReset(): any { }
+    beforeReset(): any {}
 
-    onReset(): any { }
+    onReset(): any {}
 
-    afterReset(): any { }
+    afterReset(): any {}
 
-    beforeShutdown(): any { }
+    beforeShutdown(): any {}
 
-    onShutdown(): any { }
+    onShutdown(): any {}
 
-    afterShutdown(): any { }
+    afterShutdown(): any {}
   }
 
   const lifeCycleHooks = [
@@ -162,7 +162,7 @@ describe('Module', () => {
     });
 
     it(`throws InvalidModuleError error if provided submodule does not implement Module interface`, () => {
-      class InvalidModule { }
+      class InvalidModule {}
       expect(() => {
         new MyModule({
           modules: [new InvalidModule()],
@@ -246,17 +246,17 @@ describe('Module', () => {
         class MyApp {
           config: any;
 
-          initialize(): void { }
+          initialize(): void {}
 
-          start(): void { }
+          start(): void {}
 
-          stop(): void { }
+          stop(): void {}
 
-          reset(): void { }
+          reset(): void {}
 
-          shutdown(): void { }
+          shutdown(): void {}
 
-          invokeAction(): void { }
+          invokeAction(): void {}
         }
 
         const module = new MyModule({});

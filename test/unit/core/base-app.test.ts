@@ -94,7 +94,7 @@ describe('BaseApp', () => {
 
     // afterShutdown is set on BaseApp
   }
-  class MyModule extends Module { }
+  class MyModule extends Module {}
 
   const lifeCycleHooks = [
     'beforeInitialize',
@@ -189,7 +189,7 @@ describe('BaseApp', () => {
       });
 
       it(`throws InvalidModuleError error if provided module in list does not inherit from Module`, () => {
-        class InvalidModule { }
+        class InvalidModule {}
         expect(() => {
           new MyApp({
             modules: [new InvalidModule()],
@@ -230,7 +230,7 @@ describe('BaseApp', () => {
       });
 
       it(`throws InvalidAppConfigError error if provided configuration does not inherit from AppConfig`, () => {
-        class InvalidAppConfig { }
+        class InvalidAppConfig {}
         expect(() => {
           new MyApp({
             config: InvalidAppConfig,
@@ -551,7 +551,7 @@ describe('BaseApp', () => {
         ioc.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
 
         @injectable()
-        class MyClass { }
+        class MyClass {}
         const app = new MyApp({
           modules: [],
           injector: ioc,

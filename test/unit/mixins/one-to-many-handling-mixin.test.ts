@@ -39,19 +39,19 @@ describe('OneToManyHandlingMixin', () => {
 
   describe('construction', () => {
     it('ensures that controller can be initialized without handlers', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       expect(() => new MyController()).to.not.throw(Error);
     });
 
     it('initializes with empty handlers as instance of map', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
       expect(controller.getHandlers()).to.be.instanceof(Map);
       expect(controller.getHandlers()).to.be.empty;
     });
 
     it('initializes with empty handleable types as instance of array', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
       expect(controller.getHandleableTypes()).to.be.instanceof(Array);
       expect(controller.getHandleableTypes()).to.be.eql([Message]);
@@ -90,7 +90,7 @@ describe('OneToManyHandlingMixin', () => {
     });
 
     it('annotates initializes as post construction method for Inversify', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
       expect(hasPostConstruct(controller)).to.be.true;
     });
@@ -98,10 +98,10 @@ describe('OneToManyHandlingMixin', () => {
 
   describe('handler registration', () => {
     it('throws UnhandleableTypeError if provided message type is not handleabe', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
-      class InvalidType { }
+      class InvalidType {}
       expect(() =>
         controller.registerHandler(InvalidType as any, sinon.stub())
       ).to.throw(
@@ -111,7 +111,7 @@ describe('OneToManyHandlingMixin', () => {
     });
 
     it('throws InvalidHandlerError if provided handler is not a function', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
       expect(() =>
@@ -123,7 +123,7 @@ describe('OneToManyHandlingMixin', () => {
     });
 
     it('registers one to many relational handler for a message type', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
       const handler = sinon.stub();
@@ -132,7 +132,7 @@ describe('OneToManyHandlingMixin', () => {
     });
 
     it('registers one to many relational handler for a namespaced message type', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
       const handler = sinon.stub();
@@ -141,7 +141,7 @@ describe('OneToManyHandlingMixin', () => {
     });
 
     it('allows for registering multiple one to many relational handlers for same message type', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
       const firstHandler = sinon.stub();
@@ -160,7 +160,7 @@ describe('OneToManyHandlingMixin', () => {
 
   describe('handler overriding', () => {
     it('allows to override already registered one to many relational handler(s) for a message type', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
       const handler = sinon.stub();
@@ -175,7 +175,7 @@ describe('OneToManyHandlingMixin', () => {
 
   describe('evaluating handler(s)', () => {
     it('returns true if message type has registered handler(s)', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
       controller.registerHandler(NamespacedEvent, sinon.stub());
@@ -183,7 +183,7 @@ describe('OneToManyHandlingMixin', () => {
     });
 
     it('returns false if message type has no registered handler(s)', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
       expect(controller.hasHandler(NamespacedEvent)).to.be.false;
     });
@@ -192,10 +192,10 @@ describe('OneToManyHandlingMixin', () => {
   describe('resolving handler(s)', () => {
     describe('getHandler', () => {
       it('throws InvalidMessageableType if provided value is not implementing Messageable interface', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
-        class InvalidType { }
+        class InvalidType {}
         expect(() => controller.getHandler(InvalidType as any)).to.throw(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
@@ -203,7 +203,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns registered single handler for message type as an array with function', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -212,7 +212,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns registered single handler for namespaced message type as an array with function', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -221,7 +221,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns multiple handlers for message type as an array with functions', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const firstHandler = sinon.stub();
@@ -235,7 +235,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns undefined for message type that does not have registered handler', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         expect(controller.getHandler(MyEvent)).to.be.equal(undefined);
@@ -244,10 +244,10 @@ describe('OneToManyHandlingMixin', () => {
 
     describe('getHandlerOrThrow', () => {
       it('throws InvalidMessageableType if provided value is not implementing Messageable interface', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
-        class InvalidType { }
+        class InvalidType {}
         expect(() => controller.getHandlerOrThrow(InvalidType as any)).to.throw(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
@@ -255,7 +255,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('throws HandlerNotFoundError if there is no handler registered for provided message type', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         expect(() => controller.getHandlerOrThrow(MyEvent)).to.throw(
@@ -265,7 +265,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns single handler for message type as an array with function', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -274,7 +274,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns multiple handlers for message type as an array with functions', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const firstHandler = sinon.stub();
@@ -288,7 +288,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns single handler for namespaced message type as an array with function', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -301,7 +301,7 @@ describe('OneToManyHandlingMixin', () => {
 
     describe('getTypeByHandler', () => {
       it('resolves message type by handler reference', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -331,7 +331,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('returns undefined for unregistered handler reference', () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -342,7 +342,7 @@ describe('OneToManyHandlingMixin', () => {
 
   describe('manipulation', () => {
     it('removes handler for message type', () => {
-      class MyController extends OneToManyHandlingMixin { }
+      class MyController extends OneToManyHandlingMixin {}
       const controller = new MyController();
 
       controller.registerHandler(MyEvent, sinon.stub());
@@ -355,7 +355,7 @@ describe('OneToManyHandlingMixin', () => {
   describe('handling', () => {
     describe('sequential', () => {
       it(`does not throws HandlerNotFoundError if handler for message type can't be found`, async () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const event = new MyEvent({ sourceId: 'my-id', key: 'my-string' });
@@ -365,7 +365,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('handles message type instance with single handler with implicit sequentially execution(default)', async () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -378,7 +378,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('handles message type instance with single handler with explicit sequential execution', async () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const handler = sinon.stub();
@@ -391,7 +391,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('handles message type instance with multiple handlers sequentially', async () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const firstSpy = sinon.spy();
@@ -426,7 +426,7 @@ describe('OneToManyHandlingMixin', () => {
 
     describe('concurrent', () => {
       it(`does not throws HandlerNotFoundError if handler for message type can't be found`, async () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const event = new MyEvent({ sourceId: 'my-id', key: 'my-string' });
@@ -436,7 +436,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it('handles message type instance concurrently', async () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const firstSpy = sinon.spy();
@@ -466,7 +466,7 @@ describe('OneToManyHandlingMixin', () => {
       });
 
       it(`handles message type with concurrent handler execution in settled mode(multiple requests can be completed, regardless of their success or failure)`, async () => {
-        class MyController extends OneToManyHandlingMixin { }
+        class MyController extends OneToManyHandlingMixin {}
         const controller = new MyController();
 
         const error = new Error('my-error');

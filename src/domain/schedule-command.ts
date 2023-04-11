@@ -29,7 +29,7 @@ export class ScheduleCommand extends Command<ScheduleCommand> {
    * Returns scheduling assignment if present.
    * @returns Instance of `Assignment`, else `undefined`.
    */
-  public getAssignment(): Assignment {
+  public getAssignment(): Assignment | any {
     return get(this, 'metadata.scheduling');
   }
 }

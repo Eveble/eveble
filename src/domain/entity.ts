@@ -24,7 +24,8 @@ import { List } from './list';
 @define('Entity')
 export class Entity
   extends classes(Serializable, StatefulMixin, StatusfulMixin)
-  implements types.Entity {
+  implements types.Entity
+{
   protected static asserter: types.Asserter;
 
   public id: string | Guid;

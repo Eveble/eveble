@@ -323,7 +323,7 @@ describe('Entity', () => {
 
         it('sets the action as a Command on asserter', () => {
           @define('MyCommand', { isRegistrable: false })
-          class MyCommand extends Command<MyCommand> { }
+          class MyCommand extends Command<MyCommand> {}
 
           const entity = new Account({ id: 'my-id', name: 'my-name' });
           entity.on(MyCommand);
