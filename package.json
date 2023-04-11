@@ -144,6 +144,7 @@
     "test:integration:watch": "./node_modules/.bin/cross-env NODE_ENV=test TS_NODE_PROJECT=./test/tsconfig.json TS_NODE_COMPILER=\"ttypescript\" ./node_modules/.bin/mocha --watch --config ./.mocharc.json ./test/integration",
     "test:integration": "./node_modules/.bin/cross-env NODE_ENV=test TS_NODE_PROJECT=./test/tsconfig.json TS_NODE_COMPILER=\"ttypescript\" ./node_modules/.bin/mocha --config ./.mocharc.json ./test/integration --exit",
     "test:unit:watch": "./node_modules/.bin/cross-env NODE_ENV=test TS_NODE_PROJECT=./test/tsconfig.json TS_NODE_COMPILER=\"ttypescript\" ./node_modules/.bin/mocha --watch --config ./.mocharc.json ./test/unit",
+    "test:infra": "./node_modules/.bin/cross-env NODE_ENV=test TS_NODE_PROJECT=./test/tsconfig.json TS_NODE_COMPILER=\"ttypescript\" ./node_modules/.bin/mocha --watch --config ./.mocharc.json ./test/unit/infrastructure",
     "test:unit": "./node_modules/.bin/cross-env NODE_ENV=test TS_NODE_PROJECT=./test/tsconfig.json TS_NODE_COMPILER=\"ttypescript\" ./node_modules/.bin/mocha --config ./.mocharc.json ./test/unit --exit",
     "test:watch": "npm test -- --watch",
     "test": "./node_modules/.bin/cross-env NODE_ENV=test TS_NODE_PROJECT=./test/tsconfig.json TS_NODE_COMPILER=\"ttypescript\" ./node_modules/.bin/mocha --config ./.mocharc.json --exit",

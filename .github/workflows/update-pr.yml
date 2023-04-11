@@ -18,7 +18,7 @@ jobs:
     if: ${{ contains(github.event.pull_request.title, 'fix') }}
     needs: [assign_labels]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Read 'fix' body template
         id: pull_request_body
         uses: juliangruber/read-file-action@v1
@@ -36,7 +36,7 @@ jobs:
       github.actor != 'github-actions[bot]' && (! contains(github.event.pull_request.title, 'fix')) && (! contains(github.event.pull_request.labels.*.name, 'bug') && ! contains(github.event.pull_request.labels.*.name, 'fix'))
     needs: [assign_labels]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Read 'default' body template
         id: pull_request_body
         uses: juliangruber/read-file-action@v1
