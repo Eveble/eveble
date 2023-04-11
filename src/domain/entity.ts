@@ -18,7 +18,8 @@ import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
 import { List } from './list';
 
 @define('Entity')
-export class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin)
+export class Entity
+  extends classes(Serializable, StatefulMixin, StatusfulMixin)
   implements types.Entity {
   protected static asserter: types.Asserter;
 
