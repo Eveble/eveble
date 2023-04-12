@@ -88,12 +88,15 @@ export class CommitMongoDBStorage implements types.CommitStorage {
     eventSourceableId: string | Guid
   ): Promise<number | undefined> {
     const query = { sourceId: eventSourceableId.toString() };
-    const sort = {
+    const sort: any = {
       sort: [['version', 'desc']],
       projection: { version: 1 },
     };
 
-    const foundSerializedCommit = await this.collection.findOne(query, sort);
+    const foundSerializedCommit: any = await this.collection.findOne(
+      query,
+      sort
+    );
 
     if (foundSerializedCommit != null) {
       return foundSerializedCommit.version;
@@ -146,7 +149,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
       sourceId: eventSourceableId.toString(),
       version: { $gte: versionOffset },
     };
-    const options = { sort: [['version', 'asc']] };
+    const options: any = { sort: [['version', 'asc']] };
 
     return this.findAndReturnDeserializedCommits(query, options);
   }
@@ -330,7 +333,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    */
   protected async findAndReturnDeserializedCommits(
     query: FilterQuery<any> = {},
-    options: FindOneOptions = {}
+    options: FindOneOptions<any> = {}
   ): Promise<types.Commit[]> {
     const foundSerializedCommits = await this.findCommits(query, options);
 
@@ -350,7 +353,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    */
   protected async findCommits(
     query: FilterQuery<any> = {},
-    options: FindOneOptions = {}
+    options: FindOneOptions<any> = {}
   ): Promise<Record<string, any>[]> {
     const cursor = await this.collection.find(query, options);
     const foundSerializedCommits = await cursor.toArray();
@@ -387,7 +390,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
   async findOneAndUpdate(
     filter: FilterQuery<any> = {},
     update: UpdateQuery<any> = {},
-    options: FindOneAndUpdateOption = {
+    options: FindOneAndUpdateOption<any> = {
       returnOriginal: false,
     }
   ): Promise<types.Commit | undefined> {
