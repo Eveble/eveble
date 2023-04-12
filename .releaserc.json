@@ -1,5 +1,9 @@
 {
-  "branches": ["master", "next"],
+  "repositoryUrl": "https://github.com/Eveble/eveble",
+  "branches": [
+    "master",
+    "next"
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
@@ -47,6 +51,10 @@
       "path": "@semantic-release/github"
     }
   ],
-  "success": ["@semantic-release/github"],
-  "fail": ["@semantic-release/github"]
+  "success": [
+    "@semantic-release/github"
+  ],
+  "fail": [
+    "@semantic-release/github"
+  ]
 }
