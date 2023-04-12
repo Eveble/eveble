@@ -1,16 +1,15 @@
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import filesize from 'rollup-plugin-filesize';
-import tsPlugin from 'rollup-plugin-typescript2';
-import json from 'rollup-plugin-json';
-import ttypescript from 'ttypescript';
-
-import sourceMaps from 'rollup-plugin-sourcemaps';
+const resolve = require('rollup-plugin-node-resolve');
+const commonjs = require('rollup-plugin-commonjs');
+const filesize = require('rollup-plugin-filesize');
+const tsPlugin = require('rollup-plugin-typescript2');
+const json = require('rollup-plugin-json');
+const ttypescript = require('ttypescript');
+const sourceMaps = require('rollup-plugin-sourcemaps');
 
 const env = process.env.NODE_ENV;
 const pkg = require('./package.json');
 
-export default {
+module.exports = {
   input: 'src/index.ts',
   output: {
     file: {
