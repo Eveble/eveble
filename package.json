@@ -76,7 +76,8 @@
     "dotenv-extended": "^2.9.0",
     "@jsbits/deep-clone": "^1.1.1",
     "abbreviate": "^0.0.3",
-    "deep-diff": "^1.0.2"
+    "deep-diff": "^1.0.2",
+    "node-fetch": "^3.3.1"
   },
   "devDependencies": {
     "@types/chai-as-promised": "^7.1.5",
