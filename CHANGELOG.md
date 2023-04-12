@@ -1,3 +1,10 @@
+## [2.4.3](https://github.com/Eveble/eveble/compare/v2.4.2...v2.4.3) (2023-04-12)
+
+
+### Bug Fixes
+
+* **github:** fix env typo ([912efd0](https://github.com/Eveble/eveble/commit/912efd0103ddc7ccaab2c6eaa5ed676f9b83a0fb))
+
 ## [2.4.2](https://github.com/Eveble/eveble/compare/v2.4.1...v2.4.2) (2023-04-12)
 
 
