@@ -379,9 +379,7 @@ let DefinableMixin = class DefinableMixin {
         return Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) || {};
     }
     getParentInitializers() {
-        const matcher = (evaluatedProto) => {
-            return typeof evaluatedProto.getInstanceInitializers === 'function';
-        };
+        const matcher = (evaluatedProto) => typeof evaluatedProto.getInstanceInitializers === 'function';
         const parentProto = getMatchingParentProto(this.constructor.prototype, matcher);
         if (parentProto === undefined)
             return {};
@@ -501,10 +499,8 @@ let HookableMixin = HookableMixin_1 = class HookableMixin {
         return hook;
     }
     getHooks(action) {
-        const matcher = (proto) => {
-            return (typeof proto.getHooks === 'function' &&
-                proto.constructor !== HookableMixin_1);
-        };
+        const matcher = (proto) => typeof proto.getHooks === 'function' &&
+            proto.constructor !== HookableMixin_1;
         const parentProto = getMatchingParentProto(this, matcher);
         const parentHooks = parentProto !== undefined && typeof parentProto.getHooks === 'function'
             ? parentProto.getHooks(action)
@@ -519,10 +515,8 @@ let HookableMixin = HookableMixin_1 = class HookableMixin {
         return hooks;
     }
     getActions() {
-        const matcher = (proto) => {
-            return (typeof proto.getActions === 'function' &&
-                proto.constructor !== HookableMixin_1);
-        };
+        const matcher = (proto) => typeof proto.getActions === 'function' &&
+            proto.constructor !== HookableMixin_1;
         const parentProto = getMatchingParentProto(this, matcher);
         const parentActions = parentProto !== undefined && typeof parentProto.getActions === 'function'
             ? parentProto.getActions()
@@ -807,6 +801,10 @@ const LIST_KEY = Symbol('eveble:list-key');
 const SERIALIZABLE_TYPE_KEY = Symbol('eveble:serializable-type');
 const SAVE_STATE_METHOD_KEY = Symbol('eveble:save-state');
 const SAVED_STATE_KEY = Symbol('eveble:saved-state');
+const ENABLE_ACTION_VALIDATION_METHOD_KEY = Symbol('eveble:enable-action-validation');
+const DISABLE_ACTION_VALIDATION_METHOD_KEY = Symbol('eveble:disable-action-validation');
+const IS_ACTION_VALIDATED_METHOD_KEY = Symbol('eveble:is-action-validated');
+const ACTION_VALIDATION_KEY = Symbol('eveble:action-validation');
 const ROLLBACK_STATE_METHOD_KEY = Symbol('eveble:rollback-state');
 const COMMANDS_KEY = Symbol('eveble:commands');
 const EVENTS_KEY = Symbol('eveble:events');
@@ -952,9 +950,7 @@ class List extends Array {
         return this.getBy(key, value) !== undefined;
     }
     hasSame(element) {
-        return this.some((serializable) => {
-            return serializable.equals(element);
-        });
+        return this.some((serializable) => serializable.equals(element));
     }
     hasById(id) {
         return this.getById(id) !== undefined;
@@ -1984,7 +1980,7 @@ AppConfig = AppConfig_1 = __decorate([
     __metadata("design:paramtypes", [Object])
 ], AppConfig);
 
-var STATES;
+var STATES$1;
 (function (STATES) {
     STATES["constructed"] = "constructed";
     STATES["configuring"] = "configuring";
@@ -1993,7 +1989,7 @@ var STATES;
     STATES["running"] = "running";
     STATES["stopped"] = "stopped";
     STATES["shutdown"] = "shutdown";
-})(STATES || (STATES = {}));
+})(STATES$1 || (STATES$1 = {}));
 class Module extends classes(StatefulMixin) {
     constructor(props = {}) {
         super();
@@ -2232,7 +2228,7 @@ class Module extends classes(StatefulMixin) {
         return getenv.string('NODE_ENV') === env;
     }
 }
-Module.STATES = STATES;
+Module.STATES = STATES$1;
 
 const RFC5424 = {
     emerg: 0,
@@ -2296,12 +2292,12 @@ RFC5424LoggingMixin = __decorate([
 ], RFC5424LoggingMixin);
 
 var Logger_1;
-var STATES$1;
+var STATES;
 (function (STATES) {
     STATES["constructed"] = "constructed";
     STATES["stopped"] = "stopped";
     STATES["running"] = "running";
-})(STATES$1 || (STATES$1 = {}));
+})(STATES || (STATES = {}));
 let Logger = Logger_1 = class Logger extends classes(StatefulMixin, RFC5424LoggingMixin) {
     constructor(levels = LOGGING_LEVELS) {
         super();
@@ -2378,7 +2374,7 @@ let Logger = Logger_1 = class Logger extends classes(StatefulMixin, RFC5424Loggi
         }
     }
 };
-Logger.STATES = STATES$1;
+Logger.STATES = STATES;
 Logger = Logger_1 = __decorate([
     injectable(),
     __metadata("design:paramtypes", [Object])
@@ -2472,9 +2468,7 @@ class ConsoleTransport extends LogTransport {
                 all: this.config.get('flags.isWholeLineColored'),
             }));
         }
-        formatArgs.push(format.printf((log) => {
-            return this.formatEntry(log);
-        }));
+        formatArgs.push(format.printf((log) => this.formatEntry(log)));
         return format.combine(...formatArgs);
     }
     formatEntry(entry) {
@@ -2566,9 +2560,7 @@ let StringifingConverter = class StringifingConverter {
         const argNames = ReflectParams(entry.method);
         const requiredArgNames = metadata.keys instanceof Array ? metadata.keys : argNames;
         const obj = {};
-        const argsIndexes = requiredArgNames.map((argName) => {
-            return argNames.indexOf(argName);
-        });
+        const argsIndexes = requiredArgNames.map((argName) => argNames.indexOf(argName));
         for (const index of argsIndexes) {
             if (index === -1 || index >= metadata.value.length)
                 continue;
@@ -2603,9 +2595,11 @@ let StringifingConverter = class StringifingConverter {
         var _a, _b;
         const inspectOptions = {
             depth: entry instanceof Log
-                ? (_a = entry.options) === null || _a === void 0 ? void 0 : _a.isColored : options.get('isColored'),
+                ? (_a = entry.options) === null || _a === void 0 ? void 0 : _a.isColored
+                : options.get('isColored'),
             colors: entry instanceof Log
-                ? (_b = entry.options) === null || _b === void 0 ? void 0 : _b.inspectDepth : options.get('inspectDepth'),
+                ? (_b = entry.options) === null || _b === void 0 ? void 0 : _b.inspectDepth
+                : options.get('inspectDepth'),
         };
         return inspectOptions;
     }
@@ -3042,9 +3036,7 @@ let EJSONSerializerAdapter = class EJSONSerializerAdapter {
                 continue;
             const value = serializable[key];
             if (Array.isArray(value)) {
-                data[key] = value.map((item) => {
-                    return isSerializable(item) ? this.toData(item) : item;
-                });
+                data[key] = value.map((item) => isSerializable(item) ? this.toData(item) : item);
             }
             else if (isSerializable(value)) {
                 data[key] = this.toData(value);
@@ -3391,9 +3383,7 @@ let OneToManyHandlingMixin = class OneToManyHandlingMixin extends HandlingMixin 
     }
     getTypeByHandler(handlerReference) {
         for (const [messageType, handlers] of this[HANDLERS].entries()) {
-            const unboundHandlers = handlers.map((handler) => {
-                return handler.original || handler;
-            });
+            const unboundHandlers = handlers.map((handler) => handler.original || handler);
             if (unboundHandlers.includes(handlerReference) ||
                 handlers.includes(handlerReference)) {
                 return messageType;
@@ -3421,9 +3411,7 @@ let OneToManyHandlingMixin = class OneToManyHandlingMixin extends HandlingMixin 
     }
     async handleConcurrent(message) {
         const handlers = this.getHandler(message.constructor) || [];
-        const promises = handlers.map((handler) => {
-            return handler(message);
-        });
+        const promises = handlers.map((handler) => handler(message));
         return Promise.all(promises);
     }
 };
@@ -3885,9 +3873,7 @@ let Commit = class Commit extends Serializable {
         this.receivers.push(receiver);
     }
     getReceiver(appId) {
-        return this.receivers.find((receiver) => {
-            return receiver.appId.toString() === appId.toString();
-        });
+        return this.receivers.find((receiver) => receiver.appId.toString() === appId.toString());
     }
 };
 Commit = __decorate([
@@ -4510,8 +4496,7 @@ class Router {
     setupInitializingMessageHandler(handler) {
         const boundHandler = handler.bind(this);
         boundHandler.original = handler;
-        const MessageType = this
-            .InitializingMessageType;
+        const MessageType = this.InitializingMessageType;
         if (this.InitializingMessageType.prototype instanceof Event) {
             this.eventBus.subscribeTo(MessageType, boundHandler);
         }
@@ -4936,9 +4921,9 @@ class AbilityAssertion extends Assertion {
                         if (typeof entity[propKey] === 'function') {
                             const proxifiedMethod = new Proxy(entity[propKey], {
                                 apply(_targetMethod, _thisArg, args) {
-                                    entity[SAVE_STATE_METHOD_KEY]();
+                                    entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     const result = entity[propKey](...args);
-                                    entity[ROLLBACK_STATE_METHOD_KEY]();
+                                    entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     target.asserter.clearAction();
                                     return result;
                                 },
@@ -4957,7 +4942,7 @@ class AbilityAssertion extends Assertion {
                         if (typeof entity[propKey] === 'function') {
                             const proxifiedMethod = new Proxy(entity[propKey], {
                                 apply(_targetMethod, _thisArg, args) {
-                                    entity[SAVE_STATE_METHOD_KEY]();
+                                    entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     let isAble = true;
                                     try {
                                         entity[propKey](...args);
@@ -4965,7 +4950,7 @@ class AbilityAssertion extends Assertion {
                                     catch (e) {
                                         isAble = false;
                                     }
-                                    entity[ROLLBACK_STATE_METHOD_KEY]();
+                                    entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     return isAble;
                                 },
                             });
@@ -5011,7 +4996,8 @@ class Eveble extends Module {
     }
     async beforeStart() {
         if (this.isCommandScheduling()) {
-            this.commandScheduler = await this.injector.getAsync(BINDINGS.CommandScheduler);
+            this.commandScheduler =
+                await this.injector.getAsync(BINDINGS.CommandScheduler);
         }
     }
     async onStart() {
@@ -5282,7 +5268,8 @@ class MongoDBClient extends Client {
     isConnected() {
         var _a;
         return (this._library !== undefined &&
-            this.isInState(Client.STATES.connected) && ((_a = this._library) === null || _a === void 0 ? void 0 : _a.isConnected()));
+            this.isInState(Client.STATES.connected) &&
+            ((_a = this._library) === null || _a === void 0 ? void 0 : _a.isConnected()));
     }
     getDatabase(name) {
         var _a;
@@ -5442,7 +5429,8 @@ class AgendaClient extends Client {
         if (((_a = this.options) === null || _a === void 0 ? void 0 : _a.processEvery) === undefined)
             return undefined;
         return typeof ((_b = this.options) === null || _b === void 0 ? void 0 : _b.processEvery) === 'number'
-            ? (_c = this.options) === null || _c === void 0 ? void 0 : _c.processEvery : parseFloat((_d = this.options) === null || _d === void 0 ? void 0 : _d.processEvery);
+            ? (_c = this.options) === null || _c === void 0 ? void 0 : _c.processEvery
+            : parseFloat((_d = this.options) === null || _d === void 0 ? void 0 : _d.processEvery);
     }
     async initializeEventHandlers() {
         var _a, _b, _c, _d, _e;
@@ -5545,7 +5533,7 @@ let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandSched
         }
     }
     async unschedule(unscheduleCommand) {
-        const { assignmentId, commandType, assignerId, assignerType, } = unscheduleCommand;
+        const { assignmentId, commandType, assignerId, assignerType } = unscheduleCommand;
         const mongoQuery = {
             'data.commandType': commandType,
             'data.assignerId': assignerId.toString(),
@@ -6782,18 +6770,9 @@ let Entity = class Entity extends classes(Serializable, StatefulMixin, Statusful
                 if (typeof target[propKey] === 'function') {
                     const proxifiedMethod = new Proxy(target[propKey], {
                         apply(_targetMethod, _thisArg, args) {
-                            target[SAVE_STATE_METHOD_KEY]();
-                            let result;
-                            let error;
-                            try {
-                                result = target[propKey](...args);
-                            }
-                            catch (e) {
-                                error = e;
-                            }
-                            target[ROLLBACK_STATE_METHOD_KEY]();
-                            if (error !== undefined)
-                                throw error;
+                            target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
+                            const result = target[propKey](...args);
+                            target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                             return result;
                         },
                     });
@@ -6817,7 +6796,7 @@ let Entity = class Entity extends classes(Serializable, StatefulMixin, Statusful
             get(target, propKey) {
                 const proxifiedMethod = new Proxy(target[propKey], {
                     apply(_targetMethod, _thisArg, args) {
-                        target[SAVE_STATE_METHOD_KEY]();
+                        target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                         let isAble = true;
                         try {
                             target[propKey](...args);
@@ -6825,7 +6804,7 @@ let Entity = class Entity extends classes(Serializable, StatefulMixin, Statusful
                         catch (e) {
                             isAble = false;
                         }
-                        target[ROLLBACK_STATE_METHOD_KEY]();
+                        target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                         return isAble;
                     },
                 });
@@ -6841,6 +6820,23 @@ let Entity = class Entity extends classes(Serializable, StatefulMixin, Statusful
                 this[SAVED_STATE_KEY][key] = deepClone(this[key]);
             }
         }
+    }
+    [ENABLE_ACTION_VALIDATION_METHOD_KEY]() {
+        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+            value: true,
+            enumerable: false,
+            writable: true,
+        });
+    }
+    [DISABLE_ACTION_VALIDATION_METHOD_KEY]() {
+        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+            value: false,
+            enumerable: false,
+            writable: true,
+        });
+    }
+    [IS_ACTION_VALIDATED_METHOD_KEY]() {
+        return this[ACTION_VALIDATION_KEY] || false;
     }
     [ROLLBACK_STATE_METHOD_KEY]() {
         if (!this.isStateSaved()) {
@@ -6858,7 +6854,7 @@ let Entity = class Entity extends classes(Serializable, StatefulMixin, Statusful
     }
 };
 Entity = __decorate([
-    define('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, [SAVED_STATE_KEY]: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } }, extends: { kind: 999 } }),
+    define('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], Entity);
 Entity.enableSerializableLists();

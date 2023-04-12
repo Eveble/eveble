@@ -1,32 +1,46 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
 require('reflect-metadata');
 var core = require('@eveble/core');
 var typend = require('typend');
 var helpers = require('@eveble/helpers');
 var lodash = require('lodash');
-var merge = _interopDefault(require('deepmerge'));
+var merge = require('deepmerge');
 var polytype = require('polytype');
 var inversifyAsync = require('@parisholley/inversify-async');
-var deepClone = _interopDefault(require('@jsbits/deep-clone'));
-var decache = _interopDefault(require('decache'));
-var dotenv = _interopDefault(require('dotenv-extended'));
-var getenv = _interopDefault(require('getenv'));
+var deepClone = require('@jsbits/deep-clone');
+var decache = require('decache');
+var dotenv = require('dotenv-extended');
+var getenv = require('getenv');
 var uuid = require('uuid');
-var Agenda = _interopDefault(require('agenda'));
+var Agenda = require('agenda');
 var mongodb = require('mongodb');
 var winston = require('winston');
-var winston__default = _interopDefault(winston);
-var chalk = _interopDefault(require('chalk'));
+var chalk = require('chalk');
 var deepDiff = require('deep-diff');
 var reflectParams = require('reflect-params');
 var util = require('util');
-var hasAnsi = _interopDefault(require('has-ansi'));
-var abbreviate = _interopDefault(require('abbreviate'));
+var hasAnsi = require('has-ansi');
+var abbreviate = require('abbreviate');
+
+function _interopNamespaceDefault(e) {
+  var n = Object.create(null);
+  if (e) {
+    Object.keys(e).forEach(function (k) {
+      if (k !== 'default') {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () { return e[k]; }
+        });
+      }
+    });
+  }
+  n.default = e;
+  return Object.freeze(n);
+}
+
+var winston__namespace = /*#__PURE__*/_interopNamespaceDefault(winston);
 
 const BINDINGS = {
     chalk: Symbol.for('chalk'),
@@ -383,9 +397,7 @@ exports.DefinableMixin = class DefinableMixin {
         return Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) || {};
     }
     getParentInitializers() {
-        const matcher = (evaluatedProto) => {
-            return typeof evaluatedProto.getInstanceInitializers === 'function';
-        };
+        const matcher = (evaluatedProto) => typeof evaluatedProto.getInstanceInitializers === 'function';
         const parentProto = typend.getMatchingParentProto(this.constructor.prototype, matcher);
         if (parentProto === undefined)
             return {};
@@ -505,10 +517,8 @@ exports.HookableMixin = HookableMixin_1 = class HookableMixin {
         return hook;
     }
     getHooks(action) {
-        const matcher = (proto) => {
-            return (typeof proto.getHooks === 'function' &&
-                proto.constructor !== HookableMixin_1);
-        };
+        const matcher = (proto) => typeof proto.getHooks === 'function' &&
+            proto.constructor !== HookableMixin_1;
         const parentProto = typend.getMatchingParentProto(this, matcher);
         const parentHooks = parentProto !== undefined && typeof parentProto.getHooks === 'function'
             ? parentProto.getHooks(action)
@@ -523,10 +533,8 @@ exports.HookableMixin = HookableMixin_1 = class HookableMixin {
         return hooks;
     }
     getActions() {
-        const matcher = (proto) => {
-            return (typeof proto.getActions === 'function' &&
-                proto.constructor !== HookableMixin_1);
-        };
+        const matcher = (proto) => typeof proto.getActions === 'function' &&
+            proto.constructor !== HookableMixin_1;
         const parentProto = typend.getMatchingParentProto(this, matcher);
         const parentActions = parentProto !== undefined && typeof parentProto.getActions === 'function'
             ? parentProto.getActions()
@@ -811,6 +819,10 @@ const LIST_KEY = Symbol('eveble:list-key');
 const SERIALIZABLE_TYPE_KEY = Symbol('eveble:serializable-type');
 const SAVE_STATE_METHOD_KEY = Symbol('eveble:save-state');
 const SAVED_STATE_KEY = Symbol('eveble:saved-state');
+const ENABLE_ACTION_VALIDATION_METHOD_KEY = Symbol('eveble:enable-action-validation');
+const DISABLE_ACTION_VALIDATION_METHOD_KEY = Symbol('eveble:disable-action-validation');
+const IS_ACTION_VALIDATED_METHOD_KEY = Symbol('eveble:is-action-validated');
+const ACTION_VALIDATION_KEY = Symbol('eveble:action-validation');
 const ROLLBACK_STATE_METHOD_KEY = Symbol('eveble:rollback-state');
 const COMMANDS_KEY = Symbol('eveble:commands');
 const EVENTS_KEY = Symbol('eveble:events');
@@ -956,9 +968,7 @@ class List extends Array {
         return this.getBy(key, value) !== undefined;
     }
     hasSame(element) {
-        return this.some((serializable) => {
-            return serializable.equals(element);
-        });
+        return this.some((serializable) => serializable.equals(element));
     }
     hasById(id) {
         return this.getById(id) !== undefined;
@@ -1988,7 +1998,7 @@ exports.AppConfig = AppConfig_1 = __decorate([
     __metadata("design:paramtypes", [Object])
 ], exports.AppConfig);
 
-var STATES;
+var STATES$1;
 (function (STATES) {
     STATES["constructed"] = "constructed";
     STATES["configuring"] = "configuring";
@@ -1997,7 +2007,7 @@ var STATES;
     STATES["running"] = "running";
     STATES["stopped"] = "stopped";
     STATES["shutdown"] = "shutdown";
-})(STATES || (STATES = {}));
+})(STATES$1 || (STATES$1 = {}));
 class Module extends polytype.classes(exports.StatefulMixin) {
     constructor(props = {}) {
         super();
@@ -2236,7 +2246,7 @@ class Module extends polytype.classes(exports.StatefulMixin) {
         return getenv.string('NODE_ENV') === env;
     }
 }
-Module.STATES = STATES;
+Module.STATES = STATES$1;
 
 const RFC5424 = {
     emerg: 0,
@@ -2300,12 +2310,12 @@ exports.RFC5424LoggingMixin = __decorate([
 ], exports.RFC5424LoggingMixin);
 
 var Logger_1;
-var STATES$1;
+var STATES;
 (function (STATES) {
     STATES["constructed"] = "constructed";
     STATES["stopped"] = "stopped";
     STATES["running"] = "running";
-})(STATES$1 || (STATES$1 = {}));
+})(STATES || (STATES = {}));
 exports.Logger = Logger_1 = class Logger extends polytype.classes(exports.StatefulMixin, exports.RFC5424LoggingMixin) {
     constructor(levels = LOGGING_LEVELS) {
         super();
@@ -2382,7 +2392,7 @@ exports.Logger = Logger_1 = class Logger extends polytype.classes(exports.Statef
         }
     }
 };
-exports.Logger.STATES = STATES$1;
+exports.Logger.STATES = STATES;
 exports.Logger = Logger_1 = __decorate([
     inversifyAsync.injectable(),
     __metadata("design:paramtypes", [Object])
@@ -2476,9 +2486,7 @@ class ConsoleTransport extends LogTransport {
                 all: this.config.get('flags.isWholeLineColored'),
             }));
         }
-        formatArgs.push(format.printf((log) => {
-            return this.formatEntry(log);
-        }));
+        formatArgs.push(format.printf((log) => this.formatEntry(log)));
         return format.combine(...formatArgs);
     }
     formatEntry(entry) {
@@ -2570,9 +2578,7 @@ exports.StringifingConverter = class StringifingConverter {
         const argNames = reflectParams.ReflectParams(entry.method);
         const requiredArgNames = metadata.keys instanceof Array ? metadata.keys : argNames;
         const obj = {};
-        const argsIndexes = requiredArgNames.map((argName) => {
-            return argNames.indexOf(argName);
-        });
+        const argsIndexes = requiredArgNames.map((argName) => argNames.indexOf(argName));
         for (const index of argsIndexes) {
             if (index === -1 || index >= metadata.value.length)
                 continue;
@@ -2607,9 +2613,11 @@ exports.StringifingConverter = class StringifingConverter {
         var _a, _b;
         const inspectOptions = {
             depth: entry instanceof Log
-                ? (_a = entry.options) === null || _a === void 0 ? void 0 : _a.isColored : options.get('isColored'),
+                ? (_a = entry.options) === null || _a === void 0 ? void 0 : _a.isColored
+                : options.get('isColored'),
             colors: entry instanceof Log
-                ? (_b = entry.options) === null || _b === void 0 ? void 0 : _b.inspectDepth : options.get('inspectDepth'),
+                ? (_b = entry.options) === null || _b === void 0 ? void 0 : _b.inspectDepth
+                : options.get('inspectDepth'),
         };
         return inspectOptions;
     }
@@ -2831,7 +2839,7 @@ class BaseApp extends Module {
     }
     bindExternalDependencies() {
         if (!this.injector.isBound(BINDINGS.winston)) {
-            this.injector.bind(BINDINGS.winston).toConstantValue(winston);
+            this.injector.bind(BINDINGS.winston).toConstantValue(winston__namespace);
         }
         if (!this.injector.isBound(BINDINGS.chalk)) {
             this.injector.bind(BINDINGS.chalk).toConstantValue(chalk);
@@ -3046,9 +3054,7 @@ exports.EJSONSerializerAdapter = class EJSONSerializerAdapter {
                 continue;
             const value = serializable[key];
             if (Array.isArray(value)) {
-                data[key] = value.map((item) => {
-                    return core.isSerializable(item) ? this.toData(item) : item;
-                });
+                data[key] = value.map((item) => core.isSerializable(item) ? this.toData(item) : item);
             }
             else if (core.isSerializable(value)) {
                 data[key] = this.toData(value);
@@ -3395,9 +3401,7 @@ exports.OneToManyHandlingMixin = class OneToManyHandlingMixin extends HandlingMi
     }
     getTypeByHandler(handlerReference) {
         for (const [messageType, handlers] of this[HANDLERS].entries()) {
-            const unboundHandlers = handlers.map((handler) => {
-                return handler.original || handler;
-            });
+            const unboundHandlers = handlers.map((handler) => handler.original || handler);
             if (unboundHandlers.includes(handlerReference) ||
                 handlers.includes(handlerReference)) {
                 return messageType;
@@ -3425,9 +3429,7 @@ exports.OneToManyHandlingMixin = class OneToManyHandlingMixin extends HandlingMi
     }
     async handleConcurrent(message) {
         const handlers = this.getHandler(message.constructor) || [];
-        const promises = handlers.map((handler) => {
-            return handler(message);
-        });
+        const promises = handlers.map((handler) => handler(message));
         return Promise.all(promises);
     }
 };
@@ -3889,9 +3891,7 @@ exports.Commit = class Commit extends exports.Serializable {
         this.receivers.push(receiver);
     }
     getReceiver(appId) {
-        return this.receivers.find((receiver) => {
-            return receiver.appId.toString() === appId.toString();
-        });
+        return this.receivers.find((receiver) => receiver.appId.toString() === appId.toString());
     }
 };
 exports.Commit = __decorate([
@@ -4514,8 +4514,7 @@ class Router {
     setupInitializingMessageHandler(handler) {
         const boundHandler = handler.bind(this);
         boundHandler.original = handler;
-        const MessageType = this
-            .InitializingMessageType;
+        const MessageType = this.InitializingMessageType;
         if (this.InitializingMessageType.prototype instanceof exports.Event) {
             this.eventBus.subscribeTo(MessageType, boundHandler);
         }
@@ -4940,9 +4939,9 @@ class AbilityAssertion extends Assertion {
                         if (typeof entity[propKey] === 'function') {
                             const proxifiedMethod = new Proxy(entity[propKey], {
                                 apply(_targetMethod, _thisArg, args) {
-                                    entity[SAVE_STATE_METHOD_KEY]();
+                                    entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     const result = entity[propKey](...args);
-                                    entity[ROLLBACK_STATE_METHOD_KEY]();
+                                    entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     target.asserter.clearAction();
                                     return result;
                                 },
@@ -4961,7 +4960,7 @@ class AbilityAssertion extends Assertion {
                         if (typeof entity[propKey] === 'function') {
                             const proxifiedMethod = new Proxy(entity[propKey], {
                                 apply(_targetMethod, _thisArg, args) {
-                                    entity[SAVE_STATE_METHOD_KEY]();
+                                    entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     let isAble = true;
                                     try {
                                         entity[propKey](...args);
@@ -4969,7 +4968,7 @@ class AbilityAssertion extends Assertion {
                                     catch (e) {
                                         isAble = false;
                                     }
-                                    entity[ROLLBACK_STATE_METHOD_KEY]();
+                                    entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                                     return isAble;
                                 },
                             });
@@ -5015,7 +5014,8 @@ class Eveble extends Module {
     }
     async beforeStart() {
         if (this.isCommandScheduling()) {
-            this.commandScheduler = await this.injector.getAsync(BINDINGS.CommandScheduler);
+            this.commandScheduler =
+                await this.injector.getAsync(BINDINGS.CommandScheduler);
         }
     }
     async onStart() {
@@ -5286,7 +5286,8 @@ class MongoDBClient extends Client {
     isConnected() {
         var _a;
         return (this._library !== undefined &&
-            this.isInState(Client.STATES.connected) && ((_a = this._library) === null || _a === void 0 ? void 0 : _a.isConnected()));
+            this.isInState(Client.STATES.connected) &&
+            ((_a = this._library) === null || _a === void 0 ? void 0 : _a.isConnected()));
     }
     getDatabase(name) {
         var _a;
@@ -5446,7 +5447,8 @@ class AgendaClient extends Client {
         if (((_a = this.options) === null || _a === void 0 ? void 0 : _a.processEvery) === undefined)
             return undefined;
         return typeof ((_b = this.options) === null || _b === void 0 ? void 0 : _b.processEvery) === 'number'
-            ? (_c = this.options) === null || _c === void 0 ? void 0 : _c.processEvery : parseFloat((_d = this.options) === null || _d === void 0 ? void 0 : _d.processEvery);
+            ? (_c = this.options) === null || _c === void 0 ? void 0 : _c.processEvery
+            : parseFloat((_d = this.options) === null || _d === void 0 ? void 0 : _d.processEvery);
     }
     async initializeEventHandlers() {
         var _a, _b, _c, _d, _e;
@@ -5549,7 +5551,7 @@ exports.AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandS
         }
     }
     async unschedule(unscheduleCommand) {
-        const { assignmentId, commandType, assignerId, assignerType, } = unscheduleCommand;
+        const { assignmentId, commandType, assignerId, assignerType } = unscheduleCommand;
         const mongoQuery = {
             'data.commandType': commandType,
             'data.assignerId': assignerId.toString(),
@@ -6786,18 +6788,9 @@ exports.Entity = class Entity extends polytype.classes(exports.Serializable, exp
                 if (typeof target[propKey] === 'function') {
                     const proxifiedMethod = new Proxy(target[propKey], {
                         apply(_targetMethod, _thisArg, args) {
-                            target[SAVE_STATE_METHOD_KEY]();
-                            let result;
-                            let error;
-                            try {
-                                result = target[propKey](...args);
-                            }
-                            catch (e) {
-                                error = e;
-                            }
-                            target[ROLLBACK_STATE_METHOD_KEY]();
-                            if (error !== undefined)
-                                throw error;
+                            target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
+                            const result = target[propKey](...args);
+                            target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                             return result;
                         },
                     });
@@ -6821,7 +6814,7 @@ exports.Entity = class Entity extends polytype.classes(exports.Serializable, exp
             get(target, propKey) {
                 const proxifiedMethod = new Proxy(target[propKey], {
                     apply(_targetMethod, _thisArg, args) {
-                        target[SAVE_STATE_METHOD_KEY]();
+                        target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
                         let isAble = true;
                         try {
                             target[propKey](...args);
@@ -6829,7 +6822,7 @@ exports.Entity = class Entity extends polytype.classes(exports.Serializable, exp
                         catch (e) {
                             isAble = false;
                         }
-                        target[ROLLBACK_STATE_METHOD_KEY]();
+                        target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
                         return isAble;
                     },
                 });
@@ -6845,6 +6838,23 @@ exports.Entity = class Entity extends polytype.classes(exports.Serializable, exp
                 this[SAVED_STATE_KEY][key] = deepClone(this[key]);
             }
         }
+    }
+    [ENABLE_ACTION_VALIDATION_METHOD_KEY]() {
+        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+            value: true,
+            enumerable: false,
+            writable: true,
+        });
+    }
+    [DISABLE_ACTION_VALIDATION_METHOD_KEY]() {
+        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+            value: false,
+            enumerable: false,
+            writable: true,
+        });
+    }
+    [IS_ACTION_VALIDATED_METHOD_KEY]() {
+        return this[ACTION_VALIDATION_KEY] || false;
     }
     [ROLLBACK_STATE_METHOD_KEY]() {
         if (!this.isStateSaved()) {
@@ -6862,7 +6872,7 @@ exports.Entity = class Entity extends polytype.classes(exports.Serializable, exp
     }
 };
 exports.Entity = __decorate([
-    core.define('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: exports.Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, [SAVED_STATE_KEY]: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } }, extends: { kind: 999 } }),
+    core.define('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: exports.Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], exports.Entity);
 exports.Entity.enableSerializableLists();
@@ -7352,7 +7362,7 @@ __decorate([
 
 function bindExternalDependencies(injector) {
     if (!injector.isBound(BINDINGS.winston)) {
-        injector.bind(BINDINGS.winston).toConstantValue(winston);
+        injector.bind(BINDINGS.winston).toConstantValue(winston__namespace);
     }
     if (!injector.isBound(BINDINGS.chalk)) {
         injector.bind(BINDINGS.chalk).toConstantValue(chalk);
@@ -7392,435 +7402,291 @@ function loggerLoader(injector, level, consoleTransportConfig = new exports.LogT
 
 Object.defineProperty(exports, 'ExtendableError', {
   enumerable: true,
-  get: function () {
-    return core.ExtendableError;
-  }
+  get: function () { return core.ExtendableError; }
 });
 Object.defineProperty(exports, 'Kernel', {
   enumerable: true,
-  get: function () {
-    return core.Kernel;
-  }
+  get: function () { return core.Kernel; }
 });
 Object.defineProperty(exports, 'KernelError', {
   enumerable: true,
-  get: function () {
-    return core.KernelError;
-  }
+  get: function () { return core.KernelError; }
 });
 Object.defineProperty(exports, 'Library', {
   enumerable: true,
-  get: function () {
-    return core.Library;
-  }
+  get: function () { return core.Library; }
 });
 Object.defineProperty(exports, 'TypeError', {
   enumerable: true,
-  get: function () {
-    return core.TypeError;
-  }
+  get: function () { return core.TypeError; }
 });
 Object.defineProperty(exports, 'TypeExistsError', {
   enumerable: true,
-  get: function () {
-    return core.TypeExistsError;
-  }
+  get: function () { return core.TypeExistsError; }
 });
 Object.defineProperty(exports, 'TypeNotFoundError', {
   enumerable: true,
-  get: function () {
-    return core.TypeNotFoundError;
-  }
+  get: function () { return core.TypeNotFoundError; }
 });
 Object.defineProperty(exports, 'UnavailableAsserterError', {
   enumerable: true,
-  get: function () {
-    return core.UnavailableAsserterError;
-  }
+  get: function () { return core.UnavailableAsserterError; }
 });
 Object.defineProperty(exports, 'UnavailableSerializerError', {
   enumerable: true,
-  get: function () {
-    return core.UnavailableSerializerError;
-  }
+  get: function () { return core.UnavailableSerializerError; }
 });
 Object.defineProperty(exports, 'UnregistrableTypeError', {
   enumerable: true,
-  get: function () {
-    return core.UnregistrableTypeError;
-  }
+  get: function () { return core.UnregistrableTypeError; }
 });
 Object.defineProperty(exports, 'define', {
   enumerable: true,
-  get: function () {
-    return core.define;
-  }
+  get: function () { return core.define; }
 });
 Object.defineProperty(exports, 'isSerializable', {
   enumerable: true,
-  get: function () {
-    return core.isSerializable;
-  }
+  get: function () { return core.isSerializable; }
 });
 Object.defineProperty(exports, 'kernel', {
   enumerable: true,
-  get: function () {
-    return core.kernel;
-  }
+  get: function () { return core.kernel; }
 });
 Object.defineProperty(exports, 'resolveSerializableFromPropType', {
   enumerable: true,
-  get: function () {
-    return core.resolveSerializableFromPropType;
-  }
+  get: function () { return core.resolveSerializableFromPropType; }
 });
 Object.defineProperty(exports, 'InvalidDefinitionError', {
   enumerable: true,
-  get: function () {
-    return typend.InvalidDefinitionError;
-  }
+  get: function () { return typend.InvalidDefinitionError; }
 });
 Object.defineProperty(exports, 'InvalidTypeError', {
   enumerable: true,
-  get: function () {
-    return typend.InvalidTypeError;
-  }
+  get: function () { return typend.InvalidTypeError; }
 });
 Object.defineProperty(exports, 'InvalidValueError', {
   enumerable: true,
-  get: function () {
-    return typend.InvalidValueError;
-  }
+  get: function () { return typend.InvalidValueError; }
 });
 Object.defineProperty(exports, 'NotAMemberError', {
   enumerable: true,
-  get: function () {
-    return typend.NotAMemberError;
-  }
+  get: function () { return typend.NotAMemberError; }
 });
 Object.defineProperty(exports, 'PatternValidatorExistError', {
   enumerable: true,
-  get: function () {
-    return typend.PatternValidatorExistError;
-  }
+  get: function () { return typend.PatternValidatorExistError; }
 });
 Object.defineProperty(exports, 'PatternValidatorNotFoundError', {
   enumerable: true,
-  get: function () {
-    return typend.PatternValidatorNotFoundError;
-  }
+  get: function () { return typend.PatternValidatorNotFoundError; }
 });
 Object.defineProperty(exports, 'PropTypes', {
   enumerable: true,
-  get: function () {
-    return typend.PropTypes;
-  }
+  get: function () { return typend.PropTypes; }
 });
 Object.defineProperty(exports, 'PropsOf', {
   enumerable: true,
-  get: function () {
-    return typend.PropsOf;
-  }
+  get: function () { return typend.PropsOf; }
 });
 Object.defineProperty(exports, 'TypeConverterExists', {
   enumerable: true,
-  get: function () {
-    return typend.TypeConverterExists;
-  }
+  get: function () { return typend.TypeConverterExists; }
 });
 Object.defineProperty(exports, 'TypeDescriberExistsError', {
   enumerable: true,
-  get: function () {
-    return typend.TypeDescriberExistsError;
-  }
+  get: function () { return typend.TypeDescriberExistsError; }
 });
 Object.defineProperty(exports, 'TypeDescriberNotFoundError', {
   enumerable: true,
-  get: function () {
-    return typend.TypeDescriberNotFoundError;
-  }
+  get: function () { return typend.TypeDescriberNotFoundError; }
 });
 Object.defineProperty(exports, 'TypeOf', {
   enumerable: true,
-  get: function () {
-    return typend.TypeOf;
-  }
+  get: function () { return typend.TypeOf; }
 });
 Object.defineProperty(exports, 'UndefinableClassError', {
   enumerable: true,
-  get: function () {
-    return typend.UndefinableClassError;
-  }
+  get: function () { return typend.UndefinableClassError; }
 });
 Object.defineProperty(exports, 'UnequalValueError', {
   enumerable: true,
-  get: function () {
-    return typend.UnequalValueError;
-  }
+  get: function () { return typend.UnequalValueError; }
 });
 Object.defineProperty(exports, 'UnexpectedKeyError', {
   enumerable: true,
-  get: function () {
-    return typend.UnexpectedKeyError;
-  }
+  get: function () { return typend.UnexpectedKeyError; }
 });
 Object.defineProperty(exports, 'UnknownError', {
   enumerable: true,
-  get: function () {
-    return typend.UnknownError;
-  }
+  get: function () { return typend.UnknownError; }
 });
 Object.defineProperty(exports, 'UnmatchedTypeError', {
   enumerable: true,
-  get: function () {
-    return typend.UnmatchedTypeError;
-  }
+  get: function () { return typend.UnmatchedTypeError; }
 });
 Object.defineProperty(exports, 'ValidationError', {
   enumerable: true,
-  get: function () {
-    return typend.ValidationError;
-  }
+  get: function () { return typend.ValidationError; }
 });
 Object.defineProperty(exports, 'any', {
   enumerable: true,
-  get: function () {
-    return typend.any;
-  }
+  get: function () { return typend.any; }
 });
 Object.defineProperty(exports, 'boolean', {
   enumerable: true,
-  get: function () {
-    return typend.boolean;
-  }
+  get: function () { return typend.boolean; }
 });
 Object.defineProperty(exports, 'check', {
   enumerable: true,
-  get: function () {
-    return typend.check;
-  }
+  get: function () { return typend.check; }
 });
 Object.defineProperty(exports, 'collection', {
   enumerable: true,
-  get: function () {
-    return typend.collection;
-  }
+  get: function () { return typend.collection; }
 });
 Object.defineProperty(exports, 'collectionIncluding', {
   enumerable: true,
-  get: function () {
-    return typend.collectionIncluding;
-  }
+  get: function () { return typend.collectionIncluding; }
 });
 Object.defineProperty(exports, 'collectionWithin', {
   enumerable: true,
-  get: function () {
-    return typend.collectionWithin;
-  }
+  get: function () { return typend.collectionWithin; }
 });
 Object.defineProperty(exports, 'convert', {
   enumerable: true,
-  get: function () {
-    return typend.convert;
-  }
+  get: function () { return typend.convert; }
 });
 Object.defineProperty(exports, 'converter', {
   enumerable: true,
-  get: function () {
-    return typend.converter;
-  }
+  get: function () { return typend.converter; }
 });
 Object.defineProperty(exports, 'describer', {
   enumerable: true,
-  get: function () {
-    return typend.describer;
-  }
+  get: function () { return typend.describer; }
 });
 Object.defineProperty(exports, 'eq', {
   enumerable: true,
-  get: function () {
-    return typend.eq;
-  }
+  get: function () { return typend.eq; }
 });
 Object.defineProperty(exports, 'instanceOf', {
   enumerable: true,
-  get: function () {
-    return typend.instanceOf;
-  }
+  get: function () { return typend.instanceOf; }
 });
 Object.defineProperty(exports, 'integer', {
   enumerable: true,
-  get: function () {
-    return typend.integer;
-  }
+  get: function () { return typend.integer; }
 });
 Object.defineProperty(exports, 'internal', {
   enumerable: true,
-  get: function () {
-    return typend.internal;
-  }
+  get: function () { return typend.internal; }
 });
 Object.defineProperty(exports, 'iof', {
   enumerable: true,
-  get: function () {
-    return typend.iof;
-  }
+  get: function () { return typend.iof; }
 });
 Object.defineProperty(exports, 'is', {
   enumerable: true,
-  get: function () {
-    return typend.is;
-  }
+  get: function () { return typend.is; }
 });
 Object.defineProperty(exports, 'isInstanceOf', {
   enumerable: true,
-  get: function () {
-    return typend.isInstanceOf;
-  }
+  get: function () { return typend.isInstanceOf; }
 });
 Object.defineProperty(exports, 'isValid', {
   enumerable: true,
-  get: function () {
-    return typend.isValid;
-  }
+  get: function () { return typend.isValid; }
 });
 Object.defineProperty(exports, 'list', {
   enumerable: true,
-  get: function () {
-    return typend.list;
-  }
+  get: function () { return typend.list; }
 });
 Object.defineProperty(exports, 'maybe', {
   enumerable: true,
-  get: function () {
-    return typend.maybe;
-  }
+  get: function () { return typend.maybe; }
 });
 Object.defineProperty(exports, 'never', {
   enumerable: true,
-  get: function () {
-    return typend.never;
-  }
+  get: function () { return typend.never; }
 });
 Object.defineProperty(exports, 'number', {
   enumerable: true,
-  get: function () {
-    return typend.number;
-  }
+  get: function () { return typend.number; }
 });
 Object.defineProperty(exports, 'oneOf', {
   enumerable: true,
-  get: function () {
-    return typend.oneOf;
-  }
+  get: function () { return typend.oneOf; }
 });
 Object.defineProperty(exports, 'optional', {
   enumerable: true,
-  get: function () {
-    return typend.optional;
-  }
+  get: function () { return typend.optional; }
 });
 Object.defineProperty(exports, 'propsOf', {
   enumerable: true,
-  get: function () {
-    return typend.propsOf;
-  }
+  get: function () { return typend.propsOf; }
 });
 Object.defineProperty(exports, 'reflect', {
   enumerable: true,
-  get: function () {
-    return typend.reflect;
-  }
+  get: function () { return typend.reflect; }
 });
 Object.defineProperty(exports, 'string', {
   enumerable: true,
-  get: function () {
-    return typend.string;
-  }
+  get: function () { return typend.string; }
 });
 Object.defineProperty(exports, 'symbol', {
   enumerable: true,
-  get: function () {
-    return typend.symbol;
-  }
+  get: function () { return typend.symbol; }
 });
 Object.defineProperty(exports, 'tuple', {
   enumerable: true,
-  get: function () {
-    return typend.tuple;
-  }
+  get: function () { return typend.tuple; }
 });
 Object.defineProperty(exports, 'typeOf', {
   enumerable: true,
-  get: function () {
-    return typend.typeOf;
-  }
+  get: function () { return typend.typeOf; }
 });
 Object.defineProperty(exports, 'typend', {
   enumerable: true,
-  get: function () {
-    return typend.typend;
-  }
+  get: function () { return typend.typend; }
 });
 Object.defineProperty(exports, 'unknown', {
   enumerable: true,
-  get: function () {
-    return typend.unknown;
-  }
+  get: function () { return typend.unknown; }
 });
 Object.defineProperty(exports, 'unrecognized', {
   enumerable: true,
-  get: function () {
-    return typend.unrecognized;
-  }
+  get: function () { return typend.unrecognized; }
 });
 Object.defineProperty(exports, 'validable', {
   enumerable: true,
-  get: function () {
-    return typend.validable;
-  }
+  get: function () { return typend.validable; }
 });
 Object.defineProperty(exports, 'validate', {
   enumerable: true,
-  get: function () {
-    return typend.validate;
-  }
+  get: function () { return typend.validate; }
 });
 Object.defineProperty(exports, 'validator', {
   enumerable: true,
-  get: function () {
-    return typend.validator;
-  }
+  get: function () { return typend.validator; }
 });
 Object.defineProperty(exports, 'voided', {
   enumerable: true,
-  get: function () {
-    return typend.voided;
-  }
+  get: function () { return typend.voided; }
 });
 Object.defineProperty(exports, 'where', {
   enumerable: true,
-  get: function () {
-    return typend.where;
-  }
+  get: function () { return typend.where; }
 });
 Object.defineProperty(exports, 'inject', {
   enumerable: true,
-  get: function () {
-    return inversifyAsync.inject;
-  }
+  get: function () { return inversifyAsync.inject; }
 });
 Object.defineProperty(exports, 'injectable', {
   enumerable: true,
-  get: function () {
-    return inversifyAsync.injectable;
-  }
+  get: function () { return inversifyAsync.injectable; }
 });
 Object.defineProperty(exports, 'postConstruct', {
   enumerable: true,
-  get: function () {
-    return inversifyAsync.postConstruct;
-  }
+  get: function () { return inversifyAsync.postConstruct; }
 });
 exports.AbilityAssertion = AbilityAssertion;
 exports.AgendaClient = AgendaClient;

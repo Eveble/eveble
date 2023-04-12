@@ -5,7 +5,7 @@ export declare class DefinableMixin implements types.Definable {
     protected getInstanceInitializers(): types.Props;
     protected getParentInitializers(): types.Props;
     toPlainObject(): types.Props;
-    validateProps(props: Record<string | number | symbol, any> | undefined, propTypes: types.PropTypes, isStrict?: boolean): boolean;
+    validateProps(props: types.Props | undefined, propTypes: types.PropTypes, isStrict?: boolean): boolean;
     equals(other: any): boolean;
     protected hasSameValues(other: types.Definable): boolean;
     static getPropTypes(): types.Props;

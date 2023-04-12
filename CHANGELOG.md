@@ -1,3 +1,20 @@
+# [2.4.0](https://github.com/eveble/eveble/compare/v2.3.0...v2.4.0) (2023-04-12)
+
+
+### Bug Fixes
+
+* cast stubs to any ([3e25b57](https://github.com/eveble/eveble/commit/3e25b579775c69aacbd76a68c0d1b8ff837258b4))
+* **domain:** remove SAVED_STATE_KEY from Entity definition ([a7cca36](https://github.com/eveble/eveble/commit/a7cca360fa7331258f0809e709aa1982075a5f97))
+* **github:** update release.yml ([425e775](https://github.com/eveble/eveble/commit/425e775cd11a1dfd492cb41e86145a5496683157))
+* **github:** update release.yml action ([6d452ee](https://github.com/eveble/eveble/commit/6d452ee661f8bf7a07c6c43b0dde8b8d5e16283b))
+* **github:** update release.yml action ([562a1ef](https://github.com/eveble/eveble/commit/562a1ef2dcaf35e0746aa74c3a2c34a7e7bc7501))
+* set types ([333b2c9](https://github.com/eveble/eveble/commit/333b2c985bcd7b0f89df5002209ddde627600c75))
+
+
+### Features
+
+* **decorators:** add can decorator ([8f03e52](https://github.com/eveble/eveble/commit/8f03e52db356ee4a7075f54bf4a402c4b10fdfbf))
+
 # [2.3.0](https://github.com/eveble/eveble/compare/v2.2.1...v2.3.0) (2021-05-23)
 
 
