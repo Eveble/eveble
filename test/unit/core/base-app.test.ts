@@ -631,7 +631,7 @@ describe('BaseApp', () => {
       expect(log.debug).to.be.calledWithMatch(
         new Log(`initialize`).on(app).in('initialize')
       );
-      expect(log.debug).to.be.calledBefore(module.initialize);
+      expect(log.debug).to.be.calledBefore(module.initialize as any);
     });
 
     it(`shows simple start log`, async () => {

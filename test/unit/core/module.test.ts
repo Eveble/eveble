@@ -238,7 +238,7 @@ describe('Module', () => {
           .in(module.initialize)
           .with('arguments', [app, injector])
       );
-      expect(logger.debug).to.be.calledBefore(submodule.initialize);
+      expect(logger.debug).to.be.calledBefore(submodule.initialize as any);
     });
 
     describe('merging with application configuration', () => {
