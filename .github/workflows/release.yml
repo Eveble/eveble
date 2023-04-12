@@ -43,7 +43,7 @@ jobs:
           semantic_version: 19.0.5
           dry_run: false
           extra_plugins: |
-            @semantic-release/changelog6.0.3
+            @semantic-release/changelog@6.0.3
             @semantic-release/git@10.0.1
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
