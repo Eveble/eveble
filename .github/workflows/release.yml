@@ -8,7 +8,14 @@ jobs:
   release:
     name: Release to Github, NPM, Github, GitHub Packages
     runs-on: ubuntu-latest
-    needs: [test]
+    services:
+      mongodb:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
     permissions:
       packages: write
       contents: write
@@ -40,6 +47,10 @@ jobs:
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ env.EVEBLE_TYPES_AUTH_TOKEN }}
+      - name: ✅　Test
+        run: yarn test
+      - name: 🏗️ Build
+        run: yarn build
       - name: 🚀  Release
         uses: cycjimmy/semantic-release-action@v3
         id: semantic
@@ -79,31 +90,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-    services:
-      mongodb:
-        image: mongo:4.2
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: password
-    name: ✅ Test|node@${{ matrix.node-version}}
-    steps:
-      - uses: actions/checkout@v3
-      - name: ⚙️ Setup Node@18.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: ${{ env.USERNAME }}
-      - name: 🚧  Install dependencies
-        run: yarn install
-        env:
-          NODE_AUTH_TOKEN: ${{ env.EVEBLE_TYPES_AUTH_TOKEN }}
-      - name: ✅　Test
-        run: yarn test
