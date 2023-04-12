@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/Eveble/eveble/compare/v2.4.3...v2.5.0) (2023-04-12)
+
+
+### Features
+
+* fix versioning for semantic-release ([389c53b](https://github.com/Eveble/eveble/commit/389c53b3bc317c2c786093e2efcb3c4718557f39))
+
 ## [2.4.3](https://github.com/Eveble/eveble/compare/v2.4.2...v2.4.3) (2023-04-12)
 
 
