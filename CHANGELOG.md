@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/Eveble/eveble/compare/v2.4.1...v2.4.2) (2023-04-12)
+
+
+### Bug Fixes
+
+* **github:** streamline release action on release.yml ([df4f3ef](https://github.com/Eveble/eveble/commit/df4f3ef458b344790cbd9f1939f206e64ce84fcc))
+
 ## [2.4.1](https://github.com/Eveble/eveble/compare/v2.4.0...v2.4.1) (2023-04-12)
 
 
