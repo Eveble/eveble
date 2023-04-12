@@ -66,17 +66,15 @@
     "@typescript-eslint/ban-types": 0,
     "no-useless-constructor": 0,
     "import/extensions": 0,
-    "no-unused-vars": [
-      "error",
-      {
-        "argsIgnorePattern": "^_"
-      }
-    ],
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        "argsIgnorePattern": "^_"
-      }
-    ]
+    "no-use-before-define": 0,
+    "no-unused-vars": 0,
+    "@typescript-eslint/no-unused-vars": 0,
+    "no-undef": 0,
+    "@typescript-eslint/no-unnecessary-type-constraint": 0,
+    "no-shadow": 0,
+    "default-param-last": 0,
+    "no-redeclare": 0,
+    "prefer-regex-literals": 0,
+    "no-promise-executor-return": 0
   }
 }
