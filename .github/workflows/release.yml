@@ -79,20 +79,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
-
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-    services:
-      mongodb:
-        image: mongo:4.2
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: password
   test:
     runs-on: ubuntu-latest
     strategy:
