@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/Eveble/eveble/compare/v2.4.0...v2.4.1) (2023-04-12)
+
+
+### Bug Fixes
+
+* **release:** update repositoryUrl on .releaserc.json ([c80b411](https://github.com/Eveble/eveble/commit/c80b411978121c0040f75246879069479cad9d3e))
+
 # [2.4.0](https://github.com/eveble/eveble/compare/v2.3.0...v2.4.0) (2023-04-12)
 
 
