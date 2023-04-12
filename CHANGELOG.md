@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/Eveble/eveble/compare/v2.5.0...v2.5.1) (2023-04-12)
+
+
+### Bug Fixes
+
+* **github:** remove Publish To GitHub Package Registry step from release.yml ([49b511a](https://github.com/Eveble/eveble/commit/49b511a291bdaaf2eec7eb10a0e52a8e95b036bd))
+
 # [2.5.0](https://github.com/Eveble/eveble/compare/v2.4.3...v2.5.0) (2023-04-12)
 
 
