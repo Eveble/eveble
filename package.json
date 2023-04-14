@@ -167,8 +167,8 @@
     "test:coverage": "./node_modules/.bin/nyc --check-coverage=true npm run test",
     "docs:watch": "./node_modules/.bin/gulp docs:watch",
     "docs:clean": "./node_modules/.bin/rimraf website/docs/api/classes/* && ./node_modules/.bin/rimraf website/docs/api/interfaces/* && ./node_modules/.bin/rimraf website/docs/api/globals/md",
-    "docs:build": "npm run docs:clean && ./node_modules/.bin/typedoc --tsconfig typedoc.json && node ./website/.eveble/scripts/interface-converter.js && rm ./website/docs/api/index.md && cd website && npm run build",
-    "docs": "npm run docs:clean && ./node_modules/.bin/typedoc --tsconfig typedoc.json && node ./website/.eveble/scripts/interface-converter.js && rm ./website/docs/api/index.md && cd ./website && npm run start",
+    "docs:build": "npm run docs:clean && ./node_modules/.bin/typedoc --tsconfig typedoc.json && node ./website/.eveble/scripts/interface-converter.js && cd website && npm run build",
+    "docs": "npm run docs:clean && ./node_modules/.bin/typedoc --tsconfig typedoc.json && node ./website/.eveble/scripts/interface-converter.js && cd ./website && npm run start",
     "semantic-release": "semantic-release",
     "prepare": "npm run format && npm run lint && npm run build"
   },
