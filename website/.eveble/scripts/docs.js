@@ -284,4 +284,25 @@ module.exports = class ConfigGenerator {
       return this.normalizePathForSidebar(`${dir}/${path}`);
     });
   }
+
+  generateSidebar() {
+    const sidebar = {
+      api: {
+        Components: this.getClassesForSidebar(),
+        Interfaces: this.getInterfacesForSidebar(),
+      },
+    };
+    if (fs.existsSync('./docs/api/guides') === true) {
+      sidebar['api']['guides'] = this.getGuidesForSidebar();
+    }
+    if (fs.existsSync('./docs/api/globals') === true) {
+      sidebar['api']['Others'] = ['api/globals'];
+    }
+    for (const [key, item] of Object.entries(sidebar.api)) {
+            if (Array.isArray(item) && item.length === 0) {
+        delete sidebar.api[key];
+      }
+    }
+    return sidebar;
+  }
 };
