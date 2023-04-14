@@ -89,7 +89,7 @@ function ActionContainer() {
           <ButtonHover
             className="button--action button--dark"
             onClick={() => {
-              window.location.href = siteConfig.themeConfig.navbar.links[0].to;
+              window.location.href = siteConfig.themeConfig.navbar.items[0].to;
             }}
             target="_self"
           >

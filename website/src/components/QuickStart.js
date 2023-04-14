@@ -53,14 +53,14 @@ export const QuickStart = () => {
               {' '}
               <a
                 className="LinkBasics"
-                href={siteConfig.themeConfig.navbar.links[0].to}
+                href={siteConfig.themeConfig.navbar.items[0].to}
               >
                 Learn the basics
               </a>{' '}
               or dive deeper and take a{' '}
               <a
                 className="LinkBasics"
-                href={siteConfig.themeConfig.navbar.links[1].to}
+                href={siteConfig.themeConfig.navbar.items[1].to}
               >
                 look at the APIs.
               </a>

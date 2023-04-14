@@ -28,9 +28,9 @@ module.exports = {
         alt: `${project.title} Logo`,
         src: 'img/logo.svg',
       },
-      links: [
+      items: [
         {
-          to: 'docs/guides/01-the-basics/01-getting-started',
+          to: 'docs/guides/the-basics/getting-started',
           label: 'Docs',
           position: 'right',
         },
@@ -61,7 +61,7 @@ module.exports = {
           items: [
             {
               label: 'Getting Started',
-              to: 'docs/guides/01-the-basics/01-getting-started',
+              to: 'docs/guides/the-basics/getting-started',
             },
             {
               label: 'API',
