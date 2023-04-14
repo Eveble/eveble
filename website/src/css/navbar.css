@@ -26,6 +26,10 @@ html[data-theme=''] .navbar__link--active {
   opacity: 0.6;
 }
 
+.navbar__brand {
+  color: inherit;
+}
+
 .header-github-link:before {
   content: '';
   width: 24px;
