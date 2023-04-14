@@ -208,7 +208,7 @@ module.exports = class ConfigGenerator {
    * @returns {string} Normalized path compatible with Docusaurus
    */
   normalizePathForDocusaurusConfig(path) {
-    return path.replace('.md', '').replace('docs/', '');
+    return path.replace('.md', '').replace('docs/', '').replace(/[0-9]/g, "").replace(/\/-/g, '/')
   }
 
   /**
