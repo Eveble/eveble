@@ -19,6 +19,7 @@ import { BINDINGS } from '../constants/bindings';
 import { AppConfig } from '../configs/app-config';
 import { Config } from '../components/config';
 
+// eslint-disable-next-line no-shadow
 enum STATES {
   constructed = 'constructed',
   configuring = 'configuring',

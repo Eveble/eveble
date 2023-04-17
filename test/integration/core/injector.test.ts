@@ -183,19 +183,6 @@ describe(`Injector`, () => {
   });
 
   it(`injects synchronously dependencies from IoC container to existing value`, () => {
-    interface Ninja {
-      fight(): string;
-      sneak(): string;
-    }
-
-    interface Katana {
-      hit(): string;
-    }
-
-    interface Shuriken {
-      throw(): string;
-    }
-
     @injectable()
     class Katana implements Katana {
       public hit(): string {

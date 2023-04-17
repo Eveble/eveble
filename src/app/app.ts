@@ -191,6 +191,7 @@ export class App extends BaseApp {
         .on(this)
         .in(this.initializeGracefulShutdown)
     );
+    // eslint-disable-next-line no-undef
     const signalEvents: NodeJS.Signals[] = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
     for (const sig of signalEvents) {
       this.log?.debug(
@@ -209,6 +210,7 @@ export class App extends BaseApp {
    * @async
    * @param code - Node's signal process code.
    */
+  // eslint-disable-next-line no-undef
   public async onProcessSignal(code: NodeJS.Signals): Promise<void> {
     this.log?.warning(
       new Log(`got signal '${code}': initializing graceful shutdown`)

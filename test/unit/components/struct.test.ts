@@ -168,7 +168,7 @@ describe('Struct', () => {
 
   describe('validation', () => {
     it('skips validating properties defined with @inject decorator', () => {
-      class MyDependency { }
+      class MyDependency {}
 
       @define()
       class MyStruct extends Struct {

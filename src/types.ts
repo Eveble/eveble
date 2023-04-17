@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import { interfaces as inversifyTypes } from '@parisholley/inversify-async';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
@@ -219,11 +220,11 @@ export namespace types {
   export interface Configurable extends Definable {
     isConfigurable(path: string): boolean;
     has(path: string): boolean;
-    get<T extends any>(path: string, runtimeDefaultValue?: any): T;
-    getExact<T extends any>(path: string): T;
-    getDefault<T extends any>(path: string): T;
+    get<T>(path: string, runtimeDefaultValue?: any): T;
+    getExact<T>(path: string): T;
+    getDefault<T>(path: string): T;
     hasDefault(path: string): boolean;
-    set<T extends any>(path: string, value: T): void;
+    set<T>(path: string, value: T): void;
     assign(props: Props): void;
     include(config: Configurable): void;
     merge(config: Configurable): void;

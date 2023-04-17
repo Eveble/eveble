@@ -7,6 +7,7 @@ import { LOGGING_LEVELS } from '../constants/defaults';
 import { types } from '../types';
 import { RFC5424LoggingMixin } from '../mixins/rfc-5424-logging-mixin';
 
+// eslint-disable-next-line no-shadow
 enum STATES {
   constructed = 'constructed',
   stopped = 'stopped',

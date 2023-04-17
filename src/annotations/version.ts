@@ -43,6 +43,7 @@ import {
  * }
  *```
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function version<T>(schemaVersion: number): any {
   return function (proto: types.Prototype, propertyKey: string): void {
     const target: any = proto.constructor;

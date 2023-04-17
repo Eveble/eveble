@@ -71,7 +71,7 @@ export class Message extends Serializable implements types.Message {
    */
   public assignMetadata(props: Record<string, any>): void {
     Object.assign(
-      this.metadata,
+      this.metadata as any,
       merge(this.metadata as Record<string, any>, props, {
         isMergeableObject: isPlainRecord,
       })
