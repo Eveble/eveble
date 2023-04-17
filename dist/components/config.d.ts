@@ -7,11 +7,11 @@ export declare class Config extends Struct implements types.Configurable {
     isConfigurable(path: string): boolean;
     getPropTypes(): types.Props;
     has(path: string): boolean;
-    get<T extends any>(path: string, runtimeDefaultValue?: T): T | any;
-    getExact<T extends any>(path: string): T | any;
-    getDefault<T extends any>(path: string): T | any;
+    get<T>(path: string, runtimeDefaultValue?: T): T | any;
+    getExact<T>(path: string): T | any;
+    getDefault<T>(path: string): T | any;
     hasDefault(path: string): boolean;
-    set<T extends any>(path: string, value: T): void;
+    set<T>(path: string, value: T): void;
     assign(props: types.Props): void;
     include(config: types.Configurable): void;
     static from<T>(props: Record<string, any>): T;

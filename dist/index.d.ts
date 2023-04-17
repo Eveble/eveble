@@ -103,10 +103,10 @@ export { VersionableMixin, VersionableError, InvalidSchemaVersionError, LegacyTr
 export { isDefinable, isRecord, isPlainRecord, hasPostConstruct, toPlainObject, convertObjectToCollection, createEJSON, isEventSourceableType, loadENV, } from './utils/helpers';
 export { isSerializable, resolveSerializableFromPropType } from '@eveble/core';
 export { types } from './types';
-export declare type Stringifiable = types.Stringifiable;
+export type Stringifiable = types.Stringifiable;
 export { types as EvebleTypes } from './types';
-export declare type ConstructorType<T> = types.ConstructorType<T>;
-export declare type EntityType<T> = types.EntityType<T>;
+export type ConstructorType<T> = types.ConstructorType<T>;
+export type EntityType<T> = types.EntityType<T>;
 export { postConstruct, injectable, inject, } from '@parisholley/inversify-async';
 export { loggerLoader } from './utils/logger-loader';
 export { BINDINGS, BINDINGS as EVEBLE_BINDINGS };

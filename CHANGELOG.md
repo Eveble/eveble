@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/Eveble/eveble/compare/v2.5.1...v2.5.2) (2023-04-17)
+
+
+### Bug Fixes
+
+* **typedoc:** update typedoc.json for v0.23 ([2e13824](https://github.com/Eveble/eveble/commit/2e13824575b751ef0efc7e90fb517bf18755891a))
+
 ## [2.5.1](https://github.com/Eveble/eveble/compare/v2.5.0...v2.5.1) (2023-04-12)
 
 
