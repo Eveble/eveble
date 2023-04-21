@@ -1,6 +1,6 @@
 {
   "name": "@eveble/eveble",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "description": "Event sourcing framework with modular architecture for domain driven designed applications in Node.js",
   "main": "dist/index.js",
   "module": "dist/index.es.js",

@@ -1,3 +1,10 @@
+## [2.5.4](https://github.com/Eveble/eveble/compare/v2.5.3...v2.5.4) (2023-04-21)
+
+
+### Bug Fixes
+
+* **exports:** export missing can decorator ([b6152e0](https://github.com/Eveble/eveble/commit/b6152e0b1a026a0c12181fafc95883cbd8ed6639))
+
 ## [2.5.3](https://github.com/Eveble/eveble/compare/v2.5.2...v2.5.3) (2023-04-21)
 
 

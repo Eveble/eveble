@@ -6,6 +6,7 @@ export { initial } from './annotations/initial';
 export { route } from './annotations/route';
 export { subscribe } from './annotations/subscribe';
 export { version } from './annotations/version';
+export { can } from './decorators/can';
 export { App } from './app/app';
 export { Eveble } from './app/eveble';
 export { AgendaCommandSchedulerModule } from './app/modules/agenda-command-scheduler-module';

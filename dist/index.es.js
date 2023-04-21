@@ -1320,6 +1320,285 @@ function version(schemaVersion) {
     };
 }
 
+class StateError extends ExtendableError {
+}
+class UndefinedStatesError extends StateError {
+    constructor(typeName) {
+        super(`${typeName}: states are not defined. Please define states as class(MyClass.STATES) property or define your getter as MyClass.prototype.getAvailableStates`);
+    }
+}
+class InvalidStateError extends StateError {
+    constructor(typeName, currentState, expectedStates) {
+        super(`${typeName}: expected current state of '${currentState}' to be in one of states: '${expectedStates}'`);
+    }
+}
+let StatefulMixin = class StatefulMixin {
+    setState(state) {
+        const selectableStates = this.getSelectableStates();
+        if (isEmpty(selectableStates)) {
+            const typeName = getTypeName(this.constructor);
+            throw new UndefinedStatesError(typeName);
+        }
+        const oneOfSelectableStates = Object.values(selectableStates);
+        if (kernel.isValidating()) {
+            const pattern = new OneOf(...oneOfSelectableStates);
+            kernel.validator.validate(state, pattern);
+        }
+        this.state = state;
+    }
+    isInState(state) {
+        if (Array.isArray(state)) {
+            return this.isInOneOfStates(state);
+        }
+        return this.state === state;
+    }
+    isInOneOfStates(states) {
+        const expectedStates = Array.isArray(states)
+            ? states
+            : [states];
+        return expectedStates.includes(this.state);
+    }
+    getState() {
+        return this.state;
+    }
+    hasState() {
+        return this.state != null;
+    }
+    validateState(stateOrStates, error) {
+        const expectedStates = Array.isArray(stateOrStates)
+            ? stateOrStates
+            : [stateOrStates];
+        if (!this.isInOneOfStates(expectedStates)) {
+            if (error !== undefined) {
+                throw error;
+            }
+            const typeName = getTypeName(this.constructor);
+            throw new InvalidStateError(typeName, this.state, expectedStates.join(', '));
+        }
+        return true;
+    }
+    getSelectableStates() {
+        return this.constructor.STATES;
+    }
+};
+StatefulMixin = __decorate([
+    injectable()
+], StatefulMixin);
+
+class StatusError extends ExtendableError {
+}
+class UndefinedStatusesError extends StatusError {
+    constructor(typeName) {
+        super(`${typeName}: statuses are not defined. Please define statuses as class(MyClass.STATUSES) property or define your getter as MyClass.prototype.getAvailableStatuses`);
+    }
+}
+class InvalidStatusError extends StatusError {
+    constructor(typeName, currentStatus, expectedStatuses) {
+        super(`${typeName}: expected current status of '${currentStatus}' to be in one of statuses: '${expectedStatuses}'`);
+    }
+}
+let StatusfulMixin = class StatusfulMixin {
+    setStatus(status) {
+        const selectableStatuses = this.getSelectableStatuses();
+        if (isEmpty(selectableStatuses)) {
+            const typeName = getTypeName(this.constructor);
+            throw new UndefinedStatusesError(typeName);
+        }
+        const oneOfSelectableStatuses = Object.values(selectableStatuses);
+        if (kernel.isValidating()) {
+            const pattern = new OneOf(...oneOfSelectableStatuses);
+            kernel.validator.validate(status, pattern);
+        }
+        this.status = status;
+    }
+    isInStatus(status) {
+        if (Array.isArray(status)) {
+            return this.isInOneOfStatuses(status);
+        }
+        return this.status === status;
+    }
+    isInOneOfStatuses(status) {
+        const expectedStatuses = Array.isArray(status)
+            ? status
+            : [status];
+        return expectedStatuses.includes(this.status);
+    }
+    getStatus() {
+        return this.status;
+    }
+    hasStatus() {
+        return this.status != null;
+    }
+    validateStatus(statusOrStatuses, error) {
+        const expectedStatuses = Array.isArray(statusOrStatuses)
+            ? statusOrStatuses
+            : [statusOrStatuses];
+        if (!this.isInOneOfStatuses(expectedStatuses)) {
+            if (error !== undefined) {
+                throw error;
+            }
+            const typeName = getTypeName(this.constructor);
+            throw new InvalidStatusError(typeName, this.status, expectedStatuses.join(', '));
+        }
+        return true;
+    }
+    getSelectableStatuses() {
+        return this.constructor.STATUSES;
+    }
+};
+StatusfulMixin = __decorate([
+    injectable()
+], StatusfulMixin);
+
+let Entity = class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin) {
+    constructor(props) {
+        super([props]);
+    }
+    getId() {
+        return this.id;
+    }
+    equals(otherEntity) {
+        return (otherEntity != null &&
+            otherEntity.constructor === this.constructor &&
+            otherEntity.getId() === this.id);
+    }
+    assign(...sources) {
+        const pickedProps = this.pickProps(...sources);
+        this.validateProps({ ...this, ...pickedProps }, this.getPropTypes(), true);
+        Object.assign(this, pickedProps);
+        return this;
+    }
+    pickProps(...sources) {
+        const propTypes = this.getPropTypes();
+        const propKeys = Object.keys(propTypes);
+        const pickedProps = {};
+        for (const source of sources) {
+            Object.assign(pickedProps, pick(source, propKeys));
+        }
+        return pickedProps;
+    }
+    on(action) {
+        kernel.asserter.setAction(action);
+        return this;
+    }
+    get ensure() {
+        return new Proxy(this, {
+            get(target, key) {
+                if (key === Symbol.toStringTag) {
+                    return this;
+                }
+                const propKey = key;
+                if (kernel.asserter.hasApi(`${propKey}.`)) {
+                    kernel.asserter.setEntity(target);
+                    return kernel.asserter.ensure[propKey];
+                }
+                if (typeof target[propKey] === 'function') {
+                    const proxifiedMethod = new Proxy(target[propKey], {
+                        apply(_targetMethod, _thisArg, args) {
+                            target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
+                            const result = target[propKey](...args);
+                            target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
+                            return result;
+                        },
+                    });
+                    return proxifiedMethod;
+                }
+                if (target[propKey] === undefined) {
+                    return target;
+                }
+                return target[propKey];
+            },
+        });
+    }
+    get ableTo() {
+        return this;
+    }
+    get is() {
+        return this;
+    }
+    get can() {
+        return new Proxy(this, {
+            get(target, propKey) {
+                const proxifiedMethod = new Proxy(target[propKey], {
+                    apply(_targetMethod, _thisArg, args) {
+                        target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
+                        let isAble = true;
+                        try {
+                            target[propKey](...args);
+                        }
+                        catch (e) {
+                            isAble = false;
+                        }
+                        target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
+                        return isAble;
+                    },
+                });
+                return proxifiedMethod;
+            },
+        });
+    }
+    [SAVE_STATE_METHOD_KEY]() {
+        this[SAVED_STATE_KEY] = {};
+        const propTypes = this.getPropTypes();
+        for (const key of Object.keys(propTypes)) {
+            if (this[key] !== undefined) {
+                this[SAVED_STATE_KEY][key] = deepClone(this[key]);
+            }
+        }
+    }
+    [ENABLE_ACTION_VALIDATION_METHOD_KEY]() {
+        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+            value: true,
+            enumerable: false,
+            writable: true,
+        });
+    }
+    [DISABLE_ACTION_VALIDATION_METHOD_KEY]() {
+        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
+            value: false,
+            enumerable: false,
+            writable: true,
+        });
+    }
+    [IS_ACTION_VALIDATED_METHOD_KEY]() {
+        return this[ACTION_VALIDATION_KEY] || false;
+    }
+    [ROLLBACK_STATE_METHOD_KEY]() {
+        if (!this.isStateSaved()) {
+            throw new SavedStateNotFoundError(this.getTypeName(), this.getId().toString());
+        }
+        Object.assign(this, this[SAVED_STATE_KEY]);
+        const serializablesListProps = Reflect.getMetadata(SERIALIZABLE_LIST_PROPS_KEY, this.constructor);
+        for (const [key, serializable] of Object.entries(serializablesListProps)) {
+            this[key] = new List(this, key, serializable, this[SAVED_STATE_KEY][key] || []);
+        }
+        delete this[SAVED_STATE_KEY];
+    }
+    isStateSaved() {
+        return this[SAVED_STATE_KEY] !== undefined;
+    }
+};
+Entity = __decorate([
+    define('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 999 } }),
+    __metadata("design:paramtypes", [Object])
+], Entity);
+Entity.enableSerializableLists();
+
+const can = (validator) => (target, _propertyKey, descriptor) => {
+    if (target.prototype instanceof Entity) {
+        throw new Error(`Only 'Entity' child classes actions(methods) can be decorated with @can(...) decorator`);
+    }
+    const originalMethod = descriptor.value;
+    descriptor.value = function (...args) {
+        if (this[IS_ACTION_VALIDATED_METHOD_KEY]()) {
+            return validator(this, ...args);
+        }
+        const result = originalMethod.apply(this, args);
+        return result;
+    };
+    return descriptor;
+};
+
 class ModuleError extends ExtendableError {
 }
 class AppMissingError extends ModuleError {
@@ -1444,71 +1723,6 @@ class Injector extends Container {
         return identifiers;
     }
 }
-
-class StateError extends ExtendableError {
-}
-class UndefinedStatesError extends StateError {
-    constructor(typeName) {
-        super(`${typeName}: states are not defined. Please define states as class(MyClass.STATES) property or define your getter as MyClass.prototype.getAvailableStates`);
-    }
-}
-class InvalidStateError extends StateError {
-    constructor(typeName, currentState, expectedStates) {
-        super(`${typeName}: expected current state of '${currentState}' to be in one of states: '${expectedStates}'`);
-    }
-}
-let StatefulMixin = class StatefulMixin {
-    setState(state) {
-        const selectableStates = this.getSelectableStates();
-        if (isEmpty(selectableStates)) {
-            const typeName = getTypeName(this.constructor);
-            throw new UndefinedStatesError(typeName);
-        }
-        const oneOfSelectableStates = Object.values(selectableStates);
-        if (kernel.isValidating()) {
-            const pattern = new OneOf(...oneOfSelectableStates);
-            kernel.validator.validate(state, pattern);
-        }
-        this.state = state;
-    }
-    isInState(state) {
-        if (Array.isArray(state)) {
-            return this.isInOneOfStates(state);
-        }
-        return this.state === state;
-    }
-    isInOneOfStates(states) {
-        const expectedStates = Array.isArray(states)
-            ? states
-            : [states];
-        return expectedStates.includes(this.state);
-    }
-    getState() {
-        return this.state;
-    }
-    hasState() {
-        return this.state != null;
-    }
-    validateState(stateOrStates, error) {
-        const expectedStates = Array.isArray(stateOrStates)
-            ? stateOrStates
-            : [stateOrStates];
-        if (!this.isInOneOfStates(expectedStates)) {
-            if (error !== undefined) {
-                throw error;
-            }
-            const typeName = getTypeName(this.constructor);
-            throw new InvalidStateError(typeName, this.state, expectedStates.join(', '));
-        }
-        return true;
-    }
-    getSelectableStates() {
-        return this.constructor.STATES;
-    }
-};
-StatefulMixin = __decorate([
-    injectable()
-], StatefulMixin);
 
 class UndefinedLoggableTargetError extends ExtendableError {
     constructor() {
@@ -6660,205 +6874,6 @@ class App extends BaseApp {
     }
 }
 
-class StatusError extends ExtendableError {
-}
-class UndefinedStatusesError extends StatusError {
-    constructor(typeName) {
-        super(`${typeName}: statuses are not defined. Please define statuses as class(MyClass.STATUSES) property or define your getter as MyClass.prototype.getAvailableStatuses`);
-    }
-}
-class InvalidStatusError extends StatusError {
-    constructor(typeName, currentStatus, expectedStatuses) {
-        super(`${typeName}: expected current status of '${currentStatus}' to be in one of statuses: '${expectedStatuses}'`);
-    }
-}
-let StatusfulMixin = class StatusfulMixin {
-    setStatus(status) {
-        const selectableStatuses = this.getSelectableStatuses();
-        if (isEmpty(selectableStatuses)) {
-            const typeName = getTypeName(this.constructor);
-            throw new UndefinedStatusesError(typeName);
-        }
-        const oneOfSelectableStatuses = Object.values(selectableStatuses);
-        if (kernel.isValidating()) {
-            const pattern = new OneOf(...oneOfSelectableStatuses);
-            kernel.validator.validate(status, pattern);
-        }
-        this.status = status;
-    }
-    isInStatus(status) {
-        if (Array.isArray(status)) {
-            return this.isInOneOfStatuses(status);
-        }
-        return this.status === status;
-    }
-    isInOneOfStatuses(status) {
-        const expectedStatuses = Array.isArray(status)
-            ? status
-            : [status];
-        return expectedStatuses.includes(this.status);
-    }
-    getStatus() {
-        return this.status;
-    }
-    hasStatus() {
-        return this.status != null;
-    }
-    validateStatus(statusOrStatuses, error) {
-        const expectedStatuses = Array.isArray(statusOrStatuses)
-            ? statusOrStatuses
-            : [statusOrStatuses];
-        if (!this.isInOneOfStatuses(expectedStatuses)) {
-            if (error !== undefined) {
-                throw error;
-            }
-            const typeName = getTypeName(this.constructor);
-            throw new InvalidStatusError(typeName, this.status, expectedStatuses.join(', '));
-        }
-        return true;
-    }
-    getSelectableStatuses() {
-        return this.constructor.STATUSES;
-    }
-};
-StatusfulMixin = __decorate([
-    injectable()
-], StatusfulMixin);
-
-let Entity = class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin) {
-    constructor(props) {
-        super([props]);
-    }
-    getId() {
-        return this.id;
-    }
-    equals(otherEntity) {
-        return (otherEntity != null &&
-            otherEntity.constructor === this.constructor &&
-            otherEntity.getId() === this.id);
-    }
-    assign(...sources) {
-        const pickedProps = this.pickProps(...sources);
-        this.validateProps({ ...this, ...pickedProps }, this.getPropTypes(), true);
-        Object.assign(this, pickedProps);
-        return this;
-    }
-    pickProps(...sources) {
-        const propTypes = this.getPropTypes();
-        const propKeys = Object.keys(propTypes);
-        const pickedProps = {};
-        for (const source of sources) {
-            Object.assign(pickedProps, pick(source, propKeys));
-        }
-        return pickedProps;
-    }
-    on(action) {
-        kernel.asserter.setAction(action);
-        return this;
-    }
-    get ensure() {
-        return new Proxy(this, {
-            get(target, key) {
-                if (key === Symbol.toStringTag) {
-                    return this;
-                }
-                const propKey = key;
-                if (kernel.asserter.hasApi(`${propKey}.`)) {
-                    kernel.asserter.setEntity(target);
-                    return kernel.asserter.ensure[propKey];
-                }
-                if (typeof target[propKey] === 'function') {
-                    const proxifiedMethod = new Proxy(target[propKey], {
-                        apply(_targetMethod, _thisArg, args) {
-                            target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
-                            const result = target[propKey](...args);
-                            target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
-                            return result;
-                        },
-                    });
-                    return proxifiedMethod;
-                }
-                if (target[propKey] === undefined) {
-                    return target;
-                }
-                return target[propKey];
-            },
-        });
-    }
-    get ableTo() {
-        return this;
-    }
-    get is() {
-        return this;
-    }
-    get can() {
-        return new Proxy(this, {
-            get(target, propKey) {
-                const proxifiedMethod = new Proxy(target[propKey], {
-                    apply(_targetMethod, _thisArg, args) {
-                        target[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
-                        let isAble = true;
-                        try {
-                            target[propKey](...args);
-                        }
-                        catch (e) {
-                            isAble = false;
-                        }
-                        target[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
-                        return isAble;
-                    },
-                });
-                return proxifiedMethod;
-            },
-        });
-    }
-    [SAVE_STATE_METHOD_KEY]() {
-        this[SAVED_STATE_KEY] = {};
-        const propTypes = this.getPropTypes();
-        for (const key of Object.keys(propTypes)) {
-            if (this[key] !== undefined) {
-                this[SAVED_STATE_KEY][key] = deepClone(this[key]);
-            }
-        }
-    }
-    [ENABLE_ACTION_VALIDATION_METHOD_KEY]() {
-        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
-            value: true,
-            enumerable: false,
-            writable: true,
-        });
-    }
-    [DISABLE_ACTION_VALIDATION_METHOD_KEY]() {
-        Object.defineProperty(this, ACTION_VALIDATION_KEY, {
-            value: false,
-            enumerable: false,
-            writable: true,
-        });
-    }
-    [IS_ACTION_VALIDATED_METHOD_KEY]() {
-        return this[ACTION_VALIDATION_KEY] || false;
-    }
-    [ROLLBACK_STATE_METHOD_KEY]() {
-        if (!this.isStateSaved()) {
-            throw new SavedStateNotFoundError(this.getTypeName(), this.getId().toString());
-        }
-        Object.assign(this, this[SAVED_STATE_KEY]);
-        const serializablesListProps = Reflect.getMetadata(SERIALIZABLE_LIST_PROPS_KEY, this.constructor);
-        for (const [key, serializable] of Object.entries(serializablesListProps)) {
-            this[key] = new List(this, key, serializable, this[SAVED_STATE_KEY][key] || []);
-        }
-        delete this[SAVED_STATE_KEY];
-    }
-    isStateSaved() {
-        return this[SAVED_STATE_KEY] !== undefined;
-    }
-};
-Entity = __decorate([
-    define('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 999 } }),
-    __metadata("design:paramtypes", [Object])
-], Entity);
-Entity.enableSerializableLists();
-
 let EventSourceable = class EventSourceable extends classes(Entity, OneToOneHandlingMixin) {
     constructor(props) {
         const processedProps = { version: 0, ...props };
@@ -7382,4 +7397,4 @@ function loggerLoader(injector, level, consoleTransportConfig = new LogTransport
     return logger;
 }
 
-export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, AgendaClient, AgendaCommandScheduler, AgendaCommandSchedulerModule, AgendaScheduledJobTransformer, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingMixin, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, DefinableMixin, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableMixin, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingMixin, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, HandlerExistError, HandlerNotFoundError, HandlingError, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableMixin, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingMixin, OneToOneHandlingMixin, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, RFC5424LoggingMixin, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableMixin, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulMixin, StatusError, StatusfulAssertion, StatusfulMixin, StorageNotFoundError, StringifingConverter, Struct, TransportExistsError, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, VersionableError, VersionableMixin, convertObjectToCollection, createEJSON, delegate, handle, hasPostConstruct, initial, isDefinable, isEventSourceableType, isPlainRecord, isRecord, loadENV, loggerLoader, route, subscribe, toPlainObject, version };
+export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, AgendaClient, AgendaCommandScheduler, AgendaCommandSchedulerModule, AgendaScheduledJobTransformer, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingMixin, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, DefinableMixin, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableMixin, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingMixin, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, HandlerExistError, HandlerNotFoundError, HandlingError, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableMixin, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingMixin, OneToOneHandlingMixin, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, RFC5424LoggingMixin, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableMixin, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulMixin, StatusError, StatusfulAssertion, StatusfulMixin, StorageNotFoundError, StringifingConverter, Struct, TransportExistsError, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, VersionableError, VersionableMixin, can, convertObjectToCollection, createEJSON, delegate, handle, hasPostConstruct, initial, isDefinable, isEventSourceableType, isPlainRecord, isRecord, loadENV, loggerLoader, route, subscribe, toPlainObject, version };
