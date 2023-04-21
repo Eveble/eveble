@@ -413,17 +413,17 @@
   integrity sha512-IoD2MfUnOV58ghIHCiil01PcohxjbYR/qCxsoC+xNgUwh1EY8jOOrYmu3d3a71+tJJ23uscEV4X2HJWMsPJu4g==
 
 "@eveble/core@latest":
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/@eveble/core/-/core-1.0.2.tgz#f5a16c6e0d8a2517e09982b137e9a3ffaf3b4f09"
-  integrity sha512-oJXBOGp/ZkWM/T/Cvr0oBbaqe+3wh0CW2S9fPBRkKpbyR6RImcH3o7VVosEoSI9k45/uaTGC2hOsd+5+YPyZzQ==
+  version "1.1.8"
+  resolved "https://registry.npmjs.org/@eveble/core/-/core-1.1.8.tgz#dce6f5b85022a34cc966f48cea5d52c5d31c87c1"
+  integrity sha512-LmLB/h3Gf4kuHJoYKJo6Qglw1ikpClln3i/n3fwTC2D0dAKTiklVFwk9WXOCWe2shRxwHmwtLWVyE95KX0zkQw==
   dependencies:
     "@eveble/helpers" latest
     "@parisholley/inversify-async" "^1.1.7"
     getenv "^1.0.0"
-    lodash "^4.17.19"
+    lodash "^4.17.21"
     reflect-metadata "^0.1.13"
     tsruntime "^3.0.0-beta.1"
-    ttypescript "^1.5.10"
+    ttypescript "^1.5.15"
     typend latest
 
 "@eveble/ejson@latest":
@@ -434,9 +434,9 @@
     underscore "~1.8.3"
 
 "@eveble/helpers@^1.0.3", "@eveble/helpers@latest":
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/@eveble/helpers/-/helpers-1.0.3.tgz#4cedc4df777dfd2a7bac2387a7537bc22abbd3a1"
-  integrity sha512-gR/PKgh8yGIu6pHNrgaqb/Rgf9di6+rKQXXxofnRWVgP1pgQOpAb4TcqYJS/QV4JVSne5P0mc1oFo98jXbmprw==
+  version "1.0.4"
+  resolved "https://registry.npmjs.org/@eveble/helpers/-/helpers-1.0.4.tgz#159a66672fe3f9be42b7d3cc4bb860ce65e015d8"
+  integrity sha512-UaJji8jN9OaxvWS/hODXQDYtgAXU5RIL+87Dl6uKNHLYxqBmIw7HHE90z2CX969LTNS9D02r5ZkhMHZOTILKtQ==
   dependencies:
     reflect-metadata "^0.1.13"
 
@@ -9694,7 +9694,7 @@ tsutils@^3.21.0:
   dependencies:
     tslib "^1.8.1"
 
-ttypescript@^1.5.10, ttypescript@^1.5.15:
+ttypescript@^1.5.15:
   version "1.5.15"
   resolved "https://registry.npmjs.org/ttypescript/-/ttypescript-1.5.15.tgz#e45550ad69289d06d3bc3fd4a3c87e7c1ef3eba7"
   integrity sha512-48ykDNHzFnPMnv4hYX1P8Q84TvCZyL1QlFxeuxsuZ48X2+ameBgPenvmCkHJtoOSxpoWTWi8NcgNrRnVDOmfSg==
