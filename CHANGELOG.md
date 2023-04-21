@@ -1,3 +1,10 @@
+## [2.5.3](https://github.com/Eveble/eveble/compare/v2.5.2...v2.5.3) (2023-04-21)
+
+
+### Bug Fixes
+
+* **deps:** update eveble dependencies on yarn.lock ([1ae54b4](https://github.com/Eveble/eveble/commit/1ae54b432fd0e1931328c216ed5609911c25774d))
+
 ## [2.5.2](https://github.com/Eveble/eveble/compare/v2.5.1...v2.5.2) (2023-04-17)
 
 
