@@ -8,14 +8,14 @@ on: [pull_request]
 jobs:
   assign_reviewers:
     runs-on: ubuntu-latest
-    name: Assign reviewers
+    name: 👩🏼‍🔬 Assign reviewers
     steps:
       - uses: kentaro-m/auto-assign-action@v1.2.5
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
   misspell:
     runs-on: ubuntu-latest
-    name: Fix misspells
+    name: 📝 Fix misspells
     steps:
       - uses: actions/checkout@v3
       - uses: reviewdog/action-misspell@v1
@@ -27,13 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: Lint commits
+    name: 🔎 Lint commits
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: wagoid/commitlint-github-action@v5
-      - name: Failed - remove conventional label
+      - name: [failed] 🏷️ Remove conventional label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -44,7 +44,7 @@ jobs:
                 name: 'conventional'
               })
             }
-      - name: Success - add conventional label
+      - name: [success] 🏷️ Add conventional label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
         with:
@@ -68,21 +68,21 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: password
     env:
       USERNAME: ${{ github.event.github.actor }}
-    name: Tests / Node@${{ matrix.node-version}}
+    name: ✅ Test
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node@${{ matrix.node-version}}
+      - name: ⚙️ Setup Node@${{ matrix.node-version}}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://npm.pkg.github.com/'
           scope: ${{ env.USERNAME }}
-      - name: Install dependencies
+      - name: 🚧  Install dependencies
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
       - run: yarn test
-      - name: Failed - remove test label
+      - name: [failed] 🏷️ Remove test label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -93,7 +93,7 @@ jobs:
                 name: 'tested'
               })
             }
-      - name: Success - add test label
+      - name: [success] 🏷️ Add test label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
         with:
@@ -114,16 +114,16 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: password
     env:
       USERNAME: ${{ github.event.github.actor }}
-    name: Validate test coverage
+    name: 📈 Validate test coverage
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node@18.x
+      - name: ⚙️ Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 16
           registry-url: 'https://npm.pkg.github.com/'
           scope: ${{ env.USERNAME }}
-      - name: Install dependencies
+      - name: 🚧  Install dependencies
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
@@ -134,7 +134,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.lcov
           fail_ci_if_error: true
-      - name: Failed - remove covered label
+      - name: [failed] 🏷️ Remove covered label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -145,7 +145,7 @@ jobs:
                 name: 'covered'
               })
             }
-      - name: Success - add covered label
+      - name: [success] 🏷️ Add covered label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
         with:
@@ -167,7 +167,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-check
           eslint_flags: 'src/**/*.ts'
-      - name: Failed - remove linted label
+      - name: [failed] 🏷️ Remove linted label
         uses: actions/github-script@v6
         if: failure()
         with:
@@ -178,7 +178,7 @@ jobs:
                 name: 'linted'
               })
             }
-      - name: Success - add linted label
+      - name: [success] 🏷️ Add linted label
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -203,13 +203,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: Setup Node@18.x
+      - name: ⚙️ Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 16
           registry-url: 'https://npm.pkg.github.com/'
           scope: ${{ env.USERNAME }}
-      - name: Install dependencies
+      - name: 🚧  Install dependencies
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
@@ -226,7 +226,7 @@ jobs:
           git add -A
           git diff-index --quiet HEAD || git commit --allow-empty -m "style: add format changes 🤖" -a
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
-      - name: Failed - remove formatted label
+      - name: [failed] 🏷️ Remove formatted label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -237,7 +237,7 @@ jobs:
                 name: 'formatted'
               })
             }
-      - name: Success - add formatted label
+      - name: [success] 🏷️ Add formatted label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
         with:
@@ -284,18 +284,18 @@ jobs:
       USERNAME: ${{ github.event.github.actor }}
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node@18.x
+      - name: ⚙️ Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 16
           registry-url: 'https://npm.pkg.github.com/'
           scope: ${{ env.USERNAME }}
-      - name: Install dependencies
+      - name: 🚧  Install dependencies
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
       - run: yarn build
-      - name: Failed - remove builds label
+      - name: [failed] 🏷️ Remove builds label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -306,7 +306,7 @@ jobs:
                 name: 'builds'
               })
             }
-      - name: Success - add builds label
+      - name: [success] 🏷️ Add builds label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
         with:
@@ -317,27 +317,27 @@ jobs:
             })
   build_docs:
     runs-on: ubuntu-latest
-    name: Build documentation
+    name: 📄 Build documentation
     env:
       USERNAME: ${{ github.event.github.actor }}
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node@18.x
+      - name: ⚙️ Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 16
           registry-url: 'https://npm.pkg.github.com/'
           scope: ${{ env.USERNAME }}
-      - name: Install dependencies
+      - name: 🚧  Install dependencies
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
-      - name: Install dependencies on Docusaurus
+      - name: 🚧  Install dependencies on Docusaurus
         run: |
           cd ./website
           yarn install
       - run: yarn docs:build
-      - name: Failed - remove documented label
+      - name: [failed] 🏷️ Remove documented label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -348,7 +348,7 @@ jobs:
                 name: 'documented'
               })
             }
-      - name: Success - add documented label
+      - name: [success] 🏷️ Add documented label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
         with:

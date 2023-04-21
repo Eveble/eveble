@@ -1,12 +1,30 @@
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Through out this whole github action there are two distinct flows that
+# allows for releasing on npm & github OR github only.
+# This allows for separation on public repositories and private ones
+# without publishing release to npm.
+# Job names are prefixed with [public] & [private] tags.
+# The switch is based on top of conditional:
+# if: ${{ env.IS_PRIVATE != 'true' }}
+# and environment variable "IS_PRIVATE" set to `true` or `false`
+# that can be defined inside Github's repository `Settings`
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Evaluates on push event if release is necessary and if so - create a release Pull Request
 name: Push to release branches
 on:
   push:
     branches: [master, next, alpha, beta]
+# Setting an environment variable with the value of a configuration variable
+env:
+  IS_PRIVATE: ${{ vars.IS_PRIVATE }}
+  USERNAME: ${{ github.event.github.actor }}
+  EVEBLE_TYPES_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
+  NODE_VERSION: 18
+  SEMANTIC_VERSION: 19.0.5
 jobs:
   # Release with semantic-release an auto-merged branch to: Github repository, NPM, Github package registry
   release:
-    name: Release to Github, NPM, Github, GitHub Packages
+    name: Release to Github, GitHub Packages, NPM
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -28,21 +46,37 @@ jobs:
     if: >
       github.actor != 'semantic-release-bot'
       && ! contains(github.event.head_commit.message, 'chore(release):')
-    env:
-      USERNAME: ${{ github.event.github.actor }}
-      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      EVEBLE_TYPES_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
     steps:
+      - name: ♻️ Environment
+        run: |
+          echo IS_PRIVATE: ${{ env.IS_PRIVATE }}
       - name: ⤵️  Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: ⚙️ Setup Node@18.x
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # `Setup Node` - WILL DEFINE WHICH REGISTRY IS USED ON SEMANTIC
+        # It does not care if you are using extra-plugin: @semantic-release/npm@9.0.2
+        # If registry-url is defined to: 'https://npm.pkg.github.com/'
+        # It will always try to publish the package on github AND NOT npm
+        # On top of this issue:
+        # IT WILL COMPLETELY ignore GH_TOKEN, GITHUB_TOKEN, NPM_TOKEN
+        # IT will always use NODE_AUTH_TOKEN to define what will be used to
+        # authenticate with the registry.
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      - name: ⚙️ [public]Setup Node
+        if: ${{ env.IS_PRIVATE != 'true' }}
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          registry-url: 'https://npm.pkg.github.com/'
+          node-version: ${{env.NODE_VERSION}}
+          registry-url: 'https://registry.npmjs.org'
           scope: ${{ env.USERNAME }}
+      - name: ⚙️ [private]Setup Node
+        if: ${{ env.IS_PRIVATE == 'true' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+          registry-url: 'https://npm.pkg.github.com/'
       - name: 🚧  Install dependencies
         run: yarn install
         env:
@@ -51,18 +85,45 @@ jobs:
         run: yarn test
       - name: 🏗️ Build
         run: yarn build
-      - name: 🚀  Release
+      - name: 🚀  [public]Release
+        if: ${{ env.IS_PRIVATE != 'true' }}
         uses: cycjimmy/semantic-release-action@v3
-        id: semantic
+        id: public-semantic
         with:
-          semantic_version: 19.0.5
+          semantic_version: ${{env.SEMANTIC_VERSION}}
           dry_run: false
           extra_plugins: |
             @semantic-release/changelog@6.0.3
             @semantic-release/git@10.0.1
             @semantic-release/npm@9.0.2
         env:
+          # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          # NPM_TOKEN & GH_TOKEN _CAN_ be ignored by semantic-release
+          # use NODE_AUTH_TOKEN if this action fails do to:
+          # "EINVALIDNPMTOKEN Invalid npm token."
+          # https://github.com/semantic-release/semantic-release/issues/2313
+          # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: 🚀  [private]Release
+        if: ${{ env.IS_PRIVATE == 'true' }}
+        uses: cycjimmy/semantic-release-action@v3
+        id: private-semantic
+        with:
+          semantic_version: ${{env.SEMANTIC_VERSION}}
+          dry_run: false
+          extra_plugins: |
+            @semantic-release/changelog@6.0.3
+            @semantic-release/git@10.0.1
+            @semantic-release/npm@9.0.2
+        env:
+          # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          # NPM_TOKEN & GH_TOKEN _CAN_ be ignored, use NODE_AUTH_TOKEN
+          # if this action fails do to: "EINVALIDNPMTOKEN Invalid npm token."
+          # https://github.com/semantic-release/semantic-release/issues/2313
+          # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -75,7 +136,7 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: ${{env.NODE_VERSION}}.x
           registry-url: 'https://npm.pkg.github.com'
           scope: ${{ env.USERNAME }}
           always-auth: true
@@ -83,3 +144,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+      - name: 🎉  Publish To GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 🚧  Install dependencies on Docusaurus
+        run: |
+          cd ./website
+          yarn install
+      - name: 📄  Build docs
+        run: yarn docs:build
+      - name: Fix 404 Page not found for Github in case .nojekyll is missing in ./website/static
+        run: touch ./website/build/.nojekyll
+      - name: 🤓 Deploy documentation to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/build
+          publish_branch: gh-pages # deploying branch
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
