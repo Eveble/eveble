@@ -11,6 +11,8 @@ export { initial } from './annotations/initial';
 export { route } from './annotations/route';
 export { subscribe } from './annotations/subscribe';
 export { version } from './annotations/version';
+// Decorators
+export { can } from './decorators/can';
 // App
 export { App } from './app/app';
 export { Eveble } from './app/eveble';

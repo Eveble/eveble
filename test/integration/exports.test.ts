@@ -69,7 +69,6 @@ import {
   boolean,
   symbol,
 } from 'typend';
-// Annotations
 import {
   ExtendableError,
   Kernel,
@@ -86,12 +85,15 @@ import {
   isSerializable,
   resolveSerializableFromPropType,
 } from '@eveble/core';
+// Annotations
 import { delegate } from '../../src/annotations/delegate';
 import { handle } from '../../src/annotations/handle';
 import { initial } from '../../src/annotations/initial';
 import { route } from '../../src/annotations/route';
 import { subscribe } from '../../src/annotations/subscribe';
 import { version } from '../../src/annotations/version';
+// Decorators
+import { can } from '../../src/decorators/can';
 // App
 import { App } from '../../src/app/app';
 import { Eveble } from '../../src/app/eveble';
@@ -348,6 +350,8 @@ import {
   // Annotations
   internal as internalExported,
   validable as validableExported,
+  // Decorators
+  can as canExported,
   // Patterns
   any as anyExported,
   iof as iofExported,
@@ -821,6 +825,11 @@ describe(`exports`, () => {
       });
       it('version', () => {
         expect(versionExported).to.be.equal(version);
+      });
+    });
+    describe('annotations', () => {
+      it('can', () => {
+        expect(canExported).to.be.equal(can);
       });
     });
     describe('app', () => {
