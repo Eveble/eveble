@@ -134,7 +134,7 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^9.0.2",
     "rimraf": "^5.0.0",
-    "@types/agenda": "^2.0.8",
+    "@types/agenda": "^3.0.2",
     "@types/getenv": "^1.0.0",
     "@types/lodash": "^4.14.192",
     "@types/mongodb": "^3.5.25",
