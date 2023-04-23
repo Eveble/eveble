@@ -28,7 +28,8 @@
     "strictPropertyInitialization": false,
     "suppressImplicitAnyIndexErrors": false,
     "target": "es2018",
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts"

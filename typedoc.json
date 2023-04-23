@@ -14,5 +14,9 @@
   "tsconfig": "./tsconfig.json",
   "excludeExternals": true,
   "excludePrivate": true,
-  "excludeProtected": true
+  "excludeProtected": true,
+  "exclude": [
+    "node_modules",
+    "**/*.d.ts"
+  ]
 }
