@@ -1,3 +1,10 @@
+## [2.5.5](https://github.com/Eveble/eveble/compare/v2.5.4...v2.5.5) (2023-04-23)
+
+
+### Bug Fixes
+
+* **docs:** fix docs build do to issue with node_modules types ([5fa5364](https://github.com/Eveble/eveble/commit/5fa5364e05afd325cc31b43a013848ec9f0c675b))
+
 ## [2.5.4](https://github.com/Eveble/eveble/compare/v2.5.3...v2.5.4) (2023-04-21)
 
 
