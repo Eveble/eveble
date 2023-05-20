@@ -349,9 +349,12 @@ import {
   reflect as reflectExported,
   // Annotations
   internal as internalExported,
+  Internal as InternalExported,
   validable as validableExported,
+  Validable as ValidableExported,
   // Decorators
   can as canExported,
+  Can as CanExported,
   // Patterns
   any as anyExported,
   iof as iofExported,
@@ -389,6 +392,12 @@ import {
   route as routeExported,
   subscribe as subscribeExported,
   version as versionExported,
+  Delegate as DelegateExported,
+  Handle as HandleExported,
+  Initial as InitialExported,
+  Route as RouteExported,
+  Subscribe as SubscribeExported,
+  Version as VersionExported,
   // App
   App as AppExported,
   Eveble as EvebleExported,
@@ -457,6 +466,9 @@ import {
   TransportExistsError as TransportExistsErrorExported,
   // Decorators
   define as defineExported,
+  Define as DefineExported,
+  Type as TypeExported,
+  EvebleType as EvebleTypeExported,
   // Domain
   AbilityAssertion as AbilityAssertionExported,
   StatefulAssertion as StatefulAssertionExported,
@@ -604,6 +616,19 @@ import {
   postConstruct as postConstructExported,
   injectable as injectableExported,
   inject as injectExported,
+  // Aliases imports
+  Can,
+  Delegate,
+  Handle,
+  Initial,
+  Route,
+  Subscribe,
+  Version,
+  Define,
+  Type,
+  EvebleType,
+  Internal,
+  Validable,
 } from '../../src/index';
 
 describe(`exports`, () => {
@@ -684,6 +709,12 @@ describe(`exports`, () => {
       });
       it('validable', () => {
         expect(validableExported).to.be.equal(validable);
+      });
+      it('Internal', () => {
+        expect(InternalExported).to.be.equal(Internal);
+      });
+      it('Validable', () => {
+        expect(ValidableExported).to.be.equal(Validable);
       });
     });
     describe('end-api', () => {
@@ -811,25 +842,46 @@ describe(`exports`, () => {
       it('delegate', () => {
         expect(delegateExported).to.be.equal(delegate);
       });
+      it('Delegate', () => {
+        expect(DelegateExported).to.be.equal(Delegate);
+      });
       it('handle', () => {
         expect(handleExported).to.be.equal(handle);
+      });
+      it('Handle', () => {
+        expect(HandleExported).to.be.equal(Handle);
       });
       it('initial', () => {
         expect(initialExported).to.be.equal(initial);
       });
+      it('Initial', () => {
+        expect(InitialExported).to.be.equal(Initial);
+      });
       it('route', () => {
         expect(routeExported).to.be.equal(route);
+      });
+      it('Route', () => {
+        expect(RouteExported).to.be.equal(Route);
       });
       it('subscribe', () => {
         expect(subscribeExported).to.be.equal(subscribe);
       });
+      it('Subscribe', () => {
+        expect(SubscribeExported).to.be.equal(Subscribe);
+      });
       it('version', () => {
         expect(versionExported).to.be.equal(version);
+      });
+      it('Version', () => {
+        expect(VersionExported).to.be.equal(Version);
       });
     });
     describe('annotations', () => {
       it('can', () => {
         expect(canExported).to.be.equal(can);
+      });
+      it('Can', () => {
+        expect(CanExported).to.be.equal(Can);
       });
     });
     describe('app', () => {
@@ -1049,6 +1101,15 @@ describe(`exports`, () => {
   describe('decorators', () => {
     it('define', () => {
       expect(defineExported).to.be.equal(define);
+    });
+    it('Define', () => {
+      expect(DefineExported).to.be.equal(Define);
+    });
+    it('Type', () => {
+      expect(TypeExported).to.be.equal(Type);
+    });
+    it('EvebleType', () => {
+      expect(EvebleTypeExported).to.be.equal(EvebleType);
     });
   });
   describe('domain', () => {

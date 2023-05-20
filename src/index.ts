@@ -5,14 +5,14 @@ import { types } from './types';
 // Constants
 import { BINDINGS } from './constants/bindings';
 // Annotations
-export { delegate } from './annotations/delegate';
-export { handle } from './annotations/handle';
-export { initial } from './annotations/initial';
-export { route } from './annotations/route';
-export { subscribe } from './annotations/subscribe';
-export { version } from './annotations/version';
+export { delegate, delegate as Delegate } from './annotations/delegate';
+export { handle, handle as Handle } from './annotations/handle';
+export { initial, initial as Initial } from './annotations/initial';
+export { route, route as Route } from './annotations/route';
+export { subscribe, subscribe as Subscribe } from './annotations/subscribe';
+export { version, version as Version } from './annotations/version';
 // Decorators
-export { can } from './decorators/can';
+export { can, can as Can } from './decorators/can';
 // App
 export { App } from './app/app';
 export { Eveble } from './app/eveble';
@@ -77,7 +77,12 @@ export { LogTransport } from './core/log-transport';
 export { Logger } from './core/logger';
 export { Module } from './core/module';
 // Decorators
-export { define } from '@eveble/core';
+export {
+  define,
+  define as Define,
+  define as Type,
+  define as EvebleType,
+} from '@eveble/core';
 // Domain
 export { AbilityAssertion } from './domain/assertions/ability-assertion';
 export {
@@ -243,8 +248,11 @@ export type EntityType<T> = types.EntityType<T>;
 
 export {
   postConstruct,
+  postConstruct as PostConstruct,
   injectable,
+  injectable as Injectable,
   inject,
+  inject as Inject,
 } from '@parisholley/inversify-async';
 export { loggerLoader } from './utils/logger-loader';
 export { BINDINGS, BINDINGS as EVEBLE_BINDINGS };
@@ -289,7 +297,9 @@ export {
   reflect,
   // Annotations
   internal,
+  internal as Internal,
   validable,
+  validable as Validable,
   // Patterns
   any,
   iof,
