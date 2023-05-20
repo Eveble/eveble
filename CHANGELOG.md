@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/Eveble/eveble/compare/v2.5.5...v2.6.0) (2023-05-20)
+
+
+### Features
+
+* export annotation with TitleCase ([5173560](https://github.com/Eveble/eveble/commit/51735607b090aa39ee2014cac4e47e0245b03fce))
+
 ## [2.5.5](https://github.com/Eveble/eveble/compare/v2.5.4...v2.5.5) (2023-04-23)
 
 

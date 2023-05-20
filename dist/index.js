@@ -7415,6 +7415,14 @@ function loggerLoader(injector, level, consoleTransportConfig = new exports.LogT
     return logger;
 }
 
+Object.defineProperty(exports, 'Define', {
+  enumerable: true,
+  get: function () { return core.define; }
+});
+Object.defineProperty(exports, 'EvebleType', {
+  enumerable: true,
+  get: function () { return core.define; }
+});
 Object.defineProperty(exports, 'ExtendableError', {
   enumerable: true,
   get: function () { return core.ExtendableError; }
@@ -7430,6 +7438,10 @@ Object.defineProperty(exports, 'KernelError', {
 Object.defineProperty(exports, 'Library', {
   enumerable: true,
   get: function () { return core.Library; }
+});
+Object.defineProperty(exports, 'Type', {
+  enumerable: true,
+  get: function () { return core.define; }
 });
 Object.defineProperty(exports, 'TypeError', {
   enumerable: true,
@@ -7470,6 +7482,10 @@ Object.defineProperty(exports, 'kernel', {
 Object.defineProperty(exports, 'resolveSerializableFromPropType', {
   enumerable: true,
   get: function () { return core.resolveSerializableFromPropType; }
+});
+Object.defineProperty(exports, 'Internal', {
+  enumerable: true,
+  get: function () { return typend.internal; }
 });
 Object.defineProperty(exports, 'InvalidDefinitionError', {
   enumerable: true,
@@ -7538,6 +7554,10 @@ Object.defineProperty(exports, 'UnknownError', {
 Object.defineProperty(exports, 'UnmatchedTypeError', {
   enumerable: true,
   get: function () { return typend.UnmatchedTypeError; }
+});
+Object.defineProperty(exports, 'Validable', {
+  enumerable: true,
+  get: function () { return typend.validable; }
 });
 Object.defineProperty(exports, 'ValidationError', {
   enumerable: true,
@@ -7691,6 +7711,18 @@ Object.defineProperty(exports, 'where', {
   enumerable: true,
   get: function () { return typend.where; }
 });
+Object.defineProperty(exports, 'Inject', {
+  enumerable: true,
+  get: function () { return inversifyAsync.inject; }
+});
+Object.defineProperty(exports, 'Injectable', {
+  enumerable: true,
+  get: function () { return inversifyAsync.injectable; }
+});
+Object.defineProperty(exports, 'PostConstruct', {
+  enumerable: true,
+  get: function () { return inversifyAsync.postConstruct; }
+});
 Object.defineProperty(exports, 'inject', {
   enumerable: true,
   get: function () { return inversifyAsync.inject; }
@@ -7715,11 +7747,14 @@ exports.AssertionApiAlreadyExistsError = AssertionApiAlreadyExistsError;
 exports.BINDINGS = BINDINGS;
 exports.BaseApp = BaseApp;
 exports.BoundedContext = BoundedContext;
+exports.Can = can;
 exports.Client = Client;
 exports.ConsoleTransport = ConsoleTransport;
 exports.DEFAULTS = DEFAULTS;
+exports.Delegate = delegate;
 exports.EVEBLE_BINDINGS = BINDINGS;
 exports.Eveble = Eveble;
+exports.Handle = handle;
 exports.HandlerExistError = HandlerExistError;
 exports.HandlerNotFoundError = HandlerNotFoundError;
 exports.HandlingError = HandlingError;
@@ -7727,6 +7762,7 @@ exports.History = History;
 exports.HookAlreadyExistsError = HookAlreadyExistsError;
 exports.HookError = HookError;
 exports.HookNotFoundError = HookNotFoundError;
+exports.Initial = initial;
 exports.InitializingMessageAlreadyExistsError = InitializingMessageAlreadyExistsError;
 exports.Injector = Injector;
 exports.InjectorError = InjectorError;
@@ -7764,6 +7800,7 @@ exports.MongoDBSnapshotStorageModule = MongoDBSnapshotStorageModule;
 exports.NotVersionableError = NotVersionableError;
 exports.Projection = Projection;
 exports.ProjectionRebuilder = ProjectionRebuilder;
+exports.Route = route;
 exports.Router = Router;
 exports.SPECIFICATIONS = SPECIFICATIONS;
 exports.SerializableMixin = SerializableMixin;
@@ -7773,12 +7810,14 @@ exports.StatefulAssertion = StatefulAssertion;
 exports.StatusError = StatusError;
 exports.StatusfulAssertion = StatusfulAssertion;
 exports.Struct = Struct;
+exports.Subscribe = subscribe;
 exports.TransportExistsError = TransportExistsError;
 exports.UndefinedStatesError = UndefinedStatesError;
 exports.UndefinedStatusesError = UndefinedStatusesError;
 exports.UnhandleableTypeError = UnhandleableTypeError;
 exports.UnparsableValueError = UnparsableValueError;
 exports.UnsupportedExecutionTypeError = UnsupportedExecutionTypeError;
+exports.Version = version;
 exports.VersionableError = VersionableError;
 exports.can = can;
 exports.convertObjectToCollection = convertObjectToCollection;
