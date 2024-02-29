@@ -841,7 +841,9 @@ class List extends Array {
                 enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
                 value: serializableType,
             });
-            this.push(...serializables);
+            if (Array.isArray(serializables)) {
+                this.push(...serializables);
+            }
         }
     }
     toPlainObject() {

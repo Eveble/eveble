@@ -1,3 +1,10 @@
+## [2.6.1](https://github.com/Eveble/eveble/compare/v2.6.0...v2.6.1) (2024-02-29)
+
+
+### Bug Fixes
+
+* ensure that serializables is array on List ([a9022f9](https://github.com/Eveble/eveble/commit/a9022f9f6a35e9e835dd4a9d5dcbc8d5285ea49b))
+
 # [2.6.0](https://github.com/Eveble/eveble/compare/v2.5.5...v2.6.0) (2023-05-20)
 
 
