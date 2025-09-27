@@ -78,11 +78,15 @@ export class Serializable
    * expect(company.in<Employee>('employees')).to.have.members(employees);
    *```
    */
-  public in<T>(listName: string): types.List<T> {
+  public in<T extends types.Serializable>(listName: string): types.List<T> {
     if (this[listName] === undefined) {
       throw new InvalidListError(this.typeName(), listName);
     }
-    return this[listName] as types.List<T>;
+    const Type = this.getPropTypes()[listName];
+    if (Type === undefined) {
+      throw new exports.InvalidListError(this.typeName(), listName);
+    }
+    return new List<T>(this, listName, Type, this[listName]);
   }
 
   /**
