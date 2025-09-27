@@ -5,11 +5,11 @@ import { InstanceOf, Collection, instanceOf, Optional } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import { define, kernel } from '@eveble/core';
 import deepClone from '@jsbits/deep-clone';
-import { Struct } from './struct';
 import { types } from '../types';
 import { InvalidConfigError } from '../core/core-errors';
 import { isPlainRecord, convertObjectToCollection } from '../utils/helpers';
 import { delegate } from '../annotations/delegate';
+import { Serializable } from './serializable';
 
 /*
 Force delegated construction always on each Configuration and inheritables by
@@ -24,12 +24,19 @@ class MyConfig extends Config {
 
 This solution enables support for property initializers ALWAYS.
 */
+export const CONFIG_INCLUDED_KEY: unique symbol = Symbol(
+  'eveble:config-included-key'
+);
+export const CONFIG_MERGED_KEY: unique symbol = Symbol(
+  'eveble:config-merged-key'
+);
+
 @delegate()
 @define()
-export class Config extends Struct implements types.Configurable {
-  public included?: Record<string, types.Configurable>;
+export class Config extends Serializable implements types.Configurable {
+  public [CONFIG_INCLUDED_KEY]?: Record<string, types.Configurable>;
 
-  public merged?: Record<string, types.Configurable>;
+  public [CONFIG_MERGED_KEY]?: Record<string, types.Configurable>;
 
   /**
    * Creates an instance of Config.
@@ -52,6 +59,18 @@ export class Config extends Struct implements types.Configurable {
    */
   constructor() {
     super();
+
+    Object.defineProperty(this, CONFIG_INCLUDED_KEY, {
+      enumerable: false,
+      writable: true,
+      value: {},
+    });
+
+    Object.defineProperty(this, CONFIG_MERGED_KEY, {
+      enumerable: false,
+      writable: true,
+      value: {},
+    });
   }
 
   /**
@@ -106,12 +125,12 @@ export class Config extends Struct implements types.Configurable {
       }
     }
 
-    if (isEmpty(this.merged)) {
+    if (isEmpty(this[CONFIG_MERGED_KEY])) {
       return propTypes;
     }
 
     let mergedPropTypes = {};
-    for (const mergedCfg of Object.values(this.merged || {})) {
+    for (const mergedCfg of Object.values(this[CONFIG_MERGED_KEY] || {})) {
       const mergedConfigPropTypes = mergedCfg.getPropTypes();
 
       mergedPropTypes = merge(mergedPropTypes, mergedConfigPropTypes, {
@@ -159,7 +178,7 @@ export class Config extends Struct implements types.Configurable {
     const hasValue: boolean = has(this, path);
     if (hasValue) return true;
 
-    for (const config of Object.values(this.included || {})) {
+    for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || {})) {
       if (config.has(path)) {
         return true;
       }
@@ -211,7 +230,7 @@ export class Config extends Struct implements types.Configurable {
       return foundValue;
     }
 
-    for (const config of Object.values(this.included || [])) {
+    for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || [])) {
       foundValue = config.getExact(path);
       if (foundValue !== undefined) {
         return foundValue;
@@ -240,7 +259,7 @@ export class Config extends Struct implements types.Configurable {
       return foundValue;
     }
 
-    for (const config of Object.values(this.included || [])) {
+    for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || [])) {
       foundValue = config.getExact(path);
       if (foundValue !== undefined) {
         return foundValue;
@@ -265,7 +284,7 @@ export class Config extends Struct implements types.Configurable {
       return foundDefaultValue;
     }
 
-    for (const config of Object.values(this.included || {})) {
+    for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || {})) {
       foundDefaultValue = config.getDefault(path);
       if (foundDefaultValue !== undefined) {
         return foundDefaultValue;
@@ -284,7 +303,7 @@ export class Config extends Struct implements types.Configurable {
 
     if (hasDefaultValue) return true;
 
-    for (const config of Object.values(this.included || {})) {
+    for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || {})) {
       if (config.hasDefault(path)) {
         return true;
       }
@@ -432,8 +451,8 @@ export class Config extends Struct implements types.Configurable {
         kernel.describer.describe(config)
       );
     }
-    if (this.included === undefined) this.included = {};
-    this.included[getTypeName(config) as string] = config;
+    if (this[CONFIG_INCLUDED_KEY] === undefined) this[CONFIG_INCLUDED_KEY] = {};
+    this[CONFIG_INCLUDED_KEY][getTypeName(config) as string] = config;
   }
 
   /**
@@ -541,8 +560,8 @@ export class Config extends Struct implements types.Configurable {
 
     this.findDiffAndUpdate(this, this, configCopy);
 
-    if (this.merged === undefined) this.merged = {};
-    this.merged[getTypeName(config) as string] = config;
+    if (this[CONFIG_MERGED_KEY] === undefined) this[CONFIG_MERGED_KEY] = {};
+    this[CONFIG_MERGED_KEY][getTypeName(config) as string] = config;
   }
 
   /**
