@@ -584,6 +584,7 @@ export namespace types {
     getByIdOrThrow(id: string | Stringifiable): T;
     findById(id: string | Stringifiable): T;
     findBy(key: string, value: any): T;
+    findByOrFail(key: string, value: any): T;
     hasBy(key: string, value: any): boolean;
     hasSame(element: T): boolean;
     hasById(id: string | Stringifiable): boolean;
@@ -591,6 +592,8 @@ export namespace types {
     replaceBy(key: string, value: any, element: T): void;
     removeById(id: string | Stringifiable): void;
     removeBy(key: string, value: any): void;
+    deleteById(id: string | Stringifiable): void;
+    deleteBy(key: string, value: any): void;
     first(): T | undefined;
     last(): T | undefined;
   }

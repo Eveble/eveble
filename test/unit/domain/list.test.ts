@@ -504,6 +504,41 @@ describe('List', () => {
     });
   });
 
+  describe('deleteById', () => {
+    it('deletes identifiable element by matching identifier', () => {
+      const source = new Company({ id: 'my-company-id', employees: [] });
+      const firstElement = new Employee({ id: 'my-first-id' });
+      const secondElement = new Employee({
+        id: 'my-second-id',
+      });
+      source.in<Employee>('employees').add(firstElement);
+      source.in<Employee>('employees').add(secondElement);
+      expect(source.employees).to.have.length(2);
+      expect(source.employees).to.be.have.members([
+        firstElement,
+        secondElement,
+      ]);
+      source.in<Employee>('employees').deleteById('my-first-id');
+      expect(source.employees).to.have.length(1);
+      expect(source.employees).to.be.have.members([secondElement]);
+    });
+  });
+
+  describe('deleteBy', () => {
+    it('deletes element by matching key and value', () => {
+      const source = new Order({ id: 'my-order-id', items: [] });
+      const firstElement = new Item({ name: 'my-first-name' });
+      const secondElement = new Item({ name: 'my-second-name' });
+      source.in<Item>('items').add(firstElement);
+      source.in<Item>('items').add(secondElement);
+      expect(source.items).to.have.length(2);
+      expect(source.items).to.be.have.members([firstElement, secondElement]);
+      source.in<Item>('items').deleteBy('name', 'my-first-name');
+      expect(source.items).to.have.length(1);
+      expect(source.items).to.be.have.members([secondElement]);
+    });
+  });
+
   describe('first', () => {
     it('returns undefined for empty list', () => {
       const source = new Order({ id: 'my-order-id', items: [] });

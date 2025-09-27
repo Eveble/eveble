@@ -162,7 +162,7 @@ export class List<T extends types.Serializable> extends Array {
         element,
       });
     }
-    this.push(element);
+    this.getSource()[this.getListKey()].push(element);
   }
 
   /**
@@ -199,7 +199,8 @@ export class List<T extends types.Serializable> extends Array {
     if (foundSerializable === undefined) {
       this.add(element);
     } else {
-      this[this.indexOf(foundSerializable)] = element;
+      this.getSource()[this.getListKey()][this.indexOf(foundSerializable)] =
+        element;
     }
   }
 
@@ -229,7 +230,7 @@ export class List<T extends types.Serializable> extends Array {
    */
   public getBy(key: string, value: any): T | undefined {
     let foundSerializable: T | undefined;
-    for (const serializable of this) {
+    for (const serializable of this.getSource()[this.getListKey()]) {
       if (serializable[key] === undefined) {
         continue;
       }
@@ -333,9 +334,23 @@ export class List<T extends types.Serializable> extends Array {
   }
 
   /**
+   * @alias getOrThrow
+   */
+  public findByIdOrFail(id: string | types.Stringifiable): T {
+    return this.getByIdOrThrow(id);
+  }
+
+  /**
    * @alias getByOrThrow
    */
   public findBy(key: string, value: any): T {
+    return this.getByOrThrow(key, value);
+  }
+
+  /**
+   * @alias getByOrThrow
+   */
+  public findByOrFail(key: string, value: any): T {
     return this.getByOrThrow(key, value);
   }
 
@@ -462,7 +477,8 @@ export class List<T extends types.Serializable> extends Array {
     if (foundSerializable === undefined) {
       this.add(element);
     } else {
-      this[this.indexOf(foundSerializable)] = element;
+      this.getSource()[this.getListKey()][this.indexOf(foundSerializable)] =
+        element;
     }
   }
 
@@ -500,7 +516,8 @@ export class List<T extends types.Serializable> extends Array {
     if (foundSerializable === undefined) {
       this.add(element);
     } else {
-      this[this.indexOf(foundSerializable)] = element;
+      this.getSource()[this.getListKey()][this.indexOf(foundSerializable)] =
+        element;
     }
   }
 
@@ -537,7 +554,7 @@ export class List<T extends types.Serializable> extends Array {
   public removeById(id: string | types.Stringifiable): void {
     const foundSerializable = this.getById(id);
     if (foundSerializable !== undefined) {
-      pull(this, foundSerializable);
+      pull(this.getSource()[this.getListKey()], foundSerializable);
     }
   }
 
@@ -567,7 +584,74 @@ export class List<T extends types.Serializable> extends Array {
   public removeBy(key: string, value: any): void {
     const foundSerializable = this.getBy(key, value);
     if (foundSerializable !== undefined) {
-      pull(this, foundSerializable);
+      pull(this.getSource()[this.getListKey()], foundSerializable);
+    }
+  }
+
+  /**
+   * Delete `Serializable` from list by its identifier.
+   * @param id - Identifier of `Serializable`.
+   * @example
+   *```ts
+   * @define('Employee')
+   * class Employee extends Serializable {
+   *   id: string;
+   *
+   *   getId(): string {
+   *     return this.id;
+   *   }
+   * }
+   *
+   * @define('Company')
+   * class Company extends Serializable {
+   *   id: string;
+   *
+   *   employees: Employee[];
+   * }
+   *
+   * const source = new Company({ id: 'my-company-id', employees: [] });
+   * const element = new Employee({ id: 'my-employee-id' });
+   *
+   * source.in<Employee>('employees').add(element);
+   * expect(source.employees).to.have.length(1);
+   * source.in<Employee>('employees').deleteById('my-employee-id');
+   * expect(source.employees).to.have.length(0);
+   *```
+   */
+  public deleteById(id: string | types.Stringifiable): void {
+    const foundSerializable = this.getById(id);
+    if (foundSerializable !== undefined) {
+      pull(this.getSource()[this.getListKey()], foundSerializable);
+    }
+  }
+
+  /**
+   * Delete `Serializable` from list by key and value.
+   * @param key - Property name(key) from `Serializable`.
+   * @param value - Property value that should be matched.
+   * @example
+   *```ts
+   * @define('Item')
+   * class Item extends Serializable {
+   *   name: string;
+   * }
+   * @define('Order')
+   * class Order extends Serializable {
+   *   items: Item[];
+   * }
+   *
+   * const source = new Order({ items: [] });
+   * const element = new Item({ name: 'my-item-name' });
+   * source.in<Item>('items').add(element);
+   * expect(source.items).to.have.length(1);
+   * source.in<Item>('items').deleteBy('name', 'my-item-name');
+   * expect(source.items).to.have.length(0);
+   *```
+   */
+  public deleteBy(key: string, value: any): void {
+    const foundSerializable = this.getBy(key, value);
+    if (foundSerializable !== undefined) {
+      pull(this.getSource()[this.getListKey()], foundSerializable);
     }
   }
 
@@ -594,7 +678,7 @@ export class List<T extends types.Serializable> extends Array {
    *```
    */
   public first(): T | undefined {
-    return this[0];
+    return this.getSource()[this.getListKey()][0];
   }
 
   /**
@@ -620,7 +704,7 @@ export class List<T extends types.Serializable> extends Array {
    *```
    */
   public last(): T | undefined {
-    return last(this);
+    return last(this.getSource()[this.getListKey()]);
   }
 
   /**
