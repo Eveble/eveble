@@ -40,7 +40,6 @@ export class EventSourceableRepository
       )
         .on(this)
         .in(this.save)
-        .with('event sourceable', eventSourceable)
     );
 
     const storageIdentifiers: types.StorageIdentifiers = {};
@@ -64,7 +63,6 @@ export class EventSourceableRepository
         )
           .on(this)
           .in(this.save)
-          .with('event sourceable', eventSourceable)
       );
       throw error;
     }
@@ -75,7 +73,6 @@ export class EventSourceableRepository
       )
         .on(this)
         .in(this.save)
-        .with('event sourceable', eventSourceable)
     );
     return storageIdentifiers;
   }
@@ -220,7 +217,6 @@ export class EventSourceableRepository
         )
           .on(this)
           .in(this.restoreFromSnapshot)
-          .with('event sourceable', eventSourceable)
       );
 
       const nextVersion = eventSourceable.getVersion() + 1;
@@ -238,7 +234,7 @@ export class EventSourceableRepository
           )
             .on(this)
             .in(this.restoreFromSnapshot)
-            .with('event sourceable', eventSourceable)
+
             .with('remaining events', remainingEvents)
         );
         const history = new History(remainingEvents);
