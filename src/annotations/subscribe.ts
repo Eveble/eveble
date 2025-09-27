@@ -61,7 +61,16 @@ export function subscribe(
 
   const params = Reflect.getMetadata('design:paramtypes', target, propertyName);
   const event = params[index];
-
+  /*
+  [⚠️] This covers scenario where `event` is not reflected do tu circular dependency issues.
+  */
+  if (event === undefined) {
+    throw new Error(
+      `Unable to identify Event type for method on '${getTypeName(
+        target.constructor
+      )}::${propertyName}'. This can happen because of circular dependency definition used while defining typeorm 'OneToMany' or 'ManyToOne' relations.\n\nPlease ensure, that in such case - both files are not referencing each other. Replace any definition of the relating parent Entity on child using 'any' type.`
+    );
+  }
   if (!(event?.prototype instanceof Event)) {
     throw new UnhandleableTypeError(
       getTypeName(target.constructor) as types.TypeName,
