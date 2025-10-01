@@ -30,28 +30,6 @@ export class Serializable
   }
 
   /**
-   * Processes properties for Serializable by wrapping each serializable list property with `List` .
-   * @param props - Properties of the type required for construction.
-   * @returns Processed properties with any registered `onConstruction` hooks and
-   * validates them against prop types.
-   */
-  public processSerializableList(props: types.Props = {}): types.Props {
-    const serializablesListProps = Reflect.getMetadata(
-      SERIALIZABLE_LIST_PROPS_KEY,
-      this.constructor
-    );
-    if (serializablesListProps !== undefined) {
-      for (const [key, serializable] of Object.entries(
-        serializablesListProps
-      )) {
-        props[key] = new List(this, key, serializable, props[key] || []);
-      }
-    }
-
-    return props;
-  }
-
-  /**
    * Returns `List` for `Serializable` array.
    * @param listName - Property name of the `Serializable` list on this instance.
    * @return Instance of `List` implementation.
@@ -127,29 +105,4 @@ export class Serializable
     }
     return new this(pickedProps);
   }
-
-  /**
-   * Enables conversion of serializable lists to `List` instances.
-   * @remarks
-   * Since using mixins with polytype on extendable classes like: `Serializable`, `Entity`,
-   * `EventSourceable`, `ValueObject` will result in loosing all registered hooks on metadata
-   * - this ensures that hook can be easily re-applied.
-   */
-  public static enableSerializableLists(): void {
-    this.prototype.registerHook(
-      'onConstruction',
-      'convert-serializable-list',
-      this.prototype.processSerializableList,
-      true
-    );
-  }
-
-  /**
-   * Disables conversion of serializable lists to `List` instances.
-   */
-  public static disableSerializableLists(): void {
-    this.prototype.removeHook('onConstruction', 'convert-serializable-list');
-  }
 }
-// Enable conversion of serializable list by default
-Serializable.enableSerializableLists();

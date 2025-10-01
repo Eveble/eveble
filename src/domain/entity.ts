@@ -315,5 +315,3 @@ export class Entity
     return this[SAVED_STATE_KEY] !== undefined;
   }
 }
-// Enable conversion of serializable list by default
-Entity.enableSerializableLists();

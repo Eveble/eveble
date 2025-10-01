@@ -476,5 +476,3 @@ export class EventSourceable
     return [...commands, ...events];
   }
 }
-// Enable conversion of serializable list by default
-EventSourceable.enableSerializableLists();
