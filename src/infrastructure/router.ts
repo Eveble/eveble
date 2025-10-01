@@ -1,4 +1,4 @@
-import { postConstruct, inject } from '@parisholley/inversify-async';
+import { postConstruct, inject } from 'inversify';
 import { kernel } from '@eveble/core';
 import { types } from '../types';
 import {

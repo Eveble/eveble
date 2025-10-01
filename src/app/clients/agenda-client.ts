@@ -1,5 +1,5 @@
 import Agenda, { Job } from 'agenda';
-import { inject } from '@parisholley/inversify-async';
+import { inject } from 'inversify';
 import { Client } from '../client';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';

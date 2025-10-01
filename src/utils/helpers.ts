@@ -1,6 +1,5 @@
 import { isPlainObject } from 'lodash';
 import { Collection, isType, instanceOf } from 'typend';
-import { METADATA_KEY } from '@parisholley/inversify-async';
 import { isClassInstance } from '@eveble/helpers';
 import decache from 'decache';
 import dotenv from 'dotenv-extended';
@@ -40,18 +39,6 @@ export function isRecord(arg: any): boolean {
  */
 export function isPlainRecord(arg: any): boolean {
   return isPlainObject(arg) || arg instanceof Collection;
-}
-
-/**
- * Evaluates if `@postConstruct`(from Inversify) annotation is applied to target's method.
- * @param target - **Instance** of evaluated argument.
- * @returns Returns `true` if target's constructor has `@postConstruct` annotation applied, else `false`.
- */
-export function hasPostConstruct(target: any): boolean {
-  return (
-    target != null &&
-    Reflect.hasMetadata(METADATA_KEY.POST_CONSTRUCT, target.constructor)
-  );
 }
 
 /**

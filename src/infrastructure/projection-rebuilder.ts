@@ -1,4 +1,4 @@
-import { inject } from '@parisholley/inversify-async';
+import { inject } from 'inversify';
 import { Type } from '@eveble/core';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';

@@ -1,5 +1,5 @@
 import { classes } from 'polytype';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { kernel } from '@eveble/core';
 import { InvalidTransportIdError, TransportExistsError } from './core-errors';
 import { StatefulMixin } from '../mixins/stateful-mixin';

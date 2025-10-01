@@ -1,4 +1,4 @@
-import { inject, injectable } from '@parisholley/inversify-async';
+import { inject, injectable } from 'inversify';
 import {
   Collection,
   InsertOneWriteOpResult,

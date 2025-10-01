@@ -1,6 +1,6 @@
 import getenv from 'getenv';
 import { Collection, Cursor } from 'mongodb';
-import { inject, injectable } from '@parisholley/inversify-async';
+import { inject, injectable } from 'inversify';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
 import { StatefulMixin } from '../../mixins/stateful-mixin';

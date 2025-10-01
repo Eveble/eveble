@@ -2,7 +2,7 @@ import { classes } from 'polytype';
 import { omit } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
-import { postConstruct } from '@parisholley/inversify-async';
+import { postConstruct } from 'inversify';
 import getenv from 'getenv';
 import { Type, kernel } from '@eveble/core';
 import deepClone from '@jsbits/deep-clone';

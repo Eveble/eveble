@@ -1,7 +1,7 @@
 import { isEmpty } from 'lodash';
 import { OneOf } from 'typend';
 import { getTypeName } from '@eveble/helpers';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { kernel, ExtendableError } from '@eveble/core';
 
 import { types } from '../types';

@@ -1,6 +1,6 @@
 import { isNumber } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { kernel, ExtendableError } from '@eveble/core';
 import { types } from '../types';
 import {

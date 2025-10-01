@@ -1,4 +1,4 @@
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { types } from '../types';
 
 @injectable()

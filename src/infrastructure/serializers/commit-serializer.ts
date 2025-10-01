@@ -1,4 +1,4 @@
-import { inject, injectable } from '@parisholley/inversify-async';
+import { inject, injectable } from 'inversify';
 import { union } from 'lodash';
 import { Commit, CommitReceiver } from '../structs/commit';
 import { types } from '../../types';

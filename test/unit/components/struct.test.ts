@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { Integer, PropTypes, ValidationError } from 'typend';
-import { inject } from '@parisholley/inversify-async';
+import { inject } from 'inversify';
 import sinon from 'sinon';
 import { Type } from '@eveble/core';
 import { Struct } from '../../../src/components/struct';

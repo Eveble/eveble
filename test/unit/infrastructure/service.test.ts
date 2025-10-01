@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { Type } from '@eveble/core';
 import { Service } from '../../../src/infrastructure/service';
 import { CommandHandlingMixin } from '../../../src/mixins/command-handling-mixin';

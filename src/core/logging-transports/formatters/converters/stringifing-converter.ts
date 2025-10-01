@@ -2,7 +2,7 @@ import { intersection } from 'lodash';
 import { ReflectParams } from 'reflect-params';
 import { inspect } from 'util';
 import hasAnsi from 'has-ansi';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import winston from 'winston';
 import { types } from '../../../../types';
 import { LogTransportConfig } from '../../../../configs/log-transport-config';

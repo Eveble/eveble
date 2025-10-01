@@ -466,7 +466,7 @@ describe(`Eveble Module`, () => {
             }),
           });
           injector
-            .rebind<types.Configurable>(BINDINGS.Config)
+            .rebindSync<types.Configurable>(BINDINGS.Config)
             .toConstantValue(app.config);
           const eveble = new Eveble();
           await eveble.initialize(app, injector);
@@ -508,7 +508,7 @@ describe(`Eveble Module`, () => {
             }),
           });
           injector
-            .rebind<types.Configurable>(BINDINGS.Config)
+            .rebindSync<types.Configurable>(BINDINGS.Config)
             .toConstantValue(app.config);
           const eveble = new Eveble();
 
@@ -552,7 +552,7 @@ describe(`Eveble Module`, () => {
         }),
       });
       injector
-        .rebind<types.Configurable>(BINDINGS.Config)
+        .rebindSync<types.Configurable>(BINDINGS.Config)
         .toConstantValue(app.config);
 
       const eveble = new Eveble({
@@ -581,7 +581,7 @@ describe(`Eveble Module`, () => {
         }),
       });
       injector
-        .rebind<types.Configurable>(BINDINGS.Config)
+        .rebindSync<types.Configurable>(BINDINGS.Config)
         .toConstantValue(app.config);
       const eveble = new Eveble({
         injector,

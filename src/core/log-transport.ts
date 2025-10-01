@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import { inject, postConstruct } from '@parisholley/inversify-async';
+import { inject, postConstruct } from 'inversify';
 import { types } from '../types';
 import { RFC5424LoggingMixin } from '../mixins/rfc-5424-logging-mixin';
 import { LogTransportConfig } from '../configs/log-transport-config';

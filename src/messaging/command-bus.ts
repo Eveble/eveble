@@ -1,5 +1,5 @@
 import { classes } from 'polytype';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { types } from '../types';
 import { Command } from '../components/command';
 import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';

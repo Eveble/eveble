@@ -1,4 +1,4 @@
-import { inject, injectable } from '@parisholley/inversify-async';
+import { inject, injectable } from 'inversify';
 import { Service } from './service';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';

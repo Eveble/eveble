@@ -1,5 +1,5 @@
 import { MongoClient, Db, Collection, MongoClientOptions } from 'mongodb';
-import { inject } from '@parisholley/inversify-async';
+import { inject } from 'inversify';
 import { isEmpty } from 'lodash';
 import { Type } from '@eveble/core';
 import { Client } from '../client';

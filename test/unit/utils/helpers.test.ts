@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Collection, PropTypes } from 'typend';
-import { postConstruct } from '@parisholley/inversify-async';
+import { postConstruct } from 'inversify';
 import { stubInterface } from 'ts-sinon';
 import {
   Type,

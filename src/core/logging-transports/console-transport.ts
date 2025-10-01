@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { inject, postConstruct } from '@parisholley/inversify-async';
+import { inject, postConstruct } from 'inversify';
 import winston from 'winston';
 import { BINDINGS } from '../../constants/bindings';
 import { LogTransportConfig } from '../../configs/log-transport-config';

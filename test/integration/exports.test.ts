@@ -3,7 +3,7 @@ import {
   postConstruct,
   injectable,
   inject,
-} from '@parisholley/inversify-async';
+} from 'inversify';
 // Typend
 import {
   // Errors

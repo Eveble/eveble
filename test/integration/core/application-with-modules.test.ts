@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { inject } from '@parisholley/inversify-async';
+import { inject } from 'inversify';
 import { stubInterface } from 'ts-sinon';
 import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';

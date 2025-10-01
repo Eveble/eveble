@@ -1,4 +1,4 @@
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { TaskList } from './task-list';
 import { Guid } from '../../../src/domain/value-objects/guid';
 

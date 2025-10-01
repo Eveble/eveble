@@ -1,4 +1,4 @@
-import { inject, postConstruct } from '@parisholley/inversify-async';
+import { inject, postConstruct } from 'inversify';
 import { classes } from 'polytype';
 import { isFunction } from 'lodash';
 import {

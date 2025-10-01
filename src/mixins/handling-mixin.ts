@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import getenv from 'getenv';
 import { kernel } from '@eveble/core';
 import { types } from '../types';

@@ -1,9 +1,5 @@
 import { classes } from 'polytype';
-import {
-  postConstruct,
-  inject,
-  injectable,
-} from '@parisholley/inversify-async';
+import { postConstruct, inject, injectable } from 'inversify';
 import { CommandHandlingMixin } from '../mixins/command-handling-mixin';
 import { EventHandlingMixin } from '../mixins/event-handling-mixin';
 import { BINDINGS } from '../constants/bindings';

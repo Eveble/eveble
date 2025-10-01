@@ -2,7 +2,7 @@ import {
   postConstruct,
   inject,
   injectable,
-} from '@parisholley/inversify-async';
+} from 'inversify';
 import { OneToOneHandlingMixin } from './one-to-one-handling-mixin';
 import { types } from '../types';
 import { Command } from '../components/command';

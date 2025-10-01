@@ -1,29 +1,31 @@
 import 'reflect-metadata';
 import {
-  interfaces as inversifyTypes,
-  METADATA_KEY,
+  BindingIdentifier,
+  BindingScope,
+  BindToFluentSyntax,
   Container as InversifyContainer,
-} from '@parisholley/inversify-async';
+  ServiceIdentifier,
+} from 'inversify';
 import { kernel } from '@eveble/core';
 import { types } from '../types';
-import { hasPostConstruct, isEventSourceableType } from '../utils/helpers';
+import { isEventSourceableType } from '../utils/helpers';
 import { BINDINGS } from '../constants/bindings';
 import { InvalidEventSourceableError } from './core-errors';
-
-type Mappings = Record<keyof any, inversifyTypes.Metadata[]>;
+import {
+  getInversifyMetadata,
+  getPostConstructMethodNames,
+  hasPostConstruct,
+} from '../utils/inversify';
 
 /**
  * Executes annotated by `@postConstruct` post construction method on target.
  * @param target - Instance that has `@postConstruct` annotation applied to method.
  */
 function executePostConstruct(target: any): void {
-  const metadata = Reflect.getMetadata(
-    METADATA_KEY.POST_CONSTRUCT,
-    target.constructor
-  );
-
-  const methodName = metadata.value;
-  target[methodName]();
+  const postConstructMethods = getPostConstructMethodNames(target.constructor);
+  for (const methodName of postConstructMethods) {
+    target[methodName]();
+  }
 }
 
 /**
@@ -32,53 +34,158 @@ function executePostConstruct(target: any): void {
  * @param target - Instance that has `@postConstruct` annotation applied to method.
  */
 async function executePostConstructAsync(target: any): Promise<void> {
-  const metadata = Reflect.getMetadata(
-    METADATA_KEY.POST_CONSTRUCT,
-    target.constructor
-  );
+  const postConstructMethods = getPostConstructMethodNames(target.constructor);
+  for (const methodName of postConstructMethods) {
+    await target[methodName]();
+  }
+}
 
-  const methodName = metadata.value;
-  await target[methodName]();
+/**
+ * Extended binding syntax that tracks scope
+ */
+class TrackedBindingToSyntax<T> {
+  constructor(
+    private originalSyntax: any,
+    private injector: Injector,
+    private serviceIdentifier: ServiceIdentifier<T>
+  ) {
+    // Copy all methods from original
+    const proto = Object.getPrototypeOf(originalSyntax);
+    const methods = Object.getOwnPropertyNames(proto).filter(
+      (name) =>
+        name !== 'constructor' && typeof (proto as any)[name] === 'function'
+    );
+
+    for (const method of methods) {
+      if (!(this as any)[method]) {
+        (this as any)[method] = (...args: any[]) => {
+          const result = (originalSyntax as any)[method](...args);
+
+          // Track scope changes
+          if (method === 'inSingletonScope') {
+            this.injector._trackScope('Singleton', this.serviceIdentifier);
+          } else if (method === 'inTransientScope') {
+            this.injector._trackScope('Transient', this.serviceIdentifier);
+          } else if (method === 'inRequestScope') {
+            this.injector._trackScope('Request', this.serviceIdentifier);
+          } else if (method === 'toConstantValue') {
+            this.injector._trackScope('Transient', this.serviceIdentifier);
+          } else if (method === 'to' || method === 'toSelf') {
+            // Default scope is Transient
+            this.injector._trackScope('Transient', this.serviceIdentifier);
+          }
+
+          // Return wrapped result if it's chainable
+          if (
+            result &&
+            typeof result === 'object' &&
+            result !== originalSyntax
+          ) {
+            return new TrackedBindingToSyntax(
+              result,
+              this.injector,
+              this.serviceIdentifier
+            );
+          }
+          return result;
+        };
+      }
+    }
+  }
+
+  toRoute(EventSourceableType: types.EventSourceableType): void {
+    if (!isEventSourceableType(EventSourceableType)) {
+      throw new InvalidEventSourceableError(
+        kernel.describer.describe(EventSourceableType)
+      );
+    }
+    const Router = this.injector.get<types.RouterType>(BINDINGS.Router);
+    const router = new Router(
+      EventSourceableType,
+      EventSourceableType.resolveInitializingMessage(),
+      EventSourceableType.resolveRoutedCommands(),
+      EventSourceableType.resolveRoutedEvents()
+    );
+    this.injector.injectInto(router);
+    (this.originalSyntax as any).toConstantValue(router);
+    this.injector._trackScope('Transient', this.serviceIdentifier);
+  }
 }
 
 export class Injector extends InversifyContainer implements types.Injector {
   /**
+   * Internal registry to track bindings by scope
+   */
+  private _scopeRegistry: Map<BindingScope, Set<ServiceIdentifier<any>>> =
+    new Map([
+      ['Singleton', new Set()],
+      ['Transient', new Set()],
+      ['Request', new Set()],
+    ]);
+
+  /**
+   * Track a service identifier with its scope (internal use only)
+   * @internal
+   */
+  public _trackScope(
+    scope: BindingScope,
+    serviceIdentifier: ServiceIdentifier<any>
+  ): void {
+    // Remove from all scopes
+    for (const identifiers of this._scopeRegistry.values()) {
+      identifiers.delete(serviceIdentifier);
+    }
+
+    // Add to new scope
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this._scopeRegistry.get(scope)!.add(serviceIdentifier);
+  }
+
+  /**
    * [OVERRIDE]
    * Registers a type binding
    * @param serviceIdentifier - Identifier for a service.
-   * @returns Instance implementing `BindingToSyntax` with additional `toRoute` method.
+   * @returns Instance implementing `BindToFluentSyntax` with additional `toRoute` method.
    */
   public bind<T>(
-    serviceIdentifier: inversifyTypes.ServiceIdentifier<T>
-  ): inversifyTypes.BindingToSyntax<T> & {
+    serviceIdentifier: ServiceIdentifier<T>
+  ): BindToFluentSyntax<T> & {
     toRoute(EventSourceableType: types.EventSourceableType): void;
   } {
-    const bindingToSyntax = super.bind<T>(serviceIdentifier) as any;
+    const originalSyntax = super.bind<T>(serviceIdentifier);
+    return new TrackedBindingToSyntax(
+      originalSyntax,
+      this,
+      serviceIdentifier
+    ) as any;
+  }
 
-    /**
-     * Binds a new instance of `Router` for `EventSourceable` as constant value on Container
-     * @param EventSourceableType - `EventSourceable` type(constructor).
-     * @returns Instance of `BindingWhenOnSyntax`
-     */
-    bindingToSyntax.toRoute = (
-      EventSourceableType: types.EventSourceableType
-    ): void => {
-      if (!isEventSourceableType(EventSourceableType)) {
-        throw new InvalidEventSourceableError(
-          kernel.describer.describe(EventSourceableType)
-        );
-      }
-      const Router = this.get<types.RouterType>(BINDINGS.Router);
-      const router = new Router(
-        EventSourceableType,
-        EventSourceableType.resolveInitializingMessage(),
-        EventSourceableType.resolveRoutedCommands(),
-        EventSourceableType.resolveRoutedEvents()
-      );
-      this.injectInto(router);
-      bindingToSyntax.toConstantValue(router);
-    };
-    return bindingToSyntax;
+  /**
+   * [OVERRIDE]
+   * Removes all bindings for a given service identifier
+   */
+  public unbind(
+    serviceIdentifier: BindingIdentifier | ServiceIdentifier
+  ): Promise<void> {
+    super.unbind(serviceIdentifier);
+
+    // Remove from all scopes
+    for (const identifiers of this._scopeRegistry.values()) {
+      identifiers.delete(serviceIdentifier as any);
+    }
+    return Promise.resolve();
+  }
+
+  /**
+   * [OVERRIDE]
+   * Removes all bindings
+   */
+  public unbindAll(): Promise<void> {
+    super.unbindAll();
+    for (const identifiers of this._scopeRegistry.values()) {
+      identifiers.clear();
+    }
+    return Promise.resolve();
   }
 
   /**
@@ -88,23 +195,32 @@ export class Injector extends InversifyContainer implements types.Injector {
    * @param value - Value to which dependencies should be injected.
    */
   public injectInto(value: any): void {
-    const mappings: Mappings = Reflect.getMetadata(
-      METADATA_KEY.TAGGED_PROP,
-      value.constructor
-    );
-    if (mappings) {
-      for (const [key, metadatas] of Object.entries(mappings)) {
-        for (const metadata of metadatas) {
-          if (metadata.key === 'inject') {
-            const id = metadata.value;
+    const metadata = getInversifyMetadata(value.constructor);
 
-            value[key] = this.get(id);
+    // Inject property dependencies
+    if (metadata?.properties) {
+      for (const [
+        propertyName,
+        propertyMetadata,
+      ] of metadata.properties.entries()) {
+        const serviceId = propertyMetadata.value;
+
+        // Handle optional dependencies
+        if (propertyMetadata.optional) {
+          try {
+            value[propertyName] = this.get(serviceId);
+          } catch (error) {
+            // Optional dependency not found, skip
+            value[propertyName] = undefined;
           }
+        } else {
+          value[propertyName] = this.get(serviceId);
         }
       }
     }
 
-    if (hasPostConstruct(value)) {
+    // Execute post construct hooks
+    if (hasPostConstruct(value.constructor)) {
       executePostConstruct(value);
     }
   }
@@ -116,22 +232,32 @@ export class Injector extends InversifyContainer implements types.Injector {
    * @param value - Value to which dependencies should be injected.
    */
   async injectIntoAsync(value: any): Promise<void> {
-    const mappings: Mappings = Reflect.getMetadata(
-      METADATA_KEY.TAGGED_PROP,
-      value.constructor
-    );
-    if (mappings) {
-      for (const [key, metadatas] of Object.entries(mappings)) {
-        for (const metadata of metadatas) {
-          if (metadata.key === 'inject') {
-            const id = metadata.value;
-            value[key] = await this.getAsync(id);
+    const metadata = getInversifyMetadata(value.constructor);
+
+    // Inject property dependencies
+    if (metadata?.properties) {
+      for (const [
+        propertyName,
+        propertyMetadata,
+      ] of metadata.properties.entries()) {
+        const serviceId = propertyMetadata.value;
+
+        // Handle optional dependencies
+        if (propertyMetadata.optional) {
+          try {
+            value[propertyName] = await this.getAsync(serviceId);
+          } catch (error) {
+            // Optional dependency not found, skip
+            value[propertyName] = undefined;
           }
+        } else {
+          value[propertyName] = await this.getAsync(serviceId);
         }
       }
     }
 
-    if (hasPostConstruct(value)) {
+    // Execute post construct hooks
+    if (hasPostConstruct(value.constructor)) {
       await executePostConstructAsync(value);
     }
   }
@@ -141,21 +267,8 @@ export class Injector extends InversifyContainer implements types.Injector {
    * @param scope - One of supported scopes by Inversify.
    * @returns List of service identifiers binding with provided scope.
    */
-  findByScope(
-    scope: inversifyTypes.BindingScope
-  ): inversifyTypes.ServiceIdentifier<any>[] {
-    const lookup = (this as any)._bindingDictionary;
-
-    const identifiers: inversifyTypes.ServiceIdentifier<any>[] = [];
-    lookup.traverse((key: any) => {
-      const bindings = lookup.get(key);
-      for (const binding of bindings) {
-        if (binding.scope === scope) {
-          identifiers.push(binding.serviceIdentifier);
-        }
-      }
-    });
-
-    return identifiers;
+  findByScope(scope: BindingScope): ServiceIdentifier<any>[] {
+    const identifiers = this._scopeRegistry.get(scope);
+    return identifiers ? Array.from(identifiers) : [];
   }
 }

@@ -1,6 +1,6 @@
 import { getTypeName } from '@eveble/helpers';
 import { isFunction } from 'lodash';
-import { postConstruct, injectable } from '@parisholley/inversify-async';
+import { postConstruct, injectable } from 'inversify';
 import { kernel } from '@eveble/core';
 import { HandlingMixin } from './handling-mixin';
 import {

@@ -461,6 +461,47 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
+"@inversifyjs/common@1.5.2":
+  version "1.5.2"
+  resolved "https://registry.npmjs.org/@inversifyjs/common/-/common-1.5.2.tgz#6836287fef1c25dddbdf6af345a33a6d6caf6835"
+  integrity sha512-WlzR9xGadABS9gtgZQ+luoZ8V6qm4Ii6RQfcfC9Ho2SOlE6ZuemFo7PKJvKI0ikm8cmKbU8hw5UK6E4qovH21w==
+
+"@inversifyjs/container@1.13.2":
+  version "1.13.2"
+  resolved "https://registry.npmjs.org/@inversifyjs/container/-/container-1.13.2.tgz#1ca7e979d19d617b90d2a01b98ea8ac3e52c4ed5"
+  integrity sha512-nr02jAB4LSuLNB4d5oFb+yXclfwnQ27QSaAHiO/SMkEc02dLhFMEq+Sk41ycUjvKgbVo6HoxcETJGKBoTlZ+SA==
+  dependencies:
+    "@inversifyjs/common" "1.5.2"
+    "@inversifyjs/core" "9.0.1"
+    "@inversifyjs/plugin" "0.2.0"
+    "@inversifyjs/reflect-metadata-utils" "1.4.1"
+
+"@inversifyjs/core@9.0.1":
+  version "9.0.1"
+  resolved "https://registry.npmjs.org/@inversifyjs/core/-/core-9.0.1.tgz#2a5144ea3791ea406de2f09cb310c355d75a711d"
+  integrity sha512-glc/HLeHedD4Qy6XKEv065ABWfy23rXuENxy6+GbplQOJFL4rPN6H4XEPmThuXPhmR+a38VcQ5eL/tjcF7HXPQ==
+  dependencies:
+    "@inversifyjs/common" "1.5.2"
+    "@inversifyjs/prototype-utils" "0.1.2"
+    "@inversifyjs/reflect-metadata-utils" "1.4.1"
+
+"@inversifyjs/plugin@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.npmjs.org/@inversifyjs/plugin/-/plugin-0.2.0.tgz#03957c7d02803f32254a2ff2f8f8ffb05ec57eec"
+  integrity sha512-R/JAdkTSD819pV1zi0HP54mWHyX+H2m8SxldXRgPQarS3ySV4KPyRdosWcfB8Se0JJZWZLHYiUNiS6JvMWSPjw==
+
+"@inversifyjs/prototype-utils@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@inversifyjs/prototype-utils/-/prototype-utils-0.1.2.tgz#2ff5241c2f50772b3202ad5f052b84852eedd8d3"
+  integrity sha512-WZAEycwVd8zVCPCQ7GRzuQmjYF7X5zbjI9cGigDbBoTHJ8y5US9om00IAp0RYislO+fYkMzgcB2SnlIVIzyESA==
+  dependencies:
+    "@inversifyjs/common" "1.5.2"
+
+"@inversifyjs/reflect-metadata-utils@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.npmjs.org/@inversifyjs/reflect-metadata-utils/-/reflect-metadata-utils-1.4.1.tgz#6219df487e6aab1810a0feee4a625a0e11397340"
+  integrity sha512-Cp77C4d2wLaHXiUB7iH6Cxb7i1lD/YDuTIHLTDzKINqGSz0DCSoL/Dg2wVkW/6Qx03r/yQMLJ+32Agl32N2X8g==
+
 "@isaacs/string-locale-compare@^1.1.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@isaacs/string-locale-compare/-/string-locale-compare-1.1.0.tgz#291c227e93fd407a96ecd59879a35809120e432b"
@@ -4912,6 +4953,15 @@ into-stream@^6.0.0:
   dependencies:
     from2 "^2.3.0"
     p-is-promise "^3.0.0"
+
+inversify@^7.10.2:
+  version "7.10.2"
+  resolved "https://registry.npmjs.org/inversify/-/inversify-7.10.2.tgz#aaa29a5eaf946f379af0d821884a8aea54cb9f42"
+  integrity sha512-BdR5jPo2lm8PlIEiDvEyEciLeLxabnJ6bNV7jv2Ijq6uNxuIxhApKmk360boKbSdRL9SOVMLK/O97S1EzNw+WA==
+  dependencies:
+    "@inversifyjs/common" "1.5.2"
+    "@inversifyjs/container" "1.13.2"
+    "@inversifyjs/core" "9.0.1"
 
 invert-kv@^1.0.0:
   version "1.0.0"

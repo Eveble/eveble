@@ -1,5 +1,10 @@
 /* eslint-disable no-shadow */
-import { interfaces as inversifyTypes } from '@parisholley/inversify-async';
+import {
+  Container,
+  ServiceIdentifier,
+  BindingScope,
+  BindingToSyntax,
+} from 'inversify';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
 import Agenda from 'agenda';
@@ -98,17 +103,13 @@ export namespace types {
   /*
   CORE
   */
-  export interface Injector extends inversifyTypes.Container {
+  export interface Injector extends Container {
     injectInto(value: any): void;
     injectIntoAsync(value: any): Promise<void>;
-    bind<T>(
-      serviceIdentifier: inversifyTypes.ServiceIdentifier<T>
-    ): inversifyTypes.BindingToSyntax<T> & {
+    bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindingToSyntax<T> & {
       toRoute(EventSourceableType: EventSourceableType): void;
     };
-    findByScope(
-      scope: inversifyTypes.BindingScope
-    ): inversifyTypes.ServiceIdentifier<any>[];
+    findByScope(scope: BindingScope): ServiceIdentifier<any>[];
   }
 
   export type Validator = {

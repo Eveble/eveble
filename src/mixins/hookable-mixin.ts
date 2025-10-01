@@ -3,7 +3,7 @@ import { isString, has, get, isPlainObject } from 'lodash';
 import { getMatchingParentProto } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { kernel, ExtendableError } from '@eveble/core';
 import { HOOKABLE_KEY, HOOKS_CONTAINER_KEY } from '../constants/metadata-keys';
 

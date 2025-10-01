@@ -57,7 +57,7 @@
     "tsruntime": "github:eveble/tsruntime#eveble",
     "reflect-metadata": "^0.2.2",
     "reflect-params": "^1.0.2",
-    "@parisholley/inversify-async": "^1.1.7",
+    "inversify": "^7.10.2",
     "chalk": "^3.0.0",
     "deepmerge": "^4.3.1",
     "decache": "^4.6.1",

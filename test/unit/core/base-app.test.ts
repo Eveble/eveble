@@ -8,7 +8,7 @@ import {
   interfaces as inversifyTypes,
   postConstruct,
   injectable,
-} from '@parisholley/inversify-async';
+} from 'inversify';
 import * as winston from 'winston';
 import chalk from 'chalk';
 import getenv from 'getenv';

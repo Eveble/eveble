@@ -1,6 +1,6 @@
 import { pick } from 'lodash';
 import Agenda from 'agenda';
-import { injectable } from '@parisholley/inversify-async';
+import { injectable } from 'inversify';
 import { ScheduledJob } from '../structs/scheduled-job';
 import { types } from '../../types';
 
