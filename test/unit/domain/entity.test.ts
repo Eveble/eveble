@@ -9,7 +9,7 @@ import { Entity } from '../../../src/domain/entity';
 import { Serializable } from '../../../src/components/serializable';
 import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
 import { StatusfulMixin } from '../../../src/mixins/statusful-mixin';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { types } from '../../../src/types';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Command } from '../../../src/components/command';
@@ -108,7 +108,7 @@ describe('Entity', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Entity.prototype)).to.be.true;
+    expect(isTyped(Entity.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ValueObject } from '../../../src/domain/value-object';
 import { Serializable } from '../../../src/components/serializable';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 
 describe(`ValueObject`, () => {
   it(`extends Serializable`, () => {
@@ -9,7 +9,7 @@ describe(`ValueObject`, () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(ValueObject.prototype)).to.be.true;
+    expect(isTyped(ValueObject.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

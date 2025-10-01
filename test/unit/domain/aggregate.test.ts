@@ -9,7 +9,7 @@ import { History } from '../../../src/domain/history';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { Event } from '../../../src/components/event';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { InvalidInitializingMessageError } from '../../../src/domain/domain-errors';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { initial } from '../../../src/annotations/initial';
@@ -97,7 +97,7 @@ describe(`Aggregate`, () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Aggregate.prototype)).to.be.true;
+    expect(isTyped(Aggregate.prototype)).to.be.true;
   });
 
   describe(`construction`, () => {

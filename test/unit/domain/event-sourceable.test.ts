@@ -28,7 +28,7 @@ import { UndefinedStatesError } from '../../../src/mixins/stateful-mixin';
 import { UndefinedStatusesError } from '../../../src/mixins/statusful-mixin';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { initial } from '../../../src/annotations/initial';
 import { route } from '../../../src/annotations/route';
 
@@ -268,7 +268,7 @@ describe(`EventSourceable`, () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(EventSourceable.prototype)).to.be.true;
+    expect(isTyped(EventSourceable.prototype)).to.be.true;
   });
 
   describe('prop types', () => {

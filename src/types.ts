@@ -161,7 +161,7 @@ export namespace types {
   /*
   DEFINITION
   */
-  export interface Definable {
+  export interface Typed {
     getPropTypes(): Record<keyof any, any>;
     toPlainObject(): Props;
     validateProps(

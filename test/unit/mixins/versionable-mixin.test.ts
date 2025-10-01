@@ -6,7 +6,7 @@ import { Type } from '@eveble/core';
 import { types } from '../../../src/types';
 import { version } from '../../../src/annotations/version';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
-import { DefinableMixin } from '../../../src/mixins/definable-mixin';
+import { TypeTrait } from '../../../src/mixins/definable-mixin';
 import {
   InvalidLegacyTransformerError,
   NotVersionableError,
@@ -21,7 +21,7 @@ describe(`VersionableMixin`, () => {
     it('enforces with Versionable schemaVersion prop type as optional number', () => {
       @Type('MyClass', { isRegistrable: false })
       class MyClass
-        extends classes(DefinableMixin, VersionableMixin)
+        extends classes(TypeTrait, VersionableMixin)
         implements types.Versionable
       {
         schemaVersion: number | undefined;

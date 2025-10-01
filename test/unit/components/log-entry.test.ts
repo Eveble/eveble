@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { Type } from '@eveble/core';
 import { Log, LogMetadata } from '../../../src/components/log-entry';
-import { DefinableMixin } from '../../../src/mixins/definable-mixin';
+import { TypeTrait } from '../../../src/mixins/definable-mixin';
 
 describe('Log', () => {
   @Type('MyClass')
-  class MyClass extends DefinableMixin {
+  class MyClass extends TypeTrait {
     myMethod(first: string, second: string, third: string): void {
       Object.assign(this, { first, second, third });
     }

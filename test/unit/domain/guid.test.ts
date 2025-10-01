@@ -4,7 +4,7 @@ import {
   InvalidGuidValueError,
 } from '../../../src/domain/value-objects/guid';
 import { ValueObject } from '../../../src/domain/value-object';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 
 describe('Guid', () => {
   it(`extends ValueObject`, () => {
@@ -18,7 +18,7 @@ describe('Guid', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Guid.prototype)).to.be.true;
+    expect(isTyped(Guid.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

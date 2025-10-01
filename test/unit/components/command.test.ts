@@ -4,7 +4,7 @@ import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
 import { Command, Assignment } from '../../../src/components/command';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { types } from '../../../src/types';
 
@@ -37,7 +37,7 @@ describe('Command', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Command.prototype)).to.be.true;
+    expect(isTyped(Command.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

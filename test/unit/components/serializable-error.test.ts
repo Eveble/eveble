@@ -5,8 +5,8 @@ import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { SerializableError } from '../../../src/components/serializable-error';
 import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
-import { isDefinable } from '../../../src/utils/helpers';
-import { DefinableMixin } from '../../../src/mixins/definable-mixin';
+import { isTyped } from '../../../src/utils/helpers';
+import { TypeTrait } from '../../../src/mixins/definable-mixin';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
@@ -30,8 +30,8 @@ describe('SerializableError', () => {
   });
 
   it('implements Definable interface', () => {
-    expect(SerializableError.prototype).to.instanceof(DefinableMixin);
-    expect(instanceOf<types.Definable>(Serializable.prototype)).to.be.true;
+    expect(SerializableError.prototype).to.instanceof(TypeTrait);
+    expect(instanceOf<types.Typed>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Hookable interface', () => {
@@ -55,7 +55,7 @@ describe('SerializableError', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(SerializableError.prototype)).to.be.true;
+    expect(isTyped(SerializableError.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

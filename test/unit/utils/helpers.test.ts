@@ -8,7 +8,7 @@ import {
   resolveSerializableFromPropType,
 } from '@eveble/core';
 import {
-  isDefinable,
+  isTyped,
   isRecord,
   hasPostConstruct,
   toPlainObject,
@@ -57,7 +57,7 @@ describe('helpers', () => {
     getLegacyTransformer(): void {}
   }
 
-  describe('isDefinable', () => {
+  describe('isTyped', () => {
     it('returns true for defined(@Type) instances of class implementing Definable interface', () => {
       @Type()
       class MyDefinable {
@@ -72,18 +72,18 @@ describe('helpers', () => {
         equals(): void {}
       }
 
-      expect(isDefinable(new MyDefinable())).to.be.true;
+      expect(isTyped(new MyDefinable())).to.be.true;
     });
 
     it('returns false for nil', () => {
-      expect(isDefinable(null)).to.be.false;
-      expect(isDefinable(undefined)).to.be.false;
+      expect(isTyped(null)).to.be.false;
+      expect(isTyped(undefined)).to.be.false;
     });
 
     it('returns true for Struct', () => {
       @Type('MyStruct', { isRegistrable: false })
       class MyStruct extends Struct {}
-      expect(isDefinable(new MyStruct())).to.be.true;
+      expect(isTyped(new MyStruct())).to.be.true;
     });
 
     it('returns false for not defined(@Type) classes implementing Definable interface', () => {
@@ -99,12 +99,12 @@ describe('helpers', () => {
         equals(): void {}
       }
 
-      expect(isDefinable(ValidButNotDefined)).to.be.false;
+      expect(isTyped(ValidButNotDefined)).to.be.false;
     });
 
     it('returns false for arguments not implementing Definable interface', () => {
       class InvalidDefinable {}
-      expect(isDefinable(InvalidDefinable)).to.be.false;
+      expect(isTyped(InvalidDefinable)).to.be.false;
     });
   });
 

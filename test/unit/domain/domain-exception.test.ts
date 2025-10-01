@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { PropTypes } from 'typend';
 import { DomainException } from '../../../src/domain/domain-exception';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { DomainError } from '../../../src/domain/domain-error';
 import { Event } from '../../../src/components/event';
 
@@ -11,7 +11,7 @@ describe('DomainException', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(DomainException.prototype)).to.be.true;
+    expect(isTyped(DomainException.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

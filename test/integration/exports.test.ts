@@ -1,9 +1,5 @@
 import { expect } from 'chai';
-import {
-  postConstruct,
-  injectable,
-  inject,
-} from 'inversify';
+import { postConstruct, injectable, inject } from 'inversify';
 // Typend
 import {
   // Errors
@@ -258,7 +254,7 @@ import {
 } from '../../src/messaging/messaging-errors';
 // Mixins
 import { CommandHandlingMixin } from '../../src/mixins/command-handling-mixin';
-import { DefinableMixin } from '../../src/mixins/definable-mixin';
+import { TypeTrait } from '../../src/mixins/definable-mixin';
 import { EjsonableMixin } from '../../src/mixins/ejsonable-mixin';
 import { EventHandlingMixin } from '../../src/mixins/event-handling-mixin';
 import {
@@ -296,7 +292,7 @@ import {
 } from '../../src/mixins/versionable-mixin';
 // Helpers
 import {
-  isDefinable,
+  isTyped,
   isRecord,
   isPlainRecord,
   hasPostConstruct,
@@ -571,7 +567,7 @@ import {
   UnparsableValueError as UnparsableValueErrorExported,
   // Mixins
   CommandHandlingMixin as CommandHandlingMixinExported,
-  DefinableMixin as DefinableMixinExported,
+  TypeTrait as TypeTraitExported,
   EjsonableMixin as EjsonableMixinExported,
   EventHandlingMixin as EventHandlingMixinExported,
   HookableMixin as HookableMixinExported,
@@ -600,7 +596,7 @@ import {
   InvalidLegacyTransformerError as InvalidLegacyTransformerErrorExported,
   NotVersionableError as NotVersionableErrorExported,
   // Helpers
-  isDefinable as isDefinableExported,
+  isTyped as isTypedExported,
   isSerializable as isSerializableExported,
   isRecord as isRecordExported,
   isPlainRecord as isPlainRecordExported,
@@ -1474,8 +1470,8 @@ describe(`exports`, () => {
     it('CommandHandlingMixin', () => {
       expect(CommandHandlingMixinExported).to.be.equal(CommandHandlingMixin);
     });
-    it('DefinableMixin', () => {
-      expect(DefinableMixinExported).to.be.equal(DefinableMixin);
+    it('TypeTrait', () => {
+      expect(TypeTraitExported).to.be.equal(TypeTrait);
     });
     it('EjsonableMixin', () => {
       expect(EjsonableMixinExported).to.be.equal(EjsonableMixin);
@@ -1586,8 +1582,8 @@ describe(`exports`, () => {
     });
   });
   describe('helpers', () => {
-    it('isDefinable', () => {
-      expect(isDefinableExported).to.be.equal(isDefinable);
+    it('isTyped', () => {
+      expect(isTypedExported).to.be.equal(isTyped);
     });
     it('isSerializable', () => {
       expect(isSerializableExported).to.be.equal(isSerializable);

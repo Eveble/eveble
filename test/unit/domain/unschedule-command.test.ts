@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { PropTypes } from 'typend';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Command } from '../../../src/components/command';
 
@@ -11,7 +11,7 @@ describe('UnscheduleCommand', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(UnscheduleCommand.prototype)).to.be.true;
+    expect(isTyped(UnscheduleCommand.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

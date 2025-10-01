@@ -4,7 +4,7 @@ import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
 import { Event } from '../../../src/components/event';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { types } from '../../../src';
 
@@ -37,7 +37,7 @@ describe('Event', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Event.prototype)).to.be.true;
+    expect(isTyped(Event.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

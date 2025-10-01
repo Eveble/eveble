@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
@@ -33,7 +33,7 @@ describe('ScheduleCommand', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(ScheduleCommand.prototype)).to.be.true;
+    expect(isTyped(ScheduleCommand.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {

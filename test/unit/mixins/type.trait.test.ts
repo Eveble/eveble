@@ -3,13 +3,13 @@ import sinonChai from 'sinon-chai';
 import { PropTypes } from 'typend';
 import { stubInterface } from 'ts-sinon';
 import { Type, kernel } from '@eveble/core';
-
-import { DefinableMixin } from '../../../src/mixins/definable-mixin';
+import { derive } from '@traits-ts/core';
+import { TypeTrait } from '../../../src/mixins/type.trait';
 import { types } from '../../../src/types';
 
 chai.use(sinonChai);
 
-describe('DefinableMixin', () => {
+describe('TypeTrait', () => {
   let originalConverter: any;
   let originalValidator: any;
   let originalLibrary: any;
@@ -47,7 +47,7 @@ describe('DefinableMixin', () => {
   I did this test, I fell for this twice.
   */
   @Type('Person')
-  class Person extends DefinableMixin {
+  class Person extends derive(TypeTrait) {
     firstName: string;
 
     lastName: string;
@@ -63,7 +63,7 @@ describe('DefinableMixin', () => {
   }
 
   @Type('Parent')
-  class Parent extends DefinableMixin {
+  class Parent extends derive(TypeTrait) {
     parentKey: string;
 
     parentObj?: Record<string, any>;
@@ -80,7 +80,7 @@ describe('DefinableMixin', () => {
   }
 
   @Type('Customer')
-  class Customer extends DefinableMixin {
+  class Customer extends derive(TypeTrait) {
     name: string;
 
     emails: string[];
@@ -97,7 +97,7 @@ describe('DefinableMixin', () => {
   }
 
   @Type('Order')
-  class Order extends DefinableMixin {
+  class Order extends derive(TypeTrait) {
     customer: Customer;
 
     constructor(props: types.Props) {
@@ -146,7 +146,7 @@ describe('DefinableMixin', () => {
 
         it('returns false if one instance has different type then other', () => {
           @Type('NotAPerson')
-          class NotAPerson extends DefinableMixin {
+          class NotAPerson extends derive(TypeTrait) {
             firstName: string;
 
             lastName: string;
@@ -387,7 +387,7 @@ describe('DefinableMixin', () => {
         converter.convert.returns({ properties: propTypes });
 
         @Type('MyClass')
-        class MyClass extends DefinableMixin {
+        class MyClass extends derive(TypeTrait) {
           stringKey = 'my-string';
 
           numberKey = 1337;
@@ -411,7 +411,7 @@ describe('DefinableMixin', () => {
         converter.convert.returns({ properties: propTypes });
 
         @Type('MyClass')
-        class MyClass extends DefinableMixin {
+        class MyClass extends derive(TypeTrait) {
           stringKey = 'my-string';
 
           numberKey = 1337;
@@ -435,7 +435,7 @@ describe('DefinableMixin', () => {
         converter.convert.returns({ properties: propTypes });
 
         @Type('OtherParent')
-        class OtherParent extends DefinableMixin {
+        class OtherParent extends derive(TypeTrait) {
           stringKey = 'my-string';
 
           numberKey = 1337;
@@ -462,7 +462,7 @@ describe('DefinableMixin', () => {
         converter.convert.returns({ properties: parentPropTypes });
 
         @Type('OtherParent')
-        class OtherParent extends DefinableMixin {
+        class OtherParent extends derive(TypeTrait) {
           stringKey = 'my-string';
         }
 
@@ -506,7 +506,7 @@ describe('DefinableMixin', () => {
       converter.convert.returns({ properties: propTypes });
 
       @Type('Namespace.MyClass')
-      class MyClass extends DefinableMixin {
+      class MyClass extends derive(TypeTrait) {
         key: string;
       }
 
@@ -528,7 +528,7 @@ describe('DefinableMixin', () => {
       converter.convert.returns({ properties: propTypes });
 
       @Type('MyClass')
-      class MyClass extends DefinableMixin {
+      class MyClass extends derive(TypeTrait) {
         key: string;
       }
 
@@ -552,7 +552,7 @@ describe('DefinableMixin', () => {
       });
 
       it('returns true always if validation is disabled on kernel', () => {
-        class MyClass extends DefinableMixin {}
+        class MyClass extends derive(TypeTrait) {}
 
         const message = 'my-error';
         const error = new Error(message);

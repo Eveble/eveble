@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { Type } from '@eveble/core';
 import { DomainError } from '../../../src/domain/domain-error';
 import { SerializableError } from '../../../src/components/serializable-error';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 
 describe('DomainError', () => {
   @Type()
@@ -13,7 +13,7 @@ describe('DomainError', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(DomainError.prototype)).to.be.true;
+    expect(isTyped(DomainError.prototype)).to.be.true;
   });
 
   it('defines its serializable type name correctly', () => {

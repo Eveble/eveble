@@ -11,12 +11,12 @@ import { Struct } from '../components/struct';
  * @param arg - **Instance** of evaluated argument.
  * @returns Returns `true` if provided argument is implementing `Definable` interface, else `false`.
  */
-export function isDefinable(arg: any): boolean {
+export function isTyped(arg: any): boolean {
   if (arg == null) return false;
 
   return (
     // TODO: instanceOf from Typend is still not fully reliable atm
-    (arg instanceof Struct || instanceOf<types.Definable>(arg)) &&
+    (arg instanceof Struct || instanceOf<types.Typed>(arg)) &&
     isType(arg.constructor)
   );
 }
@@ -43,7 +43,7 @@ export function isPlainRecord(arg: any): boolean {
 
 /**
  *
- * Converts object and all nested records implementing `DefinableMixin` to plain object.
+ * Converts object and all nested records implementing `TypeTrait` to plain object.
  * @param arg - Object or instance of a class for conversion.
  * @returns Plain object representation of provided argument.
  */

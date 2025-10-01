@@ -1,8 +1,8 @@
-import { classes } from 'polytype';
 import merge from 'deepmerge';
 import { pick } from 'lodash';
 import { Type, ExtendableError } from '@eveble/core';
-import { DefinableMixin } from '../mixins/definable-mixin';
+import { derive } from '@traits-ts/core';
+import { TypeTrait } from '../mixins/type.trait';
 import { types } from '../types';
 import { VersionableMixin } from '../mixins/versionable-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';
@@ -11,9 +11,9 @@ import { EjsonableMixin } from '../mixins/ejsonable-mixin';
 
 @Type('SerializableError')
 export abstract class SerializableError
-  extends classes(
+  extends derive(
     ExtendableError,
-    DefinableMixin,
+    TypeTrait,
     HookableMixin,
     EjsonableMixin,
     VersionableMixin

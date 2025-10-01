@@ -5,7 +5,7 @@ import { inject } from 'inversify';
 import sinon from 'sinon';
 import { Type } from '@eveble/core';
 import { Struct } from '../../../src/components/struct';
-import { DefinableMixin } from '../../../src/mixins/definable-mixin';
+import { TypeTrait } from '../../../src/mixins/type.trait';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
 import { DELEGATED_KEY } from '../../../src/constants/metadata-keys';
 import { types } from '../../../src/types';
@@ -32,8 +32,8 @@ describe('Struct', () => {
     toy: string;
   }
 
-  it('has DefinableMixin applied', () => {
-    expect(Struct.prototype instanceof DefinableMixin).to.be.true;
+  it('has TypeTrait applied', () => {
+    expect(Struct.prototype instanceof TypeTrait).to.be.true;
   });
 
   it('has HookableMixin applied', () => {

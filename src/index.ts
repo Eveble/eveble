@@ -185,7 +185,7 @@ export {
 } from './messaging/messaging-errors';
 // Mixins
 export { CommandHandlingMixin } from './mixins/command-handling-mixin';
-export { DefinableMixin } from './mixins/definable-mixin';
+export { TypeTrait } from './mixins/type.trait';
 export { EjsonableMixin } from './mixins/ejsonable-mixin';
 export { EventHandlingMixin } from './mixins/event-handling-mixin';
 export {
@@ -223,7 +223,7 @@ export {
 } from './mixins/versionable-mixin';
 // Helpers
 export {
-  isDefinable,
+  isTyped,
   isRecord,
   isPlainRecord,
   hasPostConstruct,

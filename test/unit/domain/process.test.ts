@@ -8,7 +8,7 @@ import { Process } from '../../../src/domain/process';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { Event } from '../../../src/components/event';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { History } from '../../../src/domain/history';
 import { EventIdMismatchError } from '../../../src/domain/domain-errors';
@@ -118,7 +118,7 @@ describe(`Process`, () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Process.prototype)).to.be.true;
+    expect(isTyped(Process.prototype)).to.be.true;
   });
 
   describe(`construction`, () => {

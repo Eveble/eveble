@@ -6,7 +6,7 @@ import { Serializable } from '../../../src/components/serializable';
 import { Struct } from '../../../src/components/struct';
 import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
 import { types } from '../../../src/types';
-import { isDefinable } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
 import { List } from '../../../src/domain/list';
@@ -52,7 +52,7 @@ describe('Serializable', () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Serializable.prototype)).to.be.true;
+    expect(isTyped(Serializable.prototype)).to.be.true;
   });
 
   it('defines the type name correctly', () => {
