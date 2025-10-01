@@ -1119,6 +1119,11 @@
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
+"@traits-ts/core@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.npmjs.org/@traits-ts/core/-/core-1.2.1.tgz#07928d3feae2adc6c16bc4ab9b8e3e581997afef"
+  integrity sha512-RZlVm5bu4edh5eMHn6Npp2UMkaCD448l/IcnH+g5nFAZDj2tMRY3poXAdgUPChkh7qj2c02I4qUpWyXdJ5PEzA==
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.npmjs.org/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"
