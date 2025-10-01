@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { OneToOneHandlingMixin } from '../../../src/mixins/one-to-one-handling-mixin';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
@@ -15,12 +15,12 @@ import { Event } from '../../../src/components/event';
 chai.use(sinonChai);
 
 describe('CommandBus', () => {
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;
   }
 
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
   }

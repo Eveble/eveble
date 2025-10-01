@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { CommandHandlingMixin } from '../../../src/mixins/command-handling-mixin';
 import { OneToOneHandlingMixin } from '../../../src/mixins/one-to-one-handling-mixin';
 import { Command } from '../../../src/components/command';
@@ -28,17 +28,17 @@ describe(`CommandHandlingMixin`, () => {
       .toConstantValue(commandBus);
   });
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;
   }
 
-  @define('MyOtherCommand', { isRegistrable: false })
+  @Type('MyOtherCommand', { isRegistrable: false })
   class MyOtherCommand extends Command<MyOtherCommand> {
     key: string;
   }
 
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
   }

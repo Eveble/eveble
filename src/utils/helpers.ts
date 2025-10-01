@@ -1,5 +1,5 @@
 import { isPlainObject } from 'lodash';
-import { Collection, isDefined, instanceOf } from 'typend';
+import { Collection, isType, instanceOf } from 'typend';
 import { METADATA_KEY } from '@parisholley/inversify-async';
 import { isClassInstance } from '@eveble/helpers';
 import decache from 'decache';
@@ -18,7 +18,7 @@ export function isDefinable(arg: any): boolean {
   return (
     // TODO: instanceOf from Typend is still not fully reliable atm
     (arg instanceof Struct || instanceOf<types.Definable>(arg)) &&
-    isDefined(arg.constructor)
+    isType(arg.constructor)
   );
 }
 

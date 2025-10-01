@@ -1,9 +1,9 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { DomainException } from '../../../src/domain/domain-exception';
 import { Event } from '../../../src/components/event';
 
-@define()
+@Type()
 export class EmployeeCreated extends Event<EmployeeCreated> {
   firstName: string;
 
@@ -14,19 +14,19 @@ export class EmployeeCreated extends Event<EmployeeCreated> {
   taskListsIds: Guid[];
 }
 
-@define()
+@Type()
 export class TaskListAssignedToEmployee extends Event<TaskListAssignedToEmployee> {
   taskListId: Guid;
 }
 
-@define()
+@Type()
 export class EmployeeProductivityEstimated extends Event<EmployeeProductivityEstimated> {
   estimatedPoints: number;
 
   points: number;
 }
 
-@define()
+@Type()
 export class EmployeeTerminated extends Event<EmployeeTerminated> {
   firstName: string;
 
@@ -41,7 +41,7 @@ export class EmployeeTerminated extends Event<EmployeeTerminated> {
 CANCELING EMPLOYMENT
 */
 // Process
-@define()
+@Type()
 export class CancelingEmploymentInitiated extends Event<CancelingEmploymentInitiated> {
   employeeId: Guid;
 
@@ -50,7 +50,7 @@ export class CancelingEmploymentInitiated extends Event<CancelingEmploymentIniti
   closedTaskListsIds: Guid[];
 }
 
-@define()
+@Type()
 export class CancelingEmploymentCompleted extends Event<CancelingEmploymentCompleted> {
   employeeId: Guid;
 
@@ -59,19 +59,19 @@ export class CancelingEmploymentCompleted extends Event<CancelingEmploymentCompl
   closedTaskListsIds: Guid[];
 }
 
-@define()
+@Type()
 export class CancelingEmploymentFailed extends Event<CancelingEmploymentFailed> {
   employeeId: Guid;
 
   exception: DomainException;
 }
 // Employee Termination
-@define()
+@Type()
 export class EmployeeTerminationInitiated extends Event<EmployeeTerminationInitiated> {
   employeeId: Guid;
 }
 
-@define()
+@Type()
 export class EmployeeTerminationCompleted extends Event<EmployeeTerminationCompleted> {
   employeeId: Guid;
 
@@ -79,7 +79,7 @@ export class EmployeeTerminationCompleted extends Event<EmployeeTerminationCompl
 }
 
 // Closing task lists
-@define()
+@Type()
 export class ClosingEmployeeTaskListsInitiated extends Event<ClosingEmployeeTaskListsInitiated> {
   employeeId: Guid;
 
@@ -88,14 +88,14 @@ export class ClosingEmployeeTaskListsInitiated extends Event<ClosingEmployeeTask
   closedTaskListsIds: Guid[];
 }
 
-@define()
+@Type()
 export class AddedClosedEmployeeTaskList extends Event<AddedClosedEmployeeTaskList> {
   employeeId: Guid;
 
   taskListId: Guid;
 }
 
-@define()
+@Type()
 export class ClosingEmployeeTaskListsCompleted extends Event<ClosingEmployeeTaskListsCompleted> {
   taskListsIds: Guid[];
 

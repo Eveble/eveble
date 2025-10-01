@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai';
 import { MongoClient, Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
 import getenv from 'getenv';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import {
@@ -27,11 +27,11 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`CommitMongoDBStorage`, () => {
-  @define('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
+  @Type('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }
-  @define('CommitMongoDBStorage.MyEvent', { isRegistrable: false })
+  @Type('CommitMongoDBStorage.MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     name: string;
   }

@@ -1,19 +1,19 @@
 import { isString, isPlainObject } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { ValueObject } from '../value-object';
 import { types } from '../../types';
 
 import { ValueObjectError } from '../domain-errors';
 
-@define('InvalidGuidValueError')
+@Type('InvalidGuidValueError')
 export class InvalidGuidValueError extends ValueObjectError {
   constructor(got: string) {
     super(`Guid: Expected string as a valid guid, got ${got}`);
   }
 }
 
-@define('Guid')
+@Type('Guid')
 export class Guid extends ValueObject implements types.Stringifiable {
   id: string;
 

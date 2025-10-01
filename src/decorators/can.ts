@@ -39,7 +39,7 @@ import { Entity } from '../domain/entity';
  *
  * @example
  *```ts
- * @define()
+ * @Type()
  * class Task extends Entity {
  *
  *   @can((_task: Task, priority: number) => {

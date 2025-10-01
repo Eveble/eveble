@@ -4,7 +4,7 @@ import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import { PropTypes, ValidationError } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { InvalidInitializingMessageError } from '../../../src/domain/domain-errors';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -71,35 +71,35 @@ describe(`Router`, () => {
     clock.restore();
   });
 
-  @define('InvalidMessage', { isRegistrable: false })
+  @Type('InvalidMessage', { isRegistrable: false })
   class InvalidMessage extends Message {}
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }
-  @define('MyOtherCommand', { isRegistrable: false })
+  @Type('MyOtherCommand', { isRegistrable: false })
   class MyOtherCommand extends Command<MyOtherCommand> {
     name: string;
   }
 
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     name: string;
   }
 
-  @define('MyOtherEvent', { isRegistrable: false })
+  @Type('MyOtherEvent', { isRegistrable: false })
   class MyOtherEvent extends Event<MyOtherEvent> {
     name: string;
   }
 
-  @define('MyCorrelatingEvent', { isRegistrable: false })
+  @Type('MyCorrelatingEvent', { isRegistrable: false })
   class MyCorrelatingEvent extends Event<MyCorrelatingEvent> {
     name: string;
   }
 
   describe(`construction`, () => {
-    @define('MyEventSourceable', { isRegistrable: false })
+    @Type('MyEventSourceable', { isRegistrable: false })
     class MyEventSourceable extends EventSourceable {}
 
     it(`throws MissingEventSourceableError if event sourceable is not set`, () => {
@@ -173,7 +173,7 @@ describe(`Router`, () => {
     class MyEventSourceable extends EventSourceable {}
 
     it(`throws UnresolvableIdentifierFromMessageError if provided message to initializing handler is invalid `, async () => {
-      @define('MyMessage', { isRegistrable: false })
+      @Type('MyMessage', { isRegistrable: false })
       class MyMessage extends Message {
         key: string;
       }
@@ -371,7 +371,7 @@ describe(`Router`, () => {
   });
 
   describe(`message handlers`, () => {
-    @define('MyEventSourceable', { isRegistrable: false })
+    @Type('MyEventSourceable', { isRegistrable: false })
     class MyEventSourceable extends EventSourceable {
       name: string;
 
@@ -687,7 +687,7 @@ describe(`Router`, () => {
       });
 
       it(`throws UnresolvableIdentifierFromMessageError if provided message to handler is invalid `, async () => {
-        @define('MyMessage', { isRegistrable: false })
+        @Type('MyMessage', { isRegistrable: false })
         class MyMessage extends Message {
           key: string;
         }

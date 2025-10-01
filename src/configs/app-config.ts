@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import getenv from 'getenv';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Config } from '../components/config';
 import { LoggingConfig } from './logging-config';
 import { EvebleConfig } from './eveble-config';
 import { types } from '../types';
 
-@define()
+@Type()
 export class AppConfig extends Config {
   static defaultMongoDBOptions = {
     useNewUrlParser: true,

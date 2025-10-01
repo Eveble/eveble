@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
 import { Snapshotter } from '../../../src/infrastructure/snapshotter';
@@ -20,7 +20,7 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
-  @define('SnapshotterWithMongoDBStorage.MyEventSourceable')
+  @Type('SnapshotterWithMongoDBStorage.MyEventSourceable')
   class MyEventSourceable extends EventSourceable {
     name: string;
   }

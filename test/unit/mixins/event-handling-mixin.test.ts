@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { EventHandlingMixin } from '../../../src/mixins/event-handling-mixin';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -25,17 +25,17 @@ describe(`EventHandlingMixin`, () => {
     injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
   });
 
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
   }
 
-  @define('MyOtherEvent', { isRegistrable: false })
+  @Type('MyOtherEvent', { isRegistrable: false })
   class MyOtherEvent extends Event<MyOtherEvent> {
     key: string;
   }
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;
   }

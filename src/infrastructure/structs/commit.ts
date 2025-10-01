@@ -1,10 +1,10 @@
 import { classes } from 'polytype';
-import { define } from 'typend';
+import { Type } from 'typend';
 import { types } from '../../types';
 import { StatefulMixin } from '../../mixins/stateful-mixin';
 import { Serializable } from '../../components/serializable';
 
-@define('CommitReceiver')
+@Type('CommitReceiver')
 export class CommitReceiver
   extends classes(Serializable, StatefulMixin)
   implements types.CommitReceiver
@@ -93,7 +93,7 @@ export class CommitReceiver
   }
 }
 
-@define('Commit')
+@Type('Commit')
 export class Commit extends Serializable implements types.Commit {
   public id: string;
 

@@ -57,7 +57,7 @@ export class OneToOneHandlingMixin
    * Thrown if handler would overridden without explicit call.
    * @example
    *```ts
-   * @define('MyCommand')
+   * @Type('MyCommand')
    * class MyCommand extends Command<MyCommand> {
    *   key: string;
    * }

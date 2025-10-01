@@ -3,7 +3,7 @@ import sinonChai from 'sinon-chai';
 import { Integer, PropTypes, ValidationError } from 'typend';
 import { inject } from '@parisholley/inversify-async';
 import sinon from 'sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Struct } from '../../../src/components/struct';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
@@ -13,7 +13,7 @@ import { types } from '../../../src/types';
 chai.use(sinonChai);
 
 describe('Struct', () => {
-  @define('Parent')
+  @Type('Parent')
   class Parent extends Struct {
     hasJob: boolean;
 
@@ -22,12 +22,12 @@ describe('Struct', () => {
     age: Integer;
   }
 
-  @define('Child')
+  @Type('Child')
   class Child extends Parent {
     hobby: string;
   }
 
-  @define('BastardChild')
+  @Type('BastardChild')
   class BastardChild extends Parent {
     toy: string;
   }
@@ -127,7 +127,7 @@ describe('Struct', () => {
       it('allows for manual construction by flagging constructor with metadata', () => {
         // Without Object.assign on Struct's constructor classes with property
         // initializers will never work as expected.
-        @define('MyDelegatedStruct')
+        @Type('MyDelegatedStruct')
         class MyDelegatedStruct extends Struct {
           key: string;
         }
@@ -138,7 +138,7 @@ describe('Struct', () => {
       it('does not construct for classes with property initializers', () => {
         // Without Object.assign on Struct's constructor classes with property
         // initializers will never work as expected.
-        @define('MyStructWithInitializer')
+        @Type('MyStructWithInitializer')
         class MyStructWithInitializer extends Struct {
           key = 'default';
         }
@@ -150,7 +150,7 @@ describe('Struct', () => {
       it('requires that developer define constructor on their derived class', () => {
         // Without Object.assign on Struct's constructor classes with property
         // initializers will never work as expected - this is one of possible solutions.
-        @define('MyStructWithDefinedConstructor')
+        @Type('MyStructWithDefinedConstructor')
         class MyStructWithDefinedConstructor extends Struct {
           key = 'default';
 
@@ -170,7 +170,7 @@ describe('Struct', () => {
     it('skips validating properties defined with @inject decorator', () => {
       class MyDependency {}
 
-      @define()
+      @Type()
       class MyStruct extends Struct {
         key: string;
 
@@ -187,7 +187,7 @@ describe('Struct', () => {
 
   describe('hooks', () => {
     it('supports onConstruction hook', () => {
-      @define('Car')
+      @Type('Car')
       class Car extends Struct {
         brand: string;
       }
@@ -204,7 +204,7 @@ describe('Struct', () => {
     });
 
     it('supports onValidation hook', () => {
-      @define('Car')
+      @Type('Car')
       class Car extends Struct {
         model: string;
       }
@@ -220,7 +220,7 @@ describe('Struct', () => {
     });
 
     it('ensures that onValidation hooks are executed after prop types validation', () => {
-      @define('Car')
+      @Type('Car')
       class Car extends Struct {
         model: string;
       }

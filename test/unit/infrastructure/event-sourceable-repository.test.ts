@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import {
   Commit,
   CommitReceiver,
@@ -29,17 +29,17 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`EventSourceableRepository`, () => {
-  @define('MyInitEvent', { isRegistrable: false })
+  @Type('MyInitEvent', { isRegistrable: false })
   class MyInitEvent extends Event<MyInitEvent> {
     name: string;
   }
 
-  @define('MyOtherEvent', { isRegistrable: false })
+  @Type('MyOtherEvent', { isRegistrable: false })
   class MyOtherEvent extends Event<MyOtherEvent> {
     age: number;
   }
 
-  @define('Namespace.MyEventSourceable', { isRegistrable: false })
+  @Type('Namespace.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {
     name?: string;
 
@@ -54,7 +54,7 @@ describe(`EventSourceableRepository`, () => {
     }
   }
 
-  @define('Namespace.MyAggregate', { isRegistrable: false })
+  @Type('Namespace.MyAggregate', { isRegistrable: false })
   class MyAggregate extends Aggregate {
     name?: string;
 
@@ -69,7 +69,7 @@ describe(`EventSourceableRepository`, () => {
     }
   }
 
-  @define('MyProcess', { isRegistrable: false })
+  @Type('MyProcess', { isRegistrable: false })
   class MyProcess extends Process {
     name: string;
 

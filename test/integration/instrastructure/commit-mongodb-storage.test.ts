@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -25,11 +25,11 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`CommitMongoDBStorage`, () => {
-  @define('IntegrationCommitMongoDBStorage.MyCommand')
+  @Type('IntegrationCommitMongoDBStorage.MyCommand')
   class MyCommand extends Command<MyCommand> {
     name: string;
   }
-  @define('IntegrationCommitMongoDBStorage.MyEvent')
+  @Type('IntegrationCommitMongoDBStorage.MyEvent')
   class MyEvent extends Event<MyEvent> {
     name: string;
   }

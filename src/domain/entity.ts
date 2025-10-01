@@ -1,7 +1,7 @@
 import { classes } from 'polytype';
 import { pick } from 'lodash';
 import deepClone from '@jsbits/deep-clone';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { StatefulMixin } from '../mixins/stateful-mixin';
 import { Serializable } from '../components/serializable';
 import { Guid } from './value-objects/guid';
@@ -21,7 +21,7 @@ import {
 import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
 import { List } from './list';
 
-@define('Entity')
+@Type('Entity')
 export class Entity
   extends classes(Serializable, StatefulMixin, StatusfulMixin)
   implements types.Entity

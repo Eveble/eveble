@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { PropTypes } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
 import { isDefinable } from '../../../src/utils/helpers';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
@@ -23,7 +23,7 @@ describe('ScheduleCommand', () => {
     clock.restore();
   });
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;
   }

@@ -1,7 +1,7 @@
 import { stubInterface } from 'ts-sinon';
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
@@ -11,7 +11,7 @@ import { EventSourceable } from '../../../src/domain/event-sourceable';
 chai.use(sinonChai);
 
 describe(`SnapshotSerializer`, () => {
-  @define('MyEventSourceable', { isRegistrable: false })
+  @Type('MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {
     key: string;
   }

@@ -16,7 +16,7 @@ export class DefinableMixin implements types.Definable {
    * @returns Plain object representation of properties types.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyClass extends DefinableMixin {
    *   stringKey: string
    *
@@ -44,7 +44,7 @@ export class DefinableMixin implements types.Definable {
    * @returns Default values for properties.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyClass extends Struct {
    *   stringKey = 'my-string';
    *
@@ -105,7 +105,7 @@ export class DefinableMixin implements types.Definable {
    * will cascade to original instance(**THIS** instance, since properties are **referenced**).
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class Point extends DefinableMixin {
    *   x: number;
    *   y: number;
@@ -143,7 +143,7 @@ export class DefinableMixin implements types.Definable {
    * path `validation.type` set to `runtime` before staring application.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyClass extends DefinableMixin {
    *   stringKey: string
    *
@@ -245,7 +245,7 @@ export class DefinableMixin implements types.Definable {
    * @returns Plain object representation of properties types.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyClass extends DefinableMixin {
    *   stringKey: string
    *
@@ -269,7 +269,7 @@ export class DefinableMixin implements types.Definable {
    * @returns Plain object representation of property initializers.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyClass extends Struct {
    *   stringKey = 'my-string';
    *

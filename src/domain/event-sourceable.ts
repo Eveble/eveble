@@ -4,7 +4,7 @@ import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
 import { postConstruct } from '@parisholley/inversify-async';
 import getenv from 'getenv';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import deepClone from '@jsbits/deep-clone';
 import { Entity } from './entity';
 import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
@@ -26,7 +26,7 @@ import { ScheduleCommand } from './schedule-command';
 import { UnscheduleCommand } from './unschedule-command';
 import { History } from './history';
 
-@define('EventSourceable')
+@Type('EventSourceable')
 export class EventSourceable
   extends classes(Entity, OneToOneHandlingMixin)
   implements types.EventSourceable

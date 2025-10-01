@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Serializable } from '../../../src/components/serializable';
 import { List } from '../../../src/domain/list';
 import {
@@ -13,12 +13,12 @@ import {
 chai.use(sinonChai);
 
 describe('List', () => {
-  @define('Item', { isRegistrable: false })
+  @Type('Item', { isRegistrable: false })
   class Item extends Serializable {
     name: string;
   }
 
-  @define('Order', { isRegistrable: false })
+  @Type('Order', { isRegistrable: false })
   class Order extends Serializable {
     id: string;
 
@@ -29,7 +29,7 @@ describe('List', () => {
     }
   }
 
-  @define('Employee', { isRegistrable: false })
+  @Type('Employee', { isRegistrable: false })
   class Employee extends Serializable {
     id: string;
 
@@ -40,7 +40,7 @@ describe('List', () => {
     }
   }
 
-  @define('Company', { isRegistrable: false })
+  @Type('Company', { isRegistrable: false })
   class Company extends Serializable {
     id: string;
 
@@ -90,7 +90,7 @@ describe('List', () => {
       });
 
       it('converting other values', () => {
-        @define('MyString', { isRegistrable: false })
+        @Type('MyString', { isRegistrable: false })
         class MyString extends String {
           typeName() {
             return 'MyString';
@@ -101,7 +101,7 @@ describe('List', () => {
           }
         }
 
-        @define('MyStringContainer', { isRegistrable: false })
+        @Type('MyStringContainer', { isRegistrable: false })
         class MyStringContainer extends Serializable {
           items: MyString[];
         }

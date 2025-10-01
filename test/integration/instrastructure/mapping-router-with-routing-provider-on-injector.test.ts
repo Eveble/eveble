@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Process } from '../../../src/domain/process';
 import { Command } from '../../../src/components/command';
@@ -25,14 +25,14 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`Mapping Router with routing provider on Injector`, () => {
-  @define('RoutesProvider.MyCommand')
+  @Type('RoutesProvider.MyCommand')
   class MyCommand extends Command<MyCommand> {}
-  @define('RoutesProvider.MyOtherCommand')
+  @Type('RoutesProvider.MyOtherCommand')
   class MyOtherCommand extends Command<MyOtherCommand> {}
 
-  @define('RoutesProvider.MyEvent')
+  @Type('RoutesProvider.MyEvent')
   class MyEvent extends Event<MyEvent> {}
-  @define('RoutesProvider.MyOtherEvent')
+  @Type('RoutesProvider.MyOtherEvent')
   class MyOtherEvent extends Event<MyOtherEvent> {}
 
   // Injector

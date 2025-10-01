@@ -3,7 +3,7 @@ import { Collection, PropTypes } from 'typend';
 import { postConstruct } from '@parisholley/inversify-async';
 import { stubInterface } from 'ts-sinon';
 import {
-  define,
+  Type,
   isSerializable,
   resolveSerializableFromPropType,
 } from '@eveble/core';
@@ -22,7 +22,7 @@ import { Struct } from '../../../src/components/struct';
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 describe('helpers', () => {
-  @define('SerializableStub')
+  @Type('SerializableStub')
   class SerializableStub {
     getPropTypes(): void {}
 
@@ -58,8 +58,8 @@ describe('helpers', () => {
   }
 
   describe('isDefinable', () => {
-    it('returns true for defined(@define) instances of class implementing Definable interface', () => {
-      @define()
+    it('returns true for defined(@Type) instances of class implementing Definable interface', () => {
+      @Type()
       class MyDefinable {
         getPropTypes(): void {}
 
@@ -81,12 +81,12 @@ describe('helpers', () => {
     });
 
     it('returns true for Struct', () => {
-      @define('MyStruct', { isRegistrable: false })
+      @Type('MyStruct', { isRegistrable: false })
       class MyStruct extends Struct {}
       expect(isDefinable(new MyStruct())).to.be.true;
     });
 
-    it('returns false for not defined(@define) classes implementing Definable interface', () => {
+    it('returns false for not defined(@Type) classes implementing Definable interface', () => {
       class ValidButNotDefined {
         getPropTypes(): void {}
 
@@ -109,14 +109,14 @@ describe('helpers', () => {
   });
 
   describe('isSerializable', () => {
-    it('returns true for defined(@define) class instances implementing Serializable interface', () => {
-      @define('MySerialziable', { isRegistrable: false })
+    it('returns true for defined(@Type) class instances implementing Serializable interface', () => {
+      @Type('MySerialziable', { isRegistrable: false })
       class MySerializable extends SerializableStub {}
 
       expect(isSerializable(new MySerializable())).to.be.true;
     });
 
-    it('returns false for not defined(@define) class instances that implementing Serializable interface', () => {
+    it('returns false for not defined(@Type) class instances that implementing Serializable interface', () => {
       class MySerializable extends SerializableStub {}
 
       expect(isSerializable(new MySerializable())).to.be.false;

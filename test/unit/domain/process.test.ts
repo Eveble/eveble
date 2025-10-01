@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Process } from '../../../src/domain/process';
 import { subscribe } from '../../../src/annotations/subscribe';
@@ -25,16 +25,16 @@ describe(`Process`, () => {
   let commands: Record<string, Command<{}>>;
   let events: Record<string, Event<{}>>;
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     name: string;
   }
 
-  @define('MyCommandProcess', { isRegistrable: false })
+  @Type('MyCommandProcess', { isRegistrable: false })
   class MyCommandProcess extends Process {
     name: string;
 
@@ -44,7 +44,7 @@ describe(`Process`, () => {
     }
   }
 
-  @define('MyEventProcess')
+  @Type('MyEventProcess')
   class MyEventProcess extends Process {
     name: string;
 
@@ -54,7 +54,7 @@ describe(`Process`, () => {
     }
   }
 
-  @define('MyProcess', { isRegistrable: false })
+  @Type('MyProcess', { isRegistrable: false })
   class MyProcess extends Process {
     name: string;
 
@@ -221,7 +221,7 @@ describe(`Process`, () => {
   });
   describe(`triggering`, () => {
     it('allows to define custom correlation key as static class property', () => {
-      @define('MyCorrelationProcess', { isRegistrable: false })
+      @Type('MyCorrelationProcess', { isRegistrable: false })
       class MyCorrelationProcess extends Process {
         public static correlationKey = 'myCorrelationKey';
       }
@@ -235,7 +235,7 @@ describe(`Process`, () => {
     });
 
     it('allows to define custom correlation key with static setter', () => {
-      @define('MyCorrelationProcess2')
+      @Type('MyCorrelationProcess2')
       class MyCorrelationProcess extends Process {
         static correlationKey = 'myCorrelationKey';
       }
@@ -250,7 +250,7 @@ describe(`Process`, () => {
     });
 
     it('returns default correlation key as process type name', () => {
-      @define('Process.MyCorrelationProcess')
+      @Type('Process.MyCorrelationProcess')
       class MyCorrelationProcess extends Process {}
       expect(MyCorrelationProcess.getCorrelationKey()).to.be.equal(
         'Process.MyCorrelationProcess'
@@ -278,7 +278,7 @@ describe(`Process`, () => {
     });
 
     it(`ensures that correlating key using dot notation is correctly set on metadata for databases that does not allow such notations `, () => {
-      @define('Namespaced.MyProcess', { isRegistrable: false })
+      @Type('Namespaced.MyProcess', { isRegistrable: false })
       class NamespacedMyProcess extends Process {
         name: string;
 

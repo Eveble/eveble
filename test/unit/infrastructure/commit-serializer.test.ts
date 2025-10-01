@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinonChai from 'sinon-chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import {
   Commit,
   CommitReceiver,
@@ -17,11 +17,11 @@ import { Injector } from '../../../src/core/injector';
 chai.use(sinonChai);
 
 describe(`CommitSerializer`, () => {
-  @define('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
+  @Type('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }
-  @define('CommitMongoDBStorage.MyEvent', { isRegistrable: false })
+  @Type('CommitMongoDBStorage.MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     name: string;
   }

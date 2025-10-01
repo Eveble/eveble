@@ -1,13 +1,13 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { SerializableError } from '../components/serializable-error';
 
-@define('InfrastructureError')
+@Type('InfrastructureError')
 export class InfrastructureError extends SerializableError {}
 
 /*
 PERSISTENCE ERRORS
 */
-@define('CommitConcurrencyError')
+@Type('CommitConcurrencyError')
 export class CommitConcurrencyError extends InfrastructureError {
   constructor(
     eventSourceableType: string,
@@ -21,7 +21,7 @@ export class CommitConcurrencyError extends InfrastructureError {
   }
 }
 
-@define('EventsNotFoundError')
+@Type('EventsNotFoundError')
 export class EventsNotFoundError extends InfrastructureError {
   constructor(EventSourceableTypeName: string, id: string) {
     super(
@@ -30,7 +30,7 @@ export class EventsNotFoundError extends InfrastructureError {
   }
 }
 
-@define('AddingCommitFailedError')
+@Type('AddingCommitFailedError')
 export class AddingCommitFailedError extends InfrastructureError {
   constructor(storageName: string, commitId: string, appId: string) {
     super(
@@ -39,7 +39,7 @@ export class AddingCommitFailedError extends InfrastructureError {
   }
 }
 
-@define('UpdatingCommitError')
+@Type('UpdatingCommitError')
 export class UpdatingCommitError extends InfrastructureError {
   constructor(storageName: string, commitId: string, appId: string) {
     super(
@@ -48,7 +48,7 @@ export class UpdatingCommitError extends InfrastructureError {
   }
 }
 
-@define('AddingSnapshotError')
+@Type('AddingSnapshotError')
 export class AddingSnapshotError extends InfrastructureError {
   constructor(
     storageName: string,
@@ -60,7 +60,7 @@ export class AddingSnapshotError extends InfrastructureError {
     );
   }
 }
-@define('UpdatingSnapshotError')
+@Type('UpdatingSnapshotError')
 export class UpdatingSnapshotError extends InfrastructureError {
   constructor(
     storageName: string,
@@ -73,7 +73,7 @@ export class UpdatingSnapshotError extends InfrastructureError {
   }
 }
 
-@define('StorageNotFoundError')
+@Type('StorageNotFoundError')
 export class StorageNotFoundError extends InfrastructureError {
   constructor(storageName: string, clientType: string) {
     super(
@@ -85,10 +85,10 @@ export class StorageNotFoundError extends InfrastructureError {
 /*
 ROUTER ERRORS
 */
-@define('RouterError')
+@Type('RouterError')
 export class RouterError extends InfrastructureError {}
 
-@define('MissingEventSourceableError')
+@Type('MissingEventSourceableError')
 export class MissingEventSourceableError extends RouterError {
   constructor(routerName: string) {
     super(
@@ -97,7 +97,7 @@ export class MissingEventSourceableError extends RouterError {
   }
 }
 
-@define('MissingInitializingMessageError')
+@Type('MissingInitializingMessageError')
 export class MissingInitializingMessageError extends RouterError {
   constructor(routerName: string) {
     super(
@@ -106,7 +106,7 @@ export class MissingInitializingMessageError extends RouterError {
   }
 }
 
-@define('CannotRouteMessageError')
+@Type('CannotRouteMessageError')
 export class CannotRouteMessageError extends RouterError {
   constructor(routerName: string, messageTypeName: string) {
     super(
@@ -115,7 +115,7 @@ export class CannotRouteMessageError extends RouterError {
   }
 }
 
-@define('UnresolvableIdentifierFromMessageError')
+@Type('UnresolvableIdentifierFromMessageError')
 export class UnresolvableIdentifierFromMessageError extends RouterError {
   constructor(routerName: string, eventTypeName: string, esTypeName: string) {
     super(
@@ -124,7 +124,7 @@ export class UnresolvableIdentifierFromMessageError extends RouterError {
   }
 }
 
-@define('InitializingIdentifierAlreadyExistsError')
+@Type('InitializingIdentifierAlreadyExistsError')
 export class InitializingIdentifierAlreadyExistsError extends RouterError {
   constructor(routerName: string, id: string) {
     super(`${routerName}: provided identifier ${id} is already in use`);
@@ -134,10 +134,10 @@ export class InitializingIdentifierAlreadyExistsError extends RouterError {
 /*
 SNAPSHOOTING ERRORS
 */
-@define('SnapshotterError')
+@Type('SnapshotterError')
 class SnapshotterError extends InfrastructureError {}
 
-@define('UndefinedSnapshotterFrequencyError')
+@Type('UndefinedSnapshotterFrequencyError')
 export class UndefinedSnapshotterFrequencyError extends SnapshotterError {
   constructor() {
     super(
@@ -146,7 +146,7 @@ export class UndefinedSnapshotterFrequencyError extends SnapshotterError {
   }
 }
 
-@define('UndefinedSnapshotterError')
+@Type('UndefinedSnapshotterError')
 export class UndefinedSnapshotterError extends InfrastructureError {
   constructor() {
     super(`Snapshotter is not defined on EventSourceableRepository`);
@@ -156,17 +156,17 @@ export class UndefinedSnapshotterError extends InfrastructureError {
 /*
 PROJECTION ERRORS
 */
-@define('ProjectionRebuildingError')
+@Type('ProjectionRebuildingError')
 export class ProjectionRebuildingError extends InfrastructureError {}
 
-@define('ProjectionAlreadyRebuildingError')
+@Type('ProjectionAlreadyRebuildingError')
 export class ProjectionAlreadyRebuildingError extends ProjectionRebuildingError {
   constructor(projectionName: string) {
     super(`Projection '${projectionName}' is already being rebuilt`);
   }
 }
 
-@define('ProjectionNotRebuildingError')
+@Type('ProjectionNotRebuildingError')
 export class ProjectionNotRebuildingError extends ProjectionRebuildingError {
   constructor(projectionName: string) {
     super(
@@ -178,10 +178,10 @@ export class ProjectionNotRebuildingError extends ProjectionRebuildingError {
 /*
 CLIENT ERRORS
 */
-@define('ClientError')
+@Type('ClientError')
 export class ClientError extends InfrastructureError {}
 
-@define('InactiveClientError')
+@Type('InactiveClientError')
 export class InactiveClientError extends ClientError {
   constructor(targetName: string, clientId: string) {
     super(
@@ -193,10 +193,10 @@ export class InactiveClientError extends ClientError {
 /*
 SCHEDULER ERRORS
 */
-@define('SchedulerError')
+@Type('SchedulerError')
 export class SchedulerError extends InfrastructureError {}
 
-@define('CommandSchedulingError')
+@Type('CommandSchedulingError')
 export class CommandSchedulingError extends SchedulerError {
   constructor(
     jobName: string,
@@ -211,7 +211,7 @@ export class CommandSchedulingError extends SchedulerError {
   }
 }
 
-@define('CommandUnschedulingError')
+@Type('CommandUnschedulingError')
 export class CommandUnschedulingError extends SchedulerError {
   constructor(
     jobName: string,

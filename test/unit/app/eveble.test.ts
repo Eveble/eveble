@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from 'typend';
+import { Type } from 'typend';
 import { kernel } from '@eveble/core';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
@@ -220,11 +220,11 @@ describe(`Eveble Module`, () => {
           injector
             .bind<types.Serializer>(BINDINGS.Serializer)
             .toConstantValue(serializer);
-          @define('MyCommand')
+          @Type('MyCommand')
           class MyCommand extends Command<MyCommand> {
             key: string;
           }
-          @define('Namespace.MyEvent')
+          @Type('Namespace.MyEvent')
           class MyEvent extends Event<MyEvent> {
             key: string;
           }

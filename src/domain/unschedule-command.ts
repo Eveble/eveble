@@ -1,9 +1,9 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command } from '../components/command';
 import { types } from '../types';
 import { Guid } from './value-objects/guid';
 
-@define('UnscheduleCommand')
+@Type('UnscheduleCommand')
 export class UnscheduleCommand extends Command<UnscheduleCommand> {
   assignmentId: string | Guid;
 

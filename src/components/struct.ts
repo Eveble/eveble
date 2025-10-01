@@ -5,24 +5,25 @@ import {
   interfaces as inversifyTypes,
 } from '@parisholley/inversify-async';
 import { omit } from 'lodash';
+import { METADATA_KEYS } from '@eveble/core';
 import { DefinableMixin } from '../mixins/definable-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';
 import { types } from '../types';
-import { DEFAULT_PROPS_KEY, DELEGATED_KEY } from '../constants/metadata-keys';
 import { isPlainRecord } from '../utils/helpers';
+import { DELEGATED_KEY } from '../constants/metadata-keys';
 
 export class Struct extends classes(DefinableMixin, HookableMixin) {
   /**
    * Creates an instance of Struct.
    * @param props - Properties of the type required for construction.
    * @throws {UndefinableClassError}
-   * Thrown if provided class constructor has no `@define` decorator applied.
+   * Thrown if provided class constructor has no `@Type` decorator applied.
    * @remarks
    * **Property initializers** on current implementation of TypeScript v3.7 are counterintuitive
    * when inheritance is involved:
    *
    * ```ts
-   * @define('MyClass')
+   * @Type('MyClass')
    * class MyClass extends Struct {
    *  foo = 'default-value';
    * }
@@ -45,7 +46,7 @@ export class Struct extends classes(DefinableMixin, HookableMixin) {
    *
    * To **fix this issue** - define custom constructor for derived class:
    *```ts
-   * @define('MyClass')
+   * @Type('MyClass')
    * class MyClass extends Struct {
    *  foo = 'default-value';
    *
@@ -64,7 +65,8 @@ export class Struct extends classes(DefinableMixin, HookableMixin) {
     super();
     if (
       Reflect.getMetadata(DELEGATED_KEY, this.constructor) !== true &&
-      Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) === undefined
+      Reflect.getMetadata(METADATA_KEYS.DEFAULT_PROPS_KEY, this.constructor) ===
+        undefined
     ) {
       this.construct(props);
     }

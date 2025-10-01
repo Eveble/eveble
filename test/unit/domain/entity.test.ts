@@ -4,7 +4,7 @@ import { stubInterface } from 'ts-sinon';
 import { PropTypes, ValidationError } from 'typend';
 import { pull } from 'lodash';
 import sinon from 'sinon';
-import { define, UnavailableAsserterError, kernel } from '@eveble/core';
+import { Type, UnavailableAsserterError, kernel } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
 import { Serializable } from '../../../src/components/serializable';
 import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
@@ -26,7 +26,7 @@ chai.use(sinonChai);
 describe('Entity', () => {
   let asserter: any;
 
-  @define('Account', { isRegistrable: false })
+  @Type('Account', { isRegistrable: false })
   class Account extends Entity {
     static STATES = {
       active: 'active',
@@ -67,17 +67,17 @@ describe('Entity', () => {
       this.assign(props);
     }
   }
-  @define('Price', { isRegistrable: false })
+  @Type('Price', { isRegistrable: false })
   class Price extends ValueObject {
     value: number;
   }
 
-  @define('Item', { isRegistrable: false })
+  @Type('Item', { isRegistrable: false })
   class Item extends Entity {
     price: Price;
   }
 
-  @define('Order', { isRegistrable: false })
+  @Type('Order', { isRegistrable: false })
   class Order extends Entity {
     items: Item[];
 
@@ -322,7 +322,7 @@ describe('Entity', () => {
         });
 
         it('sets the action as a Command on asserter', () => {
-          @define('MyCommand', { isRegistrable: false })
+          @Type('MyCommand', { isRegistrable: false })
           class MyCommand extends Command<MyCommand> {}
 
           const entity = new Account({ id: 'my-id', name: 'my-name' });

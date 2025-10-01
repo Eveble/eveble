@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { classes } from 'polytype';
 import { PropTypes } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { types } from '../../../src/types';
 import { version } from '../../../src/annotations/version';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
@@ -19,7 +19,7 @@ import {
 describe(`VersionableMixin`, () => {
   describe('prop types', () => {
     it('enforces with Versionable schemaVersion prop type as optional number', () => {
-      @define('MyClass', { isRegistrable: false })
+      @Type('MyClass', { isRegistrable: false })
       class MyClass
         extends classes(DefinableMixin, VersionableMixin)
         implements types.Versionable

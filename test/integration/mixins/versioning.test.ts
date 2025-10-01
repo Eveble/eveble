@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { version } from '../../../src/annotations/version';
 
 describe(`Versioning`, () => {
   describe('transforming legacy schema', () => {
-    @define('CustomerV0', { isRegistrable: false })
+    @Type('CustomerV0', { isRegistrable: false })
     class CustomerV0 extends Serializable {
       firstName: string;
 
@@ -29,7 +29,7 @@ describe(`Versioning`, () => {
       street: string;
     };
 
-    @define('CustomerV1', { isRegistrable: false })
+    @Type('CustomerV1', { isRegistrable: false })
     class CustomerV1 extends Serializable {
       name: string;
 
@@ -53,7 +53,7 @@ describe(`Versioning`, () => {
       address: string;
     };
 
-    @define('CustomerV2', { isRegistrable: false })
+    @Type('CustomerV2', { isRegistrable: false })
     class CustomerV2 extends Serializable {
       name: string;
 
@@ -144,7 +144,7 @@ describe(`Versioning`, () => {
 
   describe('leakage', () => {
     it('does not leak legacy transformers in parent-child relation', () => {
-      @define('Parent', { isRegistrable: false })
+      @Type('Parent', { isRegistrable: false })
       class Parent extends Serializable {
         key: string;
 
@@ -154,7 +154,7 @@ describe(`Versioning`, () => {
           return props;
         }
       }
-      @define('Child', { isRegistrable: false })
+      @Type('Child', { isRegistrable: false })
       class Child extends Parent {
         key: string;
 

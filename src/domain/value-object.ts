@@ -1,5 +1,5 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Serializable } from '../components/serializable';
 
-@define('ValueObject')
+@Type('ValueObject')
 export class ValueObject extends Serializable {}

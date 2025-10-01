@@ -34,7 +34,7 @@ import {
  * Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandlingMixin` constructors.
  * @example
  *```ts
- * @define('MyCommand')
+ * @Type('MyCommand')
  * class MyCommand extends Command<MyCommand> {
  *  key: string;
  * }

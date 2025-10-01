@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { PropTypes, ValidationError } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Config } from '../../../src/components/config';
 import { Struct } from '../../../src/components/struct';
 import { InvalidConfigError } from '../../../src/core/core-errors';
@@ -15,7 +15,7 @@ describe(`Config`, () => {
     second: 2,
   };
 
-  @define('Config.Simple')
+  @Type('Config.Simple')
   class Simple extends Config {
     first: string;
 
@@ -38,7 +38,7 @@ describe(`Config`, () => {
     },
   };
 
-  @define('Config.Complex')
+  @Type('Config.Complex')
   class Complex extends Config {
     root: string;
 
@@ -175,7 +175,7 @@ describe(`Config`, () => {
   });
 
   describe('static constructor', () => {
-    @define('Config.LoggingConfig')
+    @Type('Config.LoggingConfig')
     class LoggingConfig extends Config {
       isEnabled: boolean;
 
@@ -187,7 +187,7 @@ describe(`Config`, () => {
       }
     }
 
-    @define('Config.AppConfig')
+    @Type('Config.AppConfig')
     class AppConfig extends Config {
       appId: string;
 
@@ -260,7 +260,7 @@ describe(`Config`, () => {
       });
 
       it(`returns default values as fallback from class property initializers`, () => {
-        @define('Config.MyConfig')
+        @Type('Config.MyConfig')
         class MyConfig extends Config {
           foo = 'foo-default';
 
@@ -309,7 +309,7 @@ describe(`Config`, () => {
 
     describe('getDefault', () => {
       it(`returns default value from class initializing property`, () => {
-        @define('Config.MyConfig')
+        @Type('Config.MyConfig')
         class MyConfig extends Config {
           foo = 'foo-default';
 
@@ -340,7 +340,7 @@ describe(`Config`, () => {
 
     describe('getExact', () => {
       it(`returns exact value from instance without fallback to defaults`, () => {
-        @define('Config.MyConfig')
+        @Type('Config.MyConfig')
         class MyConfig extends Config {
           lorem: string;
 
@@ -376,7 +376,7 @@ describe(`Config`, () => {
   describe(`mutators`, () => {
     context('setting single value', () => {
       it(`throws ValidationError when trying to set a value that does not match prop types`, () => {
-        @define('Config.MyConfig')
+        @Type('Config.MyConfig')
         class MyConfig extends Config {
           key?: string;
 
@@ -433,7 +433,7 @@ describe(`Config`, () => {
     context('assigning multiple values', () => {
       it(`throws ValidationError when trying to assign properties that does not match
     prop types`, () => {
-        @define('Config.MyConfig')
+        @Type('Config.MyConfig')
         class MyConfig extends Config {
           key?: string;
 
@@ -491,7 +491,7 @@ describe(`Config`, () => {
       });
 
       it(`assigns matching new properties that are optional on construction`, () => {
-        @define('Config.MyConfig')
+        @Type('Config.MyConfig')
         class MyConfig extends Config {
           separator: string;
 
@@ -537,7 +537,7 @@ describe(`Config`, () => {
     });
 
     it('includes other configurable implementations', () => {
-      @define('Config.First')
+      @Type('Config.First')
       class First extends Config {
         firstKey: string;
 
@@ -547,7 +547,7 @@ describe(`Config`, () => {
         }
       }
 
-      @define('Config.Second')
+      @Type('Config.Second')
       class Second extends Config {
         secondKey: string;
 
@@ -569,7 +569,7 @@ describe(`Config`, () => {
 
     describe('simple', () => {
       it('merges two configurations together while keeping parent properties precedence', () => {
-        @define('Config.First')
+        @Type('Config.First')
         class First extends Config {
           key = 'first-key';
 
@@ -581,7 +581,7 @@ describe(`Config`, () => {
           }
         }
 
-        @define('Config.Second')
+        @Type('Config.Second')
         class Second extends Config {
           key = 'second-key';
 
@@ -620,7 +620,7 @@ describe(`Config`, () => {
       });
 
       it('resolves default value from path through all available dependent configurations', () => {
-        @define('Config.First')
+        @Type('Config.First')
         class First extends Config {
           foo?: string;
 
@@ -630,7 +630,7 @@ describe(`Config`, () => {
           }
         }
 
-        @define('Config.Second')
+        @Type('Config.Second')
         class Second extends Config {
           foo = 'second-default-foo';
 
@@ -669,7 +669,7 @@ describe(`Config`, () => {
     });
 
     describe('simple with nested structs', () => {
-      @define('MyFirst', { isRegistrable: false })
+      @Type('MyFirst', { isRegistrable: false })
       class MyFirst extends Struct {
         value: string;
 
@@ -677,7 +677,7 @@ describe(`Config`, () => {
           super({ value });
         }
       }
-      @define('MySecond', { isRegistrable: false })
+      @Type('MySecond', { isRegistrable: false })
       class MySecond extends Struct {
         value: string;
 
@@ -687,7 +687,7 @@ describe(`Config`, () => {
       }
 
       it('merges two configurations together while keeping parent properties precedence', () => {
-        @define('Config.First')
+        @Type('Config.First')
         class First extends Config {
           key = 'first-key';
 
@@ -699,7 +699,7 @@ describe(`Config`, () => {
           }
         }
 
-        @define('Config.Second')
+        @Type('Config.Second')
         class Second extends Config {
           key = 'second-key';
 
@@ -737,7 +737,7 @@ describe(`Config`, () => {
       });
 
       it('merges two deeply nested configurations together while keeping parent properties precedence', () => {
-        @define('Config.First')
+        @Type('Config.First')
         class First extends Config {
           key = 'first-key';
 
@@ -749,7 +749,7 @@ describe(`Config`, () => {
           }
         }
 
-        @define('Config.Second')
+        @Type('Config.Second')
         class Second extends Config {
           I: {
             II: {
@@ -818,7 +818,7 @@ describe(`Config`, () => {
 
     describe('complex', () => {
       it('merges complex nested prop types and properties with parent config that takes explicit precedence', () => {
-        @define('Config.First')
+        @Type('Config.First')
         class First extends Config {
           I = 'first-I';
 
@@ -852,7 +852,7 @@ describe(`Config`, () => {
           }
         }
 
-        @define('Config.Second')
+        @Type('Config.Second')
         class Second extends Config {
           I = 'second-I';
 
@@ -954,7 +954,7 @@ describe(`Config`, () => {
       });
 
       it('resolves default value from path through all available dependent configurations', () => {
-        @define('Config.First')
+        @Type('Config.First')
         class First extends Config {
           foo?: {
             baz?: {};
@@ -966,7 +966,7 @@ describe(`Config`, () => {
           }
         }
 
-        @define('Config.Second')
+        @Type('Config.Second')
         class Second extends Config {
           foo?: {
             baz?: {

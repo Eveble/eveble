@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Process } from '../../../src/domain/process';
@@ -25,21 +25,21 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`CommitStore`, () => {
-  @define('CommitStore.MyEventSourceable', { isRegistrable: false })
+  @Type('CommitStore.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {}
-  @define('CommitStore.MyAggregate', { isRegistrable: false })
+  @Type('CommitStore.MyAggregate', { isRegistrable: false })
   class MyAggregate extends Aggregate {}
-  @define('CommitStore.MyProcess', { isRegistrable: false })
+  @Type('CommitStore.MyProcess', { isRegistrable: false })
   class MyProcess extends Process {}
 
-  @define('CommitStore.MyCommand', { isRegistrable: false })
+  @Type('CommitStore.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {}
-  @define('CommitStore.MyOtherCommand', { isRegistrable: false })
+  @Type('CommitStore.MyOtherCommand', { isRegistrable: false })
   class MyOtherCommand extends Command<MyOtherCommand> {}
 
-  @define('CommitStore.MyEvent', { isRegistrable: false })
+  @Type('CommitStore.MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {}
-  @define('CommitStore.MyOtherEvent', { isRegistrable: false })
+  @Type('CommitStore.MyOtherEvent', { isRegistrable: false })
   class MyOtherEvent extends Event<MyOtherEvent> {}
 
   const appId = 'my-app-id';

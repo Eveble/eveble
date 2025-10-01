@@ -1,9 +1,9 @@
 import { get } from 'lodash';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command, Assignment } from '../components/command';
 import { types } from '../types';
 
-@define('ScheduleCommand')
+@Type('ScheduleCommand')
 export class ScheduleCommand extends Command<ScheduleCommand> {
   public command: types.Command;
 

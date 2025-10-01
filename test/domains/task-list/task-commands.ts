@@ -1,4 +1,4 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { taskTypes } from './task-types';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Command } from '../../../src/components/command';
@@ -6,26 +6,26 @@ import { Command } from '../../../src/components/command';
 /*
 TASK LIST
 */
-@define()
+@Type()
 export class CreateTaskList extends Command<CreateTaskList> {
   title: string;
 }
 
-@define()
+@Type()
 export class AssignTaskList extends Command<AssignTaskList> {
   employeeId: Guid;
 }
 
-@define()
+@Type()
 export class OpenTaskList extends Command<OpenTaskList> {}
 
-@define()
+@Type()
 export class CloseTaskList extends Command<CloseTaskList> {}
 
 /*
 TASK
 */
-@define()
+@Type()
 export class CreateTask extends Command<CreateTask> {
   id: Guid;
 
@@ -34,53 +34,53 @@ export class CreateTask extends Command<CreateTask> {
   priority: number;
 }
 
-@define()
+@Type()
 export class ChangeTaskPriority extends Command<ChangeTaskPriority> {
   id: Guid;
 
   priority: taskTypes.Priority;
 }
 
-@define()
+@Type()
 export class AcceptTask extends Command<AcceptTask> {
   id: Guid;
 }
 
-@define()
+@Type()
 export class DeclineTask extends Command<DeclineTask> {
   id: Guid;
 
   reason: string;
 }
 
-@define()
+@Type()
 export class StartTask extends Command<StartTask> {
   id: Guid;
 }
 
-@define()
+@Type()
 export class CompleteTask extends Command<CompleteTask> {
   id: Guid;
 }
 
-@define()
+@Type()
 export class PostponeTask extends Command<PostponeTask> {
   id: Guid;
 
   tillAt: Date;
 }
 
-@define()
+@Type()
 export class QuitTask extends Command<QuitTask> {
   id: Guid;
 }
 
-@define()
+@Type()
 export class HoldTask extends Command<HoldTask> {
   id: Guid;
 }
 
-@define()
+@Type()
 export class ExpireTask extends Command<ExpireTask> {
   id: Guid;
 

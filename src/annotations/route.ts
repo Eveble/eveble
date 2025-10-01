@@ -36,7 +36,7 @@ import { subscribe } from './subscribe';
  * Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandlingMixin` constructors.
  * @example
  *```ts
- * @define('MyCommand')
+ * @Type('MyCommand')
  * class MyCommand extends Command<MyCommand> {
  *  key: string;
  * }
@@ -51,7 +51,7 @@ import { subscribe } from './subscribe';
  *```
  * @example
  *```ts
- * @define('MyEvent')
+ * @Type('MyEvent')
  * class MyEvent extends Event<MyEvent> {
  *  key: string;
  * }

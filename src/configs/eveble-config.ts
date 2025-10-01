@@ -1,7 +1,7 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Config } from '../components/config';
 
-@define()
+@Type()
 export class EvebleConfig extends Config {
   public CommitStore?: {
     timeout?: number;

@@ -1,11 +1,11 @@
 import { expect } from 'chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { DomainError } from '../../../src/domain/domain-error';
 import { SerializableError } from '../../../src/components/serializable-error';
 import { isDefinable } from '../../../src/utils/helpers';
 
 describe('DomainError', () => {
-  @define()
+  @Type()
   class MyDomainError extends DomainError {}
 
   it(`extends SerializableError`, () => {

@@ -24,7 +24,7 @@ import {
  *   street: string;
  * };
  *
- * @define('Customer')
+ * @Type('Customer')
  * class Customer extends Serializable {
  *   name: string;
  *

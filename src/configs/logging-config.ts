@@ -1,10 +1,10 @@
 import getenv from 'getenv';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Config } from '../components/config';
 import { LogTransportConfig } from './log-transport-config';
 import { types } from '../types';
 
-@define()
+@Type()
 export class LoggingConfig extends Config {
   public isEnabled? = true;
 

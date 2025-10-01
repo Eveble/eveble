@@ -6,7 +6,7 @@ import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
 import { stubInterface } from 'ts-sinon';
 import getenv from 'getenv';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { PropTypes } from 'typend';
 import { Module } from '../../../src/core/module';
 import { Config } from '../../../src/components/config';
@@ -140,7 +140,7 @@ describe('Module', () => {
     });
 
     it(`takes props with: config instance implementing Configurable interface and assigns it`, () => {
-      @define('MyConfig')
+      @Type('MyConfig')
       class MyConfig extends Config {
         foo: string;
 
@@ -269,7 +269,7 @@ describe('Module', () => {
       });
 
       it(`merges module configuration with application and replaces module's configuration with the one from app`, async () => {
-        @define('MyAppConfig')
+        @Type('MyAppConfig')
         class MyAppConfig extends AppConfig {
           foo: string;
 
@@ -281,7 +281,7 @@ describe('Module', () => {
           }
         }
 
-        @define('MyModuleConfig')
+        @Type('MyModuleConfig')
         class MyModuleConfig extends Config {
           baz: boolean;
 
@@ -398,7 +398,7 @@ describe('Module', () => {
       });
 
       it(`ensures that module configuration is not overriding already set properties on app configuration`, async () => {
-        @define('MyAppConfig')
+        @Type('MyAppConfig')
         class MyAppConfig extends AppConfig {
           foo: string;
 
@@ -410,7 +410,7 @@ describe('Module', () => {
           }
         }
 
-        @define('MyModuleConfig')
+        @Type('MyModuleConfig')
         class MyModuleConfig extends Config {
           foo: string;
 

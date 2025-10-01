@@ -41,14 +41,14 @@ export class SerializableMixin {
    * @returns Normalized value as JSON-compatible without type identifers.
    * @example
    *```ts
-   * @define('Address')
+   * @Type('Address')
    * class Address extends Serializable {
    *   city: string;
    *
    *   street: string;
    * }
    *
-   * @define('Person')
+   * @Type('Person')
    * class Person extends Serializable {
    *   firstName: string;
    *

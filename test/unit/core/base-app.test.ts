@@ -12,7 +12,7 @@ import {
 import * as winston from 'winston';
 import chalk from 'chalk';
 import getenv from 'getenv';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { BaseApp } from '../../../src/core/base-app';
 import { Module } from '../../../src/core/module';
 import { Log } from '../../../src/components/log-entry';
@@ -779,7 +779,7 @@ describe('BaseApp', () => {
     /*
     CONFIGURATIONS
     */
-    @define('GrandchildModuleConfig')
+    @Type('GrandchildModuleConfig')
     class GrandchildModuleConfig extends Config {
       root: string;
 
@@ -794,7 +794,7 @@ describe('BaseApp', () => {
       }
     }
 
-    @define('ChildModuleConfig')
+    @Type('ChildModuleConfig')
     class ChildModuleConfig extends Config {
       root: string;
 
@@ -809,7 +809,7 @@ describe('BaseApp', () => {
       }
     }
 
-    @define('MyAppConfig')
+    @Type('MyAppConfig')
     class MyAppConfig extends AppConfig {
       root: string;
 

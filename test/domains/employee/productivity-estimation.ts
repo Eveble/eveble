@@ -1,4 +1,4 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { EstimateEmployeeProductivity } from './employee-commands';
 import { EmployeeProductivityEstimated } from './employee-events';
 import { DomainError } from '../../../src/domain/domain-error';
@@ -16,7 +16,7 @@ import { DomainException } from '../../../src/domain/domain-exception';
 import { Task } from '../task-list/task';
 import { route } from '../../../src/annotations/route';
 
-@define()
+@Type()
 export class ProductivityEstimationUnavailableForEmployeeError extends DomainError {
   constructor(employeeId: string) {
     super(
@@ -25,7 +25,7 @@ export class ProductivityEstimationUnavailableForEmployeeError extends DomainErr
   }
 }
 
-@define()
+@Type()
 export class ProductivityEstimation extends Process {
   static STATES = {
     initiated: 'initiated',

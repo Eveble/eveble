@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Log, LogMetadata } from '../../../src/components/log-entry';
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 
 describe('Log', () => {
-  @define('MyClass')
+  @Type('MyClass')
   class MyClass extends DefinableMixin {
     myMethod(first: string, second: string, third: string): void {
       Object.assign(this, { first, second, third });

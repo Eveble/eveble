@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
 import { CommandSchedulingService } from '../../../src/infrastructure/command-scheduling-service';
 import { types } from '../../../src/types';
@@ -15,7 +15,7 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 chai.use(sinonChai);
 
 describe(`CommandSchedulingService`, () => {
-  @define('CommandSchedulingService.MyCommand', { isRegistrable: false })
+  @Type('CommandSchedulingService.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }

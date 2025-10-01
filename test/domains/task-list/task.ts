@@ -1,25 +1,25 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
 import { can } from '../../../src/decorators/can';
 import { StateError } from '../../../src/mixins/stateful-mixin';
 import { types } from '../../../src/types';
 // import { PriorityOutOfRangeError } from './task-errors';
 
-@define()
+@Type()
 export class NoQuittingFoolError extends StateError {
   constructor() {
     super('I pitty you fool!');
   }
 }
 
-@define()
+@Type()
 export class TaskAlreadyCompletedError extends StateError {
   constructor(id) {
     super(`Task '${id}' is already completed!`);
   }
 }
 
-@define()
+@Type()
 export class Task extends Entity {
   static STATES = {
     created: 'created',

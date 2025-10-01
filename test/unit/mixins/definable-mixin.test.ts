@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { PropTypes } from 'typend';
 import { stubInterface } from 'ts-sinon';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 
 import { DefinableMixin } from '../../../src/mixins/definable-mixin';
 import { types } from '../../../src/types';
@@ -46,7 +46,7 @@ describe('DefinableMixin', () => {
   required. Otherwise MyType.getPropTypes() DURING test will resolve empty object.
   I did this test, I fell for this twice.
   */
-  @define('Person')
+  @Type('Person')
   class Person extends DefinableMixin {
     firstName: string;
 
@@ -62,7 +62,7 @@ describe('DefinableMixin', () => {
     }
   }
 
-  @define('Parent')
+  @Type('Parent')
   class Parent extends DefinableMixin {
     parentKey: string;
 
@@ -74,12 +74,12 @@ describe('DefinableMixin', () => {
     }
   }
 
-  @define('Child')
+  @Type('Child')
   class Child extends Parent {
     childKey: number;
   }
 
-  @define('Customer')
+  @Type('Customer')
   class Customer extends DefinableMixin {
     name: string;
 
@@ -96,7 +96,7 @@ describe('DefinableMixin', () => {
     }
   }
 
-  @define('Order')
+  @Type('Order')
   class Order extends DefinableMixin {
     customer: Customer;
 
@@ -145,7 +145,7 @@ describe('DefinableMixin', () => {
         });
 
         it('returns false if one instance has different type then other', () => {
-          @define('NotAPerson')
+          @Type('NotAPerson')
           class NotAPerson extends DefinableMixin {
             firstName: string;
 
@@ -375,7 +375,7 @@ describe('DefinableMixin', () => {
     });
 
     describe('property initializers', () => {
-      it('returns property initializers for instance defined on metadata via @define decorator', () => {
+      it('returns property initializers for instance defined on metadata via @Type decorator', () => {
         const stringKey = PropTypes.instanceOf(String);
         stringKey.setInitializer('my-string');
         const numberKey = PropTypes.instanceOf(Number);
@@ -386,7 +386,7 @@ describe('DefinableMixin', () => {
         };
         converter.convert.returns({ properties: propTypes });
 
-        @define('MyClass')
+        @Type('MyClass')
         class MyClass extends DefinableMixin {
           stringKey = 'my-string';
 
@@ -399,7 +399,7 @@ describe('DefinableMixin', () => {
         });
       });
 
-      it('returns property initializers for class constructor defined on metadata via @define decorator', () => {
+      it('returns property initializers for class constructor defined on metadata via @Type decorator', () => {
         const stringKey = PropTypes.instanceOf(String);
         stringKey.setInitializer('my-string');
         const numberKey = PropTypes.instanceOf(Number);
@@ -410,7 +410,7 @@ describe('DefinableMixin', () => {
         };
         converter.convert.returns({ properties: propTypes });
 
-        @define('MyClass')
+        @Type('MyClass')
         class MyClass extends DefinableMixin {
           stringKey = 'my-string';
 
@@ -434,14 +434,14 @@ describe('DefinableMixin', () => {
         };
         converter.convert.returns({ properties: propTypes });
 
-        @define('OtherParent')
+        @Type('OtherParent')
         class OtherParent extends DefinableMixin {
           stringKey = 'my-string';
 
           numberKey = 1337;
         }
 
-        @define('OtherChild')
+        @Type('OtherChild')
         class OtherChild extends OtherParent {}
 
         expect(OtherChild.prototype.getPropertyInitializers()).to.be.eql({
@@ -461,7 +461,7 @@ describe('DefinableMixin', () => {
         };
         converter.convert.returns({ properties: parentPropTypes });
 
-        @define('OtherParent')
+        @Type('OtherParent')
         class OtherParent extends DefinableMixin {
           stringKey = 'my-string';
         }
@@ -471,7 +471,7 @@ describe('DefinableMixin', () => {
         };
         converter.convert.returns({ properties: childPropTypes });
 
-        @define('OtherChild')
+        @Type('OtherChild')
         class OtherChild extends OtherParent {
           numberKey = 1337;
         }
@@ -505,7 +505,7 @@ describe('DefinableMixin', () => {
       };
       converter.convert.returns({ properties: propTypes });
 
-      @define('Namespace.MyClass')
+      @Type('Namespace.MyClass')
       class MyClass extends DefinableMixin {
         key: string;
       }
@@ -527,7 +527,7 @@ describe('DefinableMixin', () => {
       };
       converter.convert.returns({ properties: propTypes });
 
-      @define('MyClass')
+      @Type('MyClass')
       class MyClass extends DefinableMixin {
         key: string;
       }

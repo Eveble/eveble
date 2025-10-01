@@ -77,12 +77,7 @@ export { LogTransport } from './core/log-transport';
 export { Logger } from './core/logger';
 export { Module } from './core/module';
 // Decorators
-export {
-  define,
-  define as Define,
-  define as Type,
-  define as EvebleType,
-} from '@eveble/core';
+export { Type, Type as EvebleType } from '@eveble/core';
 // Domain
 export { AbilityAssertion } from './domain/assertions/ability-assertion';
 export {
@@ -298,8 +293,7 @@ export {
   // Annotations
   internal,
   internal as Internal,
-  validable,
-  validable as Validable,
+  Validable,
   // Patterns
   any,
   iof,

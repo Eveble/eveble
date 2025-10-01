@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { has, set, get, isEmpty } from 'lodash';
 import merge from 'deepmerge';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Serializable } from './serializable';
 import { isPlainRecord } from '../utils/helpers';
 import { types } from '../types';
 
-@define('Message')
+@Type('Message')
 export class Message extends Serializable implements types.Message {
   /**
    * @remarks

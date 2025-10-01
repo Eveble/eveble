@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
 import { pull } from 'lodash';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import {
   StatefulAssertion,
   InvalidStateTransitionError,
@@ -22,7 +22,7 @@ chai.use(sinonChai);
 
 describe(`Entity BDD assertions`, () => {
   describe(`validating state assertion`, () => {
-    @define('MyEntity', { isRegistrable: false })
+    @Type('MyEntity', { isRegistrable: false })
     class MyEntity extends Entity {
       static STATES = {
         first: 'first',
@@ -294,7 +294,7 @@ describe(`Entity BDD assertions`, () => {
   });
 
   describe(`validating status assertion`, () => {
-    @define('MyEntity', { isRegistrable: false })
+    @Type('MyEntity', { isRegistrable: false })
     class MyEntity extends Entity {
       static STATES = {
         created: 'created',
@@ -568,7 +568,7 @@ describe(`Entity BDD assertions`, () => {
   describe(`ability validating assertions`, () => {
     const handler = sinon.stub();
 
-    @define('MyEntity', { isRegistrable: false })
+    @Type('MyEntity', { isRegistrable: false })
     class MyEntity extends Entity {
       static STATES = {
         created: 'created',
@@ -598,17 +598,17 @@ describe(`Entity BDD assertions`, () => {
       }
     }
 
-    @define('Price', { isRegistrable: false })
+    @Type('Price', { isRegistrable: false })
     class Price extends ValueObject {
       value: number;
     }
 
-    @define('Item', { isRegistrable: false })
+    @Type('Item', { isRegistrable: false })
     class Item extends Entity {
       price: Price;
     }
 
-    @define('Order', { isRegistrable: false })
+    @Type('Order', { isRegistrable: false })
     class Order extends Entity {
       items: Item[];
 
@@ -678,7 +678,7 @@ describe(`Entity BDD assertions`, () => {
   describe(`ability evaluation assertions`, () => {
     const handler = sinon.stub();
 
-    @define('MyEntity', {
+    @Type('MyEntity', {
       isRegistrable: false,
     })
     class MyEntity extends Entity {

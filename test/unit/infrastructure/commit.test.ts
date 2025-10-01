@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ValidationError } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { Struct } from '../../../src/components/struct';
@@ -10,14 +10,14 @@ import {
 } from '../../../src/infrastructure/structs/commit';
 
 describe(`Commit`, () => {
-  @define('Commit.FirstCommand', { isRegistrable: false })
+  @Type('Commit.FirstCommand', { isRegistrable: false })
   class FirstCommand extends Command<FirstCommand> {}
-  @define('Commit.SecondCommand', { isRegistrable: false })
+  @Type('Commit.SecondCommand', { isRegistrable: false })
   class SecondCommand extends Command<SecondCommand> {}
 
-  @define('Commit.FirstEvent', { isRegistrable: false })
+  @Type('Commit.FirstEvent', { isRegistrable: false })
   class FirstEvent extends Event<FirstEvent> {}
-  @define('Commit.SecondEvent', { isRegistrable: false })
+  @Type('Commit.SecondEvent', { isRegistrable: false })
   class SecondEvent extends Event<SecondEvent> {}
 
   const now: Date = new Date();

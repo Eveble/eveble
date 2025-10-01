@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import {
-  define,
+  Type,
   TypeNotFoundError,
   TypeExistsError,
   UnregistrableTypeError,
@@ -37,14 +37,14 @@ describe(`EJSONSerializerAdapter`, () => {
     kernel.setSerializer(undefined as any);
   });
 
-  @define('Address', { isRegistrable: false })
+  @Type('Address', { isRegistrable: false })
   class Address extends Serializable {
     city: string;
 
     street: string;
   }
 
-  @define('Person', { isRegistrable: false })
+  @Type('Person', { isRegistrable: false })
   class Person extends Serializable {
     firstName: string;
 
@@ -53,7 +53,7 @@ describe(`EJSONSerializerAdapter`, () => {
     address?: Address;
   }
 
-  @define('Legal', { isRegistrable: false })
+  @Type('Legal', { isRegistrable: false })
   class Legal extends Serializable {
     tos?: {
       id: Guid;
@@ -61,12 +61,12 @@ describe(`EJSONSerializerAdapter`, () => {
     };
   }
 
-  @define('Car', { isRegistrable: false })
+  @Type('Car', { isRegistrable: false })
   class Car extends Serializable {
     brand: string;
   }
 
-  @define('Garage', { isRegistrable: false })
+  @Type('Garage', { isRegistrable: false })
   class Garage extends Serializable {
     cars: Car[];
   }

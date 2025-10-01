@@ -1,4 +1,4 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { DomainError } from './domain-error';
 import { types } from '../types';
 import { SerializableError } from '../components/serializable-error';
@@ -6,10 +6,10 @@ import { SerializableError } from '../components/serializable-error';
 /*
 ASSERTION ERRORS
 */
-@define('AssertionError')
+@Type('AssertionError')
 export class AssertionError extends DomainError {}
 
-@define('UndefinedActionError')
+@Type('UndefinedActionError')
 export class UndefinedActionError extends AssertionError {
   constructor(entityName: string, assertionApi: string) {
     super(
@@ -21,10 +21,10 @@ export class UndefinedActionError extends AssertionError {
 /*
 LIST ERRORS
 */
-@define('ListError')
+@Type('ListError')
 export class ListError extends DomainError {}
 
-@define('IdentifiableAlreadyExistsError')
+@Type('IdentifiableAlreadyExistsError')
 export class IdentifiableAlreadyExistsError extends ListError {
   constructor(props: {
     sourceName: string;
@@ -41,7 +41,7 @@ export class IdentifiableAlreadyExistsError extends ListError {
   }
 }
 
-@define('ElementAlreadyExistsError')
+@Type('ElementAlreadyExistsError')
 export class ElementAlreadyExistsError extends ListError {
   element: types.Serializable;
 
@@ -59,7 +59,7 @@ export class ElementAlreadyExistsError extends ListError {
   }
 }
 
-@define('ElementNotFoundError')
+@Type('ElementNotFoundError')
 export class ElementNotFoundError extends ListError {
   constructor(props: {
     sourceName: string;
@@ -77,7 +77,7 @@ export class ElementNotFoundError extends ListError {
   }
 }
 
-@define('InvalidListError')
+@Type('InvalidListError')
 export class InvalidListError extends ListError {
   constructor(sourceName: string, listName: string) {
     super(
@@ -88,16 +88,16 @@ export class InvalidListError extends ListError {
 /*
 VALUE OBJECT ERRORS
 */
-@define('ValueObjectError')
+@Type('ValueObjectError')
 export class ValueObjectError extends SerializableError {}
 
 /*
 ENTITY ERRORS
 */
-@define('EntityError')
+@Type('EntityError')
 export class EntityError extends DomainError {}
 
-@define('SavedStateNotFoundError')
+@Type('SavedStateNotFoundError')
 export class SavedStateNotFoundError extends EntityError {
   constructor(esTypeName: string, id: string) {
     super(
@@ -109,17 +109,17 @@ export class SavedStateNotFoundError extends EntityError {
 /*
 EVENT SOURCEABLE ERRORS
 */
-@define('EventSourceableError')
+@Type('EventSourceableError')
 export class EventSourceableError extends DomainError {}
 
-@define('InvalidEventError')
+@Type('InvalidEventError')
 export class InvalidEventError extends EventSourceableError {
   constructor(esTypeName: string, got: string) {
     super(`${esTypeName}: event must be instance of Event, got ${got}`);
   }
 }
 
-@define('EventIdMismatchError')
+@Type('EventIdMismatchError')
 export class EventIdMismatchError extends EventSourceableError {
   constructor(esTypeName: string, expectedId: string, got: string) {
     super(
@@ -128,7 +128,7 @@ export class EventIdMismatchError extends EventSourceableError {
   }
 }
 
-@define('InvalidInitializingMessageError')
+@Type('InvalidInitializingMessageError')
 export class InvalidInitializingMessageError extends EventSourceableError {
   constructor(esTypeName: string, expected: string, got: string) {
     super(

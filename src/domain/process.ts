@@ -1,4 +1,4 @@
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { EventSourceable } from './event-sourceable';
 import { Command } from '../components/command';
 import { Event } from '../components/event';
@@ -9,7 +9,7 @@ import { InvalidInitializingMessageError } from './domain-errors';
 
 import { COMMANDS_KEY, EVENTS_KEY } from '../constants/literal-keys';
 
-@define('Process')
+@Type('Process')
 export class Process extends EventSourceable {
   public static correlationKey?: string;
 

@@ -5,7 +5,7 @@ import Agenda from 'agenda';
 import delay from 'delay';
 import { Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
@@ -512,7 +512,7 @@ describe(`Command scheduling`, () => {
   });
 
   describe('batch unscheduling commands', () => {
-    @define('CommandScheduling.MyCommand')
+    @Type('CommandScheduling.MyCommand')
     class MyCommand extends Command<MyCommand> {
       name: string;
     }

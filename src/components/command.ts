@@ -1,12 +1,12 @@
 import { has, get } from 'lodash';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Message } from './message';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { Serializable } from './serializable';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
-@define('Assignment')
+@Type('Assignment')
 export class Assignment extends Serializable implements types.Assignment {
   assignmentId: Guid | string; // Assignment id
 
@@ -17,7 +17,7 @@ export class Assignment extends Serializable implements types.Assignment {
   assignerType: types.TypeName; // Entities type name that scheduled command
 }
 
-@define('Command')
+@Type('Command')
 export class Command<
     T extends {
       [key: string]: any;

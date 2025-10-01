@@ -49,11 +49,11 @@ export class OneToManyHandlingMixin
    * Thrown if the handler argument is not a function.
    * @example
    *```ts
-   * @define('MyEvent')
+   * @Type('MyEvent')
    * class MyEvent extends Event<MyEvent> {
    *   key: string;
    * }
-   * @define('MyOtherEvent')
+   * @Type('MyOtherEvent')
    * class MyOtherEvent extends Event<MyOtherEvent> {
    *   key: string;
    * }

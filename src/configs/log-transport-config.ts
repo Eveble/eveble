@@ -1,9 +1,9 @@
 import chalk from 'chalk';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Config } from '../components/config';
 import { types } from '../types';
 
-@define()
+@Type()
 export class LogTransportConfig extends Config {
   public isEnabled? = true;
 

@@ -1,7 +1,7 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { PropTypes } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
 import { Command, Assignment } from '../../../src/components/command';
 import { isDefinable } from '../../../src/utils/helpers';
@@ -24,10 +24,10 @@ describe('Command', () => {
     clock.restore();
   });
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {}
 
-  @define('MyCustomCommand', { isRegistrable: false })
+  @Type('MyCustomCommand', { isRegistrable: false })
   class MyCustomCommand extends Command<MyCustomCommand> {
     name: string;
   }
@@ -127,7 +127,7 @@ describe('Command', () => {
       });
 
       it('requires explicit constructor for messages with property initializers', () => {
-        @define('MyDefaultCommand', { isRegistrable: false })
+        @Type('MyDefaultCommand', { isRegistrable: false })
         class MyDefaultCommand extends Command<MyDefaultCommand> {
           key: string;
 

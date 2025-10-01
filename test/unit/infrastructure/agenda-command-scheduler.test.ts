@@ -5,7 +5,7 @@ import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
 import Agenda from 'agenda';
 import sinon from 'sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { AgendaClient } from '../../../src/app/clients/agenda-client';
 import { Command, Assignment } from '../../../src/components/command';
 import { types } from '../../../src/types';
@@ -26,7 +26,7 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`AgendaCommandScheduler`, () => {
-  @define('AgendaCommandScheduler.MyCommand', { isRegistrable: false })
+  @Type('AgendaCommandScheduler.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }

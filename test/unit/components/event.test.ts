@@ -1,7 +1,7 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { PropTypes } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
 import { Event } from '../../../src/components/event';
 import { isDefinable } from '../../../src/utils/helpers';
@@ -24,10 +24,10 @@ describe('Event', () => {
     clock.restore();
   });
 
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {}
 
-  @define('MyCustomEvent', { isRegistrable: false })
+  @Type('MyCustomEvent', { isRegistrable: false })
   class MyCustomEvent extends Event<MyCustomEvent> {
     name: string;
   }
@@ -137,7 +137,7 @@ describe('Event', () => {
       });
 
       it('requires explicit constructor for messages with property initializers', () => {
-        @define('MyDefaultEvent', { isRegistrable: false })
+        @Type('MyDefaultEvent', { isRegistrable: false })
         class MyDefaultEvent extends Event<MyDefaultEvent> {
           key: string;
 

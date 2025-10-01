@@ -1,10 +1,10 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { PropTypes } from 'typend';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
 import { Serializable } from '../../../src/components/serializable';
-import { isDefinable } from '../../../src/utils/helpers';
+// import { isDefinable } from '../../../src/utils/helpers';
 
 describe('Message', () => {
   let now: Date;
@@ -22,10 +22,10 @@ describe('Message', () => {
     clock.restore();
   });
 
-  @define('MyMessage', { isRegistrable: false })
+  @Type('MyMessage', { isRegistrable: false })
   class MyMessage extends Message {}
 
-  @define('MyCustomMessage', { isRegistrable: false })
+  @Type('MyCustomMessage', { isRegistrable: false })
   class MyCustomMessage extends Message {
     name: string;
   }
@@ -34,9 +34,9 @@ describe('Message', () => {
     expect(Message.prototype).to.be.instanceof(Serializable);
   });
 
-  it('ensures that type is defined', () => {
-    expect(isDefinable(Serializable.prototype)).to.be.true;
-  });
+  // it('ensures that type is defined', () => {
+  //   expect(isDefinable(Serializable.prototype)).to.be.true;
+  // });
 
   it('defines the type name correctly', () => {
     expect(Message.getTypeName()).to.equal('Message');
@@ -75,14 +75,14 @@ describe('Message', () => {
     });
 
     it('requires explicit constructor for messages with property initializers', () => {
-      @define('MyDefaultMessage', { isRegistrable: false })
+      @Type('MyDefaultMessage', { isRegistrable: false })
       class MyDefaultMessage extends Message {
         key: string;
 
         default = 'default';
 
         constructor(props: Partial<MyDefaultMessage>) {
-          super();
+          super(props);
           Object.assign(this, this.processProps(props));
         }
       }

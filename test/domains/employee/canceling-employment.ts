@@ -1,4 +1,4 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { CancelEmployment, TerminateEmployee } from './employee-commands';
 import {
   // Canceling employment
@@ -24,7 +24,7 @@ import { initial } from '../../../src/annotations/initial';
 import { route } from '../../../src/annotations/route';
 import { DomainException } from '../../../src/domain/domain-exception';
 
-@define()
+@Type()
 export class CancelingEmploymentUnavailableForEmployee extends DomainError {
   constructor(employeeId: string) {
     super(
@@ -33,7 +33,7 @@ export class CancelingEmploymentUnavailableForEmployee extends DomainError {
   }
 }
 
-@define()
+@Type()
 export class CancelingEmployment extends Process {
   static STATES = {
     // Employment cancellation

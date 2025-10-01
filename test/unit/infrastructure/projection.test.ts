@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Event } from '../../../src/components/event';
 import { Projection } from '../../../src/infrastructure/projection';
 import { types } from '../../../src/types';
@@ -22,9 +22,9 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`Projection`, () => {
-  @define('Projection.MyEvent')
+  @Type('Projection.MyEvent')
   class MyEvent extends Event<MyEvent> {}
-  @define('Projection.MyCommand')
+  @Type('Projection.MyCommand')
   class MyCommand extends Command<MyCommand> {}
 
   class MyProjection extends Projection {

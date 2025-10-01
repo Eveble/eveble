@@ -1,4 +1,4 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { route } from '../../../src/annotations/route';
 import { Aggregate } from '../../../src/domain/aggregate';
 import {
@@ -18,7 +18,7 @@ import { initial } from '../../../src/annotations/initial';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { DomainError } from '../../../src/domain/domain-error';
 
-@define()
+@Type()
 export class EmployeeTerminatedError extends DomainError {
   constructor(employeeId: string) {
     super(
@@ -27,7 +27,7 @@ export class EmployeeTerminatedError extends DomainError {
   }
 }
 
-@define()
+@Type()
 export class EmployeeAlreadyTerminatedError extends DomainError {
   constructor(employeeId: string) {
     super(
@@ -36,7 +36,7 @@ export class EmployeeAlreadyTerminatedError extends DomainError {
   }
 }
 
-@define()
+@Type()
 export class TaskListAlreadyAssignedError extends DomainError {
   constructor(employeeId: string, taskListId: string) {
     super(
@@ -45,7 +45,7 @@ export class TaskListAlreadyAssignedError extends DomainError {
   }
 }
 
-@define()
+@Type()
 export class Employee extends Aggregate {
   static STATES = {
     active: 'active',

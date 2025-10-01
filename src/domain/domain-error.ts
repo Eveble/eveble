@@ -1,5 +1,5 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { SerializableError } from '../components/serializable-error';
 
-@define('DomainError')
+@Type('DomainError')
 export abstract class DomainError extends SerializableError {}

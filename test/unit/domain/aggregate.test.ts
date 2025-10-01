@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { History } from '../../../src/domain/history';
@@ -25,16 +25,16 @@ describe(`Aggregate`, () => {
   let commands: Record<string, Command<{}>>;
   let events: Record<string, Event<{}>>;
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     name: string;
   }
 
-  @define('MyAggregate', { isRegistrable: false })
+  @Type('MyAggregate', { isRegistrable: false })
   class MyAggregate extends Aggregate {
     name: string;
 

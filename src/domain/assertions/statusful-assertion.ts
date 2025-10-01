@@ -1,10 +1,10 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Assertion } from '../assertion';
 import { DomainError } from '../domain-error';
 import { types } from '../../types';
 import { UndefinedActionError, AssertionError } from '../domain-errors';
 
-@define('InvalidStatusTransitionError')
+@Type('InvalidStatusTransitionError')
 export class InvalidStatusTransitionError extends AssertionError {
   entityName: string;
 

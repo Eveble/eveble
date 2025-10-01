@@ -3,7 +3,7 @@ import merge from 'deepmerge';
 import { diff } from 'deep-diff';
 import { InstanceOf, Collection, instanceOf, Optional } from 'typend';
 import { getTypeName } from '@eveble/helpers';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import deepClone from '@jsbits/deep-clone';
 import { types } from '../types';
 import { InvalidConfigError } from '../core/core-errors';
@@ -32,7 +32,7 @@ export const CONFIG_MERGED_KEY: unique symbol = Symbol(
 );
 
 @delegate()
-@define()
+@Type()
 export class Config extends Serializable implements types.Configurable {
   public [CONFIG_INCLUDED_KEY]?: Record<string, types.Configurable>;
 
@@ -42,7 +42,7 @@ export class Config extends Serializable implements types.Configurable {
    * Creates an instance of Config.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyConfig extends Config {
    *   appId: string
    *   logging: {
@@ -79,7 +79,7 @@ export class Config extends Serializable implements types.Configurable {
    * @returns Returns `true` if property on path is configurable on configuration, else `false`.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyConfig extends Config {
    *   appId: string
    *   logging: {
@@ -151,7 +151,7 @@ export class Config extends Serializable implements types.Configurable {
    * @returns Returns `true` if configuration is set under questioned path, else `false`.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyConfig extends Config {
    *   appId: string
    *   logging: {
@@ -193,7 +193,7 @@ export class Config extends Serializable implements types.Configurable {
    * @returns Resolved value from instance if its found on path; value from other included configurations; the runtime default value(if provided) or undefined.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyConfig extends Config {
    *   appId: string
    *   logging: {
@@ -319,7 +319,7 @@ export class Config extends Serializable implements types.Configurable {
    * Thrown if the provided value does not match the prop types.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyConfig extends Config {
    *   appId: string
    *   logging: {
@@ -368,7 +368,7 @@ export class Config extends Serializable implements types.Configurable {
    * Thrown if the provided properties does not match prop types.
    * @example
    *```ts
-   * @define()
+   * @Type()
    * class MyConfig extends Config {
    *   appId: string
    *   logging: {
@@ -415,7 +415,7 @@ export class Config extends Serializable implements types.Configurable {
    * Thrown if the passed configuration is not implementation of `Configurable` interface.
    * @example
    *```ts
-   * @define('First')
+   * @Type('First')
    * class First extends Config {
    *   firstKey: string;
    *
@@ -425,7 +425,7 @@ export class Config extends Serializable implements types.Configurable {
    *   }
    * }
    *
-   * @define('Second')
+   * @Type('Second')
    * class Second extends Config {
    *   secondKey: string;
    *
@@ -498,7 +498,7 @@ export class Config extends Serializable implements types.Configurable {
    * @throws {InvalidConfigError}
    * Thrown if the passed configuration is not implementation of `Configurable` interface.
    *```ts
-   * @define('Config.First')
+   * @Type('Config.First')
    * class First extends Config {
    *   key = 'first-key';
    *
@@ -510,7 +510,7 @@ export class Config extends Serializable implements types.Configurable {
    *   }
    * }
    *
-   * @define('Config.Second')
+   * @Type('Config.Second')
    * class Second extends Config {
    *   key = 'second-key';
    *

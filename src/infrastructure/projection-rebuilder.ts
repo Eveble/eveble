@@ -1,11 +1,11 @@
 import { inject } from '@parisholley/inversify-async';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { Struct } from '../components/struct';
 import { Log } from '../components/log-entry';
 
-@define()
+@Type()
 export class RebuildingResult extends Struct {
   projectionsNames: string[];
 

@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 
 import { types } from '../../../src/types';
@@ -38,7 +38,7 @@ describe('SerializableMixin', () => {
 
   describe('type name', () => {
     it('returns the default defined type name as class constructor name', () => {
-      @define()
+      @Type()
       class MyClass extends SerializableMixin {}
 
       expect(new MyClass().getTypeName()).to.be.equal('MyClass');
@@ -46,7 +46,7 @@ describe('SerializableMixin', () => {
     });
 
     it('returns the defined type name to the type', () => {
-      @define('MyNamedClass')
+      @Type('MyNamedClass')
       class MyClass extends SerializableMixin {}
 
       expect(new MyClass().getTypeName()).to.be.equal('MyNamedClass');
@@ -54,7 +54,7 @@ describe('SerializableMixin', () => {
     });
 
     it('returns the defined type name with namespace', () => {
-      @define('Namespace.MyClass')
+      @Type('Namespace.MyClass')
       class MyClass extends SerializableMixin {}
 
       expect(new MyClass().getTypeName()).to.be.equal('Namespace.MyClass');
@@ -64,7 +64,7 @@ describe('SerializableMixin', () => {
 
   describe('serialization', () => {
     it('serializes instance to JSON with serializer', () => {
-      @define('Person', { isRegistrable: false })
+      @Type('Person', { isRegistrable: false })
       class Person extends SerializableMixin {}
 
       const serialized = sinon.stub();

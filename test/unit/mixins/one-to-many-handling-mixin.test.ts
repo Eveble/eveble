@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import delay from 'delay';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Event } from '../../../src/components/event';
 import { types } from '../../../src/types';
 import { OneToManyHandlingMixin } from '../../../src/mixins/one-to-many-handling-mixin';
@@ -23,12 +23,12 @@ chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 describe('OneToManyHandlingMixin', () => {
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
   }
 
-  @define('Namespaced.Event', { isRegistrable: false })
+  @Type('Namespaced.Event', { isRegistrable: false })
   class NamespacedEvent extends Event<NamespacedEvent> {
     key: string;
   }

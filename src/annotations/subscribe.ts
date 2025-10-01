@@ -32,7 +32,7 @@ import {
  * Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandlingMixin` constructors.
  * @example
  *```ts
- * @define('MyEvent')
+ * @Type('MyEvent')
  * class MyEvent extends Event<MyEvent> {
  *  key: string;
  * }

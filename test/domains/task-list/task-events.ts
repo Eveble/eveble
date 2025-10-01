@@ -1,4 +1,4 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Task } from './task';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Event } from '../../../src/components/event';
@@ -8,26 +8,26 @@ import { taskTypes } from './task-types';
 /*
 TASK LIST
 */
-@define()
+@Type()
 export class TaskListCreated extends Event<TaskListCreated> {
   title: string;
 
   tasks: Task[];
 }
 
-@define()
+@Type()
 export class TaskListAssigned extends Event<TaskListAssigned> {
   employeeId: Guid;
 }
 
-@define()
+@Type()
 export class TaskListOpened extends Event<TaskListOpened> {
   title: string;
 
   tasks: Task[];
 }
 
-@define()
+@Type()
 export class TaskListClosed extends Event<TaskListClosed> {
   title: string;
 
@@ -37,14 +37,14 @@ export class TaskListClosed extends Event<TaskListClosed> {
 /*
 TASK
 */
-@define()
+@Type()
 export class TaskCreated extends Event<TaskCreated> {
   task: Task;
 
   employeeId?: Guid;
 }
 
-@define()
+@Type()
 export class TaskPriorityChanged extends Event<TaskPriorityChanged> {
   task: Task;
 
@@ -53,14 +53,14 @@ export class TaskPriorityChanged extends Event<TaskPriorityChanged> {
   employeeId?: Guid;
 }
 
-@define()
+@Type()
 export class TaskAccepted extends Event<TaskAccepted> {
   task: Task;
 
   employeeId?: Guid;
 }
 
-@define()
+@Type()
 export class TaskDeclined extends Event<TaskDeclined> {
   task: Task;
 
@@ -69,21 +69,21 @@ export class TaskDeclined extends Event<TaskDeclined> {
   reason: string;
 }
 
-@define()
+@Type()
 export class TaskStarted extends Event<TaskStarted> {
   task: Task;
 
   employeeId?: Guid;
 }
 
-@define()
+@Type()
 export class TaskCompleted extends Event<TaskCompleted> {
   task: Task;
 
   employeeId?: Guid;
 }
 
-@define()
+@Type()
 export class TaskPostponed extends Event<TaskPostponed> {
   task: Task;
 
@@ -92,21 +92,21 @@ export class TaskPostponed extends Event<TaskPostponed> {
   tillAt: Date;
 }
 
-@define()
+@Type()
 export class TaskQuitted extends Event<TaskQuitted> {
   task: Task;
 
   employeeId?: Guid;
 }
 
-@define()
+@Type()
 export class TaskHold extends Event<TaskHold> {
   task: Task;
 
   employeeId?: Guid;
 }
 
-@define()
+@Type()
 export class TaskExpired extends Event<TaskExpired> {
   task: Task;
 
@@ -116,7 +116,7 @@ export class TaskExpired extends Event<TaskExpired> {
 /*
 PRODUCTIVITY REWARDING
 */
-@define()
+@Type()
 export class ProductivityEstimationInitiated extends Event<ProductivityEstimationInitiated> {
   taskId: Guid;
 
@@ -125,10 +125,10 @@ export class ProductivityEstimationInitiated extends Event<ProductivityEstimatio
   estimatedPoints: number;
 }
 
-@define()
+@Type()
 export class ProductivityEstimationCompleted extends Event<ProductivityEstimationCompleted> {}
 
-@define()
+@Type()
 export class ProductivityEstimationFailed extends Event<ProductivityEstimationFailed> {
   exception: DomainException;
 }

@@ -1,15 +1,15 @@
 import { classes } from 'polytype';
 import { pick } from 'lodash';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { VersionableMixin } from '../mixins/versionable-mixin';
 import { Struct } from './struct';
 import { types } from '../types';
 import { EjsonableMixin } from '../mixins/ejsonable-mixin';
-import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
+// import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
 import { List } from '../domain/list';
 import { InvalidListError } from '../domain/domain-errors';
 
-@define('Serializable')
+@Type('Serializable')
 export class Serializable
   extends classes(Struct, EjsonableMixin, VersionableMixin)
   implements types.Ejsonable
@@ -59,11 +59,11 @@ export class Serializable
    * Thrown if the provided container name does not point to list of supported `Serializables`.
    * @example
    *```ts
-   * @define('Employee')
+   * @Type('Employee')
    * class Employee extends Serializable {
    *   id: string;
    * }
-   * @define('Company')
+   * @Type('Company')
    * class Company extends Serializable {
    *   employees: Employee[];
    * }
@@ -82,11 +82,11 @@ export class Serializable
     if (this[listName] === undefined) {
       throw new InvalidListError(this.typeName(), listName);
     }
-    const Type = this.getPropTypes()[listName];
-    if (Type === undefined) {
+    const ListCnstr = this.getPropTypes()[listName];
+    if (ListCnstr === undefined) {
       throw new exports.InvalidListError(this.typeName(), listName);
     }
-    return new List<T>(this, listName, Type, this[listName]);
+    return new List<T>(this, listName, ListCnstr, this[listName]);
   }
 
   /**

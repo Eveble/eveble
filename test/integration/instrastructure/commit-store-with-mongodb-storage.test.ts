@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Process } from '../../../src/domain/process';
@@ -29,21 +29,21 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`CommitStore with MongoDB storage`, () => {
-  @define('CommitStoreWithMongoDBStorage.MyEventSourceable')
+  @Type('CommitStoreWithMongoDBStorage.MyEventSourceable')
   class MyEventSourceable extends EventSourceable {}
-  @define('CommitStoreWithMongoDBStorage.MyAggregate')
+  @Type('CommitStoreWithMongoDBStorage.MyAggregate')
   class MyAggregate extends Aggregate {}
-  @define('CommitStoreWithMongoDBStorage.MyProcess')
+  @Type('CommitStoreWithMongoDBStorage.MyProcess')
   class MyProcess extends Process {}
 
-  @define('CommitStoreWithMongoDBStorage.MyCommand')
+  @Type('CommitStoreWithMongoDBStorage.MyCommand')
   class MyCommand extends Command<MyCommand> {}
-  @define('CommitStoreWithMongoDBStorage.MyOtherCommand')
+  @Type('CommitStoreWithMongoDBStorage.MyOtherCommand')
   class MyOtherCommand extends Command<MyOtherCommand> {}
 
-  @define('CommitStoreWithMongoDBStorage.MyEvent')
+  @Type('CommitStoreWithMongoDBStorage.MyEvent')
   class MyEvent extends Event<MyEvent> {}
-  @define('CommitStoreWithMongoDBStorage.MyOtherEvent')
+  @Type('CommitStoreWithMongoDBStorage.MyOtherEvent')
   class MyOtherEvent extends Event<MyOtherEvent> {}
 
   // Props

@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import delay from 'delay';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { OneToManyHandlingMixin } from '../../../src/mixins/one-to-many-handling-mixin';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
@@ -16,12 +16,12 @@ import { Event } from '../../../src/components/event';
 chai.use(sinonChai);
 
 describe('EventBus', () => {
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
   }
 
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;
   }

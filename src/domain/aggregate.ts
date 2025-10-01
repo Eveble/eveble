@@ -1,4 +1,4 @@
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { EventSourceable } from './event-sourceable';
 import { History } from './history';
 import { types } from '../types';
@@ -9,7 +9,7 @@ import { Event } from '../components/event';
 import { COMMANDS_KEY, EVENTS_KEY } from '../constants/literal-keys';
 import { Guid } from './value-objects/guid';
 
-@define('Aggregate')
+@Type('Aggregate')
 export class Aggregate extends EventSourceable {
   public id: string | Guid;
 

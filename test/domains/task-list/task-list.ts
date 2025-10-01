@@ -1,5 +1,5 @@
 import { inject } from '@parisholley/inversify-async';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Task } from './task';
 import {
@@ -40,14 +40,14 @@ import { subscribe } from '../../../src/annotations/subscribe';
 import { initial } from '../../../src/annotations/initial';
 import { route } from '../../../src/annotations/route';
 
-@define()
+@Type()
 export class TaskListClosedError extends DomainError {
   constructor(taskListId: string) {
     super(`Can't add new tasks to closed task list with id '${taskListId}'`);
   }
 }
 
-@define()
+@Type()
 export class InappropriateTaskListTitleError extends DomainError {
   constructor(taskListId: string, title: string) {
     super(
@@ -56,7 +56,7 @@ export class InappropriateTaskListTitleError extends DomainError {
   }
 }
 
-@define()
+@Type()
 export class TaskList extends Aggregate {
   @inject('TaskList.TaskCompletionPolicy')
   taskCompletionPolicy: any;

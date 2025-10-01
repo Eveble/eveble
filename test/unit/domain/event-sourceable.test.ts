@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { PropTypes, ValidationError } from 'typend';
 import sinon from 'sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { History } from '../../../src/domain/history';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -46,18 +46,18 @@ describe(`EventSourceable`, () => {
   /*
   COMMANDS
   */
-  @define('CreateOrder')
+  @Type('CreateOrder')
   class CreateOrder extends Command<CreateOrder> {
     customerName: string;
   }
 
-  @define('PayOrder')
+  @Type('PayOrder')
   class PayOrder extends Command<PayOrder> {}
 
-  @define('FulfillOrder')
+  @Type('FulfillOrder')
   class FulfillOrder extends Command<FulfillOrder> {}
 
-  @define('AddItem')
+  @Type('AddItem')
   class AddItem extends Command<AddItem> {
     item: string;
   }
@@ -65,26 +65,26 @@ describe(`EventSourceable`, () => {
   /*
   EVENTS
   */
-  @define('OrderCreated')
+  @Type('OrderCreated')
   class OrderCreated extends Event<OrderCreated> {
     customerName: string;
 
     items: string[];
   }
 
-  @define('OrderPaid')
+  @Type('OrderPaid')
   class OrderPaid extends Event<OrderPaid> {
     customerName: string;
   }
 
-  @define('OrderFulfilled')
+  @Type('OrderFulfilled')
   class OrderFulfilled extends Event<OrderFulfilled> {
     customerName: string;
 
     discountCode: string;
   }
 
-  @define('ItemAdded')
+  @Type('ItemAdded')
   class ItemAdded extends Event<ItemAdded> {
     item: string;
 
@@ -155,10 +155,10 @@ describe(`EventSourceable`, () => {
   /*
   EVENT SOURCEABLE
   */
-  @define('MyEventSourceable', { isRegistrable: false })
+  @Type('MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {}
 
-  @define('Order', { isRegistrable: false })
+  @Type('Order', { isRegistrable: false })
   class Order extends EventSourceable {
     static STATES = {
       pending: 'pending',
@@ -499,7 +499,7 @@ describe(`EventSourceable`, () => {
     });
 
     it(`expects recorded event with source id matching event sourcable's id`, () => {
-      @define('MyEvent', { isRegistrable: false })
+      @Type('MyEvent', { isRegistrable: false })
       class MyEvent extends Event<MyEvent> {}
 
       const event = new MyEvent({
@@ -516,7 +516,7 @@ describe(`EventSourceable`, () => {
     });
 
     it('does not throw error if there is missing handler for event', () => {
-      @define('MyEvent', { isRegistrable: false })
+      @Type('MyEvent', { isRegistrable: false })
       class MyEvent extends Event<MyEvent> {}
 
       const event = new MyEvent({
@@ -577,7 +577,7 @@ describe(`EventSourceable`, () => {
 
   describe('working with state', () => {
     it(`throws UndefinedStatesError when setting state on event sourceable without defined states`, () => {
-      @define('MyNonStateES')
+      @Type('MyNonStateES')
       class MyNonStateES extends EventSourceable {}
 
       const instance = new MyNonStateES({ id: 'my-id' });
@@ -602,7 +602,7 @@ describe(`EventSourceable`, () => {
 
   describe('working with status', () => {
     it(`throws UndefinedStatusesError when setting status on event sourceable without defined statuses`, () => {
-      @define('MyNonStatusES')
+      @Type('MyNonStatusES')
       class MyNonStatusES extends EventSourceable {}
 
       const instance = new MyNonStatusES({ id: 'my-id' });
@@ -708,13 +708,13 @@ describe(`EventSourceable`, () => {
   });
 
   describe(`history`, () => {
-    @define('Created', { isRegistrable: false })
+    @Type('Created', { isRegistrable: false })
     class Created extends Event<Created> {}
 
-    @define('FirstChange', { isRegistrable: false })
+    @Type('FirstChange', { isRegistrable: false })
     class FirstChange extends Event<FirstChange> {}
 
-    @define('SecondChange', { isRegistrable: false })
+    @Type('SecondChange', { isRegistrable: false })
     class SecondChange extends Event<SecondChange> {}
 
     it('replays given historic events on the event sourceable', () => {
@@ -755,7 +755,7 @@ describe(`EventSourceable`, () => {
     });
 
     it(`throws HandlerNotFoundError when handler for message was not registered`, async () => {
-      @define('NotHandledCommand')
+      @Type('NotHandledCommand')
       class NotHandledCommand extends Command<NotHandledCommand> {}
 
       const id = 'my-id';
@@ -843,7 +843,7 @@ describe(`EventSourceable`, () => {
   });
 
   describe(`assigning properties`, () => {
-    @define('UpdateProfile', { isRegistrable: false })
+    @Type('UpdateProfile', { isRegistrable: false })
     class UpdateProfile extends Event<UpdateProfile> {
       name: string;
 
@@ -852,12 +852,12 @@ describe(`EventSourceable`, () => {
       bio: string;
     }
 
-    @define('NotRelatedEvent', { isRegistrable: false })
+    @Type('NotRelatedEvent', { isRegistrable: false })
     class NotRelatedEvent extends Event<NotRelatedEvent> {
       propertyThatDoesNotMatchDefinition: string;
     }
 
-    @define('Profile', { isRegistrable: false })
+    @Type('Profile', { isRegistrable: false })
     class Profile extends EventSourceable {
       name: string;
 
@@ -1124,20 +1124,20 @@ describe(`EventSourceable`, () => {
   });
 
   describe('flagging messages', () => {
-    @define('FirstCommand', { isRegistrable: false })
+    @Type('FirstCommand', { isRegistrable: false })
     class FirstCommand extends Command<FirstCommand> {}
-    @define('SecondCommand', { isRegistrable: false })
+    @Type('SecondCommand', { isRegistrable: false })
     class SecondCommand extends Command<SecondCommand> {}
 
-    @define('FirstEvent', { isRegistrable: false })
+    @Type('FirstEvent', { isRegistrable: false })
     class FirstEvent extends Event<FirstEvent> {}
-    @define('SecondEvent', { isRegistrable: false })
+    @Type('SecondEvent', { isRegistrable: false })
     class SecondEvent extends Event<SecondEvent> {}
 
     describe('initializing messages', () => {
       it(`throws InitializingMessageAlreadyExistsError when there is more then one initializing command found`, () => {
         const fn = (): any => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
             FirstComand(@initial command: FirstCommand): Command<{}> {
               return command;
@@ -1156,7 +1156,7 @@ describe(`EventSourceable`, () => {
       });
       it(`throws InitializingMessageAlreadyExistsError when there is more then one initializing event found`, () => {
         const fn = (): any => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
             FirstEvent(@initial event: FirstEvent): Event<{}> {
               return event;
@@ -1175,7 +1175,7 @@ describe(`EventSourceable`, () => {
       });
       it(`throws InitializingMessageAlreadyExistsError when there is more then one initializing message mix found`, () => {
         const fn = (): any => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
             FirstCommand(@initial command: FirstCommand): Command<{}> {
               return command;
@@ -1194,7 +1194,7 @@ describe(`EventSourceable`, () => {
       });
 
       it('sets the initializing command', () => {
-        @define('MyClass', { isRegistrable: false })
+        @Type('MyClass', { isRegistrable: false })
         class MyClass extends EventSourceable {
           FirstCommand(@initial command: FirstCommand): Command<{}> {
             return command;
@@ -1216,7 +1216,7 @@ describe(`EventSourceable`, () => {
       });
 
       it('sets the initializing event', () => {
-        @define('MyClass', { isRegistrable: false })
+        @Type('MyClass', { isRegistrable: false })
         class MyClass extends EventSourceable {
           FirstCommand(@handle command: FirstCommand): Command<{}> {
             return command;
@@ -1238,7 +1238,7 @@ describe(`EventSourceable`, () => {
       });
 
       it('returns undefined if initializing message is not set', () => {
-        @define('MyClass', { isRegistrable: false })
+        @Type('MyClass', { isRegistrable: false })
         class MyClass extends EventSourceable {
           FirstCommand(@handle command: FirstCommand): Command<{}> {
             return command;
@@ -1263,7 +1263,7 @@ describe(`EventSourceable`, () => {
     describe('routing messages', () => {
       context('commands', () => {
         it('routes commands', () => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
             FirstCommand(@route command: FirstCommand): Command<{}> {
               return command;
@@ -1280,14 +1280,14 @@ describe(`EventSourceable`, () => {
         });
 
         it('returns empty array if there are no routed commands', () => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {}
           expect(MyClass.resolveRoutedCommands()).to.be.eql([]);
         });
       });
       context('events', () => {
         it('routes events', () => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
             FirstEvent(@route event: FirstEvent): Event<{}> {
               return event;
@@ -1304,7 +1304,7 @@ describe(`EventSourceable`, () => {
         });
 
         it('returns empty array if there are no routed events', () => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {}
           expect(MyClass.resolveRoutedEvents()).to.be.eql([]);
         });
@@ -1312,7 +1312,7 @@ describe(`EventSourceable`, () => {
 
       context('mixed messages', () => {
         it('routes mixed messages', () => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
             FirstCommand(@route command: FirstCommand): Command<{}> {
               return command;
@@ -1329,7 +1329,7 @@ describe(`EventSourceable`, () => {
         });
 
         it('returns empty array if there are no routed messages', () => {
-          @define('MyClass', { isRegistrable: false })
+          @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {}
           expect(MyClass.resolveRoutedMessages()).to.be.eql([]);
         });

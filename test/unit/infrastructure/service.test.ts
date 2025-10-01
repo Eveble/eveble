@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import { injectable } from '@parisholley/inversify-async';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Service } from '../../../src/infrastructure/service';
 import { CommandHandlingMixin } from '../../../src/mixins/command-handling-mixin';
 import { EventHandlingMixin } from '../../../src/mixins/event-handling-mixin';
@@ -14,10 +14,10 @@ import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 
 describe(`Service`, () => {
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {}
 
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
   }

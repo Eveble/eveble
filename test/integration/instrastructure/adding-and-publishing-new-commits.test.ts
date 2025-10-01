@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai';
 import delay from 'delay';
 import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -32,9 +32,9 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`Adding and publishing new commits`, () => {
-  @define('AddingAndPublishingNewCommits.MyCommand')
+  @Type('AddingAndPublishingNewCommits.MyCommand')
   class MyCommand extends Command<MyCommand> {}
-  @define('AddingAndPublishingNewCommits.MyEvent')
+  @Type('AddingAndPublishingNewCommits.MyEvent')
   class MyEvent extends Event<MyEvent> {}
 
   // Props

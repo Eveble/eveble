@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { Injector } from '../../../src/core/injector';
@@ -25,9 +25,9 @@ function sleep(ms: number): Promise<any> {
 }
 
 describe(`CommitPublisher`, () => {
-  @define('CommitPublisher.MyCommand', { isRegistrable: false })
+  @Type('CommitPublisher.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {}
-  @define('CommitPublisher.MyEvent', { isRegistrable: false })
+  @Type('CommitPublisher.MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {}
 
   const appId = 'my-app-id';

@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { types } from '../../../src/types';
@@ -24,17 +24,17 @@ chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 describe('OneToOneHandlingMixin', () => {
-  @define('MyCommand', { isRegistrable: false })
+  @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;
   }
 
-  @define('Namespaced.Command', { isRegistrable: false })
+  @Type('Namespaced.Command', { isRegistrable: false })
   class NamespacedCommand extends Command<NamespacedCommand> {
     key: string;
   }
 
-  @define('MyEvent', { isRegistrable: false })
+  @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     key: string;
   }

@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import { instanceOf, PropTypes } from 'typend';
 import sinonChai from 'sinon-chai';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Serializable } from '../../../src/components/serializable';
 import { Struct } from '../../../src/components/struct';
 import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
@@ -15,19 +15,19 @@ import { InvalidListError } from '../../../src/domain/domain-errors';
 chai.use(sinonChai);
 
 describe('Serializable', () => {
-  @define('Person', { isRegistrable: false })
+  @Type('Person', { isRegistrable: false })
   class Person extends Serializable {
     firstName: string;
 
     lastName: string;
   }
 
-  @define('Employee', { isRegistrable: false })
+  @Type('Employee', { isRegistrable: false })
   class Employee extends Serializable {
     id: string;
   }
 
-  @define('Company', { isRegistrable: false })
+  @Type('Company', { isRegistrable: false })
   class Company extends Serializable {
     employees: Employee[];
   }

@@ -1,11 +1,11 @@
 import { classes } from 'polytype';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { StatefulMixin } from '../../mixins/stateful-mixin';
 import { types } from '../../types';
 import { Guid } from '../../domain/value-objects/guid';
 import { Struct } from '../../components/struct';
 
-@define()
+@Type()
 export class ScheduledJob
   extends classes(Struct, StatefulMixin)
   implements types.ScheduledJob

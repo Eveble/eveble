@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { instanceOf, PropTypes, ValidationError } from 'typend';
-import { define, ExtendableError } from '@eveble/core';
+import { Type, ExtendableError } from '@eveble/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { SerializableError } from '../../../src/components/serializable-error';
@@ -12,15 +12,15 @@ import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 
 describe('SerializableError', () => {
-  @define('MySerializable', { isRegistrable: false })
+  @Type('MySerializable', { isRegistrable: false })
   class MySerializable extends Serializable {
     foo: string;
   }
 
-  @define('MySerializableError', { isRegistrable: false })
+  @Type('MySerializableError', { isRegistrable: false })
   class MySerializableError extends SerializableError {}
 
-  @define('MyNestedSerializableError', { isRegistrable: false })
+  @Type('MyNestedSerializableError', { isRegistrable: false })
   class MyNestedSerializableError extends SerializableError {
     nested: MySerializable;
   }
@@ -134,7 +134,7 @@ describe('SerializableError', () => {
     });
 
     it(`allows to set message as initializing class property`, () => {
-      @define('MyDefaultError', { isRegistrable: false })
+      @Type('MyDefaultError', { isRegistrable: false })
       class MyDefaultError extends SerializableError {
         message = 'The default message for error';
       }
@@ -153,7 +153,7 @@ describe('SerializableError', () => {
 
   describe('hooks', () => {
     describe('supports onConstruction hook', () => {
-      @define('MyOtherSerializableError', { isRegistrable: false })
+      @Type('MyOtherSerializableError', { isRegistrable: false })
       class MyOtherSerializableError extends SerializableError {}
 
       const hookFn = (props: types.Props): types.Props => {

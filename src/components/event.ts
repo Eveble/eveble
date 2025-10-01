@@ -1,10 +1,10 @@
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Message } from './message';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
-@define('Event')
+@Type('Event')
 export class Event<
     T extends {
       [key: string]: any;

@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Snapshotter } from '../../../src/infrastructure/snapshotter';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { types } from '../../../src/types';
@@ -15,7 +15,7 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`Snapshotter`, () => {
-  @define('Snapshotter.MyEventSourceable', { isRegistrable: false })
+  @Type('Snapshotter.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {}
 
   let injector: Injector;

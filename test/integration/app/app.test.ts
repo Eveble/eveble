@@ -4,7 +4,7 @@ import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import Agenda from 'agenda';
 import { MongoClient, Collection, Db } from 'mongodb';
-import { define, kernel } from '@eveble/core';
+import { Type, kernel } from '@eveble/core';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -530,9 +530,9 @@ describe(`App`, () => {
   });
 
   describe(`helpers`, () => {
-    @define('App.MyCommand')
+    @Type('App.MyCommand')
     class MyCommand extends Command<{}> {}
-    @define('App.MyEvent')
+    @Type('App.MyEvent')
     class MyEvent extends Event<{}> {}
 
     let app: App;

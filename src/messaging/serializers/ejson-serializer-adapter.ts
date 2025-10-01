@@ -213,13 +213,13 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * Method `stringify` will produce string that has exact structure like presented above.
    * @example
    *```ts
-   * @define('Address')
+   * @Type('Address')
    * class Address extends Serializable {
    *   city: string;
    *   street: string;
    * }
    *
-   * @define('Person')
+   * @Type('Person')
    * class Person extends Serializable {
    *   firstName: string;
    *   lastName: string;
@@ -282,13 +282,13 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * Thrown if the value contains a serialized type that is not supported.
    * @example
    *```ts
-   * @define('Address')
+   * @Type('Address')
    * class Address extends Serializable {
    *   city: string;
    *   street: string;
    * }
    *
-   * @define('Person')
+   * @Type('Person')
    * class Person extends Serializable {
    *   firstName: string;
    *   lastName: string;
@@ -359,13 +359,13 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * @return Stringified value.
    * @example
    *```ts
-   * @define('Address')
+   * @Type('Address')
    * class Address extends Serializable {
    *   city: string;
    *   street: string;
    * }
    *
-   * @define('Person')
+   * @Type('Person')
    * class Person extends Serializable {
    *   firstName: string;
    *   lastName: string;
@@ -401,13 +401,13 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * Thrown if the argument is not a valid EJSON.
    * @example
    *```ts
-   * @define('Address')
+   * @Type('Address')
    * class Address extends Serializable {
    *   city: string;
    *   street: string;
    * }
    *
-   * @define('Person')
+   * @Type('Person')
    * class Person extends Serializable {
    *   firstName: string;
    *   lastName: string;
@@ -445,13 +445,13 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * @returns Cloned value without any reference
    * @example
    *```ts
-   * @define('Address')
+   * @Type('Address')
    * class Address extends Serializable {
    *   city: string;
    *   street: string;
    * }
    *
-   * @define('Person')
+   * @Type('Person')
    * class Person extends Serializable {
    *   firstName: string;
    *   lastName: string;
@@ -490,7 +490,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * is equal to `{b: 2, a: 1}` only when `keyOrderSensitive` is `false`.
    * @example
    *```ts
-   * @define('Car')
+   * @Type('Car')
    * class Car extends Serializable {
    *   brand: string;
    * }
@@ -506,7 +506,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
    *```
    * @example
    *```ts
-   * @define('Car')
+   * @Type('Car')
    * class Car extends Serializable {
    *   brand: string;
    * }
@@ -537,7 +537,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * Thrown if provided argument is not a type implementing `Serializable` interface.
    * @example
    *```ts
-   * @define('Car')
+   * @Type('Car')
    * class Car extends Serializable {
    *   brand: string;
    * }
@@ -608,7 +608,7 @@ export class EJSONSerializerAdapter implements types.Serializer {
    * @returns Converted data to `Serializable` instance.
    * @example
    *```ts
-   * @define('Car')
+   * @Type('Car')
    * class Car extends Serializable {
    *   brand: string;
    * }

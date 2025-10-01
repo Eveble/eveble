@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
-import { define } from '@eveble/core';
+import { Type } from '@eveble/core';
 import { Event } from '../../../src/components/event';
 import { Projection } from '../../../src/infrastructure/projection';
 import { types } from '../../../src/types';
@@ -20,7 +20,7 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe(`ProjectionRebuilder`, () => {
-  @define('ProjectionRebuilder.MyEvent', { isRegistrable: false })
+  @Type('ProjectionRebuilder.MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
     value: string;
   }

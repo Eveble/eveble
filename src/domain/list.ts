@@ -77,12 +77,12 @@ export class List<T extends types.Serializable> extends Array {
    * Thrown if the properties does not match property types on `Serializable`.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
    *
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -116,11 +116,11 @@ export class List<T extends types.Serializable> extends Array {
    * Thrown if the same `Serializable` already exists on list(use `List.prototype.push` instead).
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -172,11 +172,11 @@ export class List<T extends types.Serializable> extends Array {
    * @param element - `Serializable` instance.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -211,11 +211,11 @@ export class List<T extends types.Serializable> extends Array {
    * @return Returns `Serializable` instance if found, else `undefined`.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -275,7 +275,7 @@ export class List<T extends types.Serializable> extends Array {
    * @return Returns `Serializable` instance if found, else `undefined`.
    * @example
    *```ts
-   * @define('Employee')
+   * @Type('Employee')
    * class Employee extends Serializable implements types.Identifiable {
    *   id: string;
    *
@@ -284,7 +284,7 @@ export class List<T extends types.Serializable> extends Array {
    *   }
    * }
    *
-   * @define('Company')
+   * @Type('Company')
    * class Company extends Serializable {
    *   id: string;
    *
@@ -361,11 +361,11 @@ export class List<T extends types.Serializable> extends Array {
    * @return Returns `Serializable` instance if found, else `undefined`.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -387,11 +387,11 @@ export class List<T extends types.Serializable> extends Array {
    * @returns Returns `true` if `Serializable` exists on list, else `false`.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -412,7 +412,7 @@ export class List<T extends types.Serializable> extends Array {
    * @returns Returns `true` if `Serializable` exists on list, else `false`.
    * @example
    *```ts
-   * @define('Employee')
+   * @Type('Employee')
    * class Employee extends Serializable {
    *   id: string;
    *
@@ -421,7 +421,7 @@ export class List<T extends types.Serializable> extends Array {
    *   }
    * }
    *
-   * @define('Company')
+   * @Type('Company')
    * class Company extends Serializable {
    *   id: string;
    *
@@ -445,7 +445,7 @@ export class List<T extends types.Serializable> extends Array {
    * @param element - `Serializable` instance matching type for which list is dedicated.
    * @example
    *```ts
-   * @define('Employee')
+   * @Type('Employee')
    * class Employee extends Serializable {
    *   id: string;
    *
@@ -454,7 +454,7 @@ export class List<T extends types.Serializable> extends Array {
    *   }
    * }
    *
-   * @define('Company')
+   * @Type('Company')
    * class Company extends Serializable {
    *   id: string;
    *
@@ -490,11 +490,11 @@ export class List<T extends types.Serializable> extends Array {
    * which list is dedicated.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -526,7 +526,7 @@ export class List<T extends types.Serializable> extends Array {
    * @param id - Identifier of `Serializable`.
    * @example
    *```ts
-   * @define('Employee')
+   * @Type('Employee')
    * class Employee extends Serializable {
    *   id: string;
    *
@@ -535,7 +535,7 @@ export class List<T extends types.Serializable> extends Array {
    *   }
    * }
    *
-   * @define('Company')
+   * @Type('Company')
    * class Company extends Serializable {
    *   id: string;
    *
@@ -564,11 +564,11 @@ export class List<T extends types.Serializable> extends Array {
    * @param value - Property value that should be matched.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -593,7 +593,7 @@ export class List<T extends types.Serializable> extends Array {
    * @param id - Identifier of `Serializable`.
    * @example
    *```ts
-   * @define('Employee')
+   * @Type('Employee')
    * class Employee extends Serializable {
    *   id: string;
    *
@@ -602,7 +602,7 @@ export class List<T extends types.Serializable> extends Array {
    *   }
    * }
    *
-   * @define('Company')
+   * @Type('Company')
    * class Company extends Serializable {
    *   id: string;
    *
@@ -631,11 +631,11 @@ export class List<T extends types.Serializable> extends Array {
    * @param value - Property value that should be matched.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -660,11 +660,11 @@ export class List<T extends types.Serializable> extends Array {
    * @return Returns `Serializable` instance.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }
@@ -686,11 +686,11 @@ export class List<T extends types.Serializable> extends Array {
    * @return Returns `Serializable` instance.
    * @example
    *```ts
-   * @define('Item')
+   * @Type('Item')
    * class Item extends Serializable {
    *   name: string;
    * }
-   * @define('Order')
+   * @Type('Order')
    * class Order extends Serializable {
    *   items: Item[];
    * }

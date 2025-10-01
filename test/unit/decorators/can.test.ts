@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define, Entity } from '../../../src';
+import { Type, Entity } from '../../../src';
 import {
   DISABLE_ACTION_VALIDATION_METHOD_KEY,
   ENABLE_ACTION_VALIDATION_METHOD_KEY,
@@ -22,7 +22,7 @@ describe('can', () => {
     actionMethod = sinon.stub();
   });
 
-  @define('can.Person')
+  @Type('can.Person')
   class Person extends Entity {
     name: string;
 

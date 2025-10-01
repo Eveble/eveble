@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { define } from 'typend';
+import { Type } from 'typend';
 import { stubInterface } from 'ts-sinon';
 import { Event } from '../../../src/components/event';
 import { Projection } from '../../../src/infrastructure/projection';
@@ -22,7 +22,7 @@ describe('Event projection', () => {
     CustomerGraphStorageProjection: sandbox.stub(),
   };
 
-  @define('EventProjection.CustomerRegistered')
+  @Type('EventProjection.CustomerRegistered')
   class CustomerRegistered extends Event<CustomerRegistered> {
     firstName: string;
 
