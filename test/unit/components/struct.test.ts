@@ -5,7 +5,7 @@ import { inject } from 'inversify';
 import sinon from 'sinon';
 import { Type } from '@eveble/core';
 import { Struct } from '../../../src/components/struct';
-import { TypeTrait } from '../../../src/mixins/type.trait';
+import { TypeTrait } from '../../../src/trait/type.trait';
 import { HookableMixin } from '../../../src/mixins/hookable-mixin';
 import { DELEGATED_KEY } from '../../../src/constants/metadata-keys';
 import { types } from '../../../src/types';

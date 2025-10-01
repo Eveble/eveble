@@ -6,7 +6,7 @@ import {
 } from '@parisholley/inversify-async';
 import { omit } from 'lodash';
 import { METADATA_KEYS } from '@eveble/core';
-import { DefinableMixin } from '../mixins/definable-mixin';
+import { TypeTrait } from '../mixins/definable-mixin';
 import { HookableMixin } from '../mixins/hookable-mixin';
 import { types } from '../types';
 import { isPlainRecord } from '../utils/helpers';
