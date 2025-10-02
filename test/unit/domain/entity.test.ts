@@ -8,7 +8,7 @@ import { Type, UnavailableAsserterError, kernel } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
 import { Serializable } from '../../../src/components/serializable';
 import { StatefulTrait } from '../../../src/mixins/stateful-mixin';
-import { StatusfulMixin } from '../../../src/mixins/statusful-mixin';
+import { StatusfulTrait } from '../../../src/mixins/statusful-mixin';
 import { isTyped } from '../../../src/utils/helpers';
 import { types } from '../../../src/types';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -103,8 +103,8 @@ describe('Entity', () => {
     expect(Entity.prototype).to.be.instanceof(StatefulTrait);
   });
 
-  it(`implements StatusfulMixin`, () => {
-    expect(Entity.prototype).to.be.instanceof(StatusfulMixin);
+  it(`implements StatusfulTrait`, () => {
+    expect(Entity.prototype).to.be.instanceof(StatusfulTrait);
   });
 
   it('ensures that type is defined', () => {

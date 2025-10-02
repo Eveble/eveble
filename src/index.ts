@@ -207,11 +207,11 @@ export {
   InvalidStateError,
 } from './trait/stateful.trait';
 export {
-  StatusfulMixin,
+  StatusfulTrait,
   StatusError,
   UndefinedStatusesError,
   InvalidStatusError,
-} from './mixins/statusful-mixin';
+} from './trait/statusful.trait';
 export {
   VersionableTrait,
   VersionableError,

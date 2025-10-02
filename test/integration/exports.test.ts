@@ -276,7 +276,7 @@ import {
   InvalidStateError,
 } from '../../src/mixins/stateful-mixin';
 import {
-  StatusfulMixin,
+  StatusfulTrait,
   StatusError,
   UndefinedStatusesError,
   InvalidStatusError,
@@ -584,7 +584,7 @@ import {
   StateError as StateErrorExported,
   UndefinedStatesError as UndefinedStatesErrorExported,
   InvalidStateError as InvalidStateErrorExported,
-  StatusfulMixin as StatusfulMixinExported,
+  StatusfulTrait as StatusfulTraitExported,
   StatusError as StatusErrorExported,
   UndefinedStatusesError as UndefinedStatusesErrorExported,
   InvalidStatusError as InvalidStatusErrorExported,
@@ -1533,9 +1533,9 @@ describe(`exports`, () => {
         expect(InvalidStateErrorExported).to.be.equal(InvalidStateError);
       });
     });
-    describe('StatusfulMixin', () => {
-      it('StatusfulMixin', () => {
-        expect(StatusfulMixinExported).to.be.equal(StatusfulMixin);
+    describe('StatusfulTrait', () => {
+      it('StatusfulTrait', () => {
+        expect(StatusfulTraitExported).to.be.equal(StatusfulTrait);
       });
       it('StatusError', () => {
         expect(StatusErrorExported).to.be.equal(StatusError);

@@ -1,19 +1,17 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { classes } from 'polytype';
+import { derive } from '@traits-ts/core';
 import {
-  StatusfulMixin,
+  StatusfulTrait,
   UndefinedStatusesError,
   InvalidStatusError,
-} from '../../../src/mixins/statusful-mixin';
+} from '../../../src/trait/statusful.trait';
 
 chai.use(sinonChai);
 
-describe(`StatusfulMixin`, () => {
-  class BaseClass {}
-
-  class MyClass extends classes(BaseClass, StatusfulMixin) {
+describe(`StatusfulTrait`, () => {
+  class MyClass extends derive(StatusfulTrait) {
     static STATUSES = {
       pendingPayment: 'pendingPayment',
       paid: 'paid',
@@ -21,10 +19,7 @@ describe(`StatusfulMixin`, () => {
     };
   }
 
-  class MyClassWithoutPredefinedStatuses extends classes(
-    BaseClass,
-    StatusfulMixin
-  ) {}
+  class MyClassWithoutPredefinedStatuses extends derive(StatusfulTrait) {}
 
   describe('getters', () => {
     it('returns all available statuses', () => {
