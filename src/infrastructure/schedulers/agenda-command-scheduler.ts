@@ -8,7 +8,7 @@ import {
   CommandSchedulingError,
   CommandUnschedulingError,
 } from '../infrastructure-errors';
-import { StatefulMixin } from '../../mixins/stateful-mixin';
+import { StatefulTrait } from '../../trait/stateful.trait';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
 import { Log } from '../../components/log-entry';
@@ -19,7 +19,7 @@ import { AgendaClient } from '../../app/clients/agenda-client';
 
 @injectable()
 export class AgendaCommandScheduler
-  extends StatefulMixin
+  extends StatefulTrait
   implements types.CommandScheduler
 {
   static STATES = {

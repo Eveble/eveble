@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { Type, UnavailableAsserterError, kernel } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
 import { Serializable } from '../../../src/components/serializable';
-import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
+import { StatefulTrait } from '../../../src/mixins/stateful-mixin';
 import { StatusfulMixin } from '../../../src/mixins/statusful-mixin';
 import { isTyped } from '../../../src/utils/helpers';
 import { types } from '../../../src/types';
@@ -99,8 +99,8 @@ describe('Entity', () => {
     expect(Entity.prototype).to.be.instanceof(Serializable);
   });
 
-  it(`implements StatefulMixin`, () => {
-    expect(Entity.prototype).to.be.instanceof(StatefulMixin);
+  it(`implements StatefulTrait`, () => {
+    expect(Entity.prototype).to.be.instanceof(StatefulTrait);
   });
 
   it(`implements StatusfulMixin`, () => {

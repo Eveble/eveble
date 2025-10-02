@@ -6,13 +6,13 @@ import {
   ProjectionNotRebuildingError,
 } from './infrastructure-errors';
 import { EventHandlingMixin } from '../mixins/event-handling-mixin';
-import { StatefulMixin } from '../mixins/stateful-mixin';
+import { StatefulTrait } from '../trait/stateful.trait';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { Log } from '../components/log-entry';
 
 export class Projection
-  extends classes(EventHandlingMixin, StatefulMixin)
+  extends classes(EventHandlingMixin, StatefulTrait)
   implements types.Projection
 {
   @inject(BINDINGS.EventBus)

@@ -270,7 +270,7 @@ import { OneToOneHandlingMixin } from '../../src/mixins/one-to-one-handling-mixi
 import { RFC5424LoggingMixin } from '../../src/mixins/rfc-5424-logging-mixin';
 import { SerializableMixin } from '../../src/mixins/serializable-mixin';
 import {
-  StatefulMixin,
+  StatefulTrait,
   StateError,
   UndefinedStatesError,
   InvalidStateError,
@@ -580,7 +580,7 @@ import {
   OneToOneHandlingMixin as OneToOneHandlingMixinExported,
   RFC5424LoggingMixin as RFC5424LoggingMixinExported,
   SerializableMixin as SerializableMixinExported,
-  StatefulMixin as StatefulMixinExported,
+  StatefulTrait as StatefulTraitExported,
   StateError as StateErrorExported,
   UndefinedStatesError as UndefinedStatesErrorExported,
   InvalidStateError as InvalidStateErrorExported,
@@ -1519,9 +1519,9 @@ describe(`exports`, () => {
         expect(HookNotFoundErrorExported).to.be.equal(HookNotFoundError);
       });
     });
-    describe('StatefulMixin', () => {
-      it('StatefulMixin', () => {
-        expect(StatefulMixinExported).to.be.equal(StatefulMixin);
+    describe('StatefulTrait', () => {
+      it('StatefulTrait', () => {
+        expect(StatefulTraitExported).to.be.equal(StatefulTrait);
       });
       it('StateError', () => {
         expect(StateErrorExported).to.be.equal(StateError);

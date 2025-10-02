@@ -2,7 +2,7 @@ import { classes } from 'polytype';
 import { injectable } from 'inversify';
 import { kernel } from '@eveble/core';
 import { InvalidTransportIdError, TransportExistsError } from './core-errors';
-import { StatefulMixin } from '../mixins/stateful-mixin';
+import { StatefulTrait } from '../trait/stateful.trait';
 import { LOGGING_LEVELS } from '../constants/defaults';
 import { types } from '../types';
 import { RFC5424LoggingMixin } from '../mixins/rfc-5424-logging-mixin';
@@ -16,7 +16,7 @@ enum STATES {
 
 @injectable()
 export class Logger
-  extends classes(StatefulMixin, RFC5424LoggingMixin)
+  extends classes(StatefulTrait, RFC5424LoggingMixin)
   implements types.Logger
 {
   static STATES = STATES;

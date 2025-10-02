@@ -1,19 +1,17 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { classes } from 'polytype';
+import { derive } from '@traits-ts/core';
 import {
-  StatefulMixin,
+  StatefulTrait,
   UndefinedStatesError,
   InvalidStateError,
-} from '../../../src/mixins/stateful-mixin';
+} from '../../../src/trait/stateful.trait';
 
 chai.use(sinonChai);
 
-describe(`StatefulMixin`, () => {
-  class BaseClass {}
-
-  class MyClass extends classes(BaseClass, StatefulMixin) {
+describe(`StatefulTrait`, () => {
+  class MyClass extends derive(StatefulTrait) {
     static STATES = {
       created: 'created',
       filled: 'filled',
@@ -21,10 +19,7 @@ describe(`StatefulMixin`, () => {
     };
   }
 
-  class MyClassWithoutPredefinedStates extends classes(
-    BaseClass,
-    StatefulMixin
-  ) {}
+  class MyClassWithoutPredefinedStates extends derive(StatefulTrait) {}
 
   describe('getters', () => {
     it('returns all available states', () => {

@@ -1,12 +1,12 @@
 import { classes } from 'polytype';
 import { Type } from 'typend';
 import { types } from '../../types';
-import { StatefulMixin } from '../../mixins/stateful-mixin';
-import { Serializable } from '../../components/serializable';
+import { StatefulTrait } from '../../trait/stateful.trait';
+import { Serializable } from '../../trait/serializable.trait';
 
 @Type('CommitReceiver')
 export class CommitReceiver
-  extends classes(Serializable, StatefulMixin)
+  extends classes(Serializable, StatefulTrait)
   implements types.CommitReceiver
 {
   static STATES = {

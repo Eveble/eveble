@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { Client } from '../../../src/app/client';
-import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
+import { StatefulTrait } from '../../../src/mixins/stateful-mixin';
 
 describe(`Client`, () => {
-  it(`has StatefulMixin mixin on prototype chain applied`, () => {
-    expect(Client.prototype).to.be.instanceof(StatefulMixin);
+  it(`has StatefulTrait mixin on prototype chain applied`, () => {
+    expect(Client.prototype).to.be.instanceof(StatefulTrait);
   });
 
   describe('working with state', () => {

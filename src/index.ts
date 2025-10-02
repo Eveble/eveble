@@ -201,11 +201,11 @@ export { OneToOneHandlingMixin } from './mixins/one-to-one-handling-mixin';
 export { RFC5424LoggingMixin } from './mixins/rfc-5424-logging-mixin';
 export { SerializableMixin } from './mixins/serializable-mixin';
 export {
-  StatefulMixin,
+  StatefulTrait,
   StateError,
   UndefinedStatesError,
   InvalidStateError,
-} from './mixins/stateful-mixin';
+} from './trait/stateful.trait';
 export {
   StatusfulMixin,
   StatusError,
@@ -213,14 +213,14 @@ export {
   InvalidStatusError,
 } from './mixins/statusful-mixin';
 export {
-  VersionableMixin,
+  VersionableTrait,
   VersionableError,
   InvalidSchemaVersionError,
   LegacyTransformerAlreadyExistsError,
   LegacyTransformerNotFoundError,
   InvalidLegacyTransformerError,
   NotVersionableError,
-} from './mixins/versionable-mixin';
+} from './trait/versionable.trait';
 // Helpers
 export {
   isTyped,

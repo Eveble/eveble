@@ -6,7 +6,7 @@ import { stubInterface } from 'ts-sinon';
 import { Logger } from '../../../src/core/logger';
 import { types } from '../../../src/types';
 import { Log } from '../../../src/components/log-entry';
-import { StatefulMixin } from '../../../src/mixins/stateful-mixin';
+import { StatefulTrait } from '../../../src/mixins/stateful-mixin';
 import {
   InvalidTransportIdError,
   TransportExistsError,
@@ -36,8 +36,8 @@ describe('Logger', () => {
     transport = stubInterface<types.LogTransport>();
   });
 
-  it('has StatefulMixin applied', () => {
-    expect(Logger.prototype instanceof StatefulMixin);
+  it('has StatefulTrait applied', () => {
+    expect(Logger.prototype instanceof StatefulTrait);
   });
 
   it('has RFC5424LoggingMixin applied', () => {

@@ -1,8 +1,8 @@
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
-import { StatefulMixin } from '../mixins/stateful-mixin';
+import { StatefulTrait } from '../trait/stateful.trait';
 
-export class Client extends StatefulMixin {
+export class Client extends StatefulTrait {
   static STATES = {
     constructed: 'constructed',
     initialized: 'initialized',

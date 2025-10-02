@@ -4,7 +4,7 @@ import { instanceOf } from 'typend';
 import { classes } from 'polytype';
 import getenv from 'getenv';
 import { kernel } from '@eveble/core';
-import { StatefulMixin } from '../mixins/stateful-mixin';
+import { StatefulTrait } from '../trait/stateful.trait';
 import {
   AppMissingError,
   InjectorMissingError,
@@ -31,7 +31,7 @@ enum STATES {
 }
 
 export abstract class Module
-  extends classes(StatefulMixin)
+  extends classes(StatefulTrait)
   implements types.Stateful, types.Module
 {
   static STATES = STATES;

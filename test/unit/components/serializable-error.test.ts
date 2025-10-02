@@ -4,7 +4,7 @@ import { Type, ExtendableError } from '@eveble/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { SerializableError } from '../../../src/components/serializable-error';
-import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
+import { VersionableTrait } from '../../../src/trait/versionable.trait';
 import { isTyped } from '../../../src/utils/helpers';
 import { TypeTrait } from '../../../src/mixins/definable-mixin';
 import { HookableTrait } from '../../../src/mixins/hookable-mixin';
