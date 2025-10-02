@@ -14,8 +14,6 @@ import { HOOKABLE_KEY } from '../../../src/constants/metadata-keys';
 chai.use(sinonChai);
 
 describe('HookableTrait', () => {
-  // class BaseClass {}
-
   describe('registration', () => {
     it('registers hook for specific action with id as a string and fn as a function', () => {
       class MyClass extends derive(HookableTrait) {}
