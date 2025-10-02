@@ -185,17 +185,17 @@ export {
 } from './messaging/messaging-errors';
 // Mixins
 export { CommandHandlingMixin } from './mixins/command-handling-mixin';
-export { TypeTrait } from './mixins/type.trait';
+export { TypeTrait } from './trait/type.trait';
 export { EjsonableMixin } from './mixins/ejsonable-mixin';
 export { EventHandlingMixin } from './mixins/event-handling-mixin';
 export {
-  HookableMixin,
+  HookableTrait,
   HookError,
   InvalidHookActionError,
   InvalidHookIdError,
   HookAlreadyExistsError,
   HookNotFoundError,
-} from './mixins/hookable-mixin';
+} from './trait/hookable.trait';
 export { OneToManyHandlingMixin } from './mixins/one-to-many-handling-mixin';
 export { OneToOneHandlingMixin } from './mixins/one-to-one-handling-mixin';
 export { RFC5424LoggingMixin } from './mixins/rfc-5424-logging-mixin';

@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import { Type } from '@eveble/core';
 import { Struct } from '../../../src/components/struct';
 import { TypeTrait } from '../../../src/trait/type.trait';
-import { HookableMixin } from '../../../src/mixins/hookable-mixin';
+import { HookableTrait } from '../../../src/trait/hookable.trait';
 import { DELEGATED_KEY } from '../../../src/constants/metadata-keys';
 import { types } from '../../../src/types';
 
@@ -36,8 +36,8 @@ describe('Struct', () => {
     expect(Struct.prototype instanceof TypeTrait).to.be.true;
   });
 
-  it('has HookableMixin applied', () => {
-    expect(Struct.prototype instanceof HookableMixin).to.be.true;
+  it('has HookableTrait applied', () => {
+    expect(Struct.prototype instanceof HookableTrait).to.be.true;
   });
 
   describe('property types', () => {

@@ -1,24 +1,24 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { classes } from 'polytype';
-import { HOOKABLE_KEY } from '../../../src/constants/metadata-keys';
+import { derive } from '@traits-ts/core';
 import {
-  HookableMixin,
-  InvalidHookActionError,
-  InvalidHookIdError,
+  HookableTrait,
   HookAlreadyExistsError,
   HookNotFoundError,
-} from '../../../src/mixins/hookable-mixin';
+  InvalidHookActionError,
+  InvalidHookIdError,
+} from '../../../src/trait/hookable.trait';
+import { HOOKABLE_KEY } from '../../../src/constants/metadata-keys';
 
 chai.use(sinonChai);
 
-describe('HookableMixin', () => {
-  class BaseClass {}
+describe('HookableTrait', () => {
+  // class BaseClass {}
 
   describe('registration', () => {
     it('registers hook for specific action with id as a string and fn as a function', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-action';
       const id = 'my-id';
@@ -29,7 +29,7 @@ describe('HookableMixin', () => {
     });
 
     it(`throws InvalidHookActionError when action is not a string`, () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       expect(() => {
         MyClass.prototype.registerHook(
@@ -54,7 +54,7 @@ describe('HookableMixin', () => {
     });
 
     it(`throws InvalidHookIdError when id is not a string`, () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       expect(() => {
         MyClass.prototype.registerHook(
@@ -79,7 +79,7 @@ describe('HookableMixin', () => {
     });
 
     it('ensures that hook can be set for action that was previously not defined', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-new-action';
       const id = 'my-id';
@@ -91,7 +91,7 @@ describe('HookableMixin', () => {
     });
 
     it('throws HookAlreadyExistsError when hook would be overridden', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-action';
       const id = 'my-id';
@@ -107,7 +107,7 @@ describe('HookableMixin', () => {
     });
 
     it('returns hook by action and id', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-action';
       const id = 'my-id';
@@ -118,7 +118,7 @@ describe('HookableMixin', () => {
     });
 
     it(`throws HookNotFoundError when hook can't be found`, () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const notExistingAction = 'my-not-existing-action';
       const notExistingId = 'my-not-existing-id';
@@ -132,7 +132,7 @@ describe('HookableMixin', () => {
     });
 
     it('adds metadata to class flagging it as hookable', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-action';
       const id = 'my-id';
@@ -143,7 +143,7 @@ describe('HookableMixin', () => {
     });
 
     it(`ensures that hooks registered under same action and different id are resolved from both: parent and child`, () => {
-      class Parent extends classes(BaseClass, HookableMixin) {}
+      class Parent extends derive(HookableTrait) {}
       class Child extends Parent {}
 
       const action = 'my-action';
@@ -170,7 +170,7 @@ describe('HookableMixin', () => {
   describe('evaluation', () => {
     describe('evaluate if hooks are registered for action', () => {
       it('returns true if hooks exists for action', () => {
-        class MyClass extends classes(BaseClass, HookableMixin) {}
+        class MyClass extends derive(HookableTrait) {}
 
         const action = 'my-action';
         const id = 'my-id';
@@ -181,7 +181,7 @@ describe('HookableMixin', () => {
       });
 
       it('returns false if hooks does not exist for action', () => {
-        class MyClass extends classes(BaseClass, HookableMixin) {}
+        class MyClass extends derive(HookableTrait) {}
 
         const action = 'my-action';
         const id = 'my-id';
@@ -194,7 +194,7 @@ describe('HookableMixin', () => {
 
     describe('evaluate if hook exists', () => {
       it('returns true if hook exists for action and id', () => {
-        class MyClass extends classes(BaseClass, HookableMixin) {}
+        class MyClass extends derive(HookableTrait) {}
 
         const action = 'my-action';
         const id = 'my-id';
@@ -205,7 +205,7 @@ describe('HookableMixin', () => {
       });
 
       it('returns false if hook does not exist for action and id', () => {
-        class MyClass extends classes(BaseClass, HookableMixin) {}
+        class MyClass extends derive(HookableTrait) {}
 
         const action = 'my-action';
         const id = 'my-id';
@@ -222,7 +222,7 @@ describe('HookableMixin', () => {
 
   describe('getters', () => {
     it('returns collection of all registered hooks for specific action', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-action';
       const firstId = 'first';
@@ -240,7 +240,7 @@ describe('HookableMixin', () => {
     });
 
     it('returns collection of all registered actions', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-action';
       const firstId = 'first';
@@ -260,7 +260,7 @@ describe('HookableMixin', () => {
     });
 
     it('returns empty collection on non registered action', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       expect(MyClass.prototype.getActions()).to.be.eql({});
     });
@@ -268,7 +268,7 @@ describe('HookableMixin', () => {
 
   describe('mutators', () => {
     it('removes hook by action and id', () => {
-      class MyClass extends classes(BaseClass, HookableMixin) {}
+      class MyClass extends derive(HookableTrait) {}
 
       const action = 'my-action';
       const id = 'my-id';
@@ -281,7 +281,7 @@ describe('HookableMixin', () => {
     });
 
     it(`ensures that hook from parent can't removed on child class instance`, () => {
-      class Parent extends classes(BaseClass, HookableMixin) {}
+      class Parent extends derive(HookableTrait) {}
       class Child extends Parent {}
 
       const action = 'my-action';
@@ -298,7 +298,7 @@ describe('HookableMixin', () => {
     });
 
     it(`allows to remove overriding hook on child even if parent hs already registered hook under same action and id`, () => {
-      class Parent extends classes(BaseClass, HookableMixin) {}
+      class Parent extends derive(HookableTrait) {}
       class Child extends Parent {}
 
       const action = 'my-action';
@@ -321,7 +321,7 @@ describe('HookableMixin', () => {
 
   describe('leakage', () => {
     it('ensures that hooks set on child class does not leak to parent class and vice versa', () => {
-      class MyParent extends classes(BaseClass, HookableMixin) {}
+      class MyParent extends derive(HookableTrait) {}
       class MyChild extends MyParent {}
 
       const myParentInstance = new MyParent();

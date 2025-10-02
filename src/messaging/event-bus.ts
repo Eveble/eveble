@@ -3,11 +3,11 @@ import { injectable } from 'inversify';
 import { types } from '../types';
 import { Event } from '../components/event';
 import { OneToManyHandlingMixin } from '../mixins/one-to-many-handling-mixin';
-import { HookableMixin } from '../mixins/hookable-mixin';
+import { HookableTrait } from '../trait/hookable.trait';
 
 @injectable()
 export class EventBus
-  extends classes(HookableMixin, OneToManyHandlingMixin)
+  extends classes(HookableTrait, OneToManyHandlingMixin)
   implements types.EventBus
 {
   /**

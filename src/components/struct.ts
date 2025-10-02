@@ -1,18 +1,15 @@
 import { classes } from 'polytype';
 import merge from 'deepmerge';
-import {
-  METADATA_KEY,
-  interfaces as inversifyTypes,
-} from '@parisholley/inversify-async';
 import { omit } from 'lodash';
 import { METADATA_KEYS } from '@eveble/core';
 import { TypeTrait } from '../mixins/definable-mixin';
-import { HookableMixin } from '../mixins/hookable-mixin';
+import { HookableTrait } from '../trait/hookable.trait';
 import { types } from '../types';
 import { isPlainRecord } from '../utils/helpers';
 import { DELEGATED_KEY } from '../constants/metadata-keys';
+import { getInjectedPropertyNames } from '../utils/inversify';
 
-export class Struct extends classes(DefinableMixin, HookableMixin) {
+export class Struct extends classes(TypeTrait, HookableTrait) {
   /**
    * Creates an instance of Struct.
    * @param props - Properties of the type required for construction.
@@ -118,9 +115,11 @@ export class Struct extends classes(DefinableMixin, HookableMixin) {
    * Thrown if the provided properties does not match the prop types.
    */
   protected onValidation(props: types.Props): boolean {
-    const mappings: Record<keyof any, inversifyTypes.Metadata[]> =
-      Reflect.getMetadata(METADATA_KEY.TAGGED_PROP, this.constructor) || {};
-    const propTypes = omit(this.getPropTypes(), Object.keys(mappings));
+    const dependencyMappings: string[] = getInjectedPropertyNames(
+      this.constructor
+    );
+    console.log('Injected props:', dependencyMappings);
+    const propTypes = omit(this.getPropTypes(), dependencyMappings);
     const result = this.validateProps(props, propTypes, true);
 
     const hooks: types.hooks.Mappings = this.getHooks('onValidation');

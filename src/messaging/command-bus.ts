@@ -3,11 +3,11 @@ import { injectable } from 'inversify';
 import { types } from '../types';
 import { Command } from '../components/command';
 import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
-import { HookableMixin } from '../mixins/hookable-mixin';
+import { HookableTrait } from '../trait/hookable.trait';
 
 @injectable()
 export class CommandBus
-  extends classes(HookableMixin, OneToOneHandlingMixin)
+  extends classes(HookableTrait, OneToOneHandlingMixin)
   implements types.CommandBus
 {
   /**

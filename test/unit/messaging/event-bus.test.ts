@@ -5,7 +5,7 @@ import delay from 'delay';
 import { Type } from '@eveble/core';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { OneToManyHandlingMixin } from '../../../src/mixins/one-to-many-handling-mixin';
-import { HookableMixin } from '../../../src/mixins/hookable-mixin';
+import { HookableTrait } from '../../../src/mixins/hookable-mixin';
 import {
   HandlerExistError,
   UnhandleableTypeError,
@@ -30,8 +30,8 @@ describe('EventBus', () => {
     expect(EventBus.prototype).to.be.instanceof(OneToManyHandlingMixin);
   });
 
-  it(`extends HookableMixin mixin on prototype chain applied`, () => {
-    expect(EventBus.prototype).to.be.instanceof(HookableMixin);
+  it(`extends HookableTrait mixin on prototype chain applied`, () => {
+    expect(EventBus.prototype).to.be.instanceof(HookableTrait);
   });
 
   describe('construction', () => {

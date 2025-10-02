@@ -5,7 +5,7 @@ import { derive } from '@traits-ts/core';
 import { TypeTrait } from '../trait/type.trait';
 import { types } from '../types';
 import { VersionableMixin } from '../mixins/versionable-mixin';
-import { HookableMixin } from '../mixins/hookable-mixin';
+import { HookableTrait } from '../trait/hookable.trait';
 import { isPlainRecord } from '../utils/helpers';
 import { EjsonableMixin } from '../mixins/ejsonable-mixin';
 
@@ -14,7 +14,7 @@ export abstract class SerializableError
   extends derive(
     ExtendableError,
     TypeTrait,
-    HookableMixin,
+    HookableTrait,
     EjsonableMixin,
     VersionableMixin
   )

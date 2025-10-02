@@ -5,7 +5,7 @@ import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { types } from '../../../src/types';
 import { version } from '../../../src/annotations/version';
-import { HookableMixin } from '../../../src/mixins/hookable-mixin';
+import { HookableTrait } from '../../../src/mixins/hookable-mixin';
 import { TypeTrait } from '../../../src/mixins/definable-mixin';
 import {
   InvalidLegacyTransformerError,
@@ -177,7 +177,7 @@ describe(`VersionableMixin`, () => {
 
   describe('transforming legacy schema', () => {
     it('does not register onConstruction versionable hook before first legacy transformer is annotated', () => {
-      class MyClass extends classes(VersionableMixin, HookableMixin) {
+      class MyClass extends classes(VersionableMixin, HookableTrait) {
         key: string;
       }
       expect(MyClass.prototype.hasHook('onConstruction', 'versionable')).to.be
@@ -185,7 +185,7 @@ describe(`VersionableMixin`, () => {
     });
 
     it('register an onConstruction versionable hook after first legacy transformer is annotated', () => {
-      class MyClass extends classes(VersionableMixin, HookableMixin) {
+      class MyClass extends classes(VersionableMixin, HookableTrait) {
         key: string;
 
         @version(1)
@@ -202,7 +202,7 @@ describe(`VersionableMixin`, () => {
     });
 
     it.skip('does not leak legacy transformers in parent-child relation', () => {
-      class Parent extends classes(VersionableMixin, HookableMixin) {
+      class Parent extends classes(VersionableMixin, HookableTrait) {
         key: string;
 
         @version(1)
@@ -252,7 +252,7 @@ describe(`VersionableMixin`, () => {
 
     context('v1', () => {
       it('transforms legacy props that are 1 version behind', () => {
-        class MyClass extends classes(VersionableMixin, HookableMixin) {
+        class MyClass extends classes(VersionableMixin, HookableTrait) {
           key: string;
 
           @version(1)
@@ -274,7 +274,7 @@ describe(`VersionableMixin`, () => {
       });
 
       it('does not transform schema is up-to-date', () => {
-        class MyClass extends classes(VersionableMixin, HookableMixin) {
+        class MyClass extends classes(VersionableMixin, HookableTrait) {
           key: string;
 
           @version(1)
@@ -295,7 +295,7 @@ describe(`VersionableMixin`, () => {
 
     context('vN', () => {
       it('transforms legacy props that are 2 version behind', () => {
-        class MyClass extends classes(VersionableMixin, HookableMixin) {
+        class MyClass extends classes(VersionableMixin, HookableTrait) {
           key: string;
 
           @version(1)
@@ -323,7 +323,7 @@ describe(`VersionableMixin`, () => {
       });
 
       it('does not transform schema is up-to-date', () => {
-        class MyClass extends classes(VersionableMixin, HookableMixin) {
+        class MyClass extends classes(VersionableMixin, HookableTrait) {
           key: string;
 
           @version(1)

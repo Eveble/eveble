@@ -7,7 +7,7 @@ import { SerializableError } from '../../../src/components/serializable-error';
 import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
 import { isTyped } from '../../../src/utils/helpers';
 import { TypeTrait } from '../../../src/mixins/definable-mixin';
-import { HookableMixin } from '../../../src/mixins/hookable-mixin';
+import { HookableTrait } from '../../../src/mixins/hookable-mixin';
 import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 
@@ -35,7 +35,7 @@ describe('SerializableError', () => {
   });
 
   it('implements Hookable interface', () => {
-    expect(SerializableError.prototype).to.instanceof(HookableMixin);
+    expect(SerializableError.prototype).to.instanceof(HookableTrait);
     expect(instanceOf<types.Hookable>(Serializable.prototype)).to.be.true;
   });
 

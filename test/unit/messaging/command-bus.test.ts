@@ -4,7 +4,7 @@ import sinonChai from 'sinon-chai';
 import { Type } from '@eveble/core';
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { OneToOneHandlingMixin } from '../../../src/mixins/one-to-one-handling-mixin';
-import { HookableMixin } from '../../../src/mixins/hookable-mixin';
+import { HookableTrait } from '../../../src/mixins/hookable-mixin';
 import {
   HandlerExistError,
   UnhandleableTypeError,
@@ -29,8 +29,8 @@ describe('CommandBus', () => {
     expect(CommandBus.prototype).to.be.instanceof(OneToOneHandlingMixin);
   });
 
-  it(`extends HookableMixin mixin on prototype chain applied`, () => {
-    expect(CommandBus.prototype).to.be.instanceof(HookableMixin);
+  it(`extends HookableTrait mixin on prototype chain applied`, () => {
+    expect(CommandBus.prototype).to.be.instanceof(HookableTrait);
   });
 
   describe('construction', () => {

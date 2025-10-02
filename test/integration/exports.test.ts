@@ -258,13 +258,13 @@ import { TypeTrait } from '../../src/mixins/definable-mixin';
 import { EjsonableMixin } from '../../src/mixins/ejsonable-mixin';
 import { EventHandlingMixin } from '../../src/mixins/event-handling-mixin';
 import {
-  HookableMixin,
+  HookableTrait,
   HookError,
   InvalidHookActionError,
   InvalidHookIdError,
   HookAlreadyExistsError,
   HookNotFoundError,
-} from '../../src/mixins/hookable-mixin';
+} from '../../src/trait/hookable.trait';
 import { OneToManyHandlingMixin } from '../../src/mixins/one-to-many-handling-mixin';
 import { OneToOneHandlingMixin } from '../../src/mixins/one-to-one-handling-mixin';
 import { RFC5424LoggingMixin } from '../../src/mixins/rfc-5424-logging-mixin';
@@ -570,7 +570,7 @@ import {
   TypeTrait as TypeTraitExported,
   EjsonableMixin as EjsonableMixinExported,
   EventHandlingMixin as EventHandlingMixinExported,
-  HookableMixin as HookableMixinExported,
+  HookableTrait as HookableTraitExported,
   HookError as HookErrorExported,
   InvalidHookActionError as InvalidHookActionErrorExported,
   InvalidHookIdError as InvalidHookIdErrorExported,
@@ -1495,9 +1495,9 @@ describe(`exports`, () => {
       expect(SerializableMixinExported).to.be.equal(SerializableMixin);
     });
 
-    describe('HookableMixin', () => {
-      it('HookableMixin', () => {
-        expect(HookableMixinExported).to.be.equal(HookableMixin);
+    describe('HookableTrait', () => {
+      it('HookableTrait', () => {
+        expect(HookableTraitExported).to.be.equal(HookableTrait);
       });
       it('HookError', () => {
         expect(HookErrorExported).to.be.equal(HookError);
