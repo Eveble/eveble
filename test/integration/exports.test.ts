@@ -282,14 +282,14 @@ import {
   InvalidStatusError,
 } from '../../src/mixins/statusful-mixin';
 import {
-  VersionableMixin,
+  VersionableTrait,
   VersionableError,
   InvalidSchemaVersionError,
   LegacyTransformerAlreadyExistsError,
   LegacyTransformerNotFoundError,
   InvalidLegacyTransformerError,
   NotVersionableError,
-} from '../../src/mixins/versionable-mixin';
+} from '../../src/trait/versionable.trait';
 // Helpers
 import {
   isTyped,
@@ -588,7 +588,7 @@ import {
   StatusError as StatusErrorExported,
   UndefinedStatusesError as UndefinedStatusesErrorExported,
   InvalidStatusError as InvalidStatusErrorExported,
-  VersionableMixin as VersionableMixinExported,
+  VersionableTrait as VersionableTraitExported,
   VersionableError as VersionableErrorExported,
   InvalidSchemaVersionError as InvalidSchemaVersionErrorExported,
   LegacyTransformerAlreadyExistsError as LegacyTransformerAlreadyExistsErrorExported,
@@ -1550,8 +1550,8 @@ describe(`exports`, () => {
       });
     });
     describe('VersionablMixin', () => {
-      it('VersionableMixin', () => {
-        expect(VersionableMixinExported).to.be.equal(VersionableMixin);
+      it('VersionableTrait', () => {
+        expect(VersionableTraitExported).to.be.equal(VersionableTrait);
       });
       it('VersionableError', () => {
         expect(VersionableErrorExported).to.be.equal(VersionableError);

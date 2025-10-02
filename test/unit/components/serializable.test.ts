@@ -4,7 +4,7 @@ import sinonChai from 'sinon-chai';
 import { Type } from '@eveble/core';
 import { Serializable } from '../../../src/components/serializable';
 import { Struct } from '../../../src/components/struct';
-import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
+import { VersionableTrait } from '../../../src/trait/versionable.trait';
 import { types } from '../../../src/types';
 import { isTyped } from '../../../src/utils/helpers';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
@@ -37,7 +37,7 @@ describe('Serializable', () => {
   });
 
   it('implements Versionable interface', () => {
-    expect(Serializable.prototype).to.instanceof(VersionableMixin);
+    expect(derived(Serializable.prototype, VersionableTrait));
     expect(instanceOf<types.Versionable>(Serializable.prototype)).to.be.true;
   });
 
