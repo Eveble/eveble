@@ -1,43 +1,36 @@
 export const TYPE_KEY = '_type'; // Must be string, will be serializaed
 
-export const HANDLERS: unique symbol = Symbol('eveble:handlers');
+export const HANDLERS = Symbol('eveble:handlers');
 
-export const HANDLEABLE_TYPES: unique symbol = Symbol(
-  'eveble:handleable-types'
-);
+export const HANDLEABLE_TYPES = Symbol('eveble:handleable-types');
 
-export const SOURCE_KEY: unique symbol = Symbol('eveble:source');
+export const SOURCE_KEY = Symbol('eveble:source');
 
-export const LIST_KEY: unique symbol = Symbol('eveble:list-key');
+export const LIST_KEY = Symbol('eveble:list-key');
 
-export const SERIALIZABLE_TYPE_KEY: unique symbol = Symbol(
-  'eveble:serializable-type'
-);
+export const SERIALIZABLE_TYPE_KEY = Symbol('eveble:serializable-type');
 
-export const SAVE_STATE_METHOD_KEY: unique symbol = Symbol('eveble:save-state');
+export const SAVE_STATE_METHOD_KEY = Symbol('eveble:save-state');
 
-export const SAVED_STATE_KEY: unique symbol = Symbol('eveble:saved-state');
+export const SAVED_STATE_KEY = Symbol('eveble:saved-state');
 
-export const ENABLE_ACTION_VALIDATION_METHOD_KEY: unique symbol = Symbol(
+export const ENABLE_ACTION_VALIDATION_METHOD_KEY = Symbol(
   'eveble:enable-action-validation'
 );
-export const DISABLE_ACTION_VALIDATION_METHOD_KEY: unique symbol = Symbol(
+export const DISABLE_ACTION_VALIDATION_METHOD_KEY = Symbol(
   'eveble:disable-action-validation'
 );
-export const IS_ACTION_VALIDATED_METHOD_KEY: unique symbol = Symbol(
+export const IS_ACTION_VALIDATED_METHOD_KEY = Symbol(
   'eveble:is-action-validated'
 );
-export const ACTION_VALIDATION_KEY: unique symbol = Symbol(
-  'eveble:action-validation'
-);
+export const ACTION_VALIDATION_KEY = Symbol('eveble:action-validation');
+// export const ACTION_VALIDATION_KEY = 'eveble:action-validation';
 
-export const ROLLBACK_STATE_METHOD_KEY: unique symbol = Symbol(
-  'eveble:rollback-state'
-);
+export const ROLLBACK_STATE_METHOD_KEY = Symbol('eveble:rollback-state');
 
-export const COMMANDS_KEY: unique symbol = Symbol('eveble:commands');
+export const COMMANDS_KEY = Symbol('eveble:commands');
 
-export const EVENTS_KEY: unique symbol = Symbol('eveble:events');
+export const EVENTS_KEY = Symbol('eveble:events');
 
 export const LITERAL_KEYS = {
   TYPE_KEY,
