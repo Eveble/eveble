@@ -4,11 +4,12 @@ import { Integer, PropTypes, ValidationError } from 'typend';
 import { inject } from 'inversify';
 import sinon from 'sinon';
 import { Type } from '@eveble/core';
+import { derived } from '@traits-ts/core';
 import { Struct } from '../../../src/components/struct';
-import { TypeTrait } from '../../../src/trait/type.trait';
-import { HookableTrait } from '../../../src/trait/hookable.trait';
 import { DELEGATED_KEY } from '../../../src/constants/metadata-keys';
 import { types } from '../../../src/types';
+import { TypeTrait } from '../../../src/trait/type.trait';
+import { HookableTrait } from '../../../src/trait/hookable.trait';
 
 chai.use(sinonChai);
 
@@ -33,11 +34,11 @@ describe('Struct', () => {
   }
 
   it('has TypeTrait applied', () => {
-    expect(Struct.prototype instanceof TypeTrait).to.be.true;
+    expect(derived(Struct.prototype, TypeTrait)).to.be.true;
   });
 
   it('has HookableTrait applied', () => {
-    expect(Struct.prototype instanceof HookableTrait).to.be.true;
+    expect(derived(Struct.prototype, HookableTrait)).to.be.true;
   });
 
   describe('property types', () => {

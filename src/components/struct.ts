@@ -1,15 +1,15 @@
-import { classes } from 'polytype';
 import merge from 'deepmerge';
 import { omit } from 'lodash';
 import { METADATA_KEYS } from '@eveble/core';
-import { TypeTrait } from '../mixins/definable-mixin';
+import { derive } from '@traits-ts/core';
 import { HookableTrait } from '../trait/hookable.trait';
 import { types } from '../types';
 import { isPlainRecord } from '../utils/helpers';
 import { DELEGATED_KEY } from '../constants/metadata-keys';
 import { getInjectedPropertyNames } from '../utils/inversify';
+import { TypeTrait } from '../trait/type.trait';
 
-export class Struct extends classes(TypeTrait, HookableTrait) {
+export class Struct extends derive(TypeTrait, HookableTrait) {
   /**
    * Creates an instance of Struct.
    * @param props - Properties of the type required for construction.
@@ -118,7 +118,7 @@ export class Struct extends classes(TypeTrait, HookableTrait) {
     const dependencyMappings: string[] = getInjectedPropertyNames(
       this.constructor
     );
-    console.log('Injected props:', dependencyMappings);
+
     const propTypes = omit(this.getPropTypes(), dependencyMappings);
     const result = this.validateProps(props, propTypes, true);
 
