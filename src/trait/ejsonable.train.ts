@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import { SerializableMixin } from './serializable-mixin';
+import { SerializableMixin } from '../mixins/serializable-mixin';
 import { types } from '../types';
 
 @injectable()
-export class EjsonableMixin extends SerializableMixin {
+export class EjsonableTrait extends SerializableMixin {
   /**
    * @alias getTypeName
    * @remarks

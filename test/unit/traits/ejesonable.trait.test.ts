@@ -5,11 +5,11 @@ import sinonChai from 'sinon-chai';
 import { Type, kernel } from '@eveble/core';
 
 import { types } from '../../../src/types';
-import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
+import { EjsonableTrait } from '../../../src/mixins/ejsonable-mixin';
 
 chai.use(sinonChai);
 
-describe('EjsonableMixin', () => {
+describe('EjsonableTrait', () => {
   let originalConverter: any;
   let converter: any;
 
@@ -32,7 +32,7 @@ describe('EjsonableMixin', () => {
     it('adds typeName static and prototype aliased methods for compatibility @eveble/ejson serializer module', () => {
       // converter.convert.returns({ properties: {} });
       @Type('MyNamedClass')
-      class MyClass extends EjsonableMixin {}
+      class MyClass extends EjsonableTrait {}
       MyClass.getTypeName = sinon.stub();
 
       const instance = new MyClass();

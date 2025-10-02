@@ -7,7 +7,7 @@ import { types } from '../types';
 import { VersionableMixin } from '../mixins/versionable-mixin';
 import { HookableTrait } from '../trait/hookable.trait';
 import { isPlainRecord } from '../utils/helpers';
-import { EjsonableMixin } from '../mixins/ejsonable-mixin';
+import { EjsonableTrait } from '../trait/ejsonable.train';
 
 @Type('SerializableError')
 export abstract class SerializableError
@@ -15,7 +15,7 @@ export abstract class SerializableError
     ExtendableError,
     TypeTrait,
     HookableTrait,
-    EjsonableMixin,
+    EjsonableTrait,
     VersionableMixin
   )
   implements types.Versionable, types.Ejsonable
