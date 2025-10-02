@@ -8,7 +8,7 @@ import { VersionableMixin } from '../../../src/mixins/versionable-mixin';
 import { types } from '../../../src/types';
 import { isTyped } from '../../../src/utils/helpers';
 import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
-import { EjsonableMixin } from '../../../src/mixins/ejsonable-mixin';
+import { EjsonableTrait } from '../../../src/trait/ejsonable.trait';
 import { List } from '../../../src/domain/list';
 import { InvalidListError } from '../../../src/domain/domain-errors';
 

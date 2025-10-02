@@ -255,7 +255,7 @@ import {
 // Mixins
 import { CommandHandlingMixin } from '../../src/mixins/command-handling-mixin';
 import { TypeTrait } from '../../src/mixins/definable-mixin';
-import { EjsonableTrait } from '../../src/trait/ejsonable.train';
+import { EjsonableTrait } from '../../src/trait/ejsonable.trait';
 import { EventHandlingMixin } from '../../src/mixins/event-handling-mixin';
 import {
   HookableTrait,

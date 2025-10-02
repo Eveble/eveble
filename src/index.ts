@@ -186,7 +186,7 @@ export {
 // Mixins
 export { CommandHandlingMixin } from './mixins/command-handling-mixin';
 export { TypeTrait } from './trait/type.trait';
-export { EjsonableMixin } from './mixins/ejsonable-mixin';
+export { EjsonableTrait } from './trait/ejsonable.trait';
 export { EventHandlingMixin } from './mixins/event-handling-mixin';
 export {
   HookableTrait,
