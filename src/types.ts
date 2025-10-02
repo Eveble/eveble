@@ -218,7 +218,7 @@ export namespace types {
   /*
   CONFIGURATION
   */
-  export interface Configurable extends Definable {
+  export interface Configurable extends Typed {
     isConfigurable(path: string): boolean;
     has(path: string): boolean;
     get<T>(path: string, runtimeDefaultValue?: any): T;
@@ -427,7 +427,7 @@ export namespace types {
   /*
   MESSAGING
   */
-  export interface Serializable extends Definable, Versionable {
+  export interface Serializable extends Typed, Versionable {
     getTypeName(): TypeName;
     toString(): TypeName | string;
   }
@@ -904,7 +904,7 @@ export namespace types {
     getInterval(): number;
   }
 
-  export interface ScheduledJob extends Definable, Hookable, Stateful {
+  export interface ScheduledJob extends Typed, Hookable, Stateful {
     id: string | Stringifiable;
     state: State;
     name: string;
