@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { Type } from '@eveble/core';
-import { derive } from '@traits-ts/core';
+import { derive, derived } from '@traits-ts/core';
 import { CommandHandlingTrait } from '../../../src/traits/command-handling.trait';
 import { OneToOneHandlingTrait } from '../../../src/traits/one-to-one-handling.trait';
 import { Command } from '../../../src/components/command';
@@ -44,10 +44,10 @@ describe(`CommandHandlingTrait`, () => {
     key: string;
   }
 
-  it.skip(`has OneToOneHandlingTrait mixin on prototype chain applied`, () => {
-    expect((CommandHandlingTrait as any).prototype).to.be.instanceof(
-      OneToOneHandlingTrait
-    );
+  it(`has OneToOneHandlingTrait in composition chain`, () => {
+    class TestClass extends derive(CommandHandlingTrait) {}
+
+    expect(derived(TestClass.prototype, OneToOneHandlingTrait)).to.be.true;
   });
 
   describe('construction', () => {

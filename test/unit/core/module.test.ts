@@ -8,6 +8,7 @@ import { stubInterface } from 'ts-sinon';
 import getenv from 'getenv';
 import { Type } from '@eveble/core';
 import { PropTypes } from 'typend';
+import { derived } from '@traits-ts/core';
 import { Module } from '../../../src/core/module';
 import { Config } from '../../../src/components/config';
 import { Log } from '../../../src/components/log-entry';
@@ -23,7 +24,10 @@ import {
 } from '../../../src/core/core-errors';
 import { AppConfig } from '../../../src/configs/app-config';
 import { LoggingConfig } from '../../../src/configs/logging-config';
-import { InvalidStateError } from '../../../src/mixins/stateful-mixin';
+import {
+  InvalidStateError,
+  StatefulTrait,
+} from '../../../src/traits/stateful.trait';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
 
 chai.use(sinonChai);
@@ -116,6 +120,10 @@ describe('Module', () => {
     for (const method of lifeCycleHooks) {
       (MyModule.prototype as any)[method].reset();
     }
+  });
+
+  it(`has StatefulTrait in composition chain`, () => {
+    expect(derived(Module.prototype, StatefulTrait)).to.be.true;
   });
 
   describe('construction', () => {

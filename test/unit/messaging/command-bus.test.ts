@@ -2,15 +2,16 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { Type } from '@eveble/core';
+import { derived } from '@traits-ts/core';
 import { CommandBus } from '../../../src/messaging/command-bus';
-import { OneToOneHandlingTrait } from '../../../src/mixins/one-to-one-handling-mixin';
-import { HookableTrait } from '../../../src/mixins/hookable-mixin';
 import {
   HandlerExistError,
   UnhandleableTypeError,
 } from '../../../src/messaging/messaging-errors';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
+import { OneToOneHandlingTrait } from '../../../src/traits/one-to-one-handling.trait';
+import { HookableTrait } from '../../../src/traits/hookable.trait';
 
 chai.use(sinonChai);
 
@@ -26,11 +27,11 @@ describe('CommandBus', () => {
   }
 
   it(`extends OneToOneHandlingTrait mixin on prototype chain applied`, () => {
-    expect(CommandBus.prototype).to.be.instanceof(OneToOneHandlingTrait);
+    expect(derived(CommandBus.prototype, OneToOneHandlingTrait)).to.be.true;
   });
 
   it(`extends HookableTrait mixin on prototype chain applied`, () => {
-    expect(CommandBus.prototype).to.be.instanceof(HookableTrait);
+    expect(derived(CommandBus.prototype, HookableTrait)).to.be.true;
   });
 
   describe('construction', () => {

@@ -41,10 +41,10 @@ describe('OneToOneHandlingTrait', () => {
     key: string;
   }
 
-  // TODO: how to test this?
-  it.skip('extends HandlingTrait', () => {
-    expect(derived((OneToOneHandlingTrait as any).prototype, HandlingTrait)).to
-      .be.true;
+  it(`has HandlingTrait in composition chain`, () => {
+    class TestClass extends derive(OneToOneHandlingTrait) {}
+
+    expect(derived(TestClass.prototype, HandlingTrait)).to.be.true;
   });
 
   describe('construction', () => {

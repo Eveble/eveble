@@ -34,7 +34,7 @@ describe('OneToManyHandlingTrait', () => {
     key: string;
   }
 
-  it.skip('extends HandlingTrait', () => {
+  it('extends HandlingTrait', () => {
     expect((OneToManyHandlingTrait as any).prototype).to.be.instanceof(
       HandlingTrait
     );

@@ -3,9 +3,10 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import delay from 'delay';
 import { Type } from '@eveble/core';
+import { derived } from '@traits-ts/core';
 import { EventBus } from '../../../src/messaging/event-bus';
-import { OneToManyHandlingTrait } from '../../../src/mixins/one-to-many-handling-mixin';
-import { HookableTrait } from '../../../src/mixins/hookable-mixin';
+import { OneToManyHandlingTrait } from '../../../src/traits/one-to-many-handling.trait';
+import { HookableTrait } from '../../../src/traits/hookable.trait';
 import {
   HandlerExistError,
   UnhandleableTypeError,
@@ -27,11 +28,11 @@ describe('EventBus', () => {
   }
 
   it(`extends OneToManyHandlingTrait mixin on prototype chain applied`, () => {
-    expect(EventBus.prototype).to.be.instanceof(OneToManyHandlingTrait);
+    expect(derived(EventBus.prototype, OneToManyHandlingTrait)).to.be.true;
   });
 
   it(`extends HookableTrait mixin on prototype chain applied`, () => {
-    expect(EventBus.prototype).to.be.instanceof(HookableTrait);
+    expect(derived(EventBus.prototype, HookableTrait)).to.be.true;
   });
 
   describe('construction', () => {

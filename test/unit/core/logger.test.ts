@@ -3,15 +3,16 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import { stubInterface } from 'ts-sinon';
+import { derived } from '@traits-ts/core';
 import { Logger } from '../../../src/core/logger';
 import { types } from '../../../src/types';
 import { Log } from '../../../src/components/log-entry';
-import { StatefulTrait } from '../../../src/mixins/stateful-mixin';
+import { StatefulTrait } from '../../../src/traits/stateful.trait';
 import {
   InvalidTransportIdError,
   TransportExistsError,
 } from '../../../src/core/core-errors';
-import { RFC5424LoggingTrait } from '../../../src/mixins/rfc-5424-logging-mixin';
+import { RFC5424LoggingTrait } from '../../../src/traits/rfc-5424-logging.trait';
 
 chai.use(sinonChai);
 
@@ -36,12 +37,12 @@ describe('Logger', () => {
     transport = stubInterface<types.LogTransport>();
   });
 
-  it('has StatefulTrait applied', () => {
-    expect(Logger.prototype instanceof StatefulTrait);
+  it(`has StatefulTrait in composition chain`, () => {
+    expect(derived(Logger.prototype, StatefulTrait)).to.be.true;
   });
 
-  it('has RFC5424LoggingTrait applied', () => {
-    expect(Logger.prototype instanceof RFC5424LoggingTrait);
+  it(`has RFC5424LoggingTrait in composition chain`, () => {
+    expect(derived(Logger.prototype, RFC5424LoggingTrait)).to.be.true;
   });
 
   describe(`construction`, () => {

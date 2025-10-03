@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { Type } from '@eveble/core';
-import { derive } from '@traits-ts/core';
+import { derive, derived } from '@traits-ts/core';
 import { EventHandlingTrait } from '../../../src/traits/event-handling.trait';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -41,11 +41,16 @@ describe(`EventHandlingTrait`, () => {
   class MyCommand extends Command<MyCommand> {
     key: string;
   }
+  it(`has OneToManyHandlingTrait in composition chain`, () => {
+    class TestClass extends derive(EventHandlingTrait) {}
 
-  it.skip(`has OneToManyHandlingTrait mixin on prototype chain applied`, () => {
-    expect((EventHandlingTrait as any).prototype).to.be.instanceof(
-      OneToManyHandlingTrait
-    );
+    expect(derived(TestClass.prototype, OneToManyHandlingTrait)).to.be.true;
+  });
+
+  it(`has OneToManyHandlingTrait in composition chain`, () => {
+    class TestClass extends derive(EventHandlingTrait) {}
+
+    expect(derived(TestClass.prototype, OneToManyHandlingTrait)).to.be.true;
   });
 
   describe('construction', () => {
