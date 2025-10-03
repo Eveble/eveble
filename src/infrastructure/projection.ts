@@ -6,7 +6,7 @@ import {
   ProjectionNotRebuildingError,
 } from './infrastructure-errors';
 import { EventHandlingMixin } from '../mixins/event-handling-mixin';
-import { StatefulTrait } from '../trait/stateful.trait';
+import { StatefulTrait } from '../traits/stateful.trait';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { Log } from '../components/log-entry';

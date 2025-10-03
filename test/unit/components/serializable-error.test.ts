@@ -5,12 +5,12 @@ import { derived } from '@traits-ts/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { SerializableError } from '../../../src/components/serializable-error';
-import { VersionableTrait } from '../../../src/trait/versionable.trait';
+import { VersionableTrait } from '../../../src/traits/versionable.trait';
 import { isTyped } from '../../../src/utils/helpers';
-import { SerializableTrait } from '../../../src/trait/serializable.trait';
-import { TypeTrait } from '../../../src/trait/type.trait';
-import { HookableTrait } from '../../../src/trait/hookable.trait';
-import { EjsonableTrait } from '../../../src/trait/ejsonable.trait';
+import { SerializableTrait } from '../../../src/traits/serializable.trait';
+import { TypeTrait } from '../../../src/traits/type.trait';
+import { HookableTrait } from '../../../src/traits/hookable.trait';
+import { EjsonableTrait } from '../../../src/traits/ejsonable.trait';
 
 describe('SerializableError', () => {
   @Type('MySerializable', { isRegistrable: false })

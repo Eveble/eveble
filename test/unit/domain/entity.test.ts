@@ -18,9 +18,9 @@ import {
 } from '../../../src/constants/literal-keys';
 import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
 import { can } from '../../../src/decorators/can';
-import { StatusfulTrait } from '../../../src/trait/statusful.trait';
+import { StatusfulTrait } from '../../../src/traits/statusful.trait';
 import { Serializable } from '../../../src/components/serializable';
-import { StatefulTrait } from '../../../src/trait/stateful.trait';
+import { StatefulTrait } from '../../../src/traits/stateful.trait';
 
 chai.use(sinonChai);
 

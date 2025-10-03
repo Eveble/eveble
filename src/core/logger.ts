@@ -2,7 +2,7 @@ import { classes } from 'polytype';
 import { injectable } from 'inversify';
 import { kernel } from '@eveble/core';
 import { InvalidTransportIdError, TransportExistsError } from './core-errors';
-import { StatefulTrait } from '../trait/stateful.trait';
+import { StatefulTrait } from '../traits/stateful.trait';
 import { LOGGING_LEVELS } from '../constants/defaults';
 import { types } from '../types';
 import { RFC5424LoggingMixin } from '../mixins/rfc-5424-logging-mixin';

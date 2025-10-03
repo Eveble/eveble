@@ -1,7 +1,7 @@
 import { classes } from 'polytype';
 import { Type } from 'typend';
 import { types } from '../../types';
-import { StatefulTrait } from '../../trait/stateful.trait';
+import { StatefulTrait } from '../../traits/stateful.trait';
 import { Serializable } from '../../components/serializable';
 
 @Type('CommitReceiver')

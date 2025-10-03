@@ -3,15 +3,15 @@ import { instanceOf, PropTypes } from 'typend';
 import sinonChai from 'sinon-chai';
 import { Type } from '@eveble/core';
 import { derived } from '@traits-ts/core';
-import { VersionableTrait } from '../../../src/trait/versionable.trait';
+import { VersionableTrait } from '../../../src/traits/versionable.trait';
 import { types } from '../../../src/types';
 import { isTyped } from '../../../src/utils/helpers';
-import { EjsonableTrait } from '../../../src/trait/ejsonable.trait';
+import { EjsonableTrait } from '../../../src/traits/ejsonable.trait';
 import { List } from '../../../src/domain/list';
 import { InvalidListError } from '../../../src/domain/domain-errors';
 import { Serializable } from '../../../src/components/serializable';
 import { Struct } from '../../../src/components/struct';
-import { SerializableTrait } from '../../../src/trait/serializable.trait';
+import { SerializableTrait } from '../../../src/traits/serializable.trait';
 
 chai.use(sinonChai);
 

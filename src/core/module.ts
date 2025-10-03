@@ -4,7 +4,7 @@ import { instanceOf } from 'typend';
 import { classes } from 'polytype';
 import getenv from 'getenv';
 import { kernel } from '@eveble/core';
-import { StatefulTrait } from '../trait/stateful.trait';
+import { StatefulTrait } from '../traits/stateful.trait';
 import {
   AppMissingError,
   InjectorMissingError,

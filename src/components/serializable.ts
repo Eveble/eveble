@@ -5,8 +5,8 @@ import { Struct } from './struct';
 import { types } from '../types';
 import { List } from '../domain/list';
 import { InvalidListError } from '../domain/domain-errors';
-import { EjsonableTrait } from '../trait/ejsonable.trait';
-import { VersionableTrait } from '../trait/versionable.trait';
+import { EjsonableTrait } from '../traits/ejsonable.trait';
+import { VersionableTrait } from '../traits/versionable.trait';
 
 @Type('Serializable')
 export class Serializable

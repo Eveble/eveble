@@ -5,7 +5,7 @@ import { types } from '../types';
 import {
   NotVersionableError,
   InvalidLegacyTransformerError,
-} from '../trait/versionable.trait';
+} from '../traits/versionable.trait';
 
 /**
  * Annotates legacy schema transformer method on a class that will used for processing legacy

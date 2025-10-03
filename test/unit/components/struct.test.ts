@@ -7,8 +7,8 @@ import { derived } from '@traits-ts/core';
 import sinon from 'sinon';
 import { Struct } from '../../../src/components/struct';
 import { DELEGATED_KEY } from '../../../src/constants/metadata-keys';
-import { HookableTrait } from '../../../src/trait/hookable.trait';
-import { TypeTrait } from '../../../src/trait/type.trait';
+import { HookableTrait } from '../../../src/traits/hookable.trait';
+import { TypeTrait } from '../../../src/traits/type.trait';
 import { types } from '../../../src/types';
 
 chai.use(sinonChai);

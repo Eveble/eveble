@@ -1,6 +1,6 @@
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
-import { StatefulTrait } from '../trait/stateful.trait';
+import { StatefulTrait } from '../traits/stateful.trait';
 
 export class Client extends StatefulTrait {
   static STATES = {

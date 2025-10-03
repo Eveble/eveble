@@ -8,7 +8,7 @@ import {
   CommandSchedulingError,
   CommandUnschedulingError,
 } from '../infrastructure-errors';
-import { StatefulTrait } from '../../trait/stateful.trait';
+import { StatefulTrait } from '../../traits/stateful.trait';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
 import { Log } from '../../components/log-entry';

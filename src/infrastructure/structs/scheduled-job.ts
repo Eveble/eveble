@@ -1,6 +1,6 @@
 import { classes } from 'polytype';
 import { Type } from '@eveble/core';
-import { StatefulTrait } from '../../trait/stateful.trait';
+import { StatefulTrait } from '../../traits/stateful.trait';
 import { types } from '../../types';
 import { Guid } from '../../domain/value-objects/guid';
 import { Struct } from '../../components/struct';

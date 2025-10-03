@@ -183,10 +183,10 @@ export {
   SerializationError,
   UnparsableValueError,
 } from './messaging/messaging-errors';
-// Mixins
+// Traits
 export { CommandHandlingMixin } from './mixins/command-handling-mixin';
-export { TypeTrait } from './trait/type.trait';
-export { EjsonableTrait } from './trait/ejsonable.trait';
+export { TypeTrait } from './traits/type.trait';
+export { EjsonableTrait } from './traits/ejsonable.trait';
 export { EventHandlingMixin } from './mixins/event-handling-mixin';
 export {
   HookableTrait,
@@ -195,23 +195,23 @@ export {
   InvalidHookIdError,
   HookAlreadyExistsError,
   HookNotFoundError,
-} from './trait/hookable.trait';
+} from './traits/hookable.trait';
 export { OneToManyHandlingMixin } from './mixins/one-to-many-handling-mixin';
 export { OneToOneHandlingMixin } from './mixins/one-to-one-handling-mixin';
 export { RFC5424LoggingMixin } from './mixins/rfc-5424-logging-mixin';
-export { SerializableMixin } from './mixins/serializable-mixin';
+export { SerializableTrait } from './traits/serializable.trait';
 export {
   StatefulTrait,
   StateError,
   UndefinedStatesError,
   InvalidStateError,
-} from './trait/stateful.trait';
+} from './traits/stateful.trait';
 export {
   StatusfulTrait,
   StatusError,
   UndefinedStatusesError,
   InvalidStatusError,
-} from './trait/statusful.trait';
+} from './traits/statusful.trait';
 export {
   VersionableTrait,
   VersionableError,
@@ -220,7 +220,7 @@ export {
   LegacyTransformerNotFoundError,
   InvalidLegacyTransformerError,
   NotVersionableError,
-} from './trait/versionable.trait';
+} from './traits/versionable.trait';
 // Helpers
 export {
   isTyped,
@@ -308,8 +308,7 @@ export {
   convert,
   reflect,
   // Annotations
-  internal,
-  internal as Internal,
+  Internal,
   Validable,
   // Patterns
   any,

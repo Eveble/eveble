@@ -2,11 +2,11 @@ import { pick } from 'lodash';
 import deepClone from '@jsbits/deep-clone';
 import { Type, kernel } from '@eveble/core';
 import { derive } from '@traits-ts/core';
-import { StatefulTrait } from '../trait/stateful.trait';
+import { StatefulTrait } from '../traits/stateful.trait';
 import { Serializable } from '../components/serializable';
 import { Guid } from './value-objects/guid';
 import { types } from '../types';
-import { StatusfulTrait } from '../trait/statusful.trait';
+import { StatusfulTrait } from '../traits/statusful.trait';
 import { SavedStateNotFoundError } from './domain-errors';
 import {
   SAVED_STATE_KEY,

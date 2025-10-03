@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import { types } from '../types';
 import { Command } from '../components/command';
 import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
-import { HookableTrait } from '../trait/hookable.trait';
+import { HookableTrait } from '../traits/hookable.trait';
 
 @injectable()
 export class CommandBus

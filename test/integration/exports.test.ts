@@ -103,11 +103,8 @@ import { Event } from '../../src/components/event';
 import { Log, LogMetadata } from '../../src/components/log-entry';
 import { Message } from '../../src/components/message';
 import { SerializableError } from '../../src/components/serializable-error';
-import {
-  Serializable,
-  SerializableMixin,
-} from '../../src/trait/serializable.trait';
-import { Struct } from '../../src/trait/struct';
+import { SerializableTrait } from '../../src/traits/serializable.trait';
+import { Struct } from '../../src/components/struct';
 // Config
 import { AppConfig } from '../../src/configs/app-config';
 import { EvebleConfig } from '../../src/configs/eveble-config';
@@ -257,8 +254,8 @@ import {
 } from '../../src/messaging/messaging-errors';
 // Traits
 import { CommandHandlingMixin } from '../../src/mixins/command-handling-mixin';
-import { TypeTrait } from '../../src/trait/type.trait';
-import { EjsonableTrait } from '../../src/trait/ejsonable.trait';
+import { TypeTrait } from '../../src/traits/type.trait';
+import { EjsonableTrait } from '../../src/traits/ejsonable.trait';
 import { EventHandlingMixin } from '../../src/mixins/event-handling-mixin';
 import {
   HookableTrait,
@@ -267,7 +264,7 @@ import {
   InvalidHookIdError,
   HookAlreadyExistsError,
   HookNotFoundError,
-} from '../../src/trait/hookable.trait';
+} from '../../src/traits/hookable.trait';
 import { OneToManyHandlingMixin } from '../../src/mixins/one-to-many-handling-mixin';
 import { OneToOneHandlingMixin } from '../../src/mixins/one-to-one-handling-mixin';
 import { RFC5424LoggingMixin } from '../../src/mixins/rfc-5424-logging-mixin';
@@ -276,13 +273,13 @@ import {
   StateError,
   UndefinedStatesError,
   InvalidStateError,
-} from '../../src/trait/stateful.trait';
+} from '../../src/traits/stateful.trait';
 import {
   StatusfulTrait,
   StatusError,
   UndefinedStatusesError,
   InvalidStatusError,
-} from '../../src/trait/statusful.trait';
+} from '../../src/traits/statusful.trait';
 import {
   VersionableTrait,
   VersionableError,
@@ -291,7 +288,7 @@ import {
   LegacyTransformerNotFoundError,
   InvalidLegacyTransformerError,
   NotVersionableError,
-} from '../../src/trait/versionable.trait';
+} from '../../src/traits/versionable.trait';
 // Helpers
 import {
   isTyped,
@@ -360,9 +357,7 @@ import {
   convert as convertExported,
   reflect as reflectExported,
   // Annotations
-  internal as internalExported,
   Internal as InternalExported,
-  validable as validableExported,
   Validable as ValidableExported,
   // Decorators
   can as canExported,
@@ -477,8 +472,6 @@ import {
   InvalidTransportIdError as InvalidTransportIdErrorExported,
   TransportExistsError as TransportExistsErrorExported,
   // Decorators
-  define as defineExported,
-  Define as DefineExported,
   Type as TypeExported,
   EvebleType as EvebleTypeExported,
   // Domain
@@ -595,7 +588,7 @@ import {
   OneToManyHandlingMixin as OneToManyHandlingMixinExported,
   OneToOneHandlingMixin as OneToOneHandlingMixinExported,
   RFC5424LoggingMixin as RFC5424LoggingMixinExported,
-  SerializableMixin as SerializableMixinExported,
+  SerializableTrait as SerializableTraitExported,
   StatefulTrait as StatefulTraitExported,
   StateError as StateErrorExported,
   UndefinedStatesError as UndefinedStatesErrorExported,
@@ -616,7 +609,6 @@ import {
   isSerializable as isSerializableExported,
   isRecord as isRecordExported,
   isPlainRecord as isPlainRecordExported,
-  hasPostConstruct as hasPostConstructExported,
   toPlainObject as toPlainObjectExported,
   convertObjectToCollection as convertObjectToCollectionExported,
   resolveSerializableFromPropType as resolveSerializableFromPropTypeExported,
@@ -1518,8 +1510,8 @@ describe(`exports`, () => {
     it('RFC5424LoggingMixin', () => {
       expect(RFC5424LoggingMixinExported).to.be.equal(RFC5424LoggingMixin);
     });
-    it('SerializableMixin', () => {
-      expect(SerializableMixinExported).to.be.equal(SerializableMixin);
+    it('SerializableTrait', () => {
+      expect(SerializableTraitExported).to.be.equal(SerializableTrait);
     });
 
     describe('HookableTrait', () => {

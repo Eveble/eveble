@@ -3,10 +3,10 @@ import { pick } from 'lodash';
 import { Type, ExtendableError } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import { types } from '../types';
-import { TypeTrait } from '../trait/type.trait';
-import { HookableTrait } from '../trait/hookable.trait';
-import { EjsonableTrait } from '../trait/ejsonable.trait';
-import { VersionableTrait } from '../trait/versionable.trait';
+import { TypeTrait } from '../traits/type.trait';
+import { HookableTrait } from '../traits/hookable.trait';
+import { EjsonableTrait } from '../traits/ejsonable.trait';
+import { VersionableTrait } from '../traits/versionable.trait';
 import { isPlainRecord } from '../utils/helpers';
 
 @Type('SerializableError')

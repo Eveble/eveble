@@ -3,7 +3,7 @@ import { Collection, Cursor } from 'mongodb';
 import { inject, injectable } from 'inversify';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
-import { StatefulTrait } from '../../trait/stateful.trait';
+import { StatefulTrait } from '../../traits/stateful.trait';
 import { Log } from '../../components/log-entry';
 
 @injectable()
