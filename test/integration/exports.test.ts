@@ -267,7 +267,7 @@ import {
 } from '../../src/traits/hookable.trait';
 import { OneToManyHandlingMixin } from '../../src/mixins/one-to-many-handling-mixin';
 import { OneToOneHandlingMixin } from '../../src/mixins/one-to-one-handling-mixin';
-import { RFC5424LoggingMixin } from '../../src/mixins/rfc-5424-logging-mixin';
+import { RFC5424LoggingTrait } from '../../src/traits/rfc-5424-logging.trait';
 import {
   StatefulTrait,
   StateError,
@@ -587,7 +587,7 @@ import {
   HookNotFoundError as HookNotFoundErrorExported,
   OneToManyHandlingMixin as OneToManyHandlingMixinExported,
   OneToOneHandlingMixin as OneToOneHandlingMixinExported,
-  RFC5424LoggingMixin as RFC5424LoggingMixinExported,
+  RFC5424LoggingTrait as RFC5424LoggingTraitExported,
   SerializableTrait as SerializableTraitExported,
   StatefulTrait as StatefulTraitExported,
   StateError as StateErrorExported,
@@ -1507,8 +1507,8 @@ describe(`exports`, () => {
     it('OneToOneHandlingMixin', () => {
       expect(OneToOneHandlingMixinExported).to.be.equal(OneToOneHandlingMixin);
     });
-    it('RFC5424LoggingMixin', () => {
-      expect(RFC5424LoggingMixinExported).to.be.equal(RFC5424LoggingMixin);
+    it('RFC5424LoggingTrait', () => {
+      expect(RFC5424LoggingTraitExported).to.be.equal(RFC5424LoggingTrait);
     });
     it('SerializableTrait', () => {
       expect(SerializableTraitExported).to.be.equal(SerializableTrait);

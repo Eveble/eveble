@@ -198,7 +198,7 @@ export {
 } from './traits/hookable.trait';
 export { OneToManyHandlingMixin } from './mixins/one-to-many-handling-mixin';
 export { OneToOneHandlingMixin } from './mixins/one-to-one-handling-mixin';
-export { RFC5424LoggingMixin } from './mixins/rfc-5424-logging-mixin';
+export { RFC5424LoggingTrait } from './traits/rfc-5424-logging.trait';
 export { SerializableTrait } from './traits/serializable.trait';
 export {
   StatefulTrait,

@@ -5,7 +5,7 @@ import { InvalidTransportIdError, TransportExistsError } from './core-errors';
 import { StatefulTrait } from '../traits/stateful.trait';
 import { LOGGING_LEVELS } from '../constants/defaults';
 import { types } from '../types';
-import { RFC5424LoggingMixin } from '../mixins/rfc-5424-logging-mixin';
+import { RFC5424LoggingTrait } from '../traits/rfc-5424-logging.trait';
 
 // eslint-disable-next-line no-shadow
 enum STATES {
@@ -16,7 +16,7 @@ enum STATES {
 
 @injectable()
 export class Logger
-  extends classes(StatefulTrait, RFC5424LoggingMixin)
+  extends classes(StatefulTrait, RFC5424LoggingTrait)
   implements types.Logger
 {
   static STATES = STATES;

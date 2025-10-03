@@ -11,7 +11,7 @@ import {
   InvalidTransportIdError,
   TransportExistsError,
 } from '../../../src/core/core-errors';
-import { RFC5424LoggingMixin } from '../../../src/mixins/rfc-5424-logging-mixin';
+import { RFC5424LoggingTrait } from '../../../src/mixins/rfc-5424-logging-mixin';
 
 chai.use(sinonChai);
 
@@ -40,8 +40,8 @@ describe('Logger', () => {
     expect(Logger.prototype instanceof StatefulTrait);
   });
 
-  it('has RFC5424LoggingMixin applied', () => {
-    expect(Logger.prototype instanceof RFC5424LoggingMixin);
+  it('has RFC5424LoggingTrait applied', () => {
+    expect(Logger.prototype instanceof RFC5424LoggingTrait);
   });
 
   describe(`construction`, () => {

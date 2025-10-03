@@ -1,19 +1,20 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { RFC5424LoggingMixin } from '../../../src/mixins/rfc-5424-logging-mixin';
+import { derive } from '@traits-ts/core';
+import { RFC5424LoggingTrait } from '../../../src/traits/rfc-5424-logging.trait';
 import { types } from '../../../src/types';
 
 chai.use(sinonChai);
 
-describe(`RFC5424LoggingMixin`, () => {
+describe(`RFC5424LoggingTrait`, () => {
   let log;
 
   beforeEach(() => {
     log = sinon.stub();
   });
 
-  class MyLogTransport extends RFC5424LoggingMixin {
+  class MyLogTransport extends derive(RFC5424LoggingTrait) {
     public log(entry: string | types.LogEntry, ...args: any[]): void {
       return log(entry, ...args);
     }
