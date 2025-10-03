@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { Collection, PropTypes } from 'typend';
-import { postConstruct } from 'inversify';
 import { stubInterface } from 'ts-sinon';
 import {
   Type,
@@ -10,7 +9,6 @@ import {
 import {
   isTyped,
   isRecord,
-  hasPostConstruct,
   toPlainObject,
   convertObjectToCollection,
   isPlainRecord,
@@ -186,28 +184,6 @@ describe('helpers', () => {
     it('returns false for other arguments', () => {
       expect(isPlainRecord('my-string')).to.be.false;
       expect(isPlainRecord(1234)).to.be.false;
-    });
-  });
-
-  describe('hasPostConstruct', () => {
-    it('returns true for class instance with implemented @postConstruct annotation from Inversify', () => {
-      class MyClass {
-        @postConstruct()
-        initialize(): void {}
-      }
-      expect(hasPostConstruct(MyClass.prototype)).to.be.true;
-    });
-
-    it('returns false for nil', () => {
-      expect(hasPostConstruct(null)).to.be.false;
-      expect(hasPostConstruct(undefined)).to.be.false;
-    });
-
-    it('returns false for classes not implementing @postConstruct annotation from Inversify', () => {
-      class MyClass {
-        initialize(): void {}
-      }
-      expect(hasPostConstruct(MyClass)).to.be.false;
     });
   });
 
