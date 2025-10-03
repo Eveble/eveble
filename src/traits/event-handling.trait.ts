@@ -17,6 +17,13 @@ export const EventHandlingTrait = trait([OneToManyHandlingTrait], (base) => {
      * is no leakage in between inheriting classes.
      */
     public initialize(): void {
+      this.setupEventHandlers();
+    }
+
+    /**
+     * Setup event handlers.
+     */
+    protected setupEventHandlers(): void {
       this.setupHandlers({
         handlers: this.subscribes(),
         registrator: this.registerEventHandler.bind(this),

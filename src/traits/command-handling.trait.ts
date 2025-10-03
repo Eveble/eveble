@@ -17,6 +17,13 @@ export const CommandHandlingTrait = trait([OneToOneHandlingTrait], (base) => {
      * is no leakage in between inheriting classes.
      */
     public initialize(): void {
+      this.setupCommandHandlers();
+    }
+
+    /**
+     * Setups command handlers.
+     */
+    protected setupCommandHandlers(): void {
       this.setupHandlers({
         handlers: this.handles(),
         registrator: this.registerCommandHandler.bind(this),

@@ -1,12 +1,12 @@
-import { classes } from 'polytype';
-import { postConstruct, inject, injectable } from 'inversify';
+import { inject, injectable, postConstruct } from 'inversify';
+import { derive } from '@traits-ts/core';
 import { CommandHandlingTrait } from '../traits/command-handling.trait';
 import { EventHandlingTrait } from '../traits/event-handling.trait';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 
 @injectable()
-export class Service extends classes(CommandHandlingTrait, EventHandlingTrait) {
+export class Service extends derive(CommandHandlingTrait, EventHandlingTrait) {
   @inject(BINDINGS.CommandBus)
   public commandBus: types.CommandBus;
 
@@ -18,8 +18,8 @@ export class Service extends classes(CommandHandlingTrait, EventHandlingTrait) {
    */
   @postConstruct()
   public initialize(): void {
-    super.class(CommandHandlingTrait).initialize();
-    super.class(EventHandlingTrait).initialize();
+    this.setupCommandHandlers();
+    this.setupEventHandlers();
   }
 }
 
