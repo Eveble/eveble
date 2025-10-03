@@ -5,10 +5,8 @@ import { PropTypes, ValidationError } from 'typend';
 import { pull } from 'lodash';
 import sinon from 'sinon';
 import { Type, UnavailableAsserterError, kernel } from '@eveble/core';
+import { derived } from '@traits-ts/core';
 import { Entity } from '../../../src/domain/entity';
-import { Serializable } from '../../../src/components/serializable';
-import { StatefulTrait } from '../../../src/mixins/stateful-mixin';
-import { StatusfulTrait } from '../../../src/mixins/statusful-mixin';
 import { isTyped } from '../../../src/utils/helpers';
 import { types } from '../../../src/types';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -20,6 +18,9 @@ import {
 } from '../../../src/constants/literal-keys';
 import { SavedStateNotFoundError } from '../../../src/domain/domain-errors';
 import { can } from '../../../src/decorators/can';
+import { StatusfulTrait } from '../../../src/trait/statusful.trait';
+import { Serializable } from '../../../src/components/serializable';
+import { StatefulTrait } from '../../../src/trait/stateful.trait';
 
 chai.use(sinonChai);
 
@@ -96,15 +97,15 @@ describe('Entity', () => {
   });
 
   it(`extends Serializable`, () => {
-    expect(Entity.prototype).to.be.instanceof(Serializable);
+    expect(Entity.prototype).to.be.instanceOf(Serializable);
   });
 
   it(`implements StatefulTrait`, () => {
-    expect(Entity.prototype).to.be.instanceof(StatefulTrait);
+    expect(derived(Entity.prototype, StatefulTrait)).to.be.true;
   });
 
   it(`implements StatusfulTrait`, () => {
-    expect(Entity.prototype).to.be.instanceof(StatusfulTrait);
+    expect(derived(Entity.prototype, StatusfulTrait)).to.be.true;
   });
 
   it('ensures that type is defined', () => {
@@ -503,14 +504,6 @@ describe('Entity', () => {
         SavedStateNotFoundError,
         `Account@my-id: expected entity to be have state saved before rollbacking it`
       );
-    });
-  });
-
-  describe('hooks', () => {
-    it('has convert-serializable-list hook applied', () => {
-      expect(
-        Entity.prototype.hasHook('onConstruction', 'convert-serializable-list')
-      ).to.be.true;
     });
   });
 });

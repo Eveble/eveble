@@ -1,12 +1,12 @@
-import { classes } from 'polytype';
 import { pick } from 'lodash';
 import deepClone from '@jsbits/deep-clone';
 import { Type, kernel } from '@eveble/core';
-import { StatefulMixin } from '../mixins/stateful-mixin';
+import { derive } from '@traits-ts/core';
+import { StatefulTrait } from '../trait/stateful.trait';
 import { Serializable } from '../components/serializable';
 import { Guid } from './value-objects/guid';
 import { types } from '../types';
-import { StatusfulMixin } from '../mixins/statusful-mixin';
+import { StatusfulTrait } from '../trait/statusful.trait';
 import { SavedStateNotFoundError } from './domain-errors';
 import {
   SAVED_STATE_KEY,
@@ -23,9 +23,13 @@ import { List } from './list';
 
 @Type('Entity')
 export class Entity
-  extends classes(Serializable, StatefulMixin, StatusfulMixin)
+  extends derive(StatefulTrait, StatusfulTrait, Serializable)
   implements types.Entity
 {
+  // eslint-disable-next-line no-undef
+  // Hack against Type 'unique symbol' cannot be used as an index type.ts(2538)
+  [key: symbol]: any;
+
   protected static asserter: types.Asserter;
 
   public id: string | Guid;
@@ -41,7 +45,7 @@ export class Entity
    * @param props - Properties of the type required for construction.
    */
   constructor(props: types.Props) {
-    super([props]);
+    super(props);
   }
 
   /**
