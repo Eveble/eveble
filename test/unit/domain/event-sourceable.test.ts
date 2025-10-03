@@ -7,7 +7,7 @@ import { Type } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { History } from '../../../src/domain/history';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { OneToOneHandlingMixin } from '../../../src/mixins/one-to-one-handling-mixin';
+import { OneToOneHandlingTrait } from '../../../src/mixins/one-to-one-handling-mixin';
 import { Entity } from '../../../src/domain/entity';
 import { EVENTS_KEY, COMMANDS_KEY } from '../../../src/constants/literal-keys';
 import { Command, Assignment } from '../../../src/components/command';
@@ -258,8 +258,8 @@ describe(`EventSourceable`, () => {
     expect(EventSourceable.prototype).to.be.instanceof(Entity);
   });
 
-  it(`implements OneToOneHandlingMixin`, () => {
-    expect(EventSourceable.prototype).to.be.instanceof(OneToOneHandlingMixin);
+  it(`implements OneToOneHandlingTrait`, () => {
+    expect(EventSourceable.prototype).to.be.instanceof(OneToOneHandlingTrait);
   });
 
   it('defines the type name correctly', () => {

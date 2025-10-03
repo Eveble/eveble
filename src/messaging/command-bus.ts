@@ -2,12 +2,12 @@ import { classes } from 'polytype';
 import { injectable } from 'inversify';
 import { types } from '../types';
 import { Command } from '../components/command';
-import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
+import { OneToOneHandlingTrait } from '../mixins/one-to-one-handling-mixin';
 import { HookableTrait } from '../traits/hookable.trait';
 
 @injectable()
 export class CommandBus
-  extends classes(HookableTrait, OneToOneHandlingMixin)
+  extends classes(HookableTrait, OneToOneHandlingTrait)
   implements types.CommandBus
 {
   /**

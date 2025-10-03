@@ -31,7 +31,7 @@ import {
  * to class is resolved and then - iterate through that container on construction
  * and register all the assigned types and handlers.
  *
- * Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandlingMixin` constructors.
+ * Implementation of this can be seen on `OneToOneHandlingTrait` or `OneToManyHandlingTrait` constructors.
  * @example
  *```ts
  * @Type('MyCommand')
@@ -39,7 +39,7 @@ import {
  *  key: string;
  * }
  *
- * class MyClass extends OneToOneHandlingMixin {
+ * class MyClass extends OneToOneHandlingTrait {
  *  MyCommandHandlingMethod(@handle command: MyCommand) {
  *    return true;
  *  }

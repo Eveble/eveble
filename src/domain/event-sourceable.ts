@@ -7,7 +7,7 @@ import getenv from 'getenv';
 import { Type, kernel } from '@eveble/core';
 import deepClone from '@jsbits/deep-clone';
 import { Entity } from './entity';
-import { OneToOneHandlingMixin } from '../mixins/one-to-one-handling-mixin';
+import { OneToOneHandlingTrait } from '../mixins/one-to-one-handling-mixin';
 import { types } from '../types';
 import { Command, Assignment } from '../components/command';
 import { HandlerNotFoundError } from '../messaging/messaging-errors';
@@ -28,7 +28,7 @@ import { History } from './history';
 
 @Type('EventSourceable')
 export class EventSourceable
-  extends classes(Entity, OneToOneHandlingMixin)
+  extends classes(Entity, OneToOneHandlingTrait)
   implements types.EventSourceable
 {
   public id: string | Guid;

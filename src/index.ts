@@ -197,7 +197,7 @@ export {
   HookNotFoundError,
 } from './traits/hookable.trait';
 export { OneToManyHandlingMixin } from './mixins/one-to-many-handling-mixin';
-export { OneToOneHandlingMixin } from './mixins/one-to-one-handling-mixin';
+export { OneToOneHandlingTrait } from './mixins/one-to-one-handling-mixin';
 export { HandlingTrait } from './traits/handling.trait';
 export { RFC5424LoggingTrait } from './traits/rfc-5424-logging.trait';
 export { SerializableTrait } from './traits/serializable.trait';

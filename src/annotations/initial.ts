@@ -31,7 +31,7 @@ import { subscribe } from './subscribe';
  * to class is resolved and then - iterate through that container on construction
  * and register all the assigned types and handlers.
  *
- * Implementation of this can be seen on `OneToOneHandlingMixin` or `OneToManyHandlingMixin` constructors.
+ * Implementation of this can be seen on `OneToOneHandlingTrait` or `OneToManyHandlingTrait` constructors.
  * @example
  *```ts
  * @Type('MyCommand')
@@ -39,7 +39,7 @@ import { subscribe } from './subscribe';
  *  key: string;
  * }
  *
- * class MyClass extends OneToOneHandlingMixin {
+ * class MyClass extends OneToOneHandlingTrait {
  *  MyInitialCommand(@initial command: MyCommand) {
  *    return true;
  *  }
@@ -56,7 +56,7 @@ import { subscribe } from './subscribe';
  *  key: string;
  * }
  *
- * class MyClass extends OneToOneHandlingMixin {
+ * class MyClass extends OneToOneHandlingTrait {
  *  MyInitialEvent(@initial event: MyEvent) {
  *    return true;
  *  }
