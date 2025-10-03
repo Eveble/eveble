@@ -104,7 +104,7 @@ import { Log, LogMetadata } from '../../src/components/log-entry';
 import { Message } from '../../src/components/message';
 import { SerializableError } from '../../src/components/serializable-error';
 import { Serializable } from '../../src/components/serializable';
-import { Struct } from '../../src/components/struct';
+import { Struct } from '../../src/trait/struct';
 // Config
 import { AppConfig } from '../../src/configs/app-config';
 import { EvebleConfig } from '../../src/configs/eveble-config';

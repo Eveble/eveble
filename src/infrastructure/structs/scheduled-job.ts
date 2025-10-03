@@ -3,7 +3,7 @@ import { Type } from '@eveble/core';
 import { StatefulTrait } from '../../trait/stateful.trait';
 import { types } from '../../types';
 import { Guid } from '../../domain/value-objects/guid';
-import { Struct } from '../../trait/struct';
+import { Struct } from '../../components/struct';
 
 @Type()
 export class ScheduledJob

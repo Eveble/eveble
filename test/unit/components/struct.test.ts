@@ -2,14 +2,14 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { Integer, PropTypes, ValidationError } from 'typend';
 import { inject } from 'inversify';
-import sinon from 'sinon';
 import { Type } from '@eveble/core';
 import { derived } from '@traits-ts/core';
+import sinon from 'sinon';
 import { Struct } from '../../../src/components/struct';
 import { DELEGATED_KEY } from '../../../src/constants/metadata-keys';
-import { types } from '../../../src/types';
-import { TypeTrait } from '../../../src/trait/type.trait';
 import { HookableTrait } from '../../../src/trait/hookable.trait';
+import { TypeTrait } from '../../../src/trait/type.trait';
+import { types } from '../../../src/types';
 
 chai.use(sinonChai);
 
