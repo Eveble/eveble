@@ -2,21 +2,21 @@ import merge from 'deepmerge';
 import { pick } from 'lodash';
 import { Type, ExtendableError } from '@eveble/core';
 import { derive } from '@traits-ts/core';
-import { TypeTrait } from '../trait/type.trait';
 import { types } from '../types';
-import { VersionableMixin } from '../mixins/versionable-mixin';
+import { TypeTrait } from '../trait/type.trait';
 import { HookableTrait } from '../trait/hookable.trait';
-import { isPlainRecord } from '../utils/helpers';
 import { EjsonableTrait } from '../trait/ejsonable.trait';
+import { VersionableTrait } from '../trait/versionable.trait';
+import { isPlainRecord } from '../utils/helpers';
 
 @Type('SerializableError')
 export abstract class SerializableError
   extends derive(
-    ExtendableError,
     TypeTrait,
     HookableTrait,
     EjsonableTrait,
-    VersionableMixin
+    VersionableTrait,
+    ExtendableError
   )
   implements types.Versionable, types.Ejsonable
 {
@@ -48,7 +48,7 @@ export abstract class SerializableError
       'stack',
       'code',
     ]);
-    super([errorProps]);
+    super(errorProps);
     Object.assign(this, this.processProps(props));
   }
 

@@ -1,15 +1,16 @@
 import { expect } from 'chai';
 import { instanceOf, PropTypes, ValidationError } from 'typend';
 import { Type, ExtendableError } from '@eveble/core';
+import { derived } from '@traits-ts/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
 import { SerializableError } from '../../../src/components/serializable-error';
 import { VersionableTrait } from '../../../src/trait/versionable.trait';
 import { isTyped } from '../../../src/utils/helpers';
-import { TypeTrait } from '../../../src/mixins/definable-mixin';
-import { HookableTrait } from '../../../src/mixins/hookable-mixin';
-import { EjsonableTrait } from '../../../src/mixins/ejsonable-mixin';
-import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
+import { SerializableTrait } from '../../../src/trait/serializable.trait';
+import { TypeTrait } from '../../../src/trait/type.trait';
+import { HookableTrait } from '../../../src/trait/hookable.trait';
+import { EjsonableTrait } from '../../../src/trait/ejsonable.trait';
 
 describe('SerializableError', () => {
   @Type('MySerializable', { isRegistrable: false })
@@ -30,27 +31,27 @@ describe('SerializableError', () => {
   });
 
   it('implements Definable interface', () => {
-    expect(SerializableError.prototype).to.instanceof(TypeTrait);
+    expect(derived(SerializableError.prototype, TypeTrait));
     expect(instanceOf<types.Typed>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Hookable interface', () => {
-    expect(SerializableError.prototype).to.instanceof(HookableTrait);
+    expect(derived(SerializableError.prototype, HookableTrait));
     expect(instanceOf<types.Hookable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Serializable interface', () => {
-    expect(SerializableError.prototype).to.instanceof(SerializableMixin);
+    expect(derived(SerializableError.prototype, SerializableTrait));
     expect(instanceOf<types.Serializable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Ejsonable interface', () => {
-    expect(SerializableError.prototype).to.instanceof(EjsonableTrait);
+    expect(derived(SerializableError.prototype, EjsonableTrait));
     expect(instanceOf<types.Ejsonable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Versionable interface', () => {
-    expect(SerializableError.prototype).to.instanceof(VersionableMixin);
+    expect(derived(SerializableError.prototype, VersionableTrait));
     expect(instanceOf<types.Versionable>(Serializable.prototype)).to.be.true;
   });
 
