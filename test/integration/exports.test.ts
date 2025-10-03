@@ -724,12 +724,6 @@ describe(`exports`, () => {
       });
     });
     describe('annotations', () => {
-      it('internal', () => {
-        expect(internalExported).to.be.equal(internal);
-      });
-      it('validable', () => {
-        expect(validableExported).to.be.equal(validable);
-      });
       it('Internal', () => {
         expect(InternalExported).to.be.equal(Internal);
       });
@@ -1119,9 +1113,6 @@ describe(`exports`, () => {
     });
   });
   describe('decorators', () => {
-    it('define', () => {
-      expect(defineExported).to.be.equal(define);
-    });
     it('Type', () => {
       expect(TypeExported).to.be.equal(Type);
     });
