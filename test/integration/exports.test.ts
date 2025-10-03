@@ -649,6 +649,7 @@ import {
   EvebleType,
   Internal,
   Validable,
+  Serializable,
 } from '../../src/index';
 
 describe(`exports`, () => {
