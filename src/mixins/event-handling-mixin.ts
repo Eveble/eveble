@@ -3,14 +3,14 @@ import {
   inject,
   injectable,
 } from 'inversify';
-import { OneToManyHandlingMixin } from './one-to-many-handling-mixin';
+import { OneToManyHandlingTrait } from '../traits/one-to-many-handling.trait';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { Event } from '../components/event';
 
 @injectable()
 export class EventHandlingMixin
-  extends OneToManyHandlingMixin
+  extends OneToManyHandlingTrait
   implements types.Publisher
 {
   @inject(BINDINGS.EventBus)

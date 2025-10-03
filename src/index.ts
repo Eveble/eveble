@@ -196,7 +196,7 @@ export {
   HookAlreadyExistsError,
   HookNotFoundError,
 } from './traits/hookable.trait';
-export { OneToManyHandlingMixin } from './mixins/one-to-many-handling-mixin';
+export { OneToManyHandlingTrait } from './traits/one-to-many-handling.trait';
 export { OneToOneHandlingTrait } from './mixins/one-to-one-handling-mixin';
 export { HandlingTrait } from './traits/handling.trait';
 export { RFC5424LoggingTrait } from './traits/rfc-5424-logging.trait';

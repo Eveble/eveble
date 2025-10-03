@@ -4,7 +4,7 @@ import sinonChai from 'sinon-chai';
 import delay from 'delay';
 import { Type } from '@eveble/core';
 import { EventBus } from '../../../src/messaging/event-bus';
-import { OneToManyHandlingMixin } from '../../../src/mixins/one-to-many-handling-mixin';
+import { OneToManyHandlingTrait } from '../../../src/mixins/one-to-many-handling-mixin';
 import { HookableTrait } from '../../../src/mixins/hookable-mixin';
 import {
   HandlerExistError,
@@ -26,8 +26,8 @@ describe('EventBus', () => {
     key: string;
   }
 
-  it(`extends OneToManyHandlingMixin mixin on prototype chain applied`, () => {
-    expect(EventBus.prototype).to.be.instanceof(OneToManyHandlingMixin);
+  it(`extends OneToManyHandlingTrait mixin on prototype chain applied`, () => {
+    expect(EventBus.prototype).to.be.instanceof(OneToManyHandlingTrait);
   });
 
   it(`extends HookableTrait mixin on prototype chain applied`, () => {
