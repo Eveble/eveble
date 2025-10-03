@@ -4,7 +4,7 @@ import { PropTypes } from 'typend';
 import { stubInterface } from 'ts-sinon';
 import { Type, kernel } from '@eveble/core';
 import { derive } from '@traits-ts/core';
-import { TypeTrait } from '../../../src/trait/type.trait';
+import { TypeTrait } from '../../../src/traits/type.trait';
 import { types } from '../../../src/types';
 
 chai.use(sinonChai);
