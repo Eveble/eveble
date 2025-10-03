@@ -38,17 +38,17 @@ describe('Serializable', () => {
   });
 
   it('implements Versionable interface', () => {
-    expect(derived(Serializable.prototype, VersionableTrait));
+    expect(derived(Serializable.prototype, VersionableTrait)).to.be.true;
     expect(instanceOf<types.Versionable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Serializable interface', () => {
-    expect(derived(Serializable.prototype, SerializableTrait));
+    expect(derived(Serializable.prototype, SerializableTrait)).to.be.true;
     expect(instanceOf<types.Serializable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Ejesonable interface', () => {
-    expect(derived(Serializable.prototype, EjsonableTrait));
+    expect(derived(Serializable.prototype, EjsonableTrait)).to.be.true;
     expect(instanceOf<types.Ejsonable>(Serializable.prototype)).to.be.true;
   });
 

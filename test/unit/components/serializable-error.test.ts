@@ -31,22 +31,22 @@ describe('SerializableError', () => {
   });
 
   it('implements Definable interface', () => {
-    expect(derived(SerializableError.prototype, TypeTrait));
+    expect(derived(SerializableError.prototype, TypeTrait)).to.be.true;
     expect(instanceOf<types.Typed>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Hookable interface', () => {
-    expect(derived(SerializableError.prototype, HookableTrait));
+    expect(derived(SerializableError.prototype, HookableTrait)).to.be.true;
     expect(instanceOf<types.Hookable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Serializable interface', () => {
-    expect(derived(SerializableError.prototype, SerializableTrait));
+    expect(derived(SerializableError.prototype, SerializableTrait)).to.be.true;
     expect(instanceOf<types.Serializable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Ejsonable interface', () => {
-    expect(derived(SerializableError.prototype, EjsonableTrait));
+    expect(derived(SerializableError.prototype, EjsonableTrait)).to.be.true;
     expect(instanceOf<types.Ejsonable>(Serializable.prototype)).to.be.true;
   });
 
