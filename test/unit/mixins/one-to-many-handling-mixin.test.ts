@@ -17,7 +17,7 @@ import {
   InvalidMessageableType,
 } from '../../../src/messaging/messaging-errors';
 import { hasPostConstruct } from '../../../src/utils/helpers';
-import { HandlingMixin } from '../../../src/mixins/handling-mixin';
+import { HandlingTrait } from '../../../src/mixins/handling-mixin';
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -33,8 +33,8 @@ describe('OneToManyHandlingMixin', () => {
     key: string;
   }
 
-  it('extends HandlingMixin', () => {
-    expect(OneToManyHandlingMixin.prototype).to.be.instanceof(HandlingMixin);
+  it('extends HandlingTrait', () => {
+    expect(OneToManyHandlingTrait.prototype).to.be.instanceof(HandlingTrait);
   });
 
   describe('construction', () => {

@@ -6,7 +6,7 @@ import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { types } from '../../../src/types';
-import { OneToOneHandlingMixin } from '../../../src/mixins/one-to-one-handling-mixin';
+import { OneToOneHandlingTrait } from '../../../src/mixins/one-to-one-handling-mixin';
 import { handle } from '../../../src/annotations/handle';
 import { Message } from '../../../src/components/message';
 import {
@@ -39,8 +39,8 @@ describe('OneToOneHandlingMixin', () => {
     key: string;
   }
 
-  it('extends HandlingMixin', () => {
-    expect(OneToOneHandlingMixin.prototype).to.be.instanceof(HandlingMixin);
+  it('extends HandlingTrait', () => {
+    expect(OneToOneHandlingTrait.prototype).to.be.instanceof(HandlingTrait);
   });
 
   describe('construction', () => {

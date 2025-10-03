@@ -257,6 +257,7 @@ import { CommandHandlingMixin } from '../../src/mixins/command-handling-mixin';
 import { TypeTrait } from '../../src/traits/type.trait';
 import { EjsonableTrait } from '../../src/traits/ejsonable.trait';
 import { EventHandlingMixin } from '../../src/mixins/event-handling-mixin';
+import { HandlingTrait } from '../../src/traits/handling.trait';
 import {
   HookableTrait,
   HookError,
@@ -579,6 +580,7 @@ import {
   TypeTrait as TypeTraitExported,
   EjsonableTrait as EjsonableTraitExported,
   EventHandlingMixin as EventHandlingMixinExported,
+  HandlingTrait as HandlingTraitExported,
   HookableTrait as HookableTraitExported,
   HookError as HookErrorExported,
   InvalidHookActionError as InvalidHookActionErrorExported,
@@ -1497,6 +1499,8 @@ describe(`exports`, () => {
     });
     it('EventHandlingMixin', () => {
       expect(EventHandlingMixinExported).to.be.equal(EventHandlingMixin);
+    it('HandlingTrait', () => {
+      expect(HandlingTraitExported).to.be.equal(HandlingTrait);
     });
 
     it('OneToManyHandlingMixin', () => {

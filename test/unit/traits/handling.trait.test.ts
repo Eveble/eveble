@@ -2,9 +2,10 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { Type } from '@eveble/core';
+import { derive } from '@traits-ts/core';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
-import { HandlingMixin } from '../../../src/mixins/handling-mixin';
+import { HandlingTrait } from '../../../src/traits/handling.trait';
 import { Message } from '../../../src/components/message';
 import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 import { handle } from '../../../src/annotations/handle';
@@ -13,7 +14,7 @@ import { HANDLERS } from '../../../src/constants/literal-keys';
 
 chai.use(sinonChai);
 
-describe('HandlingMixing', () => {
+describe('HandlingTrait', () => {
   @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     key: string;
@@ -32,7 +33,7 @@ describe('HandlingMixing', () => {
       handlers.set(MyCommand, commandHandler);
       handlers.set(MyEvent, eventHandler);
 
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers,
@@ -63,7 +64,7 @@ describe('HandlingMixing', () => {
       handlers.set(MyEvent, eventHandler);
 
       const registrator = sinon.stub();
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers,
@@ -89,7 +90,7 @@ describe('HandlingMixing', () => {
       handlers.set(MyEvent, eventHandler);
 
       const registrator = sinon.stub();
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers,
@@ -121,7 +122,7 @@ describe('HandlingMixing', () => {
       const handlers = new Map();
       handlers.set(MyEvent, sinon.stub());
 
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers,
@@ -141,7 +142,7 @@ describe('HandlingMixing', () => {
       const handlers = new Map();
       handlers.set(MyEvent, sinon.stub());
 
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers,
@@ -158,7 +159,7 @@ describe('HandlingMixing', () => {
       const handlers = new Map();
       handlers.set(MyEvent, sinon.stub());
 
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers,
@@ -182,7 +183,7 @@ describe('HandlingMixing', () => {
       const overridingHandlers = new Map();
       overridingHandlers.set(MyCommand, overridingHandler);
 
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         constructor() {
           super();
           this[HANDLERS] = originalHandlers;
@@ -209,7 +210,7 @@ describe('HandlingMixing', () => {
 
   describe('annotations', () => {
     it('returns all annotated command handlers', () => {
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers: this.handles(),
@@ -244,7 +245,7 @@ describe('HandlingMixing', () => {
     });
 
     it('returns all annotated event subscribers', () => {
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
             handlers: this.subscribes(),
@@ -284,7 +285,7 @@ describe('HandlingMixing', () => {
       it('returns true if message type has a registered handler', () => {
         const handlers = new Map();
         handlers.set(MyCommand, sinon.stub());
-        class MyController extends HandlingMixin {
+        class MyController extends derive(HandlingTrait) {
           constructor() {
             super();
             this[HANDLERS] = handlers;
@@ -294,7 +295,7 @@ describe('HandlingMixing', () => {
         expect(controller.hasHandler(MyCommand)).to.be.true;
       });
       it('returns false if message type has no registered handler', () => {
-        class MyController extends HandlingMixin {}
+        class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         expect(controller.hasHandler(MyCommand)).to.be.false;
       });
@@ -304,7 +305,7 @@ describe('HandlingMixing', () => {
       it('removes handler for message type', () => {
         const handlers = new Map();
         handlers.set(MyCommand, sinon.stub());
-        class MyController extends HandlingMixin {
+        class MyController extends derive(HandlingTrait) {
           constructor() {
             super();
             this[HANDLERS] = handlers;
@@ -320,7 +321,7 @@ describe('HandlingMixing', () => {
 
   describe('handleable types', () => {
     it('ensures that handleabe types array is created before assigning types', () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
 
       const controller = new MyController();
       controller.setHandleableTypes(Command);
@@ -330,7 +331,7 @@ describe('HandlingMixing', () => {
     });
 
     it('sets handleabe types to a single message type', () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
 
       const controller = new MyController();
       controller.setHandleableTypes(Command);
@@ -340,7 +341,7 @@ describe('HandlingMixing', () => {
     });
 
     it('sets handleabe types to a multiple message types', () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
 
       const controller = new MyController();
       controller.setHandleableTypes([Command, Event]);
@@ -350,7 +351,7 @@ describe('HandlingMixing', () => {
     });
 
     it('returns Message type as default handleabe type', () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
 
       const controller = new MyController();
       expect(controller.getHandleableTypes()).to.be.an('array');
@@ -360,20 +361,20 @@ describe('HandlingMixing', () => {
 
     describe('evaluation', () => {
       it('returns true if handleable types are not defined for any message type', () => {
-        class MyController extends HandlingMixin {}
+        class MyController extends derive(HandlingTrait) {}
 
         const controller = new MyController();
         expect(controller.isHandleabe(Command)).to.be.true;
       });
 
       it('returns true if handleable types are empty array for any message type', () => {
-        class MyController extends HandlingMixin {}
+        class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         expect(controller.isHandleabe(Command)).to.be.true;
       });
 
       it('returns true if message type is handleable', () => {
-        class MyController extends HandlingMixin {}
+        class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         controller.setHandleableTypes(MyCommand);
         expect(controller.getHandleableTypes()).to.be.eql([MyCommand]);
@@ -381,7 +382,7 @@ describe('HandlingMixing', () => {
       });
 
       it('returns true if message type is handleable by inheritance relation(subclass)', () => {
-        class MyController extends HandlingMixin {}
+        class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         controller.setHandleableTypes(Command);
         expect(controller.getHandleableTypes()).to.be.eql([Command]);
@@ -389,7 +390,7 @@ describe('HandlingMixing', () => {
       });
 
       it('returns false if message type is not handleable', () => {
-        class MyController extends HandlingMixin {}
+        class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         controller.setHandleableTypes(Event);
         expect(controller.getHandleableTypes()).to.be.eql([Event]);
@@ -398,13 +399,13 @@ describe('HandlingMixing', () => {
 
       context('runtime', () => {
         it('returns true if message type is handleable on runtime evaluation', () => {
-          class MyController extends HandlingMixin {}
+          class MyController extends derive(HandlingTrait) {}
           const controller = new MyController();
           expect(controller.isHandleabe(MyCommand, Command)).to.be.true;
         });
 
         it('returns false if message  type is not handleable on runtime evaluation', () => {
-          class MyController extends HandlingMixin {}
+          class MyController extends derive(HandlingTrait) {}
           const controller = new MyController();
           expect(controller.isHandleabe(MyCommand, Event)).to.be.false;
         });
@@ -415,7 +416,7 @@ describe('HandlingMixing', () => {
   describe('handlers', () => {
     it('returns all registered handlers', () => {
       const handlers = new Map([[MyCommand, sinon.stub()]]);
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         constructor() {
           super();
           this[HANDLERS] = handlers;
@@ -430,7 +431,7 @@ describe('HandlingMixing', () => {
       handlers.set(MyCommand, sinon.stub());
       handlers.set(MyEvent, sinon.stub());
 
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         constructor() {
           super();
           this[HANDLERS] = handlers;
@@ -446,7 +447,7 @@ describe('HandlingMixing', () => {
       handlers.set(MyCommand, sinon.stub());
       handlers.set(MyEvent, sinon.stub());
 
-      class MyController extends HandlingMixin {
+      class MyController extends derive(HandlingTrait) {
         constructor() {
           super();
           this[HANDLERS] = handlers;
@@ -466,7 +467,7 @@ describe('HandlingMixing', () => {
         handlers.set(MyCommand, sinon.stub());
         handlers.set(MyEvent, sinon.stub());
 
-        class MyController extends HandlingMixin {
+        class MyController extends derive(HandlingTrait) {
           constructor() {
             super();
             this[HANDLERS] = handlers;
@@ -483,7 +484,7 @@ describe('HandlingMixing', () => {
         handlers.set(MyCommand, sinon.stub());
         handlers.set(MyEvent, sinon.stub());
 
-        class MyController extends HandlingMixin {
+        class MyController extends derive(HandlingTrait) {
           constructor() {
             super();
             this[HANDLERS] = handlers;
@@ -500,7 +501,7 @@ describe('HandlingMixing', () => {
         handlers.set(MyCommand, sinon.stub());
         handlers.set(MyEvent, sinon.stub());
 
-        class MyController extends HandlingMixin {
+        class MyController extends derive(HandlingTrait) {
           constructor() {
             super();
             this[HANDLERS] = handlers;
@@ -516,21 +517,21 @@ describe('HandlingMixing', () => {
 
   describe(`validation`, () => {
     it(`returns true for message type that can be handled`, () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
       controller.setHandleableTypes(Command);
       expect(controller.ensureHandleability(MyCommand)).to.be.true;
     });
 
     it(`returns true for message type that can be handled by inheritance relation`, () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
       controller.setHandleableTypes(Command);
       expect(controller.ensureHandleability(MyCommand)).to.be.true;
     });
 
     it(`throws ValidationError if message type is not one of the handleable types`, () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
       controller.setHandleableTypes(Command);
       expect(() => controller.ensureHandleability(MyEvent)).to.throw(
@@ -540,7 +541,7 @@ describe('HandlingMixing', () => {
     });
 
     it(`allows to pass handleable types as second argument for custom validation`, () => {
-      class MyController extends HandlingMixin {}
+      class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
       expect(() => controller.ensureHandleability(MyCommand, [Event])).to.throw(
         UnhandleableTypeError,
