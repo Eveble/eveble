@@ -2,14 +2,14 @@ import chai, { expect } from 'chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import { Type, kernel } from '@eveble/core';
-import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
-
+import { kernel, Type } from '@eveble/core';
+import { derive } from '@traits-ts/core';
 import { types } from '../../../src/types';
+import { SerializableTrait } from '../../../src/trait/serializable.trait';
 
 chai.use(sinonChai);
 
-describe('SerializableMixin', () => {
+describe('SerializableTrait', () => {
   let originalConverter: any;
   let converter: any;
   let serializer: any;
@@ -39,7 +39,7 @@ describe('SerializableMixin', () => {
   describe('type name', () => {
     it('returns the default defined type name as class constructor name', () => {
       @Type()
-      class MyClass extends SerializableMixin {}
+      class MyClass extends derive(SerializableTrait) {}
 
       expect(new MyClass().getTypeName()).to.be.equal('MyClass');
       expect(MyClass.getTypeName()).to.be.equal('MyClass');
@@ -47,7 +47,7 @@ describe('SerializableMixin', () => {
 
     it('returns the defined type name to the type', () => {
       @Type('MyNamedClass')
-      class MyClass extends SerializableMixin {}
+      class MyClass extends derive(SerializableTrait) {}
 
       expect(new MyClass().getTypeName()).to.be.equal('MyNamedClass');
       expect(MyClass.getTypeName()).to.be.equal('MyNamedClass');
@@ -55,7 +55,7 @@ describe('SerializableMixin', () => {
 
     it('returns the defined type name with namespace', () => {
       @Type('Namespace.MyClass')
-      class MyClass extends SerializableMixin {}
+      class MyClass extends derive(SerializableTrait) {}
 
       expect(new MyClass().getTypeName()).to.be.equal('Namespace.MyClass');
       expect(MyClass.getTypeName()).to.be.equal('Namespace.MyClass');
@@ -65,7 +65,7 @@ describe('SerializableMixin', () => {
   describe('serialization', () => {
     it('serializes instance to JSON with serializer', () => {
       @Type('Person', { isRegistrable: false })
-      class Person extends SerializableMixin {}
+      class Person extends derive(SerializableTrait) {}
 
       const serialized = sinon.stub();
       const person = new Person();
