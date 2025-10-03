@@ -1,17 +1,16 @@
-import { classes } from 'polytype';
 import { pick } from 'lodash';
+import { derive } from '@traits-ts/core';
 import { Type } from '@eveble/core';
-import { VersionableMixin } from '../mixins/versionable-mixin';
 import { Struct } from './struct';
 import { types } from '../types';
-import { EjsonableMixin } from '../mixins/ejsonable-mixin';
-// import { SERIALIZABLE_LIST_PROPS_KEY } from '../constants/metadata-keys';
 import { List } from '../domain/list';
 import { InvalidListError } from '../domain/domain-errors';
+import { EjsonableTrait } from '../trait/ejsonable.trait';
+import { VersionableTrait } from '../trait/versionable.trait';
 
 @Type('Serializable')
 export class Serializable
-  extends classes(Struct, EjsonableMixin, VersionableMixin)
+  extends derive(EjsonableTrait, VersionableTrait, Struct)
   implements types.Ejsonable
 {
   public schemaVersion?: number;
@@ -26,7 +25,7 @@ export class Serializable
    * https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
    */
   constructor(props: types.Props = {}) {
-    super([props]);
+    super(props);
   }
 
   /**

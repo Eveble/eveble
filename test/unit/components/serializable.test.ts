@@ -2,15 +2,16 @@ import chai, { expect } from 'chai';
 import { instanceOf, PropTypes } from 'typend';
 import sinonChai from 'sinon-chai';
 import { Type } from '@eveble/core';
-import { Serializable } from '../../../src/components/serializable';
-import { Struct } from '../../../src/components/struct';
+import { derived } from '@traits-ts/core';
 import { VersionableTrait } from '../../../src/trait/versionable.trait';
 import { types } from '../../../src/types';
 import { isTyped } from '../../../src/utils/helpers';
-import { SerializableMixin } from '../../../src/mixins/serializable-mixin';
 import { EjsonableTrait } from '../../../src/trait/ejsonable.trait';
 import { List } from '../../../src/domain/list';
 import { InvalidListError } from '../../../src/domain/domain-errors';
+import { Serializable } from '../../../src/components/serializable';
+import { Struct } from '../../../src/components/struct';
+import { SerializableTrait } from '../../../src/trait/serializable.trait';
 
 chai.use(sinonChai);
 
@@ -42,12 +43,12 @@ describe('Serializable', () => {
   });
 
   it('implements Serializable interface', () => {
-    expect(Serializable.prototype).to.instanceof(SerializableMixin);
+    expect(derived(Serializable.prototype, SerializableTrait));
     expect(instanceOf<types.Serializable>(Serializable.prototype)).to.be.true;
   });
 
   it('implements Ejesonable interface', () => {
-    expect(Serializable.prototype).to.instanceof(EjsonableMixin);
+    expect(derived(Serializable.prototype, EjsonableTrait));
     expect(instanceOf<types.Ejsonable>(Serializable.prototype)).to.be.true;
   });
 
