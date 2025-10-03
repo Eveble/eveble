@@ -4,7 +4,7 @@ import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
 import { Serializable } from '../../../src/components/serializable';
-// import { isTyped } from '../../../src/utils/helpers';
+import { isTyped } from '../../../src/utils/helpers';
 
 describe('Message', () => {
   let now: Date;
@@ -34,9 +34,9 @@ describe('Message', () => {
     expect(Message.prototype).to.be.instanceof(Serializable);
   });
 
-  // it('ensures that type is defined', () => {
-  //   expect(isTyped(Serializable.prototype)).to.be.true;
-  // });
+  it('ensures that type is defined', () => {
+    expect(isTyped(Serializable.prototype)).to.be.true;
+  });
 
   it('defines the type name correctly', () => {
     expect(Message.getTypeName()).to.equal('Message');
