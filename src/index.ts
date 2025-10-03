@@ -226,13 +226,30 @@ export {
   isTyped,
   isRecord,
   isPlainRecord,
-  hasPostConstruct,
   toPlainObject,
   convertObjectToCollection,
   createEJSON,
   isEventSourceableType,
   loadENV,
 } from './utils/helpers';
+// Inversify
+export {
+  getInversifyMetadata,
+  isInjectableClass,
+  getInjectedPropertyNames,
+  getInjectedParameterIndices,
+  getInjectedPropertyDetails,
+  hasPostConstruct,
+  getPostConstructMethodNames,
+  hasPreDestroy,
+  getPreDestroyMethodNames,
+  getMetadataSummary,
+  debugInversifyMetadata,
+  getAllClassProperties,
+  getPropertiesToValidate,
+  isPropertyInjected,
+} from './utils/inversify';
+
 export { isSerializable, resolveSerializableFromPropType } from '@eveble/core';
 // Types
 export { types } from './types';

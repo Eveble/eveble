@@ -103,7 +103,10 @@ import { Event } from '../../src/components/event';
 import { Log, LogMetadata } from '../../src/components/log-entry';
 import { Message } from '../../src/components/message';
 import { SerializableError } from '../../src/components/serializable-error';
-import { Serializable } from '../../src/components/serializable';
+import {
+  Serializable,
+  SerializableMixin,
+} from '../../src/trait/serializable.trait';
 import { Struct } from '../../src/trait/struct';
 // Config
 import { AppConfig } from '../../src/configs/app-config';
@@ -252,9 +255,9 @@ import {
   SerializationError,
   UnparsableValueError,
 } from '../../src/messaging/messaging-errors';
-// Mixins
+// Traits
 import { CommandHandlingMixin } from '../../src/mixins/command-handling-mixin';
-import { TypeTrait } from '../../src/mixins/definable-mixin';
+import { TypeTrait } from '../../src/trait/type.trait';
 import { EjsonableTrait } from '../../src/trait/ejsonable.trait';
 import { EventHandlingMixin } from '../../src/mixins/event-handling-mixin';
 import {
@@ -268,19 +271,18 @@ import {
 import { OneToManyHandlingMixin } from '../../src/mixins/one-to-many-handling-mixin';
 import { OneToOneHandlingMixin } from '../../src/mixins/one-to-one-handling-mixin';
 import { RFC5424LoggingMixin } from '../../src/mixins/rfc-5424-logging-mixin';
-import { SerializableMixin } from '../../src/mixins/serializable-mixin';
 import {
   StatefulTrait,
   StateError,
   UndefinedStatesError,
   InvalidStateError,
-} from '../../src/mixins/stateful-mixin';
+} from '../../src/trait/stateful.trait';
 import {
   StatusfulTrait,
   StatusError,
   UndefinedStatusesError,
   InvalidStatusError,
-} from '../../src/mixins/statusful-mixin';
+} from '../../src/trait/statusful.trait';
 import {
   VersionableTrait,
   VersionableError,
@@ -295,7 +297,6 @@ import {
   isTyped,
   isRecord,
   isPlainRecord,
-  hasPostConstruct,
   toPlainObject,
   convertObjectToCollection,
   createEJSON,
@@ -303,7 +304,22 @@ import {
   loadENV,
 } from '../../src/utils/helpers';
 import { loggerLoader } from '../../src/utils/logger-loader';
-
+import {
+  getInversifyMetadata,
+  isInjectableClass,
+  getInjectedPropertyNames,
+  getInjectedParameterIndices,
+  getInjectedPropertyDetails,
+  hasPostConstruct,
+  getPostConstructMethodNames,
+  hasPreDestroy,
+  getPreDestroyMethodNames,
+  getMetadataSummary,
+  debugInversifyMetadata,
+  getAllClassProperties,
+  getPropertiesToValidate,
+  isPropertyInjected,
+} from '../../src/utils/inversify';
 /*
 EXPORTED
 */
@@ -608,6 +624,21 @@ import {
   isEventSourceableType as isEventSourceableTypeExported,
   loadENV as loadENVExported,
   loggerLoader as loggerLoaderExported,
+  // Inversify
+  getInversifyMetadata as getInversifyMetadataExported,
+  isInjectableClass as isInjectableClassExported,
+  getInjectedPropertyNames as getInjectedPropertyNamesExported,
+  getInjectedParameterIndices as getInjectedParameterIndicesExported,
+  getInjectedPropertyDetails as getInjectedPropertyDetailsExported,
+  hasPostConstruct as hasPostConstructExported,
+  getPostConstructMethodNames as getPostConstructMethodNamesExported,
+  hasPreDestroy as hasPreDestroyExported,
+  getPreDestroyMethodNames as getPreDestroyMethodNamesExported,
+  getMetadataSummary as getMetadataSummaryExported,
+  debugInversifyMetadata as debugInversifyMetadataExported,
+  getAllClassProperties as getAllClassPropertiesExported,
+  getPropertiesToValidate as getPropertiesToValidateExported,
+  isPropertyInjected as isPropertyInjectedExported,
   // External
   postConstruct as postConstructExported,
   injectable as injectableExported,
@@ -620,7 +651,6 @@ import {
   Route,
   Subscribe,
   Version,
-  Define,
   Type,
   EvebleType,
   Internal,
@@ -1098,9 +1128,6 @@ describe(`exports`, () => {
     it('define', () => {
       expect(defineExported).to.be.equal(define);
     });
-    it('Define', () => {
-      expect(DefineExported).to.be.equal(Define);
-    });
     it('Type', () => {
       expect(TypeExported).to.be.equal(Type);
     });
@@ -1466,7 +1493,7 @@ describe(`exports`, () => {
       });
     });
   });
-  describe('mixins', () => {
+  describe('traits', () => {
     it('CommandHandlingMixin', () => {
       expect(CommandHandlingMixinExported).to.be.equal(CommandHandlingMixin);
     });
@@ -1594,9 +1621,6 @@ describe(`exports`, () => {
     it('isPlainRecord', () => {
       expect(isPlainRecordExported).to.be.equal(isPlainRecord);
     });
-    it('hasPostConstruct', () => {
-      expect(hasPostConstructExported).to.be.equal(hasPostConstruct);
-    });
     it('toPlainObject', () => {
       expect(toPlainObjectExported).to.be.equal(toPlainObject);
     });
@@ -1621,6 +1645,65 @@ describe(`exports`, () => {
     });
     it('loggerLoader', () => {
       expect(loggerLoaderExported).to.be.equal(loggerLoader);
+    });
+  });
+
+  describe('inversify', () => {
+    it('getInversifyMetadata', () => {
+      expect(getInversifyMetadataExported).to.be.equal(getInversifyMetadata);
+    });
+    it('isInjectableClass', () => {
+      expect(isInjectableClassExported).to.be.equal(isInjectableClass);
+    });
+    it('getInjectedPropertyNames', () => {
+      expect(getInjectedPropertyNamesExported).to.be.equal(
+        getInjectedPropertyNames
+      );
+    });
+    it('getInjectedParameterIndices', () => {
+      expect(getInjectedParameterIndicesExported).to.be.equal(
+        getInjectedParameterIndices
+      );
+    });
+    it('getInjectedPropertyDetails', () => {
+      expect(getInjectedPropertyDetailsExported).to.be.equal(
+        getInjectedPropertyDetails
+      );
+    });
+    it('hasPostConstruct', () => {
+      expect(hasPostConstructExported).to.be.equal(hasPostConstruct);
+    });
+    it('getPostConstructMethodNames', () => {
+      expect(getPostConstructMethodNamesExported).to.be.equal(
+        getPostConstructMethodNames
+      );
+    });
+    it('hasPreDestroy', () => {
+      expect(hasPreDestroyExported).to.be.equal(hasPreDestroy);
+    });
+    it('getPreDestroyMethodNames', () => {
+      expect(getPreDestroyMethodNamesExported).to.be.equal(
+        getPreDestroyMethodNames
+      );
+    });
+    it('getMetadataSummary', () => {
+      expect(getMetadataSummaryExported).to.be.equal(getMetadataSummary);
+    });
+    it('debugInversifyMetadata', () => {
+      expect(debugInversifyMetadataExported).to.be.equal(
+        debugInversifyMetadata
+      );
+    });
+    it('getAllClassProperties', () => {
+      expect(getAllClassPropertiesExported).to.be.equal(getAllClassProperties);
+    });
+    it('getPropertiesToValidate', () => {
+      expect(getPropertiesToValidateExported).to.be.equal(
+        getPropertiesToValidate
+      );
+    });
+    it('isPropertyInjected', () => {
+      expect(isPropertyInjectedExported).to.be.equal(isPropertyInjected);
     });
   });
 
