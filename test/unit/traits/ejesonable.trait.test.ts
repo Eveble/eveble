@@ -3,9 +3,9 @@ import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { Type, kernel } from '@eveble/core';
-
+import { derive } from '@traits-ts/core';
 import { types } from '../../../src/types';
-import { EjsonableTrait } from '../../../src/mixins/ejsonable-mixin';
+import { EjsonableTrait } from '../../../src/trait/ejsonable.trait';
 
 chai.use(sinonChai);
 
@@ -32,7 +32,7 @@ describe('EjsonableTrait', () => {
     it('adds typeName static and prototype aliased methods for compatibility @eveble/ejson serializer module', () => {
       // converter.convert.returns({ properties: {} });
       @Type('MyNamedClass')
-      class MyClass extends EjsonableTrait {}
+      class MyClass extends derive(EjsonableTrait) {}
       MyClass.getTypeName = sinon.stub();
 
       const instance = new MyClass();
