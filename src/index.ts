@@ -184,7 +184,7 @@ export {
   UnparsableValueError,
 } from './messaging/messaging-errors';
 // Traits
-export { CommandHandlingMixin } from './mixins/command-handling-mixin';
+export { CommandHandlingTrait } from './traits/command-handling.trait';
 export { TypeTrait } from './traits/type.trait';
 export { EjsonableTrait } from './traits/ejsonable.trait';
 export { EventHandlingMixin } from './mixins/event-handling-mixin';

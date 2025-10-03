@@ -3,8 +3,8 @@ import { stubInterface } from 'ts-sinon';
 import { injectable } from 'inversify';
 import { Type } from '@eveble/core';
 import { Service } from '../../../src/infrastructure/service';
-import { CommandHandlingMixin } from '../../../src/mixins/command-handling-mixin';
 import { EventHandlingMixin } from '../../../src/mixins/event-handling-mixin';
+import { CommandHandlingTrait } from '../../../src/mixins/command-handling-mixin';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { handle } from '../../../src/annotations/handle';
@@ -37,8 +37,8 @@ describe(`Service`, () => {
     injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
   });
 
-  it(`has CommandHandlingMixin mixin on prototype chain applied`, () => {
-    expect(Service.prototype).to.be.instanceof(CommandHandlingMixin);
+  it(`has CommandHandlingTrait mixin on prototype chain applied`, () => {
+    expect(Service.prototype).to.be.instanceof(CommandHandlingTrait);
   });
 
   it(`has EventHandlingMixin mixin on prototype chain applied`, () => {

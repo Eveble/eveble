@@ -1,12 +1,12 @@
 import { classes } from 'polytype';
 import { postConstruct, inject, injectable } from 'inversify';
-import { CommandHandlingMixin } from '../mixins/command-handling-mixin';
 import { EventHandlingMixin } from '../mixins/event-handling-mixin';
+import { CommandHandlingTrait } from '../traits/command-handling.trait';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 
 @injectable()
-export class Service extends classes(CommandHandlingMixin, EventHandlingMixin) {
+export class Service extends classes(CommandHandlingTrait, EventHandlingTrait) {
   @inject(BINDINGS.CommandBus)
   public commandBus: types.CommandBus;
 
@@ -18,8 +18,8 @@ export class Service extends classes(CommandHandlingMixin, EventHandlingMixin) {
    */
   @postConstruct()
   public initialize(): void {
-    super.class(CommandHandlingMixin).initialize();
     super.class(EventHandlingMixin).initialize();
+    super.class(CommandHandlingTrait).initialize();
   }
 }
 

@@ -253,7 +253,7 @@ import {
   UnparsableValueError,
 } from '../../src/messaging/messaging-errors';
 // Traits
-import { CommandHandlingMixin } from '../../src/mixins/command-handling-mixin';
+import { CommandHandlingTrait } from '../../src/traits/command-handling.trait';
 import { TypeTrait } from '../../src/traits/type.trait';
 import { EjsonableTrait } from '../../src/traits/ejsonable.trait';
 import { EventHandlingMixin } from '../../src/mixins/event-handling-mixin';
@@ -575,8 +575,8 @@ import {
   InitializingMessageAlreadyExistsError as InitializingMessageAlreadyExistsErrorExported,
   SerializationError as SerializationErrorExported,
   UnparsableValueError as UnparsableValueErrorExported,
-  // Mixins
-  CommandHandlingMixin as CommandHandlingMixinExported,
+  // Traits
+  CommandHandlingTrait as CommandHandlingTraitExported,
   TypeTrait as TypeTraitExported,
   EjsonableTrait as EjsonableTraitExported,
   EventHandlingMixin as EventHandlingMixinExported,
@@ -1488,8 +1488,8 @@ describe(`exports`, () => {
     });
   });
   describe('traits', () => {
-    it('CommandHandlingMixin', () => {
-      expect(CommandHandlingMixinExported).to.be.equal(CommandHandlingMixin);
+    it('CommandHandlingTrait', () => {
+      expect(CommandHandlingTraitExported).to.be.equal(CommandHandlingTrait);
     });
     it('TypeTrait', () => {
       expect(TypeTraitExported).to.be.equal(TypeTrait);
