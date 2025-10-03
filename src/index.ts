@@ -187,7 +187,7 @@ export {
 export { CommandHandlingTrait } from './traits/command-handling.trait';
 export { TypeTrait } from './traits/type.trait';
 export { EjsonableTrait } from './traits/ejsonable.trait';
-export { EventHandlingMixin } from './mixins/event-handling-mixin';
+export { EventHandlingTrait } from './traits/event-handling.trait';
 export {
   HookableTrait,
   HookError,

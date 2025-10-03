@@ -5,14 +5,14 @@ import {
   ProjectionAlreadyRebuildingError,
   ProjectionNotRebuildingError,
 } from './infrastructure-errors';
-import { EventHandlingMixin } from '../mixins/event-handling-mixin';
+import { EventHandlingTrait } from '../traits/event-handling.trait';
 import { StatefulTrait } from '../traits/stateful.trait';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
 import { Log } from '../components/log-entry';
 
 export class Projection
-  extends classes(EventHandlingMixin, StatefulTrait)
+  extends classes(EventHandlingTrait, StatefulTrait)
   implements types.Projection
 {
   @inject(BINDINGS.EventBus)
@@ -42,7 +42,7 @@ export class Projection
    */
   @postConstruct()
   public initialize(): void {
-    super.class(EventHandlingMixin).initialize();
+    super.class(EventHandlingTrait).initialize();
   }
 
   /**

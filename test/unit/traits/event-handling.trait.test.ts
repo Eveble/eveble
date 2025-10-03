@@ -3,7 +3,8 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import { Type } from '@eveble/core';
-import { EventHandlingMixin } from '../../../src/mixins/event-handling-mixin';
+import { derive } from '@traits-ts/core';
+import { EventHandlingTrait } from '../../../src/traits/event-handling.trait';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { subscribe } from '../../../src/annotations/subscribe';
@@ -12,10 +13,11 @@ import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { handle } from '../../../src/annotations/handle';
 import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
+import { OneToManyHandlingTrait } from '../../../src/traits/one-to-many-handling.trait';
 
 chai.use(sinonChai);
 
-describe(`EventHandlingMixin`, () => {
+describe(`EventHandlingTrait`, () => {
   let injector: types.Injector;
   let eventBus: any;
 
@@ -40,9 +42,15 @@ describe(`EventHandlingMixin`, () => {
     key: string;
   }
 
+  it.skip(`has OneToManyHandlingTrait mixin on prototype chain applied`, () => {
+    expect((EventHandlingTrait as any).prototype).to.be.instanceof(
+      OneToManyHandlingTrait
+    );
+  });
+
   describe('construction', () => {
     it(`initializes with empty handled events`, () => {
-      class MyController extends EventHandlingMixin {}
+      class MyController extends derive(EventHandlingTrait) {}
 
       const controller = new MyController();
       expect(controller.getHandledEvents()).to.be.eql([]);
@@ -51,7 +59,7 @@ describe(`EventHandlingMixin`, () => {
 
   describe('getters', () => {
     it('aliases getHandledEvents with getSubscribedEvents for expressive api', () => {
-      class MyController extends EventHandlingMixin {}
+      class MyController extends derive(EventHandlingTrait) {}
 
       const controller = new MyController();
       controller.getHandledEvents = sinon.stub();
@@ -64,7 +72,7 @@ describe(`EventHandlingMixin`, () => {
 
   describe('initialization', () => {
     it('sets handler for events with dedicated registration method on initialization', () => {
-      class MyController extends EventHandlingMixin {
+      class MyController extends derive(EventHandlingTrait) {
         MyEvent(@subscribe event: MyEvent): boolean {
           return event.key === 'my-string';
         }
@@ -88,8 +96,8 @@ describe(`EventHandlingMixin`, () => {
       );
     });
 
-    it('overrides initialize method from OneToOneHandlingMixin thus not initializing command handlers mappings', () => {
-      class MyController extends EventHandlingMixin {
+    it('overrides initialize method from OneToOneHandlingTrait thus not initializing command handlers mappings', () => {
+      class MyController extends derive(EventHandlingTrait) {
         MyCommand(@handle event: MyCommand): boolean {
           return event.key === 'my-string';
         }
@@ -101,7 +109,7 @@ describe(`EventHandlingMixin`, () => {
     });
 
     it(`throws UnhandleableTypeError upon types not subclassing from Command defined as handlers`, () => {
-      class MyController extends EventHandlingMixin {
+      class MyController extends derive(EventHandlingTrait) {
         subscribes(): Map<types.MessageType<any>, types.Handler> {
           return new Map([[MyCommand, sinon.stub()]]);
         }
@@ -116,7 +124,7 @@ describe(`EventHandlingMixin`, () => {
 
   describe('registration', () => {
     it('throws UnhandleableTypeError upon registering non event type', () => {
-      class MyController extends EventHandlingMixin {}
+      class MyController extends derive(EventHandlingTrait) {}
       const controller = new MyController();
       expect(() => {
         controller.registerEventHandler(MyCommand as any, sinon.stub());
@@ -128,7 +136,7 @@ describe(`EventHandlingMixin`, () => {
 
     it(`registers event handler`, () => {
       const handler = sinon.spy();
-      class MyController extends EventHandlingMixin {}
+      class MyController extends derive(EventHandlingTrait) {}
       const controller = new MyController();
       injector.injectInto(controller);
       controller.registerHandler = sinon.stub();
@@ -139,7 +147,7 @@ describe(`EventHandlingMixin`, () => {
 
     it(`registers handler on instance with bound handler`, () => {
       const handler = sinon.stub();
-      class MyController extends EventHandlingMixin {}
+      class MyController extends derive(EventHandlingTrait) {}
       const controller = new MyController();
       const registerHandler = sinon.stub(controller, 'registerHandler');
       injector.injectInto(controller);
@@ -155,7 +163,7 @@ describe(`EventHandlingMixin`, () => {
 
     it(`registers handler on EventBus with bound handler`, () => {
       const handler = sinon.stub();
-      class MyController extends EventHandlingMixin {}
+      class MyController extends derive(EventHandlingTrait) {}
       const controller = new MyController();
       injector.injectInto(controller);
 
@@ -175,7 +183,7 @@ describe(`EventHandlingMixin`, () => {
         this.handlers.set(event, handler);
       };
 
-      class MyController extends EventHandlingMixin {
+      class MyController extends derive(EventHandlingTrait) {
         dependency: any;
 
         MyEvent(event: MyEvent): void {
@@ -197,7 +205,7 @@ describe(`EventHandlingMixin`, () => {
     });
     describe('subscribeTo', () => {
       it('aliases registerEventHandler with expressive subscribeTo', () => {
-        class MyController extends EventHandlingMixin {}
+        class MyController extends derive(EventHandlingTrait) {}
         const controller = new MyController();
         controller.registerEventHandler = sinon.stub();
 
@@ -216,7 +224,7 @@ describe(`EventHandlingMixin`, () => {
   describe('event handling', () => {
     describe('on', () => {
       it(`aliases handle with expressive 'on' api`, () => {
-        class MyController extends EventHandlingMixin {}
+        class MyController extends derive(EventHandlingTrait) {}
         const controller = new MyController();
         controller.handle = sinon.stub();
 
@@ -233,7 +241,7 @@ describe(`EventHandlingMixin`, () => {
 
   describe('event publishing', () => {
     it(`allows to publish event through event bus`, async () => {
-      class MyController extends EventHandlingMixin {}
+      class MyController extends derive(EventHandlingTrait) {}
       const controller = new MyController();
       injector.injectInto(controller);
 

@@ -3,8 +3,8 @@ import { stubInterface } from 'ts-sinon';
 import { injectable } from 'inversify';
 import { Type } from '@eveble/core';
 import { Service } from '../../../src/infrastructure/service';
-import { EventHandlingMixin } from '../../../src/mixins/event-handling-mixin';
 import { CommandHandlingTrait } from '../../../src/mixins/command-handling-mixin';
+import { EventHandlingTrait } from '../../../src/mixins/event-handling-mixin';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { handle } from '../../../src/annotations/handle';
@@ -41,11 +41,11 @@ describe(`Service`, () => {
     expect(Service.prototype).to.be.instanceof(CommandHandlingTrait);
   });
 
-  it(`has EventHandlingMixin mixin on prototype chain applied`, () => {
-    expect(Service.prototype).to.be.instanceof(EventHandlingMixin);
+  it(`has EventHandlingTrait mixin on prototype chain applied`, () => {
+    expect(Service.prototype).to.be.instanceof(EventHandlingTrait);
   });
 
-  it('ensures that initializers from CommandHandlingMixin, EventHandlingMixin are invoked upon dependency injection', () => {
+  it('ensures that initializers from CommandHandlingTrait, EventHandlingTrait are invoked upon dependency injection', () => {
     class MyService extends Service {
       MyCommand(@handle _command: MyCommand): void {
         return undefined;
