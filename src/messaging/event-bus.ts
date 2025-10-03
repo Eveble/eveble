@@ -1,5 +1,5 @@
-import { classes } from 'polytype';
 import { injectable } from 'inversify';
+import { derive } from '@traits-ts/core';
 import { types } from '../types';
 import { Event } from '../components/event';
 import { OneToManyHandlingTrait } from '../traits/one-to-many-handling.trait';
@@ -7,7 +7,7 @@ import { HookableTrait } from '../traits/hookable.trait';
 
 @injectable()
 export class EventBus
-  extends classes(HookableTrait, OneToManyHandlingTrait)
+  extends derive(HookableTrait, OneToManyHandlingTrait)
   implements types.EventBus
 {
   /**
