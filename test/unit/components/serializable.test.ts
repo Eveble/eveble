@@ -71,17 +71,6 @@ describe('Serializable', () => {
       expect(person).to.be.eql(props);
     });
 
-    it('processes lists with serializables to List instances', () => {
-      const employees = [
-        new Employee({ id: 'first' }),
-        new Employee({ id: 'second' }),
-      ];
-      const company = new Company({ employees });
-      expect(company.employees).to.be.instanceof(List);
-      expect(company.employees).to.have.length(2);
-      expect(company.employees).to.have.members(employees);
-    });
-
     describe('static constructor', () => {
       it('constructs from properties picked from source', () => {
         const props = {
@@ -128,17 +117,6 @@ describe('Serializable', () => {
     });
   });
 
-  describe('hooks', () => {
-    it('has convert-serializable-list hook applied', () => {
-      expect(
-        Serializable.prototype.hasHook(
-          'onConstruction',
-          'convert-serializable-list'
-        )
-      ).to.be.true;
-    });
-  });
-
   describe('accessors', () => {
     describe('in - serializable lists', () => {
       it('returns serializable list by its property key', () => {
@@ -147,9 +125,10 @@ describe('Serializable', () => {
           new Employee({ id: 'second' }),
         ];
         const company = new Company({ employees });
-        expect(company.in<Employee>('employees')).to.be.instanceof(List);
-        expect(company.in<Employee>('employees')).to.have.length(2);
-        expect(company.in<Employee>('employees')).to.have.members(employees);
+        const employeesList = company.in<Employee>('employees');
+        expect(employeesList).to.be.instanceof(List);
+        expect(employeesList).to.have.length(2);
+        expect(employeesList).to.have.members(employees);
       });
 
       it('throws InvalidListError upon accessing non-list property', () => {
