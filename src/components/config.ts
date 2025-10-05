@@ -7,7 +7,10 @@ import { Type, kernel } from '@eveble/core';
 import deepClone from '@jsbits/deep-clone';
 import { types } from '../types';
 import { InvalidConfigError } from '../core/core-errors';
-import { isPlainRecord, convertObjectToCollection } from '../utils/helpers';
+import {
+  isPlainRecord,
+  convertObjectToCollection,
+} from '../utils/record.helpers';
 import { delegate } from '../annotations/delegate';
 import { Serializable } from './serializable';
 
@@ -141,7 +144,6 @@ export class Config extends Serializable implements types.Configurable {
     propTypes = merge(mergedPropTypes, propTypes, {
       isMergeableObject: isPlainRecord,
     });
-
     return convertObjectToCollection(propTypes);
   }
 
@@ -354,7 +356,7 @@ export class Config extends Serializable implements types.Configurable {
    */
   public set<T>(path: string, value: T): void {
     // First validate on copy if provided value matches properties types
-    const copy = this.toPlainObject();
+    const copy = deepClone(this);
     set(copy, path, value);
     this.validateProps(copy, this.getPropTypes());
 

@@ -4,8 +4,8 @@ import { PropTypes, ValidationError } from 'typend';
 import { Type } from '@eveble/core';
 import { Config } from '../../../src/components/config';
 import { Struct } from '../../../src/components/struct';
+import { isTyped } from '../../../src/utils/helpers';
 import { InvalidConfigError } from '../../../src/core/core-errors';
-import { isDefinable } from '../../../src/utils/helpers';
 
 chai.use(sinonChai);
 
@@ -15,7 +15,7 @@ describe(`Config`, () => {
     second: 2,
   };
 
-  @Type('Config.Simple')
+  @Type('Config.Simple', { isRegistrable: false })
   class Simple extends Config {
     first: string;
 
@@ -38,7 +38,7 @@ describe(`Config`, () => {
     },
   };
 
-  @Type('Config.Complex')
+  @Type('Config.Complex', { isRegistrable: false })
   class Complex extends Config {
     root: string;
 
@@ -62,7 +62,7 @@ describe(`Config`, () => {
   });
 
   it('ensures that type is defined', () => {
-    expect(isDefinable(Config.prototype)).to.be.true;
+    expect(isTyped(Config.prototype)).to.be.true;
   });
 
   describe(`construction`, () => {
@@ -144,22 +144,21 @@ describe(`Config`, () => {
   describe('prop types', () => {
     it(`returns prop types for simple configuration`, () => {
       const propTypes = {
+        schemaVersion: PropTypes.instanceOf(Number).isOptional,
         first: PropTypes.instanceOf(String),
         second: PropTypes.instanceOf(Number),
-        included: PropTypes.interface({}).isOptional,
-        merged: PropTypes.interface({}).isOptional,
       };
       expect(Simple.prototype.getPropTypes()).to.be.eql(propTypes);
     });
 
     it(`returns prop types for complex configuration`, () => {
       const propTypes = {
+        schemaVersion: PropTypes.instanceOf(Number).isOptional,
         root: PropTypes.instanceOf(String),
         simple: PropTypes.shape({
+          schemaVersion: PropTypes.instanceOf(Number).isOptional,
           first: PropTypes.instanceOf(String),
           second: PropTypes.instanceOf(Number),
-          included: PropTypes.interface({}).isOptional,
-          merged: PropTypes.interface({}).isOptional,
         }),
         nested: PropTypes.shape({
           'nested-first': PropTypes.instanceOf(String),
@@ -167,15 +166,13 @@ describe(`Config`, () => {
             'nested-third': PropTypes.instanceOf(String),
           }),
         }),
-        included: PropTypes.interface({}).isOptional,
-        merged: PropTypes.interface({}).isOptional,
       };
       expect(Complex.prototype.getPropTypes()).to.be.eql(propTypes);
     });
   });
 
   describe('static constructor', () => {
-    @Type('Config.LoggingConfig')
+    @Type('Config.LoggingConfig', { isRegistrable: false })
     class LoggingConfig extends Config {
       isEnabled: boolean;
 
@@ -187,7 +184,7 @@ describe(`Config`, () => {
       }
     }
 
-    @Type('Config.AppConfig')
+    @Type('Config.AppConfig', { isRegistrable: false })
     class AppConfig extends Config {
       appId: string;
 
@@ -260,7 +257,7 @@ describe(`Config`, () => {
       });
 
       it(`returns default values as fallback from class property initializers`, () => {
-        @Type('Config.MyConfig')
+        @Type('Config.MyConfig', { isRegistrable: false })
         class MyConfig extends Config {
           foo = 'foo-default';
 
@@ -309,7 +306,7 @@ describe(`Config`, () => {
 
     describe('getDefault', () => {
       it(`returns default value from class initializing property`, () => {
-        @Type('Config.MyConfig')
+        @Type('Config.MyConfig', { isRegistrable: false })
         class MyConfig extends Config {
           foo = 'foo-default';
 
@@ -340,7 +337,7 @@ describe(`Config`, () => {
 
     describe('getExact', () => {
       it(`returns exact value from instance without fallback to defaults`, () => {
-        @Type('Config.MyConfig')
+        @Type('Config.MyConfig', { isRegistrable: false })
         class MyConfig extends Config {
           lorem: string;
 
@@ -376,7 +373,7 @@ describe(`Config`, () => {
   describe(`mutators`, () => {
     context('setting single value', () => {
       it(`throws ValidationError when trying to set a value that does not match prop types`, () => {
-        @Type('Config.MyConfig')
+        @Type('Config.MyConfig', { isRegistrable: false })
         class MyConfig extends Config {
           key?: string;
 
@@ -391,7 +388,7 @@ describe(`Config`, () => {
           config.set('key', 10);
         }).to.throw(
           ValidationError,
-          `Config.MyConfig: (Key 'key': Expected Number(10) to be a String in {"key":Number(10)})`
+          `Config.MyConfig: (Key 'key': Expected Number(10) to be a String in Config.MyConfig({"key":10}))`
         );
       });
 
@@ -433,7 +430,7 @@ describe(`Config`, () => {
     context('assigning multiple values', () => {
       it(`throws ValidationError when trying to assign properties that does not match
     prop types`, () => {
-        @Type('Config.MyConfig')
+        @Type('Config.MyConfig', { isRegistrable: false })
         class MyConfig extends Config {
           key?: string;
 
@@ -491,7 +488,7 @@ describe(`Config`, () => {
       });
 
       it(`assigns matching new properties that are optional on construction`, () => {
-        @Type('Config.MyConfig')
+        @Type('Config.MyConfig', { isRegistrable: false })
         class MyConfig extends Config {
           separator: string;
 
@@ -537,7 +534,7 @@ describe(`Config`, () => {
     });
 
     it('includes other configurable implementations', () => {
-      @Type('Config.First')
+      @Type('Config.First', { isRegistrable: false })
       class First extends Config {
         firstKey: string;
 
@@ -547,7 +544,7 @@ describe(`Config`, () => {
         }
       }
 
-      @Type('Config.Second')
+      @Type('Config.Second', { isRegistrable: false })
       class Second extends Config {
         secondKey: string;
 
@@ -561,15 +558,13 @@ describe(`Config`, () => {
       const second = new Second({ secondKey: 'second' });
       first.include(second);
 
-      expect(first.included).to.be.instanceof(Object);
-      expect(first.included).to.be.eql({ 'Config.Second': second });
       expect(first.get<string>('firstKey')).to.be.equal('first');
       expect(first.get<string>('secondKey')).to.be.equal('second');
     });
 
     describe('simple', () => {
       it('merges two configurations together while keeping parent properties precedence', () => {
-        @Type('Config.First')
+        @Type('Config.First', { isRegistrable: false })
         class First extends Config {
           key = 'first-key';
 
@@ -581,7 +576,7 @@ describe(`Config`, () => {
           }
         }
 
-        @Type('Config.Second')
+        @Type('Config.Second', { isRegistrable: false })
         class Second extends Config {
           key = 'second-key';
 
@@ -604,15 +599,13 @@ describe(`Config`, () => {
 
         first.merge(second);
         expect(first.getPropTypes()).to.be.eql({
-          included: PropTypes.interface({}).isOptional,
-          merged: PropTypes.interface({}).isOptional,
+          schemaVersion: PropTypes.instanceOf(Number).isOptional,
           foo: PropTypes.instanceOf(String),
           key: PropTypes.instanceOf(String),
           baz: PropTypes.instanceOf(String),
         });
 
         expect(first).to.be.eql({
-          merged: { 'Config.Second': second },
           foo: 'first-foo',
           baz: 'second-baz',
           key: 'first-key',
@@ -620,7 +613,7 @@ describe(`Config`, () => {
       });
 
       it('resolves default value from path through all available dependent configurations', () => {
-        @Type('Config.First')
+        @Type('Config.First', { isRegistrable: false })
         class First extends Config {
           foo?: string;
 
@@ -630,7 +623,7 @@ describe(`Config`, () => {
           }
         }
 
-        @Type('Config.Second')
+        @Type('Config.Second', { isRegistrable: false })
         class Second extends Config {
           foo = 'second-default-foo';
 
@@ -669,7 +662,7 @@ describe(`Config`, () => {
     });
 
     describe('simple with nested structs', () => {
-      @Type('MyFirst', { isRegistrable: false })
+      @Type('MyFirst', { isRegistrable: false }, { isRegistrable: false })
       class MyFirst extends Struct {
         value: string;
 
@@ -677,7 +670,7 @@ describe(`Config`, () => {
           super({ value });
         }
       }
-      @Type('MySecond', { isRegistrable: false })
+      @Type('MySecond', { isRegistrable: false }, { isRegistrable: false })
       class MySecond extends Struct {
         value: string;
 
@@ -687,7 +680,7 @@ describe(`Config`, () => {
       }
 
       it('merges two configurations together while keeping parent properties precedence', () => {
-        @Type('Config.First')
+        @Type('Config.First', { isRegistrable: false })
         class First extends Config {
           key = 'first-key';
 
@@ -699,7 +692,7 @@ describe(`Config`, () => {
           }
         }
 
-        @Type('Config.Second')
+        @Type('Config.Second', { isRegistrable: false })
         class Second extends Config {
           key = 'second-key';
 
@@ -722,14 +715,12 @@ describe(`Config`, () => {
 
         first.merge(second);
         expect(first.getPropTypes()).to.be.eql({
-          included: PropTypes.interface({}).isOptional,
-          merged: PropTypes.interface({}).isOptional,
+          schemaVersion: PropTypes.instanceOf(Number).isOptional,
           foo: PropTypes.instanceOf(MyFirst),
           key: PropTypes.instanceOf(String),
           baz: PropTypes.instanceOf(MySecond),
         });
         expect(first).to.be.eql({
-          merged: { 'Config.Second': second },
           foo: new MyFirst('first-foo'),
           baz: new MySecond('second-baz'),
           key: 'first-key',
@@ -737,7 +728,7 @@ describe(`Config`, () => {
       });
 
       it('merges two deeply nested configurations together while keeping parent properties precedence', () => {
-        @Type('Config.First')
+        @Type('Config.First', { isRegistrable: false })
         class First extends Config {
           key = 'first-key';
 
@@ -749,7 +740,7 @@ describe(`Config`, () => {
           }
         }
 
-        @Type('Config.Second')
+        @Type('Config.Second', { isRegistrable: false })
         class Second extends Config {
           I: {
             II: {
@@ -785,8 +776,7 @@ describe(`Config`, () => {
 
         first.merge(second);
         expect(first.getPropTypes()).to.be.eql({
-          included: PropTypes.interface({}).isOptional,
-          merged: PropTypes.interface({}).isOptional,
+          schemaVersion: PropTypes.instanceOf(Number).isOptional,
           foo: PropTypes.instanceOf(MyFirst),
           key: PropTypes.instanceOf(String),
           I: PropTypes.shape({
@@ -800,7 +790,6 @@ describe(`Config`, () => {
           }),
         });
         expect(first).to.be.eql({
-          merged: { 'Config.Second': second },
           foo: new MyFirst('first-foo'),
           key: 'first-key',
           I: {
@@ -818,7 +807,7 @@ describe(`Config`, () => {
 
     describe('complex', () => {
       it('merges complex nested prop types and properties with parent config that takes explicit precedence', () => {
-        @Type('Config.First')
+        @Type('Config.First', { isRegistrable: false })
         class First extends Config {
           I = 'first-I';
 
@@ -852,7 +841,7 @@ describe(`Config`, () => {
           }
         }
 
-        @Type('Config.Second')
+        @Type('Config.Second', { isRegistrable: false })
         class Second extends Config {
           I = 'second-I';
 
@@ -915,8 +904,7 @@ describe(`Config`, () => {
 
         first.merge(second);
         expect(first.getPropTypes()).to.be.eql({
-          included: PropTypes.interface({}).isOptional,
-          merged: PropTypes.interface({}).isOptional,
+          schemaVersion: PropTypes.instanceOf(Number).isOptional,
           I: PropTypes.instanceOf(String),
           II: PropTypes.shape({
             foo: PropTypes.instanceOf(String),
@@ -933,7 +921,6 @@ describe(`Config`, () => {
           }),
         });
         expect(first).to.be.eql({
-          merged: { 'Config.Second': second },
           I: 'first-I',
           II: {
             foo: 'first-foo',
@@ -954,7 +941,7 @@ describe(`Config`, () => {
       });
 
       it('resolves default value from path through all available dependent configurations', () => {
-        @Type('Config.First')
+        @Type('Config.First', { isRegistrable: false })
         class First extends Config {
           foo?: {
             baz?: {};
@@ -966,7 +953,7 @@ describe(`Config`, () => {
           }
         }
 
-        @Type('Config.Second')
+        @Type('Config.Second', { isRegistrable: false })
         class Second extends Config {
           foo?: {
             baz?: {
