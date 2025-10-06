@@ -27,8 +27,10 @@ chai.use(chaiAsPromised);
 describe(`CommitStore`, () => {
   @Type('CommitStore.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {}
+
   @Type('CommitStore.MyAggregate', { isRegistrable: false })
   class MyAggregate extends Aggregate {}
+
   @Type('CommitStore.MyProcess', { isRegistrable: false })
   class MyProcess extends Process {}
 
