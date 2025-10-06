@@ -58,6 +58,11 @@ export class EventSourceable
   constructor(props: types.Props) {
     const processedProps: types.Props = { version: 0, ...props };
     super(processedProps);
+
+    if (!this.id) {
+      this.construct({ version: 0, ...props });
+    }
+
     if (this.state !== undefined) {
       this.setState(this.state); // Ensure that state is valid
     }
@@ -95,6 +100,16 @@ export class EventSourceable
   }
 
   /**
+   * [OVERRIDE] Constructs EventSourceable.
+   * @param props - Properties of the type required for construction.
+   */
+  protected construct(props: types.Props = {}): void {
+    const processedProps = { version: 0, ...props };
+    // Process props through the hook system and assign to instance
+    Object.assign(this, this.processProps(processedProps));
+  }
+
+  /**
    * [OVERRIDE] Processes properties for `EventSourceable`.
    * @param props - Properties of the type required for construction.
    * @returns Processed properties with any registered `onConstruction` hooks.
@@ -103,7 +118,7 @@ export class EventSourceable
    */
   protected processProps(props: types.Props = {}): types.Props {
     const processedProps: types.Props = this.onConstruction(props);
-    // Skip validation
+    // Skip validation as intended
     return processedProps;
   }
 
