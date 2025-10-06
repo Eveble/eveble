@@ -1,5 +1,7 @@
+import { Type } from 'typend';
 import { types } from '../types';
 
+@Type()
 export class History extends Array {
   /**
    * Creates an instance of History.
