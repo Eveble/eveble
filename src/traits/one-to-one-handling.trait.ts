@@ -29,7 +29,6 @@ export const OneToOneHandlingTrait = trait([HandlingTrait], (base) => {
      * it ensures, that there is no leakage in between inheriting classes.
      */
     public initialize(): void {
-      console.log('wazaa');
       this.setupHandlers({
         handlers: this.handles(),
         handleableTypes: [Command],
