@@ -22,9 +22,3 @@ export class Service extends derive(CommandHandlingTrait, EventHandlingTrait) {
     this.setupEventHandlers();
   }
 }
-
-/*
-Fix for Inversify getClassPropsAsTargets function that can't resolve parent class constructor
-from mixed prototype.
-*/
-Object.getPrototypeOf(Service.prototype).constructor = Object;
