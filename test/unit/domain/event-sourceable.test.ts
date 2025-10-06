@@ -10,7 +10,6 @@ import { History } from '../../../src/domain/history';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { OneToOneHandlingTrait } from '../../../src/traits/one-to-one-handling.trait';
 import { Entity } from '../../../src/domain/entity';
-import { EVENTS_KEY, COMMANDS_KEY } from '../../../src/constants/literal-keys';
 import { Command, Assignment } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { handle } from '../../../src/annotations/handle';
@@ -281,8 +280,7 @@ describe(`EventSourceable`, () => {
         'state',
         'status',
         'metadata',
-        COMMANDS_KEY,
-        EVENTS_KEY,
+        'schemaVersion',
       ]);
     });
 
@@ -1275,17 +1273,6 @@ describe(`EventSourceable`, () => {
           expect(MyClass.resolveRoutedMessages()).to.be.eql([]);
         });
       });
-    });
-  });
-
-  describe('hooks', () => {
-    it('has convert-serializable-list hook applied', () => {
-      expect(
-        EventSourceable.prototype.hasHook(
-          'onConstruction',
-          'convert-serializable-list'
-        )
-      ).to.be.true;
     });
   });
 });
