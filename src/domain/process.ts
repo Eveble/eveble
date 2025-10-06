@@ -6,7 +6,6 @@ import { History } from './history';
 import { types } from '../types';
 import { Guid } from './value-objects/guid';
 import { InvalidInitializingMessageError } from './domain-errors';
-
 import { COMMANDS_KEY, EVENTS_KEY } from '../constants/literal-keys';
 
 @Type('Process')
@@ -50,8 +49,15 @@ export class Process extends EventSourceable {
    *```
    * @throws {InvalidInitializingMessageError}
    * Thrown if provided initializing message is not instance of `Command` or `Event`.
+   *
+   *
+   * @disclamer
+   * [⚠️ 🐛 ⚠️] defining History from './history'(that is extension of Array) inside
+   * constructor below will break the code during type mapping(!?) and throw
+   * error `ReferenceError: History is not defined`. Same will go for
+   * ReferenceError: Command is not defined
    */
-  constructor(arg: History | Command<{}> | Event<{}> | types.Props) {
+  constructor(arg: types.Command | types.Event | types.Event[] | types.Props) {
     // Build up Process props
     const props: Record<string, any> = {
       version: 0,

@@ -3,7 +3,6 @@ import { EventSourceable } from './event-sourceable';
 import { History } from './history';
 import { types } from '../types';
 import { Command } from '../components/command';
-
 import { InvalidInitializingMessageError } from './domain-errors';
 import { Event } from '../components/event';
 import { COMMANDS_KEY, EVENTS_KEY } from '../constants/literal-keys';
@@ -47,8 +46,15 @@ export class Aggregate extends EventSourceable {
    *```
    * @throws {InvalidInitializingMessageError}
    * Thrown if provided initializing message is not instance of `Command`.
+   *
+   * @disclamer
+   * [⚠️ 🐛 ⚠️] defining History from './history'(that is extension of Array) inside
+   * constructor below will break the code during type mapping(!?) and throw
+   * error `ReferenceError: History is not defined`. Same will go for
+   * ReferenceError: Command is not defined
    */
-  constructor(arg: History | Command<{}> | types.Props) {
+
+  constructor(arg: types.Command | types.Event[] | types.Props) {
     // Build up Aggregate props
     const props: Record<string, any> = {
       version: 0,
