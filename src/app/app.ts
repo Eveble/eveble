@@ -45,9 +45,15 @@ export class App extends BaseApp {
 
     const processedProps: types.ModuleProps = { ...props };
     if (isPlainObject(props.config)) {
-      processedProps.config = AppConfig.from(
-        props.config as Partial<AppConfig>
-      );
+      const configData = props.config as Partial<AppConfig>;
+      // Ensure logging is a LoggingConfig instance if it exists as plain object
+      if (
+        configData.logging &&
+        !(configData.logging instanceof LoggingConfig)
+      ) {
+        configData.logging = new LoggingConfig(configData.logging);
+      }
+      processedProps.config = AppConfig.from(configData);
     }
 
     if (props.config === undefined) {

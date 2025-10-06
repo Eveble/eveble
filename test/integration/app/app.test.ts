@@ -4,7 +4,7 @@ import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import Agenda from 'agenda';
 import { MongoClient, Collection, Db } from 'mongodb';
-import { Type, kernel } from '@eveble/core';
+import { kernel, Type } from '@eveble/core';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
@@ -71,7 +71,7 @@ describe(`App`, () => {
     it(`initializes configuration as AppConfig if plain object is passed`, () => {
       const config = {
         appId: 'my-custom-app-id',
-        logging: { isEnabled: false },
+        logging: new LoggingConfig({ isEnabled: false }),
       };
       const app = new App({ config });
       expect(app.config).to.be.instanceof(AppConfig);
