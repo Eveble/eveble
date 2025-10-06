@@ -17,12 +17,12 @@ import {
 export const HandlingTrait = trait(
   (base) =>
     class extends base {
-      protected [HANDLERS]: Map<
+      public [HANDLERS]: Map<
         types.MessageType<types.Message>,
         types.Handler | types.Handler[]
       >;
 
-      protected [HANDLEABLE_TYPES]: types.MessageType<types.Message>[];
+      public [HANDLEABLE_TYPES]: types.MessageType<types.Message>[];
 
       /**
        * Creates an instance of HandlingTrait.
@@ -65,7 +65,7 @@ export const HandlingTrait = trait(
        * controller.initialize();
        * ```
        */
-      protected setupHandlers(props: {
+      public setupHandlers(props: {
         handlers: Map<types.MessageType<types.Message>, types.Handler>;
         registrator?: Function;
         isBoundable?: boolean;

@@ -4,7 +4,10 @@ import { PropTypes } from 'typend';
 import { stubInterface } from 'ts-sinon';
 import { Type, kernel } from '@eveble/core';
 import { derive } from '@traits-ts/core';
-import { EXCLUDED_PROP_TYPES, TypeTrait } from '../../../src/traits/type.trait';
+import {
+  EXCLUDED_PROP_TYPES_KEY,
+  TypeTrait,
+} from '../../../src/traits/type.trait';
 import { types } from '../../../src/types';
 
 chai.use(sinonChai);
@@ -579,7 +582,7 @@ describe('TypeTrait', () => {
 
       @Type('PersonWithExclusions')
       class PersonWithExclusions extends derive(TypeTrait) {
-        static [EXCLUDED_PROP_TYPES] = ['internalKey'];
+        static [EXCLUDED_PROP_TYPES_KEY] = ['internalKey'];
 
         firstName: string;
 
@@ -627,7 +630,7 @@ describe('TypeTrait', () => {
 
       @Type('SecureClass')
       class SecureClass extends derive(TypeTrait) {
-        static [EXCLUDED_PROP_TYPES] = ['privateKey', 'internalId'];
+        static [EXCLUDED_PROP_TYPES_KEY] = ['privateKey', 'internalId'];
 
         publicKey: string;
 
@@ -667,7 +670,7 @@ describe('TypeTrait', () => {
 
       @Type('NoExclusions')
       class NoExclusions extends derive(TypeTrait) {
-        static [EXCLUDED_PROP_TYPES] = [];
+        static [EXCLUDED_PROP_TYPES_KEY] = [];
 
         firstName: string;
 
@@ -698,7 +701,7 @@ describe('TypeTrait', () => {
 
       @Type('StaticExclusionTest')
       class StaticExclusionTest extends derive(TypeTrait) {
-        static [EXCLUDED_PROP_TYPES] = ['hiddenKey'];
+        static [EXCLUDED_PROP_TYPES_KEY] = ['hiddenKey'];
 
         visibleKey: string;
 

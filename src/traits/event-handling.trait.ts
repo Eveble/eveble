@@ -23,7 +23,7 @@ export const EventHandlingTrait = trait([OneToManyHandlingTrait], (base) => {
     /**
      * Setup event handlers.
      */
-    protected setupEventHandlers(): void {
+    public setupEventHandlers(): void {
       this.setupHandlers({
         handlers: this.subscribes(),
         registrator: this.registerEventHandler.bind(this),

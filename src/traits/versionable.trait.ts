@@ -91,7 +91,7 @@ export const VersionableTrait = trait(
        * Returns current schema version.
        * @returns Current schema version as a number.
        */
-      protected getCurrentSchemaVersion(): number {
+      public getCurrentSchemaVersion(): number {
         const transformers: types.LegacyTransformers =
           this.getLegacyTransformers();
         if (transformers.size === 0) {
@@ -111,7 +111,7 @@ export const VersionableTrait = trait(
        * @param  currentVersion - Schema version of current type(class).
        * @returns Returns `true` if schema version is legacy, else `false`.
        */
-      protected isLegacySchemaVersion(
+      public isLegacySchemaVersion(
         instanceVersion: number,
         currentVersion: number
       ): boolean {
@@ -123,7 +123,7 @@ export const VersionableTrait = trait(
        * @param  instanceVersion - Schema version provided on properties that would be assigned to instance.
        * @return Calculated next schema version.
        */
-      protected calculateNextSchemaVersion(instanceVersion = 0): number {
+      public calculateNextSchemaVersion(instanceVersion = 0): number {
         return instanceVersion + 1;
       }
 

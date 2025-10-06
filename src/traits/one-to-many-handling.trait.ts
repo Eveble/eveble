@@ -18,10 +18,7 @@ import { Message } from '../components/message';
 
 export const OneToManyHandlingTrait = trait([HandlingTrait], (base) => {
   const klass = class extends base implements types.Controller {
-    protected [HANDLERS]: Map<
-      types.MessageType<types.Message>,
-      types.Handler[]
-    >;
+    public [HANDLERS]: Map<types.MessageType<types.Message>, types.Handler[]>;
 
     /**
      * Initializes OneToManyHandlingTrait.
@@ -191,7 +188,7 @@ export const OneToManyHandlingTrait = trait([HandlingTrait], (base) => {
      * @async
      * @param message - Type implementing `Messageable` interface.
      */
-    protected async handleSequential(message: types.Message): Promise<void> {
+    public async handleSequential(message: types.Message): Promise<void> {
       const handlers =
         this.getHandler(
           message.constructor as types.MessageType<types.Message>
@@ -206,7 +203,7 @@ export const OneToManyHandlingTrait = trait([HandlingTrait], (base) => {
      * @async
      * @param message - Type implementing `Messageable` interface.
      */
-    protected async handleConcurrent(message: types.Message): Promise<any> {
+    public async handleConcurrent(message: types.Message): Promise<any> {
       const handlers =
         this.getHandler(
           message.constructor as types.MessageType<types.Message>

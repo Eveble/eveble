@@ -1,8 +1,8 @@
 export const TYPE_KEY = '_type'; // Must be string, will be serializaed
 
-export const HANDLERS = Symbol('eveble:handlers');
+export const HANDLERS = 'eveble:handlers';
 
-export const HANDLEABLE_TYPES = Symbol('eveble:handleable-types');
+export const HANDLEABLE_TYPES = 'eveble:handleable-types';
 
 export const SOURCE_KEY = Symbol('eveble:source');
 

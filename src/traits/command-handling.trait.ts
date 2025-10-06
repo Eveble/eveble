@@ -23,7 +23,7 @@ export const CommandHandlingTrait = trait([OneToOneHandlingTrait], (base) => {
     /**
      * Setups command handlers.
      */
-    protected setupCommandHandlers(): void {
+    public setupCommandHandlers(): void {
       this.setupHandlers({
         handlers: this.handles(),
         registrator: this.registerCommandHandler.bind(this),

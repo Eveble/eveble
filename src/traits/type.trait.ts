@@ -9,14 +9,13 @@ import { types } from '../types';
 import { toPlainObject, isPlainRecord } from '../utils/record.helpers';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
-export const EXCLUDED_PROP_TYPES: unique symbol = Symbol(
-  'eveble:excluded-prop-types'
-);
+// Export as a regular property name instead of symbol to avoid TS4020 error
+export const EXCLUDED_PROP_TYPES_KEY = 'excludedPropTypes';
 
 export const TypeTrait = trait(
   (base) =>
     class extends base implements types.Typed {
-      public static [EXCLUDED_PROP_TYPES]?: string[] = [];
+      public static excludedPropTypes?: string[] = [];
 
       /**
        * Returns class properties types from whole inheritance tree.
@@ -43,7 +42,7 @@ export const TypeTrait = trait(
           this.constructor as typendTypes.Class
         );
         const props = classPattern.properties;
-        return omit(props, this.constructor[EXCLUDED_PROP_TYPES]);
+        return omit(props, this.constructor[EXCLUDED_PROP_TYPES_KEY]);
       }
 
       /**
@@ -84,7 +83,7 @@ export const TypeTrait = trait(
        * Returns default values metadata from property initializers conversion for this instance.
        * @returns Default values for properties.
        */
-      protected getInstanceInitializers(): types.Props {
+      public getInstanceInitializers(): types.Props {
         return Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) || {};
       }
 
@@ -92,7 +91,7 @@ export const TypeTrait = trait(
        * Returns default values metadata from property initializers conversion from parent classes.
        * @returns Default values for properties.
        */
-      protected getParentInitializers(): types.Props {
+      public getParentInitializers(): types.Props {
         // Support 'classes' from 'polytype' for multi inheritance(mixin/traits etc.)
         const matcher = (evaluatedProto: types.Prototype): boolean =>
           typeof evaluatedProto.getInstanceInitializers === 'function';
@@ -232,7 +231,7 @@ export const TypeTrait = trait(
        * @param  other - Other instance of TypeTrait.
        * @returns Returns `true` if other instance of TypeTrait has same values, else `false`.
        */
-      protected hasSameValues(other: types.Typed): boolean {
+      public hasSameValues(other: types.Typed): boolean {
         let hasSameValues = true;
         for (const key in this.getPropTypes()) {
           if (typeof this[key]?.equals === 'function') {

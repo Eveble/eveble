@@ -19,7 +19,7 @@ import { Message } from '../components/message';
 
 export const OneToOneHandlingTrait = trait([HandlingTrait], (base) => {
   const klass = class extends base implements types.Controller {
-    protected [HANDLERS]: Map<types.MessageType<types.Message>, types.Handler>;
+    public [HANDLERS]: Map<types.MessageType<types.Message>, types.Handler>;
 
     /**
      * Initializes OneToOneHandlingTrait.
