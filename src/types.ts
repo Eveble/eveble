@@ -12,6 +12,7 @@ import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
 } from './constants/literal-keys';
+import { Guid } from './domain/value-objects/guid';
 
 /*
 https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines
@@ -37,10 +38,16 @@ export namespace types {
     new (...args: any[]): T;
   }
 
-  export type NonMethodKeys<T> = {
-    [P in keyof T]: T[P] extends Function ? never : P;
+  type AllPropertyKeys<T> = T extends any ? keyof T : never;
+
+  type NonMethodKeys<T> = {
+    [K in keyof T]: T[K] extends Function ? never : K;
   }[keyof T];
-  export type ConstructorType<T> = Pick<T, NonMethodKeys<T>>;
+
+  // Recursively get constructor properties including from base classes
+  export type ConstructorType<T> = {
+    [K in AllPropertyKeys<T> as K extends NonMethodKeys<T> ? K : never]: T[K];
+  };
 
   export type AnyFunction = (...args: any[]) => any;
 
@@ -597,6 +604,7 @@ export namespace types {
     deleteBy(key: string, value: any): void;
     first(): T | undefined;
     last(): T | undefined;
+    toPlainObject(): any[];
   }
 
   export interface Assertion {
