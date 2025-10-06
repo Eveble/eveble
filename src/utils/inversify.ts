@@ -1,5 +1,19 @@
 import 'reflect-metadata';
 
+const METADATA_KEY = {
+  NAMED_TAG: 'named',
+  NAME_TAG: 'name',
+  UNMANAGED_TAG: 'unmanaged',
+  OPTIONAL_TAG: 'optional',
+  INJECT_TAG: 'inject',
+  MULTI_INJECT_TAG: 'multi_inject',
+  TAGGED: 'inversify:tagged',
+  TAGGED_PROP: 'inversify:tagged_props',
+  PARAM_TYPES: 'inversify:paramtypes',
+  DESIGN_PARAM_TYPES: 'design:paramtypes',
+  POST_CONSTRUCT: 'post_construct',
+  PRE_DESTROY: 'pre_destroy',
+};
 /**
  * InversifyJS metadata keys (v7+)
  */
@@ -39,6 +53,31 @@ export function getInversifyMetadata(
 }
 
 /**
+ * Walk up the prototype chain and collect metadata from all ancestors
+ */
+function getMetadataFromInheritanceChain(
+  target: any
+): InversifyClassMetadata[] {
+  const metadataList: InversifyClassMetadata[] = [];
+  let currentTarget = target;
+
+  // Walk up the prototype chain
+  while (
+    currentTarget &&
+    currentTarget !== Object &&
+    currentTarget !== Function.prototype
+  ) {
+    const metadata = getInversifyMetadata(currentTarget);
+    if (metadata) {
+      metadataList.push(metadata);
+    }
+    currentTarget = Object.getPrototypeOf(currentTarget);
+  }
+
+  return metadataList;
+}
+
+/**
  * Check if class is injectable
  */
 export function isInjectableClass(target: any): boolean {
@@ -46,16 +85,21 @@ export function isInjectableClass(target: any): boolean {
 }
 
 /**
- * Get all property names that have @inject decorator
+ * Get all property names that have @inject decorator (from entire inheritance chain)
  */
 export function getInjectedPropertyNames(target: any): string[] {
-  const metadata = getInversifyMetadata(target);
+  const metadataList = getMetadataFromInheritanceChain(target);
+  const propertyNames = new Set<string>();
 
-  if (!metadata || !metadata.properties) {
-    return [];
+  for (const metadata of metadataList) {
+    if (metadata?.properties) {
+      for (const propName of metadata.properties.keys()) {
+        propertyNames.add(propName);
+      }
+    }
   }
 
-  return Array.from(metadata.properties.keys());
+  return Array.from(propertyNames);
 }
 
 /**
@@ -74,7 +118,7 @@ export function getInjectedParameterIndices(target: any): number[] {
 }
 
 /**
- * Get details about injected properties
+ * Get details about injected properties (from entire inheritance chain)
  */
 export function getInjectedPropertyDetails(target: any): Map<
   string,
@@ -85,66 +129,93 @@ export function getInjectedPropertyDetails(target: any): Map<
     tags: Map<any, any>;
   }
 > {
-  const metadata = getInversifyMetadata(target);
-
-  if (!metadata || !metadata.properties) {
-    return new Map();
-  }
-
+  const metadataList = getMetadataFromInheritanceChain(target);
   const result = new Map();
 
-  for (const [propName, propMetadata] of metadata.properties.entries()) {
-    result.set(propName, {
-      serviceIdentifier: propMetadata.value,
-      optional: propMetadata.optional,
-      name: propMetadata.name,
-      tags: propMetadata.tags,
-    });
+  // Collect from parent to child (child overrides parent)
+  for (let i = metadataList.length - 1; i >= 0; i--) {
+    const metadata = metadataList[i];
+    if (metadata?.properties) {
+      for (const [propName, propMetadata] of metadata.properties.entries()) {
+        result.set(propName, {
+          serviceIdentifier: propMetadata.value,
+          optional: propMetadata.optional,
+          name: propMetadata.name,
+          tags: propMetadata.tags,
+        });
+      }
+    }
   }
 
   return result;
 }
 
 /**
- * Check if class has @postConstruct decorator
+ * Check if class has @postConstruct decorator (checks entire inheritance chain)
  */
 export function hasPostConstruct(target: any): boolean {
-  const metadata: any = getInversifyMetadata(target);
-  return metadata?.lifecycle?.postConstructMethodNames?.size > 0 ?? false;
+  const metadataList = getMetadataFromInheritanceChain(target);
+
+  for (const metadata of metadataList) {
+    if (metadata?.lifecycle?.postConstructMethodNames?.size > 0) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
- * Get all @postConstruct method names
+ * Get all @postConstruct method names (from entire inheritance chain)
  */
 export function getPostConstructMethodNames(target: any): string[] {
-  const metadata = getInversifyMetadata(target);
+  const metadataList = getMetadataFromInheritanceChain(target);
+  const methodNames = new Set<string>();
 
-  if (!metadata?.lifecycle?.postConstructMethodNames) {
-    return [];
+  // Collect from all levels of inheritance
+  for (const metadata of metadataList) {
+    if (metadata?.lifecycle?.postConstructMethodNames) {
+      for (const methodName of metadata.lifecycle.postConstructMethodNames) {
+        methodNames.add(methodName);
+      }
+    }
   }
 
-  return Array.from(metadata.lifecycle.postConstructMethodNames);
+  return Array.from(methodNames);
 }
 
 /**
- * Check if class has @preDestroy decorator
+ * Check if class has @preDestroy decorator (checks entire inheritance chain)
  */
 export function hasPreDestroy(target: any): boolean {
-  const metadata: any = getInversifyMetadata(target);
-  return metadata?.lifecycle?.preDestroyMethodNames?.size > 0 ?? false;
+  const metadataList = getMetadataFromInheritanceChain(target);
+
+  for (const metadata of metadataList) {
+    if (metadata?.lifecycle?.preDestroyMethodNames?.size > 0) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
- * Get all @preDestroy method names
+ * Get all @preDestroy method names (from entire inheritance chain)
  */
 export function getPreDestroyMethodNames(target: any): string[] {
-  const metadata = getInversifyMetadata(target);
+  const metadataList = getMetadataFromInheritanceChain(target);
+  const methodNames = new Set<string>();
 
-  if (!metadata?.lifecycle?.preDestroyMethodNames) {
-    return [];
+  // Collect from all levels of inheritance
+  for (const metadata of metadataList) {
+    if (metadata?.lifecycle?.preDestroyMethodNames) {
+      for (const methodName of metadata.lifecycle.preDestroyMethodNames) {
+        methodNames.add(methodName);
+      }
+    }
   }
 
-  return Array.from(metadata.lifecycle.preDestroyMethodNames);
+  return Array.from(methodNames);
 }
 
 /**
@@ -178,58 +249,73 @@ export function debugInversifyMetadata(target: any): void {
   console.log('Target:', target.name);
   console.log('Is Injectable:', isInjectableClass(target));
 
-  const metadata = getInversifyMetadata(target);
-  if (!metadata) {
-    console.log('No InversifyJS metadata found');
-    return;
-  }
+  const metadataList = getMetadataFromInheritanceChain(target);
 
-  console.log('\nInjected Properties:');
-  if (metadata.properties.size === 0) {
-    console.log('  (none)');
-  } else {
-    for (const [name, details] of metadata.properties.entries()) {
-      console.log(`  - ${name}:`, {
-        serviceId: details.value,
-        optional: details.optional,
-        name: details.name,
-        tags: Array.from(details.tags.entries()),
+  console.log(`\nInheritance chain depth: ${metadataList.length}`);
+
+  metadataList.forEach((metadata, index) => {
+    console.log(`\n--- Level ${index} ---`);
+
+    console.log('Injected Properties:');
+    if (metadata.properties.size === 0) {
+      console.log('  (none)');
+    } else {
+      for (const [name, details] of metadata.properties.entries()) {
+        console.log(`  - ${name}:`, {
+          serviceId: details.value,
+          optional: details.optional,
+          name: details.name,
+          tags: Array.from(details.tags.entries()),
+        });
+      }
+    }
+
+    console.log('Constructor Arguments:');
+    if (metadata.constructorArguments.length === 0) {
+      console.log('  (none)');
+    } else {
+      metadata.constructorArguments.forEach((arg, idx) => {
+        console.log(`  [${idx}]:`, arg);
       });
     }
-  }
 
-  console.log('\nConstructor Arguments:');
-  if (metadata.constructorArguments.length === 0) {
-    console.log('  (none)');
-  } else {
-    metadata.constructorArguments.forEach((arg, index) => {
-      console.log(`  [${index}]:`, arg);
-    });
-  }
+    console.log('Lifecycle Hooks:');
+    console.log(
+      '  @postConstruct:',
+      Array.from(metadata.lifecycle.postConstructMethodNames)
+    );
+    console.log(
+      '  @preDestroy:',
+      Array.from(metadata.lifecycle.preDestroyMethodNames)
+    );
 
-  console.log('\nLifecycle Hooks:');
-  console.log(
-    '  @postConstruct:',
-    Array.from(metadata.lifecycle.postConstructMethodNames)
-  );
-  console.log(
-    '  @preDestroy:',
-    Array.from(metadata.lifecycle.preDestroyMethodNames)
-  );
-
-  console.log('\nScope:', metadata.scope);
+    console.log('Scope:', metadata.scope);
+  });
 }
 
-// ============================================
-// PRACTICAL HELPER FUNCTIONS
-// ============================================
-
 /**
- * Get all own properties of a class (excluding constructor)
+ * Get all own properties of a class including inherited ones (excluding constructor)
  */
 export function getAllClassProperties(target: any): string[] {
-  const props = Object.getOwnPropertyNames(target.prototype);
-  return props.filter((p) => p !== 'constructor');
+  const props = new Set<string>();
+  let currentTarget = target;
+
+  // Walk up the prototype chain
+  while (
+    currentTarget &&
+    currentTarget !== Object &&
+    currentTarget !== Function.prototype
+  ) {
+    const ownProps = Object.getOwnPropertyNames(currentTarget.prototype);
+    ownProps.forEach((prop) => {
+      if (prop !== 'constructor') {
+        props.add(prop);
+      }
+    });
+    currentTarget = Object.getPrototypeOf(currentTarget);
+  }
+
+  return Array.from(props);
 }
 
 /**
@@ -256,4 +342,37 @@ export function getPropertiesToValidate(target: any): string[] {
 export function isPropertyInjected(target: any, propertyName: string): boolean {
   const injectedProps = getInjectedPropertyNames(target);
   return injectedProps.includes(propertyName);
+}
+
+/**
+ * Manually registers a method as a @postConstruct hook for InversifyJS
+ * This mimics what the @postConstruct decorator does internally
+ */
+export function registerPostConstruct(target: any, methodName: string): void {
+  const proto = target.prototype || target;
+
+  // Get existing post construct methods
+  let currentMetadata: string[] = Reflect.hasMetadata(
+    METADATA_KEY.POST_CONSTRUCT,
+    proto
+  )
+    ? Reflect.getMetadata(METADATA_KEY.POST_CONSTRUCT, proto)
+    : [];
+
+  // Ensure it's an array
+  if (!Array.isArray(currentMetadata)) {
+    currentMetadata = [];
+  }
+
+  // Add the method name if not already present
+  if (!currentMetadata.includes(methodName)) {
+    currentMetadata.push(methodName);
+  }
+
+  // Define the metadata on the prototype
+  Reflect.defineMetadata(METADATA_KEY.POST_CONSTRUCT, currentMetadata, proto);
+
+  console.log(
+    `Registered postConstruct for ${proto.constructor.name}.${methodName}`
+  );
 }

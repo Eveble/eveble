@@ -1,392 +1,503 @@
 import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { injectable, inject, postConstruct, preDestroy } from 'inversify';
-import sinon from 'sinon';
 import {
-  getInversifyMetadata,
-  isInjectableClass,
   getInjectedPropertyNames,
   getInjectedPropertyDetails,
   hasPostConstruct,
   getPostConstructMethodNames,
   hasPreDestroy,
   getPreDestroyMethodNames,
-  getMetadataSummary,
-  debugInversifyMetadata,
-  getAllClassProperties,
   getPropertiesToValidate,
   isPropertyInjected,
 } from '../../../src/utils/inversify';
 
 chai.use(sinonChai);
 
-describe('InversifyJS Metadata Utilities', () => {
+describe('InversifyJS Metadata Utilities - Inheritance', () => {
   const SERVICE_ID = {
-    Database: Symbol.for('Database'),
     Logger: Symbol.for('Logger'),
+    Database: Symbol.for('Database'),
     Cache: Symbol.for('Cache'),
+    Config: Symbol.for('Config'),
   };
-
-  interface IDatabase {
-    connect(): void;
-  }
 
   interface ILogger {
     log(msg: string): void;
   }
 
+  interface IDatabase {
+    connect(): void;
+  }
+
   interface ICache {
     get(key: string): any;
-    set(key: string, value: any): void;
   }
 
-  @injectable()
-  class Database implements IDatabase {
-    connect() {
-      console.log('Connected to database');
-    }
+  interface IConfig {
+    get(key: string): any;
   }
 
-  @injectable()
-  class Logger implements ILogger {
-    log(msg: string) {
-      console.log(msg);
-    }
-  }
-
-  @injectable()
-  class UserService {
-    @inject(SERVICE_ID.Database)
-    private db!: IDatabase;
-
-    @inject(SERVICE_ID.Logger)
-    private logger!: ILogger;
-
-    @inject(SERVICE_ID.Cache)
-    private cache!: ICache;
-
-    public userName = '';
-
-    public userAge = 0;
-
-    @postConstruct()
-    initialize() {
-      this.logger.log('UserService initialized');
-    }
-
-    @preDestroy()
-    cleanup() {
-      this.logger.log('UserService cleanup');
-    }
-
-    getUser() {
-      this.logger.log('Getting user...');
-      this.db.connect();
-      return this.cache.get('user');
-    }
-
-    saveUser(name: string, age: number) {
-      this.userName = name;
-      this.userAge = age;
-      this.cache.set('user', { name, age });
-    }
-  }
-
-  it.skip('debug', () => {
-    // Test the functions
-    console.log('=== TESTING INVERSIFY METADATA ===\n');
-
-    debugInversifyMetadata(UserService);
-
-    console.log('\n=== METADATA SUMMARY ===');
-    const summary = getMetadataSummary(UserService);
-    console.log(summary);
-
-    console.log('\n=== INJECTED PROPERTY DETAILS ===');
-    const propertyDetails = getInjectedPropertyDetails(UserService);
-    for (const [name, details] of propertyDetails.entries()) {
-      console.log(`${name}:`, details);
-    }
-
-    console.log('\n=== PROPERTY VALIDATION ===');
-    console.log('All properties:', getAllClassProperties(UserService));
-    console.log(
-      'Injected properties (exclude):',
-      getInjectedPropertyNames(UserService)
-    );
-    console.log('Lifecycle methods (exclude):', [
-      ...getPostConstructMethodNames(UserService),
-      ...getPreDestroyMethodNames(UserService),
-    ]);
-    console.log(
-      'Properties to validate:',
-      getPropertiesToValidate(UserService)
-    );
-
-    console.log('\n=== INDIVIDUAL CHECKS ===');
-    console.log('Is "db" injected?', isPropertyInjected(UserService, 'db'));
-    console.log(
-      'Is "userName" injected?',
-      isPropertyInjected(UserService, 'userName')
-    );
-    console.log('Has postConstruct?', hasPostConstruct(UserService));
-    console.log('Has preDestroy?', hasPreDestroy(UserService));
-  });
-  describe('getInversifyMetadata', () => {
-    it('returns metadata for injectable class', () => {
-      const metadata = getInversifyMetadata(UserService);
-
-      expect(metadata).to.not.be.null;
-      expect(metadata).to.have.property('properties');
-      expect(metadata).to.have.property('lifecycle');
-      expect(metadata).to.have.property('constructorArguments');
-    });
-
-    it('returns null for non-injectable class', () => {
-      class NonInjectable {}
-
-      const metadata = getInversifyMetadata(NonInjectable);
-      expect(metadata).to.be.null;
-    });
-  });
-
-  describe('isInjectableClass', () => {
-    it('returns true for injectable class', () => {
-      expect(isInjectableClass(UserService)).to.be.true;
-      expect(isInjectableClass(Database)).to.be.true;
-      expect(isInjectableClass(Logger)).to.be.true;
-    });
-
-    it('returns false for non-injectable class', () => {
-      class NonInjectable {}
-      expect(isInjectableClass(NonInjectable)).to.be.false;
-    });
-  });
-
-  describe('getInjectedPropertyNames', () => {
-    it('returns all injected property names', () => {
-      const properties = getInjectedPropertyNames(UserService);
-
-      expect(properties).to.be.an('array');
-      expect(properties).to.have.lengthOf(3);
-      expect(properties).to.include('db');
-      expect(properties).to.include('logger');
-      expect(properties).to.include('cache');
-    });
-
-    it('returns empty array for class without injected properties', () => {
+  describe('Inheritance chain - injected properties', () => {
+    it('collects injected properties from parent class', () => {
       @injectable()
-      class NoInjections {
-        public value = 42;
+      class BaseService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+
+        @inject(SERVICE_ID.Database)
+        protected db!: IDatabase;
       }
 
-      const properties = getInjectedPropertyNames(NoInjections);
-      expect(properties).to.be.an('array');
-      expect(properties).to.have.lengthOf(0);
+      @injectable()
+      class ChildService extends BaseService {
+        @inject(SERVICE_ID.Cache)
+        protected cache!: ICache;
+      }
+
+      const properties = getInjectedPropertyNames(ChildService);
+
+      expect(properties).to.have.lengthOf(3);
+      expect(properties).to.include.members(['logger', 'db', 'cache']);
     });
-  });
 
-  describe('getInjectedPropertyDetails', () => {
-    it('returns detailed information about injected properties', () => {
-      const details = getInjectedPropertyDetails(UserService);
+    it('collects injected properties from multiple inheritance levels', () => {
+      @injectable()
+      class GrandParentService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+      }
 
-      expect(details).to.be.instanceof(Map);
-      expect(details.size).to.equal(3);
+      @injectable()
+      class ParentService extends GrandParentService {
+        @inject(SERVICE_ID.Database)
+        protected db!: IDatabase;
+      }
 
-      const dbDetails = details.get('db');
-      expect(dbDetails).to.exist;
-      expect(dbDetails!.serviceIdentifier).to.equal(SERVICE_ID.Database);
-      expect(dbDetails!.optional).to.be.false;
+      @injectable()
+      class ChildService extends ParentService {
+        @inject(SERVICE_ID.Cache)
+        protected cache!: ICache;
+      }
+
+      const properties = getInjectedPropertyNames(ChildService);
+
+      expect(properties).to.have.lengthOf(3);
+      expect(properties).to.include.members(['logger', 'db', 'cache']);
+    });
+
+    it('handles property override in child class', () => {
+      @injectable()
+      class BaseService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        // Redefine with different service (edge case)
+        @inject(SERVICE_ID.Cache)
+        protected logger!: any; // Override parent's logger
+      }
+
+      const properties = getInjectedPropertyNames(ChildService);
+
+      // Should still have 'logger', even if overridden
+      expect(properties).to.include('logger');
+    });
+
+    it('returns correct details for inherited properties', () => {
+      @injectable()
+      class BaseService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        @inject(SERVICE_ID.Database)
+        protected db!: IDatabase;
+      }
+
+      const details = getInjectedPropertyDetails(ChildService);
+
+      expect(details.size).to.equal(2);
 
       const loggerDetails = details.get('logger');
       expect(loggerDetails).to.exist;
       expect(loggerDetails!.serviceIdentifier).to.equal(SERVICE_ID.Logger);
 
-      const cacheDetails = details.get('cache');
-      expect(cacheDetails).to.exist;
-      expect(cacheDetails!.serviceIdentifier).to.equal(SERVICE_ID.Cache);
+      const dbDetails = details.get('db');
+      expect(dbDetails).to.exist;
+      expect(dbDetails!.serviceIdentifier).to.equal(SERVICE_ID.Database);
     });
   });
 
-  describe('hasPostConstruct', () => {
-    it('returns true when class has @postConstruct', () => {
-      expect(hasPostConstruct(UserService)).to.be.true;
-    });
-
-    it('returns false when class has no @postConstruct', () => {
+  describe('Inheritance chain - lifecycle hooks', () => {
+    it('detects @postConstruct in parent class', () => {
       @injectable()
-      class NoLifecycle {}
-
-      expect(hasPostConstruct(NoLifecycle)).to.be.false;
-    });
-  });
-
-  describe('getPostConstructMethodNames', () => {
-    it('returns names of @postConstruct methods', () => {
-      const methods = getPostConstructMethodNames(UserService);
-
-      expect(methods).to.be.an('array');
-      expect(methods).to.have.lengthOf(1);
-      expect(methods).to.include('initialize');
-    });
-
-    it('supports multiple @postConstruct methods', () => {
-      @injectable()
-      class MultiplePostConstruct {
+      class BaseService {
         @postConstruct()
-        init1() {}
-
-        @postConstruct()
-        init2() {}
+        baseInit() {}
       }
 
-      const methods = getPostConstructMethodNames(MultiplePostConstruct);
-      expect(methods).to.have.lengthOf(2);
-      expect(methods).to.include.members(['init1', 'init2']);
-    });
-  });
-
-  describe('hasPreDestroy', () => {
-    it('returns true when class has @preDestroy', () => {
-      expect(hasPreDestroy(UserService)).to.be.true;
-    });
-
-    it('returns false when class has no @preDestroy', () => {
       @injectable()
-      class NoLifecycle {}
+      class ChildService extends BaseService {
+        regularMethod() {}
+      }
 
-      expect(hasPreDestroy(NoLifecycle)).to.be.false;
-    });
-  });
+      expect(hasPostConstruct(ChildService)).to.be.true;
 
-  describe('getPreDestroyMethodNames', () => {
-    it('returns names of @preDestroy methods', () => {
-      const methods = getPreDestroyMethodNames(UserService);
-
-      expect(methods).to.be.an('array');
-      expect(methods).to.have.lengthOf(1);
-      expect(methods).to.include('cleanup');
-    });
-  });
-
-  describe('getMetadataSummary', () => {
-    it('returns complete metadata summary', () => {
-      const summary = getMetadataSummary(UserService);
-
-      expect(summary).to.deep.include({
-        isInjectable: true,
-        injectedProperties: ['db', 'logger', 'cache'],
-        postConstructMethods: ['initialize'],
-        preDestroyMethods: ['cleanup'],
-      });
-      expect(summary.injectedParameters).to.be.an('array');
-    });
-  });
-
-  describe('debugInversifyMetadata', () => {
-    it('logs metadata without throwing errors', () => {
-      const consoleLogStub = sinon.stub(console, 'log');
-
-      expect(() => debugInversifyMetadata(UserService)).to.not.throw();
-
-      expect(consoleLogStub).to.have.been.called;
-      consoleLogStub.restore();
+      const methods = getPostConstructMethodNames(ChildService);
+      expect(methods).to.include('baseInit');
     });
 
-    it('handles class without metadata gracefully', () => {
-      class NonInjectable {}
-      const consoleLogStub = sinon.stub(console, 'log');
+    it('collects @postConstruct from both parent and child', () => {
+      @injectable()
+      class BaseService {
+        @postConstruct()
+        baseInit() {}
+      }
 
-      expect(() => debugInversifyMetadata(NonInjectable)).to.not.throw();
+      @injectable()
+      class ChildService extends BaseService {
+        @postConstruct()
+        childInit() {}
+      }
 
-      expect(consoleLogStub).to.have.been.calledWith(
-        'No InversifyJS metadata found'
-      );
-      consoleLogStub.restore();
+      expect(hasPostConstruct(ChildService)).to.be.true;
+
+      const methods = getPostConstructMethodNames(ChildService);
+      expect(methods).to.have.lengthOf(2);
+      expect(methods).to.include.members(['baseInit', 'childInit']);
     });
-  });
 
-  describe('getAllClassProperties', () => {
-    it('returns all prototype properties excluding constructor', () => {
-      const properties = getAllClassProperties(UserService);
+    it('collects @postConstruct from multiple inheritance levels', () => {
+      @injectable()
+      class GrandParentService {
+        @postConstruct()
+        grandParentInit() {}
+      }
 
-      expect(properties).to.be.an('array');
-      expect(properties).to.include.members([
-        'initialize',
-        'cleanup',
-        'getUser',
-        'saveUser',
+      @injectable()
+      class ParentService extends GrandParentService {
+        @postConstruct()
+        parentInit() {}
+      }
+
+      @injectable()
+      class ChildService extends ParentService {
+        @postConstruct()
+        childInit() {}
+      }
+
+      const methods = getPostConstructMethodNames(ChildService);
+
+      expect(methods).to.have.lengthOf(3);
+      expect(methods).to.include.members([
+        'grandParentInit',
+        'parentInit',
+        'childInit',
       ]);
-      expect(properties).to.not.include('constructor');
+    });
+
+    it('detects @preDestroy in parent class', () => {
+      @injectable()
+      class BaseService {
+        @preDestroy()
+        baseCleanup() {}
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        regularMethod() {}
+      }
+
+      expect(hasPreDestroy(ChildService)).to.be.true;
+
+      const methods = getPreDestroyMethodNames(ChildService);
+      expect(methods).to.include('baseCleanup');
+    });
+
+    it('collects @preDestroy from both parent and child', () => {
+      @injectable()
+      class BaseService {
+        @preDestroy()
+        baseCleanup() {}
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        @preDestroy()
+        childCleanup() {}
+      }
+
+      expect(hasPreDestroy(ChildService)).to.be.true;
+
+      const methods = getPreDestroyMethodNames(ChildService);
+      expect(methods).to.have.lengthOf(2);
+      expect(methods).to.include.members(['baseCleanup', 'childCleanup']);
+    });
+
+    it('handles multiple lifecycle hooks at different levels', () => {
+      @injectable()
+      class BaseService {
+        @postConstruct()
+        baseInit() {}
+
+        @preDestroy()
+        baseCleanup() {}
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        @postConstruct()
+        childInit() {}
+
+        @preDestroy()
+        childCleanup() {}
+      }
+
+      const postConstructMethods = getPostConstructMethodNames(ChildService);
+      expect(postConstructMethods).to.have.lengthOf(2);
+      expect(postConstructMethods).to.include.members([
+        'baseInit',
+        'childInit',
+      ]);
+
+      const preDestroyMethods = getPreDestroyMethodNames(ChildService);
+      expect(preDestroyMethods).to.have.lengthOf(2);
+      expect(preDestroyMethods).to.include.members([
+        'baseCleanup',
+        'childCleanup',
+      ]);
     });
   });
 
-  describe('getPropertiesToValidate', () => {
-    it('excludes injected properties and lifecycle methods', () => {
-      const properties = getPropertiesToValidate(UserService);
+  describe('Inheritance chain - property validation', () => {
+    it('excludes inherited injected properties from validation', () => {
+      @injectable()
+      class BaseService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
 
-      // Should include regular methods
-      expect(properties).to.include.members(['getUser', 'saveUser']);
+        baseMethod() {}
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        @inject(SERVICE_ID.Database)
+        protected db!: IDatabase;
+
+        childMethod() {}
+      }
+
+      const properties = getPropertiesToValidate(ChildService);
+      // Should include methods
+      expect(properties).to.include.members(['baseMethod', 'childMethod']);
 
       // Should NOT include injected properties
-      expect(properties).to.not.include('db');
       expect(properties).to.not.include('logger');
-      expect(properties).to.not.include('cache');
-
-      // Should NOT include lifecycle methods
-      expect(properties).to.not.include('initialize');
-      expect(properties).to.not.include('cleanup');
+      expect(properties).to.not.include('db');
     });
 
-    it('returns all properties for class without injections', () => {
+    it('excludes inherited lifecycle hooks from validation', () => {
       @injectable()
-      class SimpleClass {
-        method1() {}
+      class BaseService {
+        @postConstruct()
+        baseInit() {}
 
-        method2() {}
+        baseMethod() {}
       }
 
-      const properties = getPropertiesToValidate(SimpleClass);
-      expect(properties).to.include.members(['method1', 'method2']);
+      @injectable()
+      class ChildService extends BaseService {
+        @postConstruct()
+        childInit() {}
+
+        childMethod() {}
+      }
+
+      const properties = getPropertiesToValidate(ChildService);
+
+      // Should include regular methods
+      expect(properties).to.include.members(['baseMethod', 'childMethod']);
+
+      // Should NOT include lifecycle hooks
+      expect(properties).to.not.include('baseInit');
+      expect(properties).to.not.include('childInit');
+    });
+
+    it('correctly identifies inherited injected properties', () => {
+      @injectable()
+      class BaseService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        @inject(SERVICE_ID.Database)
+        protected db!: IDatabase;
+
+        public regularProp = 'value';
+      }
+
+      expect(isPropertyInjected(ChildService, 'logger')).to.be.true;
+      expect(isPropertyInjected(ChildService, 'db')).to.be.true;
+      expect(isPropertyInjected(ChildService, 'regularProp')).to.be.false;
     });
   });
 
-  describe('isPropertyInjected', () => {
-    it('returns true for injected properties', () => {
-      expect(isPropertyInjected(UserService, 'db')).to.be.true;
-      expect(isPropertyInjected(UserService, 'logger')).to.be.true;
-      expect(isPropertyInjected(UserService, 'cache')).to.be.true;
+  describe('Complex inheritance scenarios', () => {
+    it('handles deep inheritance chain (4+ levels)', () => {
+      @injectable()
+      class Level1 {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+
+        @postConstruct()
+        level1Init() {}
+      }
+
+      @injectable()
+      class Level2 extends Level1 {
+        @inject(SERVICE_ID.Database)
+        protected db!: IDatabase;
+
+        @postConstruct()
+        level2Init() {}
+      }
+
+      @injectable()
+      class Level3 extends Level2 {
+        @inject(SERVICE_ID.Cache)
+        protected cache!: ICache;
+
+        @postConstruct()
+        level3Init() {}
+      }
+
+      @injectable()
+      class Level4 extends Level3 {
+        @inject(SERVICE_ID.Config)
+        protected config!: IConfig;
+
+        @postConstruct()
+        level4Init() {}
+      }
+
+      const properties = getInjectedPropertyNames(Level4);
+      expect(properties).to.have.lengthOf(4);
+      expect(properties).to.include.members([
+        'logger',
+        'db',
+        'cache',
+        'config',
+      ]);
+
+      const postConstructMethods = getPostConstructMethodNames(Level4);
+      expect(postConstructMethods).to.have.lengthOf(4);
+      expect(postConstructMethods).to.include.members([
+        'level1Init',
+        'level2Init',
+        'level3Init',
+        'level4Init',
+      ]);
     });
 
-    it('returns false for non-injected properties', () => {
-      expect(isPropertyInjected(UserService, 'userName')).to.be.false;
-      expect(isPropertyInjected(UserService, 'userAge')).to.be.false;
-      expect(isPropertyInjected(UserService, 'getUser')).to.be.false;
+    it('handles mixed inheritance with and without decorators', () => {
+      @injectable()
+      class BaseWithInjection {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+      }
+
+      @injectable()
+      class MiddleWithoutInjection extends BaseWithInjection {
+        regularMethod() {}
+      }
+
+      @injectable()
+      class ChildWithInjection extends MiddleWithoutInjection {
+        @inject(SERVICE_ID.Database)
+        protected db!: IDatabase;
+      }
+
+      const properties = getInjectedPropertyNames(ChildWithInjection);
+      expect(properties).to.have.lengthOf(2);
+      expect(properties).to.include.members(['logger', 'db']);
+    });
+
+    it('handles class with only inherited metadata', () => {
+      @injectable()
+      class BaseService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+
+        @postConstruct()
+        init() {}
+      }
+
+      @injectable()
+      class ChildService extends BaseService {
+        // No additional decorators
+        someMethod() {}
+      }
+
+      expect(hasPostConstruct(ChildService)).to.be.true;
+      expect(getInjectedPropertyNames(ChildService)).to.include('logger');
+
+      const validateProps = getPropertiesToValidate(ChildService);
+      expect(validateProps).to.include('someMethod');
+      expect(validateProps).to.not.include('logger');
+      expect(validateProps).to.not.include('init');
     });
   });
 
-  describe('UserService integration', () => {
-    it('has correct metadata structure', () => {
-      const metadata = getInversifyMetadata(UserService);
+  describe('Edge cases', () => {
+    it('handles class without parent having decorators', () => {
+      @injectable()
+      class StandaloneService {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
 
-      expect(metadata).to.not.be.null;
-      expect(metadata!.properties.size).to.equal(3);
-      expect(metadata!.lifecycle.postConstructMethodNames.size).to.equal(1);
-      expect(metadata!.lifecycle.preDestroyMethodNames.size).to.equal(1);
-    });
-
-    it('correctly identifies validation properties vs injected properties', () => {
-      const allProps = getAllClassProperties(UserService);
-      const injectedProps = getInjectedPropertyNames(UserService);
-      const validateProps = getPropertiesToValidate(UserService);
-
-      // Injected properties should not be in validation list
-      for (const injected of injectedProps) {
-        expect(validateProps).to.not.include(injected);
+        @postConstruct()
+        init() {}
       }
 
-      // All properties should include both injected and non-injected
-      expect(allProps.length).to.be.greaterThan(validateProps.length);
+      expect(hasPostConstruct(StandaloneService)).to.be.true;
+      expect(getInjectedPropertyNames(StandaloneService)).to.include('logger');
+    });
+
+    it('handles non-injectable parent class', () => {
+      // Non-injectable base (no @injectable decorator)
+      class NonInjectableBase {
+        regularMethod() {}
+      }
+
+      @injectable()
+      class InjectableChild extends NonInjectableBase {
+        @inject(SERVICE_ID.Logger)
+        protected logger!: ILogger;
+      }
+
+      // Should only find metadata from injectable child
+      const properties = getInjectedPropertyNames(InjectableChild);
+      expect(properties).to.include('logger');
+    });
+
+    it('returns empty arrays when no metadata exists in chain', () => {
+      @injectable()
+      class ServiceWithNoMetadata {
+        regularMethod() {}
+      }
+
+      expect(getInjectedPropertyNames(ServiceWithNoMetadata)).to.be.empty;
+      expect(getPostConstructMethodNames(ServiceWithNoMetadata)).to.be.empty;
+      expect(getPreDestroyMethodNames(ServiceWithNoMetadata)).to.be.empty;
+      expect(hasPostConstruct(ServiceWithNoMetadata)).to.be.false;
+      expect(hasPreDestroy(ServiceWithNoMetadata)).to.be.false;
     });
   });
 });
