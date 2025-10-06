@@ -1,6 +1,7 @@
 import { pick } from 'lodash';
 import { derive } from '@traits-ts/core';
 import { Type } from '@eveble/core';
+import { InstanceOf } from 'typend';
 import { Struct } from './struct';
 import { types } from '../types';
 import { List } from '../domain/list';
@@ -59,9 +60,16 @@ export class Serializable
     if (this[listName] === undefined) {
       throw new InvalidListError(this.typeName(), listName);
     }
-    const ListCnstr = this.getPropTypes()[listName];
+    let ListCnstr = this.getPropTypes()[listName];
     if (ListCnstr === undefined) {
       throw new exports.InvalidListError(this.typeName(), listName);
+    }
+
+    if (ListCnstr.constructor.name === 'List') {
+      ListCnstr = ListCnstr[0];
+    }
+    if (ListCnstr instanceof InstanceOf) {
+      ListCnstr = ListCnstr[0];
     }
     return new List<T>(this, listName, ListCnstr, this[listName]);
   }
