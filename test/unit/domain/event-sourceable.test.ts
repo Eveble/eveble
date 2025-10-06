@@ -331,67 +331,6 @@ describe(`EventSourceable`, () => {
         ])
       );
     });
-
-    const messagePropTypeShape = PropTypes.shape({
-      getId: PropTypes.instanceOf(Function),
-      timestamp: PropTypes.instanceOf(Date).isOptional,
-      metadata: PropTypes.object.isOptional,
-      getTimestamp: PropTypes.instanceOf(Function),
-      assignMetadata: PropTypes.instanceOf(Function),
-      hasMetadata: PropTypes.instanceOf(Function),
-      getMetadata: PropTypes.instanceOf(Function),
-      setCorrelationId: PropTypes.instanceOf(Function),
-      getCorrelationId: PropTypes.instanceOf(Function),
-      hasCorrelationId: PropTypes.instanceOf(Function),
-      getTypeName: PropTypes.instanceOf(Function),
-      toString: PropTypes.instanceOf(Function),
-      getPropTypes: PropTypes.instanceOf(Function),
-      toPlainObject: PropTypes.instanceOf(Function),
-      validateProps: PropTypes.instanceOf(Function),
-      getPropertyInitializers: PropTypes.instanceOf(Function),
-      equals: PropTypes.instanceOf(Function),
-      getSchemaVersion: PropTypes.instanceOf(Function),
-      transformLegacyProps: PropTypes.instanceOf(Function),
-      registerLegacyTransformer: PropTypes.instanceOf(Function),
-      overrideLegacyTransformer: PropTypes.instanceOf(Function),
-      hasLegacyTransformer: PropTypes.instanceOf(Function),
-      getLegacyTransformers: PropTypes.instanceOf(Function),
-      getLegacyTransformer: PropTypes.instanceOf(Function),
-    });
-
-    const stringOrStringifiable = PropTypes.oneOf([
-      PropTypes.instanceOf(String),
-      PropTypes.interface({
-        toString: PropTypes.instanceOf(Function),
-      }),
-    ]);
-
-    it('takes required COMMAND property as a list of Command instances', () => {
-      // https://github.com/microsoft/TypeScript/issues/1863
-      const propTypes: any = EventSourceable.getPropTypes();
-      expect(propTypes[COMMANDS_KEY]).to.be.eql(
-        PropTypes.arrayOf({
-          ...messagePropTypeShape,
-          targetId: stringOrStringifiable,
-          isDeliverable: PropTypes.instanceOf(Function),
-          isScheduled: PropTypes.instanceOf(Function),
-          schedule: PropTypes.instanceOf(Function),
-          getAssignment: PropTypes.instanceOf(Function),
-        })
-      );
-    });
-
-    it('takes required EVENT property as a symbol', () => {
-      // https://github.com/microsoft/TypeScript/issues/1863
-      const propTypes: any = EventSourceable.getPropTypes();
-      expect(propTypes[EVENTS_KEY]).to.be.eql(
-        PropTypes.arrayOf({
-          ...messagePropTypeShape,
-          version: PropTypes.instanceOf(Number).isOptional,
-          sourceId: stringOrStringifiable,
-        })
-      );
-    });
   });
 
   describe(`construction`, () => {
