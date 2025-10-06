@@ -5,9 +5,9 @@ import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
 import {
   Container,
-  interfaces as inversifyTypes,
   postConstruct,
   injectable,
+  BindToFluentSyntax,
 } from 'inversify';
 import * as winston from 'winston';
 import chalk from 'chalk';
@@ -138,7 +138,7 @@ describe('BaseApp', () => {
 
     log = stubInterface<types.Logger>();
     injector = stubInterface<types.Injector>();
-    binding = stubInterface<inversifyTypes.BindingToSyntax<any>>();
+    binding = stubInterface<BindToFluentSyntax<any>>();
     injector.bind.returns(binding);
     injector.findByScope.withArgs('Singleton').returns([]);
 
@@ -883,10 +883,6 @@ describe('BaseApp', () => {
       await app.initialize();
 
       expect(app.config).to.be.eql({
-        merged: {
-          ChildModuleConfig: childConfig,
-          GrandchildModuleConfig: grandchildConfig,
-        },
         appId: 'my-app-id',
         workerId: 'my-worker-id',
         logging: new LoggingConfig(),
@@ -936,10 +932,6 @@ describe('BaseApp', () => {
         },
       });
       expect(app.config).to.be.eql({
-        merged: {
-          ChildModuleConfig: childConfig,
-          GrandchildModuleConfig: grandchildConfig,
-        },
         appId: 'my-app-id',
         workerId: 'my-worker-id',
         logging: new LoggingConfig(),

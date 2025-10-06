@@ -148,7 +148,7 @@ describe('Module', () => {
     });
 
     it(`takes props with: config instance implementing Configurable interface and assigns it`, () => {
-      @Type('MyConfig')
+      @Type('MyConfig', { isRegistrable: false })
       class MyConfig extends Config {
         foo: string;
 
@@ -277,7 +277,7 @@ describe('Module', () => {
       });
 
       it(`merges module configuration with application and replaces module's configuration with the one from app`, async () => {
-        @Type('MyAppConfig')
+        @Type('MyAppConfig', { isRegistrable: false })
         class MyAppConfig extends AppConfig {
           foo: string;
 
@@ -289,7 +289,7 @@ describe('Module', () => {
           }
         }
 
-        @Type('MyModuleConfig')
+        @Type('MyModuleConfig', { isRegistrable: false })
         class MyModuleConfig extends Config {
           baz: boolean;
 
@@ -321,9 +321,6 @@ describe('Module', () => {
         await module.initialize(app, injector);
 
         const expectedAppConfig = {
-          merged: {
-            MyModuleConfig: moduleConfig,
-          },
           appId: 'my-app-id',
           workerId: 'my-worker-id',
           conversion: { type: 'runtime' },
@@ -350,8 +347,7 @@ describe('Module', () => {
         };
 
         const expectedPropTypes = {
-          included: PropTypes.object.isOptional,
-          merged: PropTypes.object.isOptional,
+          schemaVersion: PropTypes.instanceOf(Number).isOptional,
           appId: PropTypes.oneOf([
             undefined,
             PropTypes.instanceOf(String),
@@ -376,8 +372,8 @@ describe('Module', () => {
           }).isOptional,
           description: PropTypes.shape({
             formatting: PropTypes.oneOf([
-              PropTypes.equal('compact'),
               PropTypes.equal('debug'),
+              PropTypes.equal('compact'),
               PropTypes.equal('default'),
             ]),
           }).isOptional,
@@ -406,7 +402,7 @@ describe('Module', () => {
       });
 
       it(`ensures that module configuration is not overriding already set properties on app configuration`, async () => {
-        @Type('MyAppConfig')
+        @Type('MyAppConfig', { isRegistrable: false })
         class MyAppConfig extends AppConfig {
           foo: string;
 
@@ -418,7 +414,7 @@ describe('Module', () => {
           }
         }
 
-        @Type('MyModuleConfig')
+        @Type('MyModuleConfig', { isRegistrable: false })
         class MyModuleConfig extends Config {
           foo: string;
 
@@ -449,9 +445,6 @@ describe('Module', () => {
         await module.initialize(app, injector);
 
         const expectedAppConfig = {
-          merged: {
-            MyModuleConfig: moduleConfig,
-          },
           logging: new LoggingConfig(),
           appId: 'my-app-id',
           workerId: 'my-worker-id',
