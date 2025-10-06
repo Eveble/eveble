@@ -83,10 +83,12 @@ describe('List', () => {
           new Item({ name: 'second' }),
         ];
         const source = new Order({ id, items });
-        const result = source.toPlainObject();
-        expect(result.items).to.be.eql([{ name: 'first' }, { name: 'second' }]);
-        expect(result.items[0]).to.not.be.instanceof(Item);
-        expect(result.items[1]).to.not.be.instanceof(Item);
+        const list = source.in<Item>('items');
+        const result = list.toPlainObject();
+
+        expect(result).to.be.eql([{ name: 'first' }, { name: 'second' }]);
+        expect(result[0]).to.not.be.instanceof(Item);
+        expect(result[1]).to.not.be.instanceof(Item);
       });
 
       it('converting other values', () => {
@@ -108,10 +110,13 @@ describe('List', () => {
 
         const items = [new MyString('first'), new MyString('second')];
         const source = new MyStringContainer({ items });
-        const result = source.toPlainObject();
-        expect(result.items).to.be.eql(['first', 'second']);
-        expect(result.items[0]).to.not.be.instanceof(MyString);
-        expect(result.items[1]).to.not.be.instanceof(MyString);
+
+        const list = source.in<Item>('items');
+        const result = list.toPlainObject();
+
+        expect(result).to.be.eql(['first', 'second']);
+        expect(result[0]).to.not.be.instanceof(MyString);
+        expect(result[1]).to.not.be.instanceof(MyString);
       });
     });
   });
@@ -135,7 +140,7 @@ describe('List', () => {
       const list = source.in<Item>('items');
       list.add = sinon.stub();
 
-      source.in<Item>('items').create({
+      list.create({
         name: 'my-item-name',
       });
       expect(list.add).to.be.calledOnce;
