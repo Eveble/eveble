@@ -260,7 +260,8 @@ describe(`EventSourceable`, () => {
   });
 
   it(`implements OneToOneHandlingTrait`, () => {
-    expect(EventSourceable.prototype).to.be.instanceof(OneToOneHandlingTrait);
+    expect(derived(EventSourceable.prototype, OneToOneHandlingTrait)).to.be
+      .true;
   });
 
   it('defines the type name correctly', () => {

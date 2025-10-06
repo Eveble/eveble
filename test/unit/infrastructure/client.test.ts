@@ -1,10 +1,11 @@
 import { expect } from 'chai';
+import { derived } from '@traits-ts/core';
 import { Client } from '../../../src/app/client';
 import { StatefulTrait } from '../../../src/traits/stateful.trait';
 
 describe(`Client`, () => {
-  it(`has StatefulTrait mixin on prototype chain applied`, () => {
-    expect(Client.prototype).to.be.instanceof(StatefulTrait);
+  it(`has StatefulTrait in composition chain`, () => {
+    expect(derived(Client.prototype, StatefulTrait)).to.be.true;
   });
 
   describe('working with state', () => {
