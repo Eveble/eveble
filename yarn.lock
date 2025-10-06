@@ -411,13 +411,13 @@
   integrity sha512-IoD2MfUnOV58ghIHCiil01PcohxjbYR/qCxsoC+xNgUwh1EY8jOOrYmu3d3a71+tJJ23uscEV4X2HJWMsPJu4g==
 
 "@eveble/core@latest":
-  version "2.0.3"
-  resolved "https://registry.npmjs.org/@eveble/core/-/core-2.0.3.tgz#e02810ed50eea6ab46eded1428abe9ec12542bcb"
-  integrity sha512-6Ps/CN/nbBNaYuEWuWugIE2Q1SYrKPq4oFx8WGlkmCBtfjkT3PrWrO4Wq+ZvoCj5QJDus70MFhl6wxg34K2wNA==
+  version "2.0.4"
+  resolved "https://registry.npmjs.org/@eveble/core/-/core-2.0.4.tgz#344fb502372daac32b26dcdecd8bed3c33c24e41"
+  integrity sha512-fzaStaP9Pn3nT6lkft2RsglQjKLB3UtPXZE84x8+S5If0XrpcV47lORKsFrvyUt9ZL34oN0+Eynv9BfiP7IA+A==
   dependencies:
     "@eveble/helpers" latest
-    "@parisholley/inversify-async" "^1.1.7"
     getenv "^2.0.0"
+    inversify "^7.10.2"
     lodash "^4.17.21"
     reflect-metadata "^0.2.2"
     tsruntime "github:eveble/tsruntime#eveble"
@@ -883,11 +883,6 @@
   integrity sha512-LUewfj94xCMH2rbD5YJ+6AQ4AVjFYTgpp6rboWM5T7N3IsIF65SBEOVcYMGAEzO/kKNiNaW4LoWtoThOhH06gw==
   dependencies:
     "@octokit/openapi-types" "^16.0.0"
-
-"@parisholley/inversify-async@^1.1.7":
-  version "1.1.7"
-  resolved "https://registry.npmjs.org/@parisholley/inversify-async/-/inversify-async-1.1.7.tgz#f7a3e50bc7ff5d9851c55351e968217206a3ad83"
-  integrity sha512-0+uQBOA9UxZtJqadNCroRsVg3lQO7dvH8sM6a70K+8nTPnzZ4tHV2VXYrajSLVb23LAnQeNdMwC9cha71bR04A==
 
 "@pnpm/config.env-replace@^1.1.0":
   version "1.1.0"
@@ -9463,9 +9458,9 @@ typedoc@^0.23.28:
     shiki "^0.14.1"
 
 typend@latest:
-  version "3.1.5"
-  resolved "https://registry.npmjs.org/typend/-/typend-3.1.5.tgz#99cf4ac1f9d18416f5495aaf3cb02835ced7969b"
-  integrity sha512-f2sbfn/EceyrAKP6rOWc5JjK489jbWIX0xENaYH65ThUBh48RPs100xwmN+ExeslPza6wIMT2+m8k+7oj4ujRw==
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/typend/-/typend-3.2.0.tgz#886bbb24864110a7be23297adfdb9446fee4bef7"
+  integrity sha512-NdgkwuV2UKzbJruLIadrui/v67B+944vAlvoV8aeWulwcto9hXbEb21HGdFooSU3SiwwqWg092NFJj1bpotqyw==
   dependencies:
     "@eveble/helpers" "^1.0.4"
     chai "^4.3.7"
