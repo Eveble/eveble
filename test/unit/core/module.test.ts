@@ -372,9 +372,9 @@ describe('Module', () => {
           }).isOptional,
           description: PropTypes.shape({
             formatting: PropTypes.oneOf([
+              PropTypes.equal('default'),
               PropTypes.equal('debug'),
               PropTypes.equal('compact'),
-              PropTypes.equal('default'),
             ]),
           }).isOptional,
           logging: PropTypes.instanceOf(LoggingConfig).isOptional,

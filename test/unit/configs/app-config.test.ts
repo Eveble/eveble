@@ -78,9 +78,9 @@ describe('AppConfig', () => {
       expect(AppConfig.getPropTypes().description).to.be.eql(
         PropTypes.shape({
           formatting: PropTypes.oneOf([
+            PropTypes.equal('default'),
             PropTypes.equal('debug'),
             PropTypes.equal('compact'),
-            PropTypes.equal('default'),
           ]),
         }).isOptional
       );
