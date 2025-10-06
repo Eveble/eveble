@@ -4,7 +4,7 @@ import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import delay from 'delay';
 import { Type } from '@eveble/core';
-import { derive } from '@traits-ts/core';
+import { derive, derived } from '@traits-ts/core';
 import { Event } from '../../../src/components/event';
 import { types } from '../../../src/types';
 import { OneToManyHandlingTrait } from '../../../src/traits/one-to-many-handling.trait';
@@ -34,10 +34,10 @@ describe('OneToManyHandlingTrait', () => {
     key: string;
   }
 
-  it('extends HandlingTrait', () => {
-    expect((OneToManyHandlingTrait as any).prototype).to.be.instanceof(
-      HandlingTrait
-    );
+  it(`has HandlingTrait in composition chain`, () => {
+    class TestClass extends derive(OneToManyHandlingTrait) {}
+
+    expect(derived(TestClass.prototype, HandlingTrait)).to.be.true;
   });
 
   describe('construction', () => {
