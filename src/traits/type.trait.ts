@@ -1,4 +1,4 @@
-import { pick, isEqual } from 'lodash';
+import { pick, isEqual, omit } from 'lodash';
 import { types as typendTypes, Class, getMatchingParentProto } from 'typend';
 import { getTypeName } from '@eveble/helpers';
 import merge from 'deepmerge';
@@ -9,9 +9,15 @@ import { types } from '../types';
 import { toPlainObject, isPlainRecord } from '../utils/record.helpers';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
+export const EXCLUDED_PROP_TYPES: unique symbol = Symbol(
+  'eveble:excluded-prop-types'
+);
+
 export const TypeTrait = trait(
   (base) =>
     class extends base implements types.Typed {
+      public static [EXCLUDED_PROP_TYPES]?: string[] = [];
+
       /**
        * Returns class properties types from whole inheritance tree.
        * @returns Plain object representation of properties types.
@@ -36,7 +42,8 @@ export const TypeTrait = trait(
         const classPattern: Class = kernel.converter.convert(
           this.constructor as typendTypes.Class
         );
-        return classPattern.properties;
+        const props = classPattern.properties;
+        return omit(props, this.constructor[EXCLUDED_PROP_TYPES]);
       }
 
       /**

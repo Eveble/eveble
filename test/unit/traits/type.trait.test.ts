@@ -4,7 +4,7 @@ import { PropTypes } from 'typend';
 import { stubInterface } from 'ts-sinon';
 import { Type, kernel } from '@eveble/core';
 import { derive } from '@traits-ts/core';
-import { TypeTrait } from '../../../src/traits/type.trait';
+import { EXCLUDED_PROP_TYPES, TypeTrait } from '../../../src/traits/type.trait';
 import { types } from '../../../src/types';
 
 chai.use(sinonChai);
@@ -564,6 +564,162 @@ describe('TypeTrait', () => {
           new MyClass().validateProps(props, propTypes)
         ).to.not.throw(Error);
       });
+    });
+  });
+
+  describe('excluding prop types', () => {
+    it('excludes properties defined in EXCLUDED_PROP_TYPES symbol', () => {
+      const propTypes = {
+        firstName: PropTypes.instanceOf(String),
+        lastName: PropTypes.instanceOf(String),
+        age: PropTypes.instanceOf(Number),
+        internalKey: PropTypes.instanceOf(String),
+      };
+      converter.convert.withArgs(Person).returns({ properties: propTypes });
+
+      @Type('PersonWithExclusions')
+      class PersonWithExclusions extends derive(TypeTrait) {
+        static [EXCLUDED_PROP_TYPES] = ['internalKey'];
+
+        firstName: string;
+
+        lastName: string;
+
+        age: number;
+
+        internalKey: string;
+
+        constructor(
+          firstName: string,
+          lastName: string,
+          age: number,
+          internalKey: string
+        ) {
+          super();
+          this.firstName = firstName;
+          this.lastName = lastName;
+          this.age = age;
+          this.internalKey = internalKey;
+        }
+      }
+
+      converter.convert
+        .withArgs(PersonWithExclusions)
+        .returns({ properties: propTypes });
+
+      const person = new PersonWithExclusions('Jane', 'Doe', 28, 'secret');
+      const props = person.getPropTypes();
+
+      expect(props).to.be.eql({
+        firstName: PropTypes.instanceOf(String),
+        lastName: PropTypes.instanceOf(String),
+        age: PropTypes.instanceOf(Number),
+      });
+      expect(props).to.not.have.property('internalKey');
+    });
+
+    it('excludes multiple properties defined in EXCLUDED_PROP_TYPES symbol', () => {
+      const propTypes = {
+        publicKey: PropTypes.instanceOf(String),
+        privateKey: PropTypes.instanceOf(String),
+        internalId: PropTypes.instanceOf(Number),
+      };
+
+      @Type('SecureClass')
+      class SecureClass extends derive(TypeTrait) {
+        static [EXCLUDED_PROP_TYPES] = ['privateKey', 'internalId'];
+
+        publicKey: string;
+
+        privateKey: string;
+
+        internalId: number;
+
+        constructor(props: Record<string, any> = {}) {
+          super();
+          Object.assign(this, props);
+        }
+      }
+
+      converter.convert
+        .withArgs(SecureClass)
+        .returns({ properties: propTypes });
+
+      const instance = new SecureClass({
+        publicKey: 'public',
+        privateKey: 'private',
+        internalId: 123,
+      });
+      const props = instance.getPropTypes();
+
+      expect(props).to.be.eql({
+        publicKey: PropTypes.instanceOf(String),
+      });
+      expect(props).to.not.have.property('privateKey');
+      expect(props).to.not.have.property('internalId');
+    });
+
+    it('returns all properties when EXCLUDED_PROP_TYPES is empty', () => {
+      const propTypes = {
+        firstName: PropTypes.instanceOf(String),
+        lastName: PropTypes.instanceOf(String),
+      };
+
+      @Type('NoExclusions')
+      class NoExclusions extends derive(TypeTrait) {
+        static [EXCLUDED_PROP_TYPES] = [];
+
+        firstName: string;
+
+        lastName: string;
+
+        constructor(firstName: string, lastName: string) {
+          super();
+          this.firstName = firstName;
+          this.lastName = lastName;
+        }
+      }
+
+      converter.convert
+        .withArgs(NoExclusions)
+        .returns({ properties: propTypes });
+
+      const instance = new NoExclusions('Jane', 'Doe');
+      const props = instance.getPropTypes();
+
+      expect(props).to.be.eql(propTypes);
+    });
+
+    it('works with static getPropTypes method', () => {
+      const propTypes = {
+        visibleKey: PropTypes.instanceOf(String),
+        hiddenKey: PropTypes.instanceOf(String),
+      };
+
+      @Type('StaticExclusionTest')
+      class StaticExclusionTest extends derive(TypeTrait) {
+        static [EXCLUDED_PROP_TYPES] = ['hiddenKey'];
+
+        visibleKey: string;
+
+        hiddenKey: string;
+
+        constructor(props: Record<string, any> = {}) {
+          super();
+          Object.assign(this, props);
+        }
+      }
+
+      converter.convert
+        .withArgs(StaticExclusionTest)
+        .returns({ properties: propTypes });
+
+      const props = StaticExclusionTest.getPropTypes();
+
+      expect(props).to.be.eql({
+        visibleKey: PropTypes.instanceOf(String),
+      });
+      expect(props).to.not.have.property('hiddenKey');
     });
   });
 });
