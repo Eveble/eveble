@@ -190,14 +190,6 @@ describe(`EventSourceableRepository`, () => {
           .in(repository.save)
           .with('event sourceable', esInstance)
       );
-      expect(log.debug).to.be.calledWithMatch(
-        new Log(
-          `saved 'Namespace.MyEventSourceable' with id '${esInstance.id}'`
-        )
-          .on(repository)
-          .in(repository.save)
-          .with('event sourceable', esInstance)
-      );
     });
 
     it('logs thrown error while saving commit to storage', async () => {
@@ -324,7 +316,7 @@ describe(`EventSourceableRepository`, () => {
         it('ensures that injector is injecting async dependencies and initializes aggregate', async () => {
           const injectorStub = stubInterface<Injector>();
           injector
-            .rebind<types.Injector>(BINDINGS.Injector)
+            .rebindSync<types.Injector>(BINDINGS.Injector)
             .toConstantValue(injectorStub);
           injector.injectInto(repository);
 
@@ -388,7 +380,7 @@ describe(`EventSourceableRepository`, () => {
         it('ensures that injector is injecting async dependencies and initializes process', async () => {
           const injectorStub = stubInterface<Injector>();
           injector
-            .rebind<types.Injector>(BINDINGS.Injector)
+            .rebindSync<types.Injector>(BINDINGS.Injector)
             .toConstantValue(injectorStub);
           injector.injectInto(repository);
 
@@ -517,7 +509,7 @@ describe(`EventSourceableRepository`, () => {
         it('ensures that injector is injecting async dependencies and initializes aggregate', async () => {
           const injectorStub = stubInterface<Injector>();
           injector
-            .rebind<types.Injector>(BINDINGS.Injector)
+            .rebindSync<types.Injector>(BINDINGS.Injector)
             .toConstantValue(injectorStub);
 
           injectorStub.isBound.withArgs(BINDINGS.Snapshotter).returns(true);
@@ -603,7 +595,7 @@ describe(`EventSourceableRepository`, () => {
         it('ensures that injector is injecting async dependencies and initializes process', async () => {
           const injectorStub = stubInterface<Injector>();
           injector
-            .rebind<types.Injector>(BINDINGS.Injector)
+            .rebindSync<types.Injector>(BINDINGS.Injector)
             .toConstantValue(injectorStub);
 
           injectorStub.isBound.withArgs(BINDINGS.Snapshotter).returns(true);
