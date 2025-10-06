@@ -134,7 +134,7 @@ describe('Command', () => {
           default? = 'default';
 
           constructor(props: types.ConstructorType<MyDefaultCommand>) {
-            super(props);
+            super(props as any);
             Object.assign(this, this.processProps(props));
             Object.freeze(this);
           }

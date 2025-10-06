@@ -144,7 +144,7 @@ describe('Event', () => {
           default? = 'default';
 
           constructor(props: types.ConstructorType<MyDefaultEvent>) {
-            super(props);
+            super(props as any);
             Object.assign(this, this.processProps(props));
             Object.freeze(this);
           }
