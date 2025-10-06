@@ -3,7 +3,7 @@ import {
   Container,
   ServiceIdentifier,
   BindingScope,
-  BindingToSyntax,
+  BindToFluentSyntax,
 } from 'inversify';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
@@ -12,7 +12,6 @@ import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
 } from './constants/literal-keys';
-import { Guid } from './domain/value-objects/guid';
 
 /*
 https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines
@@ -113,7 +112,7 @@ export namespace types {
   export interface Injector extends Container {
     injectInto(value: any): void;
     injectIntoAsync(value: any): Promise<void>;
-    bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindingToSyntax<T> & {
+    bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T> & {
       toRoute(EventSourceableType: EventSourceableType): void;
     };
     findByScope(scope: BindingScope): ServiceIdentifier<any>[];
