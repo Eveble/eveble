@@ -25,8 +25,8 @@ import {
   HandlerNotFoundError,
   InitializingMessageAlreadyExistsError,
 } from '../../../src/messaging/messaging-errors';
-import { UndefinedStatesError } from '../../../src/mixins/stateful-mixin';
-import { UndefinedStatusesError } from '../../../src/mixins/statusful-mixin';
+import { UndefinedStatesError } from '../../../src/traits/stateful.trait';
+import { UndefinedStatusesError } from '../../../src/traits/statusful.trait';
 import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
 import { isTyped } from '../../../src/utils/helpers';
