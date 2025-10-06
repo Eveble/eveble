@@ -7,7 +7,7 @@ import { TypeTrait } from '../traits/type.trait';
 import { HookableTrait } from '../traits/hookable.trait';
 import { EjsonableTrait } from '../traits/ejsonable.trait';
 import { VersionableTrait } from '../traits/versionable.trait';
-import { isPlainRecord } from '../utils/helpers';
+import { isPlainRecord } from '../utils/record.helpers';
 
 @Type('SerializableError')
 export abstract class SerializableError

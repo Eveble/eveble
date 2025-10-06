@@ -6,7 +6,7 @@ import deepClone from '@jsbits/deep-clone';
 import { kernel } from '@eveble/core';
 import { trait } from '@traits-ts/core';
 import { types } from '../types';
-import { toPlainObject, isPlainRecord } from '../utils/helpers';
+import { toPlainObject, isPlainRecord } from '../utils/record.helpers';
 import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 
 export const TypeTrait = trait(

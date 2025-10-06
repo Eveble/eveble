@@ -4,7 +4,7 @@ import { METADATA_KEYS } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import { HookableTrait } from '../traits/hookable.trait';
 import { types } from '../types';
-import { isPlainRecord } from '../utils/helpers';
+import { isPlainRecord } from '../utils/record.helpers';
 import { DELEGATED_KEY } from '../constants/metadata-keys';
 import { getInjectedPropertyNames } from '../utils/inversify';
 import { TypeTrait } from '../traits/type.trait';
