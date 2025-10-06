@@ -775,7 +775,7 @@ describe(`Router`, () => {
             router.messageHandler(commands.MyCommand)
           ).to.be.eventually.rejectedWith(
             ValidationError,
-            `MyEventSourceable: (Key 'name': Expected undefined to be a String in MyEventSourceable({"id":"my-event-sourceable-id","version":0}))`
+            `MyEventSourceable: (Key 'name': Expected undefined to be a String in MyEventSourceable({"version":0,"id":"my-event-sourceable-id"}))`
           );
         });
       });
