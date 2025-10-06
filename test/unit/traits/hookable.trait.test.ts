@@ -8,7 +8,7 @@ import {
   HookNotFoundError,
   InvalidHookActionError,
   InvalidHookIdError,
-} from '../../../src/trait/hookable.trait';
+} from '../../../src/traits/hookable.trait';
 import { HOOKABLE_KEY } from '../../../src/constants/metadata-keys';
 
 chai.use(sinonChai);

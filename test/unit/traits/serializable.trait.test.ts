@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai';
 import { kernel, Type } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import { types } from '../../../src/types';
-import { SerializableTrait } from '../../../src/trait/serializable.trait';
+import { SerializableTrait } from '../../../src/traits/serializable.trait';
 
 chai.use(sinonChai);
 

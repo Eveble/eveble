@@ -6,7 +6,7 @@ import {
   StatefulTrait,
   UndefinedStatesError,
   InvalidStateError,
-} from '../../../src/trait/stateful.trait';
+} from '../../../src/traits/stateful.trait';
 
 chai.use(sinonChai);
 
