@@ -67,7 +67,10 @@
     "no-useless-constructor": 0,
     "import/extensions": 0,
     "no-use-before-define": 0,
+    "@typescript-eslint/no-non-null-assertion": 0,
+    "@typescript-eslint/no-empty-function": 0,
     "no-unused-vars": "off",
+    "import/no-import-module-exports": 0,
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
