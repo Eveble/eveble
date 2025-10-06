@@ -1,7 +1,5 @@
 import { EventSourceable } from './event-sourceable';
-import { History } from './history';
 import { types } from '../types';
-import { Command } from '../components/command';
 import { COMMANDS_KEY, EVENTS_KEY } from '../constants/literal-keys';
 import { Guid } from './value-objects/guid';
 export declare class Aggregate extends EventSourceable {
@@ -13,5 +11,5 @@ export declare class Aggregate extends EventSourceable {
     schemaVersion?: number;
     [COMMANDS_KEY]: types.Command[];
     [EVENTS_KEY]: types.Event[];
-    constructor(arg: History | Command<{}> | types.Props);
+    constructor(arg: types.Command | types.Event[] | types.Props);
 }

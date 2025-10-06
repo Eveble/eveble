@@ -14,7 +14,9 @@ export declare class List<T extends types.Serializable> extends Array {
     getById(id: string | types.Stringifiable): T | undefined;
     getByIdOrThrow(id: string | types.Stringifiable): T;
     findById(id: string | types.Stringifiable): T;
+    findByIdOrFail(id: string | types.Stringifiable): T;
     findBy(key: string, value: any): T;
+    findByOrFail(key: string, value: any): T;
     hasBy(key: string, value: any): boolean;
     hasSame(element: T): boolean;
     hasById(id: string | types.Stringifiable): boolean;
@@ -22,6 +24,8 @@ export declare class List<T extends types.Serializable> extends Array {
     replaceBy(key: string, value: any, element: T): void;
     removeById(id: string | types.Stringifiable): void;
     removeBy(key: string, value: any): void;
+    deleteById(id: string | types.Stringifiable): void;
+    deleteBy(key: string, value: any): void;
     first(): T | undefined;
     last(): T | undefined;
     protected getSourceIdAsString(): string | undefined;

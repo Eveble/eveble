@@ -1,7 +1,38 @@
 import { types } from '../../types';
-import { StatefulMixin } from '../../mixins/stateful-mixin';
 import { Serializable } from '../../components/serializable';
-declare const CommitReceiver_base: import("polytype").Polytype.ClusteredConstructor<[typeof Serializable, typeof StatefulMixin]>;
+declare const CommitReceiver_base: (new (props?: types.Props | undefined) => {
+    [x: string]: any;
+    state: types.State;
+    setState(state: types.State): void;
+    isInState(state: types.State | types.State[]): boolean;
+    isInOneOfStates(states: types.State | types.State[]): boolean;
+    getState(): types.State;
+    hasState(): boolean;
+    validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+    getSelectableStates(): Record<string, types.State>;
+} & Serializable) & {
+    [x: string]: any;
+    prototype: {
+        [x: string]: any;
+        state: types.State;
+        setState(state: types.State): void;
+        isInState(state: types.State | types.State[]): boolean;
+        isInOneOfStates(states: types.State | types.State[]): boolean;
+        getState(): types.State;
+        hasState(): boolean;
+        validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+        getSelectableStates(): Record<string, types.State>;
+    };
+} & {
+    prototype: Serializable;
+    from: typeof Serializable.from;
+    typeName: () => string;
+    toString: (() => string) & (() => string) & (() => string);
+    getTypeName: () => string;
+    excludedPropTypes?: string[] | undefined;
+    getPropTypes: () => types.Props;
+    getPropertyInitializers: () => types.Props;
+};
 export declare class CommitReceiver extends CommitReceiver_base implements types.CommitReceiver {
     static STATES: {
         received: string;

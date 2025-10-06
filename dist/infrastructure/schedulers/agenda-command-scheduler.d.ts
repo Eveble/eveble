@@ -1,12 +1,35 @@
 import Agenda, { AgendaConfiguration } from 'agenda';
 import { Collection } from 'mongodb';
-import { StatefulMixin } from '../../mixins/stateful-mixin';
 import { types } from '../../types';
 import { ScheduleCommand } from '../../domain/schedule-command';
 import { UnscheduleCommand } from '../../domain/unschedule-command';
 import { Guid } from '../../domain/value-objects/guid';
 import { AgendaClient } from '../../app/clients/agenda-client';
-export declare class AgendaCommandScheduler extends StatefulMixin implements types.CommandScheduler {
+declare const AgendaCommandScheduler_base: (new () => {
+    [x: string]: any;
+    state: types.State;
+    setState(state: types.State): void;
+    isInState(state: types.State | types.State[]): boolean;
+    isInOneOfStates(states: types.State | types.State[]): boolean;
+    getState(): types.State;
+    hasState(): boolean;
+    validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+    getSelectableStates(): Record<string, types.State>;
+}) & {
+    [x: string]: any;
+    prototype: {
+        [x: string]: any;
+        state: types.State;
+        setState(state: types.State): void;
+        isInState(state: types.State | types.State[]): boolean;
+        isInOneOfStates(states: types.State | types.State[]): boolean;
+        getState(): types.State;
+        hasState(): boolean;
+        validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+        getSelectableStates(): Record<string, types.State>;
+    };
+};
+export declare class AgendaCommandScheduler extends AgendaCommandScheduler_base implements types.CommandScheduler {
     static STATES: {
         constructed: string;
         initialized: string;
@@ -35,3 +58,4 @@ export declare class AgendaCommandScheduler extends StatefulMixin implements typ
     protected defineJob(jobName: string, options: Agenda.JobOptions | undefined, handler: (job: Agenda.Job) => Promise<void>): Promise<void>;
     protected serializeScheduleCommandToData(scheduleCommand: ScheduleCommand): Record<string, any>;
 }
+export {};

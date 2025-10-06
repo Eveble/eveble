@@ -1,4 +1,3 @@
-import { StatefulMixin } from '../mixins/stateful-mixin';
 import { types } from '../types';
 declare enum STATES {
     constructed = "constructed",
@@ -9,7 +8,30 @@ declare enum STATES {
     stopped = "stopped",
     shutdown = "shutdown"
 }
-declare const Module_base: import("polytype").Polytype.ClusteredConstructor<[typeof StatefulMixin]>;
+declare const Module_base: (new () => {
+    [x: string]: any;
+    state: types.State;
+    setState(state: types.State): void;
+    isInState(state: types.State | types.State[]): boolean;
+    isInOneOfStates(states: types.State | types.State[]): boolean;
+    getState(): types.State;
+    hasState(): boolean;
+    validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+    getSelectableStates(): Record<string, types.State>;
+}) & {
+    [x: string]: any;
+    prototype: {
+        [x: string]: any;
+        state: types.State;
+        setState(state: types.State): void;
+        isInState(state: types.State | types.State[]): boolean;
+        isInOneOfStates(states: types.State | types.State[]): boolean;
+        getState(): types.State;
+        hasState(): boolean;
+        validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+        getSelectableStates(): Record<string, types.State>;
+    };
+};
 export declare abstract class Module extends Module_base implements types.Stateful, types.Module {
     static STATES: typeof STATES;
     config: types.Configurable;

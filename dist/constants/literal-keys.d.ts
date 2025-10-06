@@ -1,6 +1,6 @@
 export declare const TYPE_KEY = "_type";
-export declare const HANDLERS: unique symbol;
-export declare const HANDLEABLE_TYPES: unique symbol;
+export declare const HANDLERS = "eveble:handlers";
+export declare const HANDLEABLE_TYPES = "eveble:handleable-types";
 export declare const SOURCE_KEY: unique symbol;
 export declare const LIST_KEY: unique symbol;
 export declare const SERIALIZABLE_TYPE_KEY: unique symbol;
@@ -15,8 +15,8 @@ export declare const COMMANDS_KEY: unique symbol;
 export declare const EVENTS_KEY: unique symbol;
 export declare const LITERAL_KEYS: {
     TYPE_KEY: string;
-    HANDLERS: symbol;
-    HANDLEABLE_TYPES: symbol;
+    HANDLERS: string;
+    HANDLEABLE_TYPES: string;
     SOURCE_KEY: symbol;
     LIST_KEY: symbol;
     SERIALIZABLE_TYPE_KEY: symbol;

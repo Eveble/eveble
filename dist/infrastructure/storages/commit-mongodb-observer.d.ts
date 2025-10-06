@@ -1,7 +1,30 @@
 import { Collection, Cursor } from 'mongodb';
 import { types } from '../../types';
-import { StatefulMixin } from '../../mixins/stateful-mixin';
-export declare class CommitMongoDBObserver extends StatefulMixin {
+declare const CommitMongoDBObserver_base: (new () => {
+    [x: string]: any;
+    state: types.State;
+    setState(state: types.State): void;
+    isInState(state: types.State | types.State[]): boolean;
+    isInOneOfStates(states: types.State | types.State[]): boolean;
+    getState(): types.State;
+    hasState(): boolean;
+    validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+    getSelectableStates(): Record<string, types.State>;
+}) & {
+    [x: string]: any;
+    prototype: {
+        [x: string]: any;
+        state: types.State;
+        setState(state: types.State): void;
+        isInState(state: types.State | types.State[]): boolean;
+        isInOneOfStates(states: types.State | types.State[]): boolean;
+        getState(): types.State;
+        hasState(): boolean;
+        validateState(stateOrStates: types.State | types.State[], error?: Error | undefined): boolean;
+        getSelectableStates(): Record<string, types.State>;
+    };
+};
+export declare class CommitMongoDBObserver extends CommitMongoDBObserver_base {
     protected collection: Collection;
     protected storage: types.CommitStorage;
     protected log: types.Logger;
@@ -25,3 +48,4 @@ export declare class CommitMongoDBObserver extends StatefulMixin {
     initializeEventHandlers(): Promise<void>;
     protected isInProduction(): boolean;
 }
+export {};

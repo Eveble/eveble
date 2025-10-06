@@ -1,23 +1,23 @@
 import 'reflect-metadata';
-import { CORE_METADATA_KEYS, ExtendableError, kernel, define, isSerializable, UnregistrableTypeError, TypeExistsError, TypeNotFoundError } from '@eveble/core';
-export { define as Define, define as EvebleType, ExtendableError, Kernel, KernelError, Library, define as Type, TypeError, TypeExistsError, TypeNotFoundError, UnavailableAsserterError, UnavailableSerializerError, UnregistrableTypeError, define, isSerializable, kernel, resolveSerializableFromPropType } from '@eveble/core';
-import { instanceOf, isDefined, Collection, getMatchingParentProto, OneOf, InstanceOf, Optional, define as define$1 } from 'typend';
-export { internal as Internal, InvalidDefinitionError, InvalidTypeError, InvalidValueError, NotAMemberError, PatternValidatorExistError, PatternValidatorNotFoundError, PropTypes, PropsOf, TypeConverterExists, TypeDescriberExistsError, TypeDescriberNotFoundError, TypeOf, UndefinableClassError, UnequalValueError, UnexpectedKeyError, UnknownError, UnmatchedTypeError, validable as Validable, ValidationError, any, boolean, check, collection, collectionIncluding, collectionWithin, convert, converter, describer, eq, instanceOf, integer, internal, iof, is, isInstanceOf, isValid, list, maybe, never, number, oneOf, optional, propsOf, reflect, string, symbol, tuple, typeOf, typend, unknown, unrecognized, validable, validate, validator, voided, where } from 'typend';
+import { CORE_METADATA_KEYS, ExtendableError, kernel, METADATA_KEYS as METADATA_KEYS$1, Type, isSerializable, UnregistrableTypeError, TypeExistsError, TypeNotFoundError } from '@eveble/core';
+export { Type as EvebleType, ExtendableError, Kernel, KernelError, Library, Type, TypeError, TypeExistsError, TypeNotFoundError, UnavailableAsserterError, UnavailableSerializerError, UnregistrableTypeError, isSerializable, kernel, resolveSerializableFromPropType } from '@eveble/core';
+import { getMatchingParentProto, Collection, InstanceOf, instanceOf, isType, OneOf, Optional, Type as Type$1 } from 'typend';
+export { Internal, InvalidDefinitionError, InvalidTypeError, InvalidValueError, NotAMemberError, PatternValidatorExistError, PatternValidatorNotFoundError, PropTypes, PropsOf, TypeConverterExists, TypeDescriberExistsError, TypeDescriberNotFoundError, TypeOf, UndefinableClassError, UnequalValueError, UnexpectedKeyError, UnknownError, UnmatchedTypeError, Validable, ValidationError, any, boolean, check, collection, collectionIncluding, collectionWithin, convert, converter, describer, eq, instanceOf, integer, iof, is, isInstanceOf, isValid, list, maybe, never, number, oneOf, optional, propsOf, reflect, string, symbol, tuple, typeOf, typend, unknown, unrecognized, validate, validator, voided, where } from 'typend';
 import { getTypeName, isClassInstance } from '@eveble/helpers';
-import { isNumber, isPlainObject, pick, isEqual, isString, has, get, omit, isFunction, pull, last, isEmpty, set, capitalize, intersection, partial, union } from 'lodash';
+import { isString, has, get, isPlainObject, omit, pick, isEqual, isNumber, isFunction, pull, last, isEmpty, set, capitalize, intersection, partial, union } from 'lodash';
 import merge from 'deepmerge';
-import { classes } from 'polytype';
-import { injectable, METADATA_KEY, Container, inject, postConstruct } from '@parisholley/inversify-async';
-export { inject as Inject, injectable as Injectable, postConstruct as PostConstruct, inject, injectable, postConstruct } from '@parisholley/inversify-async';
+import { trait, derive } from '@traits-ts/core';
 import deepClone from '@jsbits/deep-clone';
+import getenv from 'getenv';
 import decache from 'decache';
 import dotenv from 'dotenv-extended';
-import getenv from 'getenv';
 import { v4 } from 'uuid';
 import Agenda from 'agenda';
 import { MongoClient } from 'mongodb';
 import * as winston from 'winston';
 import chalk from 'chalk';
+import { Container, injectable, inject, postConstruct } from 'inversify';
+export { inject as Inject, injectable as Injectable, postConstruct as PostConstruct, inject, injectable, postConstruct } from 'inversify';
 import { diff } from 'deep-diff';
 import { ReflectParams } from 'reflect-params';
 import { inspect } from 'util';
@@ -165,7 +165,7 @@ class UnparsableValueError extends SerializationError {
     }
 }
 
-/*! *****************************************************************************
+/******************************************************************************
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -179,6 +179,8 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
+/* global Reflect, Promise */
+
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -194,6 +196,485 @@ function __param(paramIndex, decorator) {
 function __metadata(metadataKey, metadataValue) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
 }
+
+class HookError extends ExtendableError {
+}
+class InvalidHookActionError extends HookError {
+    constructor(got) {
+        super(`Expected action argument to be string, got ${got}`);
+    }
+}
+class InvalidHookIdError extends HookError {
+    constructor(got) {
+        super(`Expected id argument to be string, got ${got}`);
+    }
+}
+class HookAlreadyExistsError extends HookError {
+    constructor(typeName, action, id) {
+        super(`${typeName}: hook for action '${action}' with id '${id}' would be overwritten. Avoid overriding of existing hooks do to inconsistent behavior`);
+    }
+}
+class HookNotFoundError extends HookError {
+    constructor(typeName, action, id) {
+        super(`${typeName}: hook for action '${action}' with id '${id}' can't be found`);
+    }
+}
+const HookableTrait = trait((base) => class extends base {
+    registerHook(action, id, hook, shouldOverride = false) {
+        if (!isString(action)) {
+            throw new InvalidHookActionError(kernel.describer.describe(action));
+        }
+        if (!isString(id)) {
+            throw new InvalidHookIdError(kernel.describer.describe(id));
+        }
+        const typeName = getTypeName(this.constructor) || '';
+        if (this.hasHook(action, id) && !shouldOverride) {
+            throw new HookAlreadyExistsError(typeName, action, id);
+        }
+        if (!Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)) {
+            Reflect.defineMetadata(HOOKS_CONTAINER_KEY, {}, this);
+        }
+        if (!Reflect.hasOwnMetadata(HOOKABLE_KEY, this.constructor)) {
+            Reflect.defineMetadata(HOOKABLE_KEY, true, this.constructor);
+        }
+        const actions = Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this);
+        if (!has(actions, action)) {
+            actions[action] = {};
+        }
+        actions[action][id] = hook;
+    }
+    overrideHook(action, id, hook) {
+        this.registerHook(action, id, hook, true);
+    }
+    getHook(action, id) {
+        const hooks = this.getHooks(action);
+        return get(hooks, id, undefined);
+    }
+    getHookOrThrow(action, id) {
+        const hook = this.getHook(action, id);
+        if (!hook) {
+            const typeName = getTypeName(this.constructor) || '';
+            throw new HookNotFoundError(typeName, action, id);
+        }
+        return hook;
+    }
+    getHooks(action) {
+        const matcher = (proto) => typeof proto.getHooks === 'function' &&
+            proto.constructor !== HookableTrait;
+        const parentProto = getMatchingParentProto(this, matcher);
+        const parentHooks = parentProto !== undefined &&
+            typeof parentProto.getHooks === 'function'
+            ? parentProto.getHooks(action)
+            : {};
+        const childActions = Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)
+            ? Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this)
+            : {};
+        const childHooks = childActions[action] || {};
+        const hooks = merge(parentHooks, childHooks, {
+            isMergeableObject: isPlainObject,
+        });
+        return hooks;
+    }
+    getActions() {
+        const matcher = (proto) => typeof proto.getActions === 'function' &&
+            proto.constructor !== HookableTrait;
+        const parentProto = getMatchingParentProto(this, matcher);
+        const parentActions = parentProto !== undefined &&
+            typeof parentProto.getActions === 'function'
+            ? parentProto.getActions()
+            : {};
+        const childActions = Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)
+            ? Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this)
+            : {};
+        const actions = merge(parentActions, childActions, {
+            isMergeableObject: isPlainObject,
+        });
+        return actions;
+    }
+    hasHook(action, id) {
+        const actions = this.getActions();
+        return has(actions, `${action}.${id}`);
+    }
+    hasAction(action) {
+        const actions = this.getActions();
+        return has(actions, action);
+    }
+    removeHook(action, id) {
+        const isHookable = Reflect.getOwnMetadata(HOOKABLE_KEY, this.constructor);
+        if (!isHookable) {
+            return;
+        }
+        const actions = Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)
+            ? Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this)
+            : {};
+        if (has(actions, `${action}.${id}`)) {
+            delete actions[action][id];
+        }
+    }
+});
+
+function isPlainRecord$1(arg) {
+    return isPlainObject(arg) || arg instanceof Collection;
+}
+function convertObjectToCollection$1(obj) {
+    const converted = {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (isPlainObject(value)) {
+            converted[key] = new Collection(value);
+        }
+        else {
+            converted[key] = value;
+        }
+    }
+    return converted;
+}
+function toPlainObject$1(arg) {
+    const plainObj = {};
+    for (const key of Reflect.ownKeys(arg)) {
+        const value = arg[key.toString()];
+        if (typeof (value === null || value === void 0 ? void 0 : value.toPlainObject) === 'function') {
+            plainObj[key] = value.toPlainObject();
+        }
+        else if (isPlainRecord$1(value)) {
+            plainObj[key] = toPlainObject$1(value);
+        }
+        else {
+            plainObj[key] = value;
+        }
+    }
+    return plainObj;
+}
+
+const INVERSIFY_METADATA_KEY = '@inversifyjs/core/classMetadataReflectKey';
+const INVERSIFY_INJECTABLE_FLAG = '@inversifyjs/core/classIsInjectableFlagReflectKey';
+function getInversifyMetadata(target) {
+    return Reflect.getMetadata(INVERSIFY_METADATA_KEY, target) || null;
+}
+function getMetadataFromInheritanceChain(target) {
+    const metadataList = [];
+    let currentTarget = target;
+    while (currentTarget &&
+        currentTarget !== Object &&
+        currentTarget !== Function.prototype) {
+        const metadata = getInversifyMetadata(currentTarget);
+        if (metadata) {
+            metadataList.push(metadata);
+        }
+        currentTarget = Object.getPrototypeOf(currentTarget);
+    }
+    return metadataList;
+}
+function isInjectableClass(target) {
+    return Reflect.getMetadata(INVERSIFY_INJECTABLE_FLAG, target) === true;
+}
+function getInjectedPropertyNames(target) {
+    const metadataList = getMetadataFromInheritanceChain(target);
+    const propertyNames = new Set();
+    for (const metadata of metadataList) {
+        if (metadata === null || metadata === void 0 ? void 0 : metadata.properties) {
+            for (const propName of metadata.properties.keys()) {
+                propertyNames.add(propName);
+            }
+        }
+    }
+    return Array.from(propertyNames);
+}
+function getInjectedParameterIndices(target) {
+    const metadata = getInversifyMetadata(target);
+    if (!metadata || !metadata.constructorArguments) {
+        return [];
+    }
+    return metadata.constructorArguments
+        .map((_, index) => index)
+        .filter((index) => metadata.constructorArguments[index] !== undefined);
+}
+function getInjectedPropertyDetails(target) {
+    const metadataList = getMetadataFromInheritanceChain(target);
+    const result = new Map();
+    for (let i = metadataList.length - 1; i >= 0; i--) {
+        const metadata = metadataList[i];
+        if (metadata === null || metadata === void 0 ? void 0 : metadata.properties) {
+            for (const [propName, propMetadata] of metadata.properties.entries()) {
+                result.set(propName, {
+                    serviceIdentifier: propMetadata.value,
+                    optional: propMetadata.optional,
+                    name: propMetadata.name,
+                    tags: propMetadata.tags,
+                });
+            }
+        }
+    }
+    return result;
+}
+function hasPostConstruct(target) {
+    var _a, _b;
+    const metadataList = getMetadataFromInheritanceChain(target);
+    for (const metadata of metadataList) {
+        if (((_b = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.lifecycle) === null || _a === void 0 ? void 0 : _a.postConstructMethodNames) === null || _b === void 0 ? void 0 : _b.size) > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+function getPostConstructMethodNames(target) {
+    var _a;
+    const metadataList = getMetadataFromInheritanceChain(target);
+    const methodNames = new Set();
+    for (const metadata of metadataList) {
+        if ((_a = metadata === null || metadata === void 0 ? void 0 : metadata.lifecycle) === null || _a === void 0 ? void 0 : _a.postConstructMethodNames) {
+            for (const methodName of metadata.lifecycle.postConstructMethodNames) {
+                methodNames.add(methodName);
+            }
+        }
+    }
+    return Array.from(methodNames);
+}
+function hasPreDestroy(target) {
+    var _a, _b;
+    const metadataList = getMetadataFromInheritanceChain(target);
+    for (const metadata of metadataList) {
+        if (((_b = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.lifecycle) === null || _a === void 0 ? void 0 : _a.preDestroyMethodNames) === null || _b === void 0 ? void 0 : _b.size) > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+function getPreDestroyMethodNames(target) {
+    var _a;
+    const metadataList = getMetadataFromInheritanceChain(target);
+    const methodNames = new Set();
+    for (const metadata of metadataList) {
+        if ((_a = metadata === null || metadata === void 0 ? void 0 : metadata.lifecycle) === null || _a === void 0 ? void 0 : _a.preDestroyMethodNames) {
+            for (const methodName of metadata.lifecycle.preDestroyMethodNames) {
+                methodNames.add(methodName);
+            }
+        }
+    }
+    return Array.from(methodNames);
+}
+function getMetadataSummary(target) {
+    const metadata = getInversifyMetadata(target);
+    return {
+        isInjectable: isInjectableClass(target),
+        injectedProperties: getInjectedPropertyNames(target),
+        injectedParameters: getInjectedParameterIndices(target),
+        postConstructMethods: getPostConstructMethodNames(target),
+        preDestroyMethods: getPreDestroyMethodNames(target),
+        scope: metadata === null || metadata === void 0 ? void 0 : metadata.scope,
+    };
+}
+function debugInversifyMetadata(target) {
+    console.log('\n=== INVERSIFY METADATA DEBUG ===');
+    console.log('Target:', target.name);
+    console.log('Is Injectable:', isInjectableClass(target));
+    const metadataList = getMetadataFromInheritanceChain(target);
+    console.log(`\nInheritance chain depth: ${metadataList.length}`);
+    metadataList.forEach((metadata, index) => {
+        console.log(`\n--- Level ${index} ---`);
+        console.log('Injected Properties:');
+        if (metadata.properties.size === 0) {
+            console.log('  (none)');
+        }
+        else {
+            for (const [name, details] of metadata.properties.entries()) {
+                console.log(`  - ${name}:`, {
+                    serviceId: details.value,
+                    optional: details.optional,
+                    name: details.name,
+                    tags: Array.from(details.tags.entries()),
+                });
+            }
+        }
+        console.log('Constructor Arguments:');
+        if (metadata.constructorArguments.length === 0) {
+            console.log('  (none)');
+        }
+        else {
+            metadata.constructorArguments.forEach((arg, idx) => {
+                console.log(`  [${idx}]:`, arg);
+            });
+        }
+        console.log('Lifecycle Hooks:');
+        console.log('  @postConstruct:', Array.from(metadata.lifecycle.postConstructMethodNames));
+        console.log('  @preDestroy:', Array.from(metadata.lifecycle.preDestroyMethodNames));
+        console.log('Scope:', metadata.scope);
+    });
+}
+function getAllClassProperties(target) {
+    const props = new Set();
+    let currentTarget = target;
+    while (currentTarget &&
+        currentTarget !== Object &&
+        currentTarget !== Function.prototype) {
+        const ownProps = Object.getOwnPropertyNames(currentTarget.prototype);
+        ownProps.forEach((prop) => {
+            if (prop !== 'constructor') {
+                props.add(prop);
+            }
+        });
+        currentTarget = Object.getPrototypeOf(currentTarget);
+    }
+    return Array.from(props);
+}
+function getPropertiesToValidate(target) {
+    const allProps = getAllClassProperties(target);
+    const injectedProps = getInjectedPropertyNames(target);
+    const postConstructMethods = getPostConstructMethodNames(target);
+    const preDestroyMethods = getPreDestroyMethodNames(target);
+    const excludedProps = new Set([
+        ...injectedProps,
+        ...postConstructMethods,
+        ...preDestroyMethods,
+    ]);
+    return allProps.filter((prop) => !excludedProps.has(prop));
+}
+function isPropertyInjected(target, propertyName) {
+    const injectedProps = getInjectedPropertyNames(target);
+    return injectedProps.includes(propertyName);
+}
+
+const EXCLUDED_PROP_TYPES_KEY = 'excludedPropTypes';
+const TypeTrait = trait((base) => { var _a; return _a = class extends base {
+        getPropTypes() {
+            const classPattern = kernel.converter.convert(this.constructor);
+            const props = classPattern.properties;
+            return omit(props, this.constructor[EXCLUDED_PROP_TYPES_KEY]);
+        }
+        getPropertyInitializers() {
+            const parentInitializers = this.getParentInitializers();
+            const instanceInitializers = this.getInstanceInitializers();
+            const defaults = merge(parentInitializers, instanceInitializers, {
+                isMergeableObject: isPlainRecord$1,
+            });
+            return defaults;
+        }
+        getInstanceInitializers() {
+            return Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) || {};
+        }
+        getParentInitializers() {
+            const matcher = (evaluatedProto) => typeof evaluatedProto.getInstanceInitializers === 'function';
+            const parentProto = getMatchingParentProto(this.constructor.prototype, matcher);
+            if (parentProto === undefined)
+                return {};
+            return parentProto.getInstanceInitializers();
+        }
+        toPlainObject() {
+            const propsKeys = Object.keys(this.getPropTypes());
+            const plainObj = deepClone(toPlainObject$1(this));
+            return pick(plainObj, propsKeys);
+        }
+        validateProps(props = {}, propTypes, isStrict = true) {
+            if (!kernel.isValidating()) {
+                return true;
+            }
+            try {
+                return kernel.validator.validate(props, propTypes, isStrict);
+            }
+            catch (error) {
+                const { message } = error;
+                const typeName = getTypeName(this);
+                throw new error.constructor(`${typeName}: ${message}`);
+            }
+        }
+        equals(other) {
+            return (other !== null &&
+                other.constructor === this.constructor &&
+                this.hasSameValues(other));
+        }
+        hasSameValues(other) {
+            var _b;
+            let hasSameValues = true;
+            for (const key in this.getPropTypes()) {
+                if (typeof ((_b = this[key]) === null || _b === void 0 ? void 0 : _b.equals) === 'function') {
+                    if (!this[key].equals(other[key])) {
+                        hasSameValues = false;
+                        break;
+                    }
+                }
+                else if (!isEqual(this[key], other[key])) {
+                    hasSameValues = false;
+                    break;
+                }
+            }
+            return hasSameValues;
+        }
+        static getPropTypes() {
+            return this.prototype.getPropTypes();
+        }
+        static getPropertyInitializers() {
+            return this.prototype.getPropertyInitializers();
+        }
+    },
+    _a.excludedPropTypes = [],
+    _a; });
+
+class Struct extends derive(TypeTrait, HookableTrait) {
+    constructor(props = {}) {
+        super();
+        if (Reflect.getMetadata(DELEGATED_KEY, this.constructor) !== true &&
+            Reflect.getMetadata(METADATA_KEYS$1.DEFAULT_PROPS_KEY, this.constructor) ===
+                undefined) {
+            this.construct(props);
+        }
+    }
+    construct(props = {}) {
+        Object.assign(this, this.processProps(props));
+    }
+    processProps(props = {}) {
+        const processedProps = this.onConstruction(props);
+        this.onValidation(processedProps);
+        return processedProps;
+    }
+    onConstruction(props) {
+        const propertyInitializers = this.getPropertyInitializers();
+        const processedProps = merge(propertyInitializers, props, {
+            isMergeableObject: isPlainRecord$1,
+        });
+        const hooks = this.getHooks('onConstruction');
+        for (const hook of Object.values(hooks)) {
+            hook.bind(this)(processedProps);
+        }
+        return processedProps;
+    }
+    onValidation(props) {
+        const dependencyMappings = getInjectedPropertyNames(this.constructor);
+        const propTypes = omit(this.getPropTypes(), dependencyMappings);
+        const result = this.validateProps(props, propTypes, true);
+        const hooks = this.getHooks('onValidation');
+        for (const hook of Object.values(hooks)) {
+            hook.bind(this)(props);
+        }
+        return result;
+    }
+}
+
+const SerializableTrait = trait((base) => class extends base {
+    getTypeName() {
+        return getTypeName(this);
+    }
+    toString() {
+        return this.getTypeName();
+    }
+    static toString() {
+        return this.getTypeName();
+    }
+    static getTypeName() {
+        return getTypeName(this);
+    }
+    toJSONValue() {
+        var _a;
+        return (_a = kernel.serializer) === null || _a === void 0 ? void 0 : _a.toJSONValue(this);
+    }
+});
+
+const EjsonableTrait = trait([SerializableTrait], (base) => class extends base {
+    typeName() {
+        return this.getTypeName();
+    }
+    static typeName() {
+        return this.getTypeName();
+    }
+});
 
 class VersionableError extends ExtendableError {
 }
@@ -222,7 +703,7 @@ class NotVersionableError extends VersionableError {
         super(`${typeName}: class must implement Versionable and Hookable interfaces`);
     }
 }
-let VersionableMixin = class VersionableMixin {
+const VersionableTrait = trait((base) => class extends base {
     transformLegacyProps(props) {
         const instanceSchemaVersion = props.schemaVersion || 0;
         const currentSchemaVersion = this.getCurrentSchemaVersion();
@@ -288,343 +769,9 @@ let VersionableMixin = class VersionableMixin {
     getSchemaVersion() {
         return this.schemaVersion;
     }
-};
-VersionableMixin = __decorate([
-    injectable()
-], VersionableMixin);
+});
 
-function isDefinable(arg) {
-    if (arg == null)
-        return false;
-    return ((arg instanceof Struct || instanceOf({ kind: 15, name: "Definable", properties: { "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(arg)) &&
-        isDefined(arg.constructor));
-}
-function isRecord(arg) {
-    return (isPlainObject(arg) || isClassInstance(arg) || arg instanceof Collection);
-}
-function isPlainRecord(arg) {
-    return isPlainObject(arg) || arg instanceof Collection;
-}
-function hasPostConstruct(target) {
-    return (target != null &&
-        Reflect.hasMetadata(METADATA_KEY.POST_CONSTRUCT, target.constructor));
-}
-function toPlainObject(arg) {
-    const plainObj = {};
-    for (const key of Reflect.ownKeys(arg)) {
-        const value = arg[key.toString()];
-        if (typeof (value === null || value === void 0 ? void 0 : value.toPlainObject) === 'function') {
-            plainObj[key] = value.toPlainObject();
-        }
-        else if (isPlainRecord(value)) {
-            plainObj[key] = toPlainObject(value);
-        }
-        else {
-            plainObj[key] = value;
-        }
-    }
-    return plainObj;
-}
-function convertObjectToCollection(obj) {
-    const converted = {};
-    for (const [key, value] of Object.entries(obj)) {
-        if (isPlainObject(value)) {
-            converted[key] = new Collection(value);
-        }
-        else {
-            converted[key] = value;
-        }
-    }
-    return converted;
-}
-const createEJSON = function () {
-    decache('@eveble/ejson');
-    return require('@eveble/ejson');
-};
-function isEventSourceableType(arg) {
-    if (arg == null)
-        return false;
-    return (typeof arg.resolveInitializingMessage === 'function' &&
-        typeof arg.resolveRoutedCommands === 'function' &&
-        typeof arg.resolveRoutedEvents === 'function' &&
-        typeof arg.resolveRoutedMessages === 'function' &&
-        typeof arg.getTypeName === 'function' &&
-        typeof arg.from === 'function');
-}
-function loadENV(envFilePath) {
-    dotenv.load({
-        silent: false,
-        defaults: '.env.defaults',
-        schema: '.env.schema',
-        errorOnMissing: true,
-        errorOnExtra: true,
-        path: envFilePath,
-    });
-}
-
-let DefinableMixin = class DefinableMixin {
-    getPropTypes() {
-        const classPattern = kernel.converter.convert(this.constructor);
-        return classPattern.properties;
-    }
-    getPropertyInitializers() {
-        const parentInitializers = this.getParentInitializers();
-        const instanceInitializers = this.getInstanceInitializers();
-        const defaults = merge(parentInitializers, instanceInitializers, {
-            isMergeableObject: isPlainRecord,
-        });
-        return defaults;
-    }
-    getInstanceInitializers() {
-        return Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) || {};
-    }
-    getParentInitializers() {
-        const matcher = (evaluatedProto) => typeof evaluatedProto.getInstanceInitializers === 'function';
-        const parentProto = getMatchingParentProto(this.constructor.prototype, matcher);
-        if (parentProto === undefined)
-            return {};
-        return parentProto.getInstanceInitializers();
-    }
-    toPlainObject() {
-        const propsKeys = Object.keys(this.getPropTypes());
-        const plainObj = deepClone(toPlainObject(this));
-        return pick(plainObj, propsKeys);
-    }
-    validateProps(props = {}, propTypes, isStrict = true) {
-        if (!kernel.isValidating()) {
-            return true;
-        }
-        try {
-            return kernel.validator.validate(props, propTypes, isStrict);
-        }
-        catch (error) {
-            const { message } = error;
-            const typeName = getTypeName(this);
-            throw new error.constructor(`${typeName}: ${message}`);
-        }
-    }
-    equals(other) {
-        return (other !== null &&
-            other.constructor === this.constructor &&
-            this.hasSameValues(other));
-    }
-    hasSameValues(other) {
-        var _a;
-        let hasSameValues = true;
-        for (const key in this.getPropTypes()) {
-            if (typeof ((_a = this[key]) === null || _a === void 0 ? void 0 : _a.equals) === 'function') {
-                if (!this[key].equals(other[key])) {
-                    hasSameValues = false;
-                    break;
-                }
-            }
-            else if (!isEqual(this[key], other[key])) {
-                hasSameValues = false;
-                break;
-            }
-        }
-        return hasSameValues;
-    }
-    static getPropTypes() {
-        return this.prototype.getPropTypes();
-    }
-    static getPropertyInitializers() {
-        return this.prototype.getPropertyInitializers();
-    }
-};
-DefinableMixin = __decorate([
-    injectable()
-], DefinableMixin);
-
-var HookableMixin_1;
-class HookError extends ExtendableError {
-}
-class InvalidHookActionError extends HookError {
-    constructor(got) {
-        super(`Expected action argument to be string, got ${got}`);
-    }
-}
-class InvalidHookIdError extends HookError {
-    constructor(got) {
-        super(`Expected id argument to be string, got ${got}`);
-    }
-}
-class HookAlreadyExistsError extends HookError {
-    constructor(typeName, action, id) {
-        super(`${typeName}: hook for action '${action}' with id '${id}' would be overwritten. Avoid overriding of existing hooks do to inconsistent behavior`);
-    }
-}
-class HookNotFoundError extends HookError {
-    constructor(typeName, action, id) {
-        super(`${typeName}: hook for action '${action}' with id '${id}' can't be found`);
-    }
-}
-let HookableMixin = HookableMixin_1 = class HookableMixin {
-    registerHook(action, id, hook, shouldOverride = false) {
-        if (!isString(action)) {
-            throw new InvalidHookActionError(kernel.describer.describe(action));
-        }
-        if (!isString(id)) {
-            throw new InvalidHookIdError(kernel.describer.describe(id));
-        }
-        const typeName = getTypeName(this.constructor) || '';
-        if (this.hasHook(action, id) && !shouldOverride) {
-            throw new HookAlreadyExistsError(typeName, action, id);
-        }
-        if (!Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)) {
-            Reflect.defineMetadata(HOOKS_CONTAINER_KEY, {}, this);
-        }
-        if (!Reflect.hasOwnMetadata(HOOKABLE_KEY, this.constructor)) {
-            Reflect.defineMetadata(HOOKABLE_KEY, true, this.constructor);
-        }
-        const actions = Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this);
-        if (!has(actions, action)) {
-            actions[action] = {};
-        }
-        actions[action][id] = hook;
-    }
-    overrideHook(action, id, hook) {
-        this.registerHook(action, id, hook, true);
-    }
-    getHook(action, id) {
-        const hooks = this.getHooks(action);
-        return get(hooks, id, undefined);
-    }
-    getHookOrThrow(action, id) {
-        const hook = this.getHook(action, id);
-        if (!hook) {
-            const typeName = getTypeName(this.constructor) || '';
-            throw new HookNotFoundError(typeName, action, id);
-        }
-        return hook;
-    }
-    getHooks(action) {
-        const matcher = (proto) => typeof proto.getHooks === 'function' &&
-            proto.constructor !== HookableMixin_1;
-        const parentProto = getMatchingParentProto(this, matcher);
-        const parentHooks = parentProto !== undefined && typeof parentProto.getHooks === 'function'
-            ? parentProto.getHooks(action)
-            : {};
-        const childActions = Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)
-            ? Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this)
-            : {};
-        const childHooks = childActions[action] || {};
-        const hooks = merge(parentHooks, childHooks, {
-            isMergeableObject: isPlainObject,
-        });
-        return hooks;
-    }
-    getActions() {
-        const matcher = (proto) => typeof proto.getActions === 'function' &&
-            proto.constructor !== HookableMixin_1;
-        const parentProto = getMatchingParentProto(this, matcher);
-        const parentActions = parentProto !== undefined && typeof parentProto.getActions === 'function'
-            ? parentProto.getActions()
-            : {};
-        const childActions = Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)
-            ? Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this)
-            : {};
-        const actions = merge(parentActions, childActions, {
-            isMergeableObject: isPlainObject,
-        });
-        return actions;
-    }
-    hasHook(action, id) {
-        const actions = this.getActions();
-        return has(actions, `${action}.${id}`);
-    }
-    hasAction(action) {
-        const actions = this.getActions();
-        return has(actions, action);
-    }
-    removeHook(action, id) {
-        const isHookable = Reflect.getOwnMetadata(HOOKABLE_KEY, this.constructor);
-        if (!isHookable) {
-            return;
-        }
-        const actions = Reflect.hasOwnMetadata(HOOKS_CONTAINER_KEY, this)
-            ? Reflect.getOwnMetadata(HOOKS_CONTAINER_KEY, this)
-            : {};
-        if (has(actions, `${action}.${id}`)) {
-            delete actions[action][id];
-        }
-    }
-};
-HookableMixin = HookableMixin_1 = __decorate([
-    injectable()
-], HookableMixin);
-
-class Struct extends classes(DefinableMixin, HookableMixin) {
-    constructor(props = {}) {
-        super();
-        if (Reflect.getMetadata(DELEGATED_KEY, this.constructor) !== true &&
-            Reflect.getMetadata(DEFAULT_PROPS_KEY, this.constructor) === undefined) {
-            this.construct(props);
-        }
-    }
-    construct(props = {}) {
-        Object.assign(this, this.processProps(props));
-    }
-    processProps(props = {}) {
-        const processedProps = this.onConstruction(props);
-        this.onValidation(processedProps);
-        return processedProps;
-    }
-    onConstruction(props) {
-        const propertyInitializers = this.getPropertyInitializers();
-        const processedProps = merge(propertyInitializers, props, {
-            isMergeableObject: isPlainRecord,
-        });
-        const hooks = this.getHooks('onConstruction');
-        for (const hook of Object.values(hooks)) {
-            hook.bind(this)(processedProps);
-        }
-        return processedProps;
-    }
-    onValidation(props) {
-        const mappings = Reflect.getMetadata(METADATA_KEY.TAGGED_PROP, this.constructor) || {};
-        const propTypes = omit(this.getPropTypes(), Object.keys(mappings));
-        const result = this.validateProps(props, propTypes, true);
-        const hooks = this.getHooks('onValidation');
-        for (const hook of Object.values(hooks)) {
-            hook.bind(this)(props);
-        }
-        return result;
-    }
-}
-
-class SerializableMixin {
-    getTypeName() {
-        return getTypeName(this);
-    }
-    toString() {
-        return this.getTypeName();
-    }
-    static toString() {
-        return this.getTypeName();
-    }
-    static getTypeName() {
-        return getTypeName(this);
-    }
-    toJSONValue() {
-        var _a;
-        return (_a = kernel.serializer) === null || _a === void 0 ? void 0 : _a.toJSONValue(this);
-    }
-}
-
-let EjsonableMixin = class EjsonableMixin extends SerializableMixin {
-    typeName() {
-        return this.getTypeName();
-    }
-    static typeName() {
-        return this.getTypeName();
-    }
-};
-EjsonableMixin = __decorate([
-    injectable()
-], EjsonableMixin);
-
-let SerializableError = class SerializableError extends classes(ExtendableError, DefinableMixin, HookableMixin, EjsonableMixin, VersionableMixin) {
+let SerializableError = class SerializableError extends derive(TypeTrait, HookableTrait, EjsonableTrait, VersionableTrait, ExtendableError) {
     constructor(propsOrMessage) {
         let props = {};
         if (typeof propsOrMessage === 'string') {
@@ -639,7 +786,7 @@ let SerializableError = class SerializableError extends classes(ExtendableError,
             'stack',
             'code',
         ]);
-        super([errorProps]);
+        super(errorProps);
         Object.assign(this, this.processProps(props));
     }
     processProps(props = {}) {
@@ -650,7 +797,7 @@ let SerializableError = class SerializableError extends classes(ExtendableError,
     onConstruction(props) {
         const propertyInitializers = this.getPropertyInitializers();
         const processedProps = merge(propertyInitializers, props, {
-            isMergeableObject: isPlainRecord,
+            isMergeableObject: isPlainRecord$1,
         });
         if (props.name === undefined)
             processedProps.name = this.name;
@@ -667,20 +814,20 @@ let SerializableError = class SerializableError extends classes(ExtendableError,
     }
 };
 SerializableError = __decorate([
-    define('SerializableError')({ kind: 19, name: "SerializableError", properties: { "name": { kind: 2 }, "message": { kind: 2 }, "stack": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "code": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 999 } }),
+    Type('SerializableError')({ kind: 19, name: "SerializableError", properties: { "name": { kind: 2, modifiers: 1 }, "message": { kind: 2, modifiers: 1 }, "stack": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "code": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "schemaVersion": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], SerializableError);
 
 let DomainError = class DomainError extends SerializableError {
 };
 DomainError = __decorate([
-    define('DomainError')({ kind: 19, name: "DomainError", properties: {}, extends: { kind: 18, type: SerializableError, arguments: [] } })
+    Type('DomainError')({ kind: 19, name: "DomainError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: SerializableError, arguments: [] } })
 ], DomainError);
 
 let AssertionError = class AssertionError extends DomainError {
 };
 AssertionError = __decorate([
-    define('AssertionError')({ kind: 19, name: "AssertionError", properties: {}, extends: { kind: 18, type: DomainError, arguments: [] } })
+    Type('AssertionError')({ kind: 19, name: "AssertionError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: DomainError, arguments: [] } })
 ], AssertionError);
 let UndefinedActionError = class UndefinedActionError extends AssertionError {
     constructor(entityName, assertionApi) {
@@ -688,13 +835,13 @@ let UndefinedActionError = class UndefinedActionError extends AssertionError {
     }
 };
 UndefinedActionError = __decorate([
-    define('UndefinedActionError')({ kind: 19, name: "UndefinedActionError", properties: {}, extends: { kind: 18, type: AssertionError, arguments: [] } }),
+    Type('UndefinedActionError')({ kind: 19, name: "UndefinedActionError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "entityName", modifiers: 0, type: { kind: 2 } }, { name: "assertionApi", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: AssertionError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], UndefinedActionError);
 let ListError = class ListError extends DomainError {
 };
 ListError = __decorate([
-    define('ListError')({ kind: 19, name: "ListError", properties: {}, extends: { kind: 18, type: DomainError, arguments: [] } })
+    Type('ListError')({ kind: 19, name: "ListError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: DomainError, arguments: [] } })
 ], ListError);
 let IdentifiableAlreadyExistsError = class IdentifiableAlreadyExistsError extends ListError {
     constructor(props) {
@@ -705,7 +852,7 @@ let IdentifiableAlreadyExistsError = class IdentifiableAlreadyExistsError extend
     }
 };
 IdentifiableAlreadyExistsError = __decorate([
-    define('IdentifiableAlreadyExistsError')({ kind: 19, name: "IdentifiableAlreadyExistsError", properties: {}, extends: { kind: 18, type: ListError, arguments: [] } }),
+    Type('IdentifiableAlreadyExistsError')({ kind: 19, name: "IdentifiableAlreadyExistsError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, properties: { "sourceName": { kind: 2, modifiers: 0 }, "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "listKey": { kind: 2, modifiers: 0 }, "identifiableName": { kind: 2, modifiers: 0 }, "key": { kind: 2, modifiers: 0 }, "value": { kind: 2, modifiers: 0 } } } }] }], extends: { kind: 18, type: ListError, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], IdentifiableAlreadyExistsError);
 let ElementAlreadyExistsError = class ElementAlreadyExistsError extends ListError {
@@ -717,7 +864,7 @@ let ElementAlreadyExistsError = class ElementAlreadyExistsError extends ListErro
     }
 };
 ElementAlreadyExistsError = __decorate([
-    define('ElementAlreadyExistsError')({ kind: 19, name: "ElementAlreadyExistsError", properties: { "element": { kind: 15, name: "Serializable", properties: { "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } } }, extends: { kind: 18, type: ListError, arguments: [] } }),
+    Type('ElementAlreadyExistsError')({ kind: 19, name: "ElementAlreadyExistsError", properties: { "element": { kind: 15, modifiers: 0, name: "Serializable", properties: { "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, properties: { "sourceName": { kind: 2, modifiers: 0 }, "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "listKey": { kind: 2, modifiers: 0 }, "serializableName": { kind: 2, modifiers: 0 }, "element": { kind: 15, modifiers: 0, name: "Serializable", properties: { "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } } } } }] }], extends: { kind: 18, type: ListError, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], ElementAlreadyExistsError);
 let ElementNotFoundError = class ElementNotFoundError extends ListError {
@@ -729,7 +876,7 @@ let ElementNotFoundError = class ElementNotFoundError extends ListError {
     }
 };
 ElementNotFoundError = __decorate([
-    define('ElementNotFoundError')({ kind: 19, name: "ElementNotFoundError", properties: {}, extends: { kind: 18, type: ListError, arguments: [] } }),
+    Type('ElementNotFoundError')({ kind: 19, name: "ElementNotFoundError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, properties: { "sourceName": { kind: 2, modifiers: 0 }, "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "listKey": { kind: 2, modifiers: 0 }, "serializableName": { kind: 2, modifiers: 0 }, "key": { kind: 2, modifiers: 0 }, "value": { kind: 2, modifiers: 0 } } } }] }], extends: { kind: 18, type: ListError, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], ElementNotFoundError);
 let InvalidListError = class InvalidListError extends ListError {
@@ -738,18 +885,18 @@ let InvalidListError = class InvalidListError extends ListError {
     }
 };
 InvalidListError = __decorate([
-    define('InvalidListError')({ kind: 19, name: "InvalidListError", properties: {}, extends: { kind: 18, type: ListError, arguments: [] } }),
+    Type('InvalidListError')({ kind: 19, name: "InvalidListError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "sourceName", modifiers: 0, type: { kind: 2 } }, { name: "listName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ListError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], InvalidListError);
 let ValueObjectError = class ValueObjectError extends SerializableError {
 };
 ValueObjectError = __decorate([
-    define('ValueObjectError')({ kind: 19, name: "ValueObjectError", properties: {}, extends: { kind: 18, type: SerializableError, arguments: [] } })
+    Type('ValueObjectError')({ kind: 19, name: "ValueObjectError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: SerializableError, arguments: [] } })
 ], ValueObjectError);
 let EntityError = class EntityError extends DomainError {
 };
 EntityError = __decorate([
-    define('EntityError')({ kind: 19, name: "EntityError", properties: {}, extends: { kind: 18, type: DomainError, arguments: [] } })
+    Type('EntityError')({ kind: 19, name: "EntityError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: DomainError, arguments: [] } })
 ], EntityError);
 let SavedStateNotFoundError = class SavedStateNotFoundError extends EntityError {
     constructor(esTypeName, id) {
@@ -757,13 +904,13 @@ let SavedStateNotFoundError = class SavedStateNotFoundError extends EntityError 
     }
 };
 SavedStateNotFoundError = __decorate([
-    define('SavedStateNotFoundError')({ kind: 19, name: "SavedStateNotFoundError", properties: {}, extends: { kind: 18, type: EntityError, arguments: [] } }),
+    Type('SavedStateNotFoundError')({ kind: 19, name: "SavedStateNotFoundError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "esTypeName", modifiers: 0, type: { kind: 2 } }, { name: "id", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: EntityError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], SavedStateNotFoundError);
 let EventSourceableError = class EventSourceableError extends DomainError {
 };
 EventSourceableError = __decorate([
-    define('EventSourceableError')({ kind: 19, name: "EventSourceableError", properties: {}, extends: { kind: 18, type: DomainError, arguments: [] } })
+    Type('EventSourceableError')({ kind: 19, name: "EventSourceableError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: DomainError, arguments: [] } })
 ], EventSourceableError);
 let InvalidEventError = class InvalidEventError extends EventSourceableError {
     constructor(esTypeName, got) {
@@ -771,7 +918,7 @@ let InvalidEventError = class InvalidEventError extends EventSourceableError {
     }
 };
 InvalidEventError = __decorate([
-    define('InvalidEventError')({ kind: 19, name: "InvalidEventError", properties: {}, extends: { kind: 18, type: EventSourceableError, arguments: [] } }),
+    Type('InvalidEventError')({ kind: 19, name: "InvalidEventError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "esTypeName", modifiers: 0, type: { kind: 2 } }, { name: "got", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: EventSourceableError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], InvalidEventError);
 let EventIdMismatchError = class EventIdMismatchError extends EventSourceableError {
@@ -780,7 +927,7 @@ let EventIdMismatchError = class EventIdMismatchError extends EventSourceableErr
     }
 };
 EventIdMismatchError = __decorate([
-    define('EventIdMismatchError')({ kind: 19, name: "EventIdMismatchError", properties: {}, extends: { kind: 18, type: EventSourceableError, arguments: [] } }),
+    Type('EventIdMismatchError')({ kind: 19, name: "EventIdMismatchError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "esTypeName", modifiers: 0, type: { kind: 2 } }, { name: "expectedId", modifiers: 0, type: { kind: 2 } }, { name: "got", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: EventSourceableError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], EventIdMismatchError);
 let InvalidInitializingMessageError = class InvalidInitializingMessageError extends EventSourceableError {
@@ -789,13 +936,13 @@ let InvalidInitializingMessageError = class InvalidInitializingMessageError exte
     }
 };
 InvalidInitializingMessageError = __decorate([
-    define('InvalidInitializingMessageError')({ kind: 19, name: "InvalidInitializingMessageError", properties: {}, extends: { kind: 18, type: EventSourceableError, arguments: [] } }),
+    Type('InvalidInitializingMessageError')({ kind: 19, name: "InvalidInitializingMessageError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "esTypeName", modifiers: 0, type: { kind: 2 } }, { name: "expected", modifiers: 0, type: { kind: 2 } }, { name: "got", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: EventSourceableError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], InvalidInitializingMessageError);
 
 const TYPE_KEY = '_type';
-const HANDLERS = Symbol('eveble:handlers');
-const HANDLEABLE_TYPES = Symbol('eveble:handleable-types');
+const HANDLERS = 'eveble:handlers';
+const HANDLEABLE_TYPES = 'eveble:handleable-types';
 const SOURCE_KEY = Symbol('eveble:source');
 const LIST_KEY = Symbol('eveble:list-key');
 const SERIALIZABLE_TYPE_KEY = Symbol('eveble:serializable-type');
@@ -883,7 +1030,7 @@ class List extends Array {
                 element,
             });
         }
-        this.push(element);
+        this.getSource()[this.getListKey()].push(element);
     }
     overrideBy(key, value, element) {
         const foundSerializable = this.getBy(key, value);
@@ -891,12 +1038,13 @@ class List extends Array {
             this.add(element);
         }
         else {
-            this[this.indexOf(foundSerializable)] = element;
+            this.getSource()[this.getListKey()][this.indexOf(foundSerializable)] =
+                element;
         }
     }
     getBy(key, value) {
         let foundSerializable;
-        for (const serializable of this) {
+        for (const serializable of this.getSource()[this.getListKey()]) {
             if (serializable[key] === undefined) {
                 continue;
             }
@@ -945,7 +1093,13 @@ class List extends Array {
     findById(id) {
         return this.getByIdOrThrow(id);
     }
+    findByIdOrFail(id) {
+        return this.getByIdOrThrow(id);
+    }
     findBy(key, value) {
+        return this.getByOrThrow(key, value);
+    }
+    findByOrFail(key, value) {
         return this.getByOrThrow(key, value);
     }
     hasBy(key, value) {
@@ -963,7 +1117,8 @@ class List extends Array {
             this.add(element);
         }
         else {
-            this[this.indexOf(foundSerializable)] = element;
+            this.getSource()[this.getListKey()][this.indexOf(foundSerializable)] =
+                element;
         }
     }
     replaceBy(key, value, element) {
@@ -972,26 +1127,39 @@ class List extends Array {
             this.add(element);
         }
         else {
-            this[this.indexOf(foundSerializable)] = element;
+            this.getSource()[this.getListKey()][this.indexOf(foundSerializable)] =
+                element;
         }
     }
     removeById(id) {
         const foundSerializable = this.getById(id);
         if (foundSerializable !== undefined) {
-            pull(this, foundSerializable);
+            pull(this.getSource()[this.getListKey()], foundSerializable);
         }
     }
     removeBy(key, value) {
         const foundSerializable = this.getBy(key, value);
         if (foundSerializable !== undefined) {
-            pull(this, foundSerializable);
+            pull(this.getSource()[this.getListKey()], foundSerializable);
+        }
+    }
+    deleteById(id) {
+        const foundSerializable = this.getById(id);
+        if (foundSerializable !== undefined) {
+            pull(this.getSource()[this.getListKey()], foundSerializable);
+        }
+    }
+    deleteBy(key, value) {
+        const foundSerializable = this.getBy(key, value);
+        if (foundSerializable !== undefined) {
+            pull(this.getSource()[this.getListKey()], foundSerializable);
         }
     }
     first() {
-        return this[0];
+        return this.getSource()[this.getListKey()][0];
     }
     last() {
-        return last(this);
+        return last(this.getSource()[this.getListKey()]);
     }
     getSourceIdAsString() {
         if (typeof this[SOURCE_KEY].getId === 'function') {
@@ -1011,24 +1179,25 @@ class List extends Array {
     }
 }
 
-let Serializable = class Serializable extends classes(Struct, EjsonableMixin, VersionableMixin) {
+let Serializable = class Serializable extends derive(EjsonableTrait, VersionableTrait, Struct) {
     constructor(props = {}) {
-        super([props]);
-    }
-    processSerializableList(props = {}) {
-        const serializablesListProps = Reflect.getMetadata(SERIALIZABLE_LIST_PROPS_KEY, this.constructor);
-        if (serializablesListProps !== undefined) {
-            for (const [key, serializable] of Object.entries(serializablesListProps)) {
-                props[key] = new List(this, key, serializable, props[key] || []);
-            }
-        }
-        return props;
+        super(props);
     }
     in(listName) {
         if (this[listName] === undefined) {
             throw new InvalidListError(this.typeName(), listName);
         }
-        return this[listName];
+        let ListCnstr = this.getPropTypes()[listName];
+        if (ListCnstr === undefined) {
+            throw new exports.InvalidListError(this.typeName(), listName);
+        }
+        if (ListCnstr.constructor.name === 'List') {
+            ListCnstr = ListCnstr[0];
+        }
+        if (ListCnstr instanceof InstanceOf) {
+            ListCnstr = ListCnstr[0];
+        }
+        return new List(this, listName, ListCnstr, this[listName]);
     }
     static from(...sources) {
         const propTypes = this.getPropTypes();
@@ -1039,18 +1208,76 @@ let Serializable = class Serializable extends classes(Struct, EjsonableMixin, Ve
         }
         return new this(pickedProps);
     }
-    static enableSerializableLists() {
-        this.prototype.registerHook('onConstruction', 'convert-serializable-list', this.prototype.processSerializableList, true);
-    }
-    static disableSerializableLists() {
-        this.prototype.removeHook('onConstruction', 'convert-serializable-list');
-    }
 };
 Serializable = __decorate([
-    define('Serializable')({ kind: 19, name: "Serializable", properties: { "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 999 } }),
+    Type('Serializable')({ kind: 19, name: "Serializable", properties: { "schemaVersion": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], Serializable);
-Serializable.enableSerializableLists();
+
+function isTyped(arg) {
+    if (arg == null)
+        return false;
+    return ((arg instanceof Struct || instanceOf({ kind: 15, name: "Typed", properties: { "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 } } })(arg)) &&
+        isType(arg.constructor));
+}
+function isRecord(arg) {
+    return (isPlainObject(arg) || isClassInstance(arg) || arg instanceof Collection);
+}
+function isPlainRecord(arg) {
+    return isPlainObject(arg) || arg instanceof Collection;
+}
+function toPlainObject(arg) {
+    const plainObj = {};
+    for (const key of Reflect.ownKeys(arg)) {
+        const value = arg[key.toString()];
+        if (typeof (value === null || value === void 0 ? void 0 : value.toPlainObject) === 'function') {
+            plainObj[key] = value.toPlainObject();
+        }
+        else if (isPlainRecord(value)) {
+            plainObj[key] = toPlainObject(value);
+        }
+        else {
+            plainObj[key] = value;
+        }
+    }
+    return plainObj;
+}
+function convertObjectToCollection(obj) {
+    const converted = {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (isPlainObject(value)) {
+            converted[key] = new Collection(value);
+        }
+        else {
+            converted[key] = value;
+        }
+    }
+    return converted;
+}
+const createEJSON = function () {
+    decache('@eveble/ejson');
+    return require('@eveble/ejson');
+};
+function isEventSourceableType(arg) {
+    if (arg == null)
+        return false;
+    return (typeof arg.resolveInitializingMessage === 'function' &&
+        typeof arg.resolveRoutedCommands === 'function' &&
+        typeof arg.resolveRoutedEvents === 'function' &&
+        typeof arg.resolveRoutedMessages === 'function' &&
+        typeof arg.getTypeName === 'function' &&
+        typeof arg.from === 'function');
+}
+function loadENV(envFilePath) {
+    dotenv.load({
+        silent: false,
+        defaults: '.env.defaults',
+        schema: '.env.schema',
+        errorOnMissing: true,
+        errorOnExtra: true,
+        path: envFilePath,
+    });
+}
 
 let Message = class Message extends Serializable {
     constructor(props = {}) {
@@ -1097,14 +1324,14 @@ let Message = class Message extends Serializable {
     }
 };
 Message = __decorate([
-    define('Message')({ kind: 19, name: "Message", properties: { "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } }, extends: { kind: 18, type: Serializable, arguments: [] } }),
+    Type('Message')({ kind: 19, name: "Message", properties: { "timestamp": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 18, type: Serializable, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], Message);
 
 let ValueObject = class ValueObject extends Serializable {
 };
 ValueObject = __decorate([
-    define('ValueObject')({ kind: 19, name: "ValueObject", properties: {}, extends: { kind: 18, type: Serializable, arguments: [] } })
+    Type('ValueObject')({ kind: 19, name: "ValueObject", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 18, type: Serializable, arguments: [] } })
 ], ValueObject);
 
 var Guid_1;
@@ -1114,7 +1341,7 @@ let InvalidGuidValueError = class InvalidGuidValueError extends ValueObjectError
     }
 };
 InvalidGuidValueError = __decorate([
-    define('InvalidGuidValueError')({ kind: 19, name: "InvalidGuidValueError", properties: {}, extends: { kind: 18, type: ValueObjectError, arguments: [] } }),
+    Type('InvalidGuidValueError')({ kind: 19, name: "InvalidGuidValueError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "got", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ValueObjectError, arguments: [] } }),
     __metadata("design:paramtypes", [String])
 ], InvalidGuidValueError);
 let Guid = Guid_1 = class Guid extends ValueObject {
@@ -1151,14 +1378,14 @@ let Guid = Guid_1 = class Guid extends ValueObject {
 };
 Guid.pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 Guid = Guid_1 = __decorate([
-    define('Guid')({ kind: 19, name: "Guid", properties: { "id": { kind: 2 } }, extends: { kind: 18, type: ValueObject, arguments: [] } }),
+    Type('Guid')({ kind: 19, name: "Guid", properties: { "id": { kind: 2, modifiers: 0 } }, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrVal", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, properties: { "id": { kind: 2, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: ValueObject, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], Guid);
 
 let Assignment = class Assignment extends Serializable {
 };
 Assignment = __decorate([
-    define('Assignment')({ kind: 19, name: "Assignment", properties: { "assignmentId": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "deliverAt": { kind: 18, type: Date, arguments: [] }, "assignerId": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "assignerType": { kind: 2 } }, extends: { kind: 18, type: Serializable, arguments: [] } })
+    Type('Assignment')({ kind: 19, name: "Assignment", properties: { "assignmentId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "deliverAt": { kind: 18, modifiers: 0, type: Date, arguments: [] }, "assignerId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "assignerType": { kind: 2, modifiers: 0 } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 18, type: Serializable, arguments: [] } })
 ], Assignment);
 let Command = class Command extends Message {
     constructor(props) {
@@ -1193,12 +1420,12 @@ let Command = class Command extends Message {
     }
 };
 Command = __decorate([
-    define('Command')({ kind: 19, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] } }, extends: { kind: 18, type: Message, arguments: [] } }),
+    Type('Command')({ kind: 19, name: "Command", properties: { "targetId": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 999 } }] }], extends: { kind: 18, type: Message, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], Command);
 
 function handle(target, methodName, index) {
-    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21 }, "handles": { kind: 21 }, "subscribes": { kind: 21 }, "registerHandler": { kind: 21 }, "overrideHandler": { kind: 21 }, "hasHandler": { kind: 21 }, "getHandler": { kind: 21 }, "getHandlerOrThrow": { kind: 21 }, "removeHandler": { kind: 21 }, "getHandlers": { kind: 21 }, "setHandleableTypes": { kind: 21 }, "getHandleableTypes": { kind: 21 }, "ensureHandleability": { kind: 21 }, "isHandleabe": { kind: 21 }, "getHandledTypes": { kind: 21 }, "getHandled": { kind: 21 }, "handle": { kind: 21 } } })(target)) {
+    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21, modifiers: 0 }, "handles": { kind: 21, modifiers: 0 }, "subscribes": { kind: 21, modifiers: 0 }, "registerHandler": { kind: 21, modifiers: 0 }, "overrideHandler": { kind: 21, modifiers: 0 }, "hasHandler": { kind: 21, modifiers: 0 }, "getHandler": { kind: 21, modifiers: 0 }, "getHandlerOrThrow": { kind: 21, modifiers: 0 }, "removeHandler": { kind: 21, modifiers: 0 }, "getHandlers": { kind: 21, modifiers: 0 }, "setHandleableTypes": { kind: 21, modifiers: 0 }, "getHandleableTypes": { kind: 21, modifiers: 0 }, "ensureHandleability": { kind: 21, modifiers: 0 }, "isHandleabe": { kind: 21, modifiers: 0 }, "getHandledTypes": { kind: 21, modifiers: 0 }, "getHandled": { kind: 21, modifiers: 0 }, "handle": { kind: 21, modifiers: 0 } } })(target)) {
         throw new InvalidControllerError(getTypeName(target.constructor));
     }
     const params = Reflect.getMetadata('design:paramtypes', target, methodName);
@@ -1228,16 +1455,19 @@ let Event = class Event extends Message {
     }
 };
 Event = __decorate([
-    define('Event')({ kind: 19, name: "Event", properties: { "sourceId": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 18, type: Message, arguments: [] } }),
+    Type('Event')({ kind: 19, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 999 } }] }], extends: { kind: 18, type: Message, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], Event);
 
 function subscribe(target, propertyName, index) {
-    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21 }, "handles": { kind: 21 }, "subscribes": { kind: 21 }, "registerHandler": { kind: 21 }, "overrideHandler": { kind: 21 }, "hasHandler": { kind: 21 }, "getHandler": { kind: 21 }, "getHandlerOrThrow": { kind: 21 }, "removeHandler": { kind: 21 }, "getHandlers": { kind: 21 }, "setHandleableTypes": { kind: 21 }, "getHandleableTypes": { kind: 21 }, "ensureHandleability": { kind: 21 }, "isHandleabe": { kind: 21 }, "getHandledTypes": { kind: 21 }, "getHandled": { kind: 21 }, "handle": { kind: 21 } } })(target)) {
+    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21, modifiers: 0 }, "handles": { kind: 21, modifiers: 0 }, "subscribes": { kind: 21, modifiers: 0 }, "registerHandler": { kind: 21, modifiers: 0 }, "overrideHandler": { kind: 21, modifiers: 0 }, "hasHandler": { kind: 21, modifiers: 0 }, "getHandler": { kind: 21, modifiers: 0 }, "getHandlerOrThrow": { kind: 21, modifiers: 0 }, "removeHandler": { kind: 21, modifiers: 0 }, "getHandlers": { kind: 21, modifiers: 0 }, "setHandleableTypes": { kind: 21, modifiers: 0 }, "getHandleableTypes": { kind: 21, modifiers: 0 }, "ensureHandleability": { kind: 21, modifiers: 0 }, "isHandleabe": { kind: 21, modifiers: 0 }, "getHandledTypes": { kind: 21, modifiers: 0 }, "getHandled": { kind: 21, modifiers: 0 }, "handle": { kind: 21, modifiers: 0 } } })(target)) {
         throw new InvalidControllerError(getTypeName(target.constructor));
     }
     const params = Reflect.getMetadata('design:paramtypes', target, propertyName);
     const event = params[index];
+    if (event === undefined) {
+        throw new Error(`Unable to identify Event type for method on '${getTypeName(target.constructor)}::${propertyName}'. This can happen because of circular dependency definition used while defining typeorm 'OneToMany' or 'ManyToOne' relations.\n\nPlease ensure, that in such case - both files are not referencing each other. Replace any definition of the relating parent Entity on child using 'any' type.`);
+    }
     if (!((event === null || event === void 0 ? void 0 : event.prototype) instanceof Event)) {
         throw new UnhandleableTypeError(getTypeName(target.constructor), kernel.describer.describe([Event]), kernel.describer.describe(event));
     }
@@ -1252,7 +1482,7 @@ function subscribe(target, propertyName, index) {
 }
 
 function initial(target, methodName, index) {
-    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21 }, "handles": { kind: 21 }, "subscribes": { kind: 21 }, "registerHandler": { kind: 21 }, "overrideHandler": { kind: 21 }, "hasHandler": { kind: 21 }, "getHandler": { kind: 21 }, "getHandlerOrThrow": { kind: 21 }, "removeHandler": { kind: 21 }, "getHandlers": { kind: 21 }, "setHandleableTypes": { kind: 21 }, "getHandleableTypes": { kind: 21 }, "ensureHandleability": { kind: 21 }, "isHandleabe": { kind: 21 }, "getHandledTypes": { kind: 21 }, "getHandled": { kind: 21 }, "handle": { kind: 21 } } })(target)) {
+    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21, modifiers: 0 }, "handles": { kind: 21, modifiers: 0 }, "subscribes": { kind: 21, modifiers: 0 }, "registerHandler": { kind: 21, modifiers: 0 }, "overrideHandler": { kind: 21, modifiers: 0 }, "hasHandler": { kind: 21, modifiers: 0 }, "getHandler": { kind: 21, modifiers: 0 }, "getHandlerOrThrow": { kind: 21, modifiers: 0 }, "removeHandler": { kind: 21, modifiers: 0 }, "getHandlers": { kind: 21, modifiers: 0 }, "setHandleableTypes": { kind: 21, modifiers: 0 }, "getHandleableTypes": { kind: 21, modifiers: 0 }, "ensureHandleability": { kind: 21, modifiers: 0 }, "isHandleabe": { kind: 21, modifiers: 0 }, "getHandledTypes": { kind: 21, modifiers: 0 }, "getHandled": { kind: 21, modifiers: 0 }, "handle": { kind: 21, modifiers: 0 } } })(target)) {
         throw new InvalidControllerError(getTypeName(target.constructor));
     }
     const params = Reflect.getMetadata('design:paramtypes', target, methodName);
@@ -1277,7 +1507,7 @@ function initial(target, methodName, index) {
 }
 
 function route(target, methodName, index) {
-    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21 }, "handles": { kind: 21 }, "subscribes": { kind: 21 }, "registerHandler": { kind: 21 }, "overrideHandler": { kind: 21 }, "hasHandler": { kind: 21 }, "getHandler": { kind: 21 }, "getHandlerOrThrow": { kind: 21 }, "removeHandler": { kind: 21 }, "getHandlers": { kind: 21 }, "setHandleableTypes": { kind: 21 }, "getHandleableTypes": { kind: 21 }, "ensureHandleability": { kind: 21 }, "isHandleabe": { kind: 21 }, "getHandledTypes": { kind: 21 }, "getHandled": { kind: 21 }, "handle": { kind: 21 } } })(target)) {
+    if (!instanceOf({ kind: 15, name: "Controller", properties: { "initialize": { kind: 21, modifiers: 0 }, "handles": { kind: 21, modifiers: 0 }, "subscribes": { kind: 21, modifiers: 0 }, "registerHandler": { kind: 21, modifiers: 0 }, "overrideHandler": { kind: 21, modifiers: 0 }, "hasHandler": { kind: 21, modifiers: 0 }, "getHandler": { kind: 21, modifiers: 0 }, "getHandlerOrThrow": { kind: 21, modifiers: 0 }, "removeHandler": { kind: 21, modifiers: 0 }, "getHandlers": { kind: 21, modifiers: 0 }, "setHandleableTypes": { kind: 21, modifiers: 0 }, "getHandleableTypes": { kind: 21, modifiers: 0 }, "ensureHandleability": { kind: 21, modifiers: 0 }, "isHandleabe": { kind: 21, modifiers: 0 }, "getHandledTypes": { kind: 21, modifiers: 0 }, "getHandled": { kind: 21, modifiers: 0 }, "handle": { kind: 21, modifiers: 0 } } })(target)) {
         throw new InvalidControllerError(getTypeName(target.constructor));
     }
     const params = Reflect.getMetadata('design:paramtypes', target, methodName);
@@ -1311,8 +1541,8 @@ function version(schemaVersion) {
         if (type !== 'method') {
             throw new InvalidLegacyTransformerError(getTypeName(target), propertyKey, schemaVersion);
         }
-        if (!instanceOf({ kind: 15, name: "Versionable", properties: { "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } })(proto) ||
-            !instanceOf({ kind: 15, name: "Hookable", properties: { "registerHook": { kind: 21 }, "overrideHook": { kind: 21 }, "getHook": { kind: 21 }, "getHookOrThrow": { kind: 21 }, "getHooks": { kind: 21 }, "getActions": { kind: 21 }, "hasHook": { kind: 21 }, "hasAction": { kind: 21 }, "removeHook": { kind: 21 } } })(proto)) {
+        if (!instanceOf({ kind: 15, name: "Versionable", properties: { "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } })(proto) ||
+            !instanceOf({ kind: 15, name: "Hookable", properties: { "registerHook": { kind: 21, modifiers: 0 }, "overrideHook": { kind: 21, modifiers: 0 }, "getHook": { kind: 21, modifiers: 0 }, "getHookOrThrow": { kind: 21, modifiers: 0 }, "getHooks": { kind: 21, modifiers: 0 }, "getActions": { kind: 21, modifiers: 0 }, "hasHook": { kind: 21, modifiers: 0 }, "hasAction": { kind: 21, modifiers: 0 }, "removeHook": { kind: 21, modifiers: 0 } } })(proto)) {
             throw new NotVersionableError(getTypeName(target));
         }
         if (!proto.hasHook('onConstruction', 'versionable')) {
@@ -1334,7 +1564,7 @@ class InvalidStateError extends StateError {
         super(`${typeName}: expected current state of '${currentState}' to be in one of states: '${expectedStates}'`);
     }
 }
-let StatefulMixin = class StatefulMixin {
+const StatefulTrait = trait((base) => class extends base {
     setState(state) {
         const selectableStates = this.getSelectableStates();
         if (isEmpty(selectableStates)) {
@@ -1382,10 +1612,7 @@ let StatefulMixin = class StatefulMixin {
     getSelectableStates() {
         return this.constructor.STATES;
     }
-};
-StatefulMixin = __decorate([
-    injectable()
-], StatefulMixin);
+});
 
 class StatusError extends ExtendableError {
 }
@@ -1399,7 +1626,7 @@ class InvalidStatusError extends StatusError {
         super(`${typeName}: expected current status of '${currentStatus}' to be in one of statuses: '${expectedStatuses}'`);
     }
 }
-let StatusfulMixin = class StatusfulMixin {
+const StatusfulTrait = trait((base) => class extends base {
     setStatus(status) {
         const selectableStatuses = this.getSelectableStatuses();
         if (isEmpty(selectableStatuses)) {
@@ -1447,14 +1674,11 @@ let StatusfulMixin = class StatusfulMixin {
     getSelectableStatuses() {
         return this.constructor.STATUSES;
     }
-};
-StatusfulMixin = __decorate([
-    injectable()
-], StatusfulMixin);
+});
 
-let Entity = class Entity extends classes(Serializable, StatefulMixin, StatusfulMixin) {
+let Entity = class Entity extends derive(StatefulTrait, StatusfulTrait, Serializable) {
     constructor(props) {
-        super([props]);
+        super(props);
     }
     getId() {
         return this.id;
@@ -1581,10 +1805,9 @@ let Entity = class Entity extends classes(Serializable, StatefulMixin, Statusful
     }
 };
 Entity = __decorate([
-    define('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 999 } }),
+    Type('Entity')({ kind: 19, name: "Entity", properties: { "id": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "schemaVersion": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: {} } }] }], extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], Entity);
-Entity.enableSerializableLists();
 
 const can = (validator) => (target, _propertyKey, descriptor) => {
     if (target.prototype instanceof Entity) {
@@ -1656,73 +1879,144 @@ class TransportExistsError extends LoggingError {
 }
 
 function executePostConstruct(target) {
-    const metadata = Reflect.getMetadata(METADATA_KEY.POST_CONSTRUCT, target.constructor);
-    const methodName = metadata.value;
-    target[methodName]();
+    const postConstructMethods = getPostConstructMethodNames(target.constructor);
+    for (const methodName of postConstructMethods) {
+        target[methodName]();
+    }
 }
 async function executePostConstructAsync(target) {
-    const metadata = Reflect.getMetadata(METADATA_KEY.POST_CONSTRUCT, target.constructor);
-    const methodName = metadata.value;
-    await target[methodName]();
+    const postConstructMethods = getPostConstructMethodNames(target.constructor);
+    for (const methodName of postConstructMethods) {
+        await target[methodName]();
+    }
+}
+class TrackedBindingToSyntax {
+    constructor(originalSyntax, injector, serviceIdentifier) {
+        this.originalSyntax = originalSyntax;
+        this.injector = injector;
+        this.serviceIdentifier = serviceIdentifier;
+        const proto = Object.getPrototypeOf(originalSyntax);
+        const methods = Object.getOwnPropertyNames(proto).filter((name) => name !== 'constructor' && typeof proto[name] === 'function');
+        for (const method of methods) {
+            if (!this[method]) {
+                this[method] = (...args) => {
+                    const result = originalSyntax[method](...args);
+                    if (method === 'inSingletonScope') {
+                        this.injector._trackScope('Singleton', this.serviceIdentifier);
+                    }
+                    else if (method === 'inTransientScope') {
+                        this.injector._trackScope('Transient', this.serviceIdentifier);
+                    }
+                    else if (method === 'inRequestScope') {
+                        this.injector._trackScope('Request', this.serviceIdentifier);
+                    }
+                    else if (method === 'toConstantValue') {
+                        this.injector._trackScope('Transient', this.serviceIdentifier);
+                    }
+                    else if (method === 'to' || method === 'toSelf') {
+                        this.injector._trackScope('Transient', this.serviceIdentifier);
+                    }
+                    if (result &&
+                        typeof result === 'object' &&
+                        result !== originalSyntax) {
+                        return new TrackedBindingToSyntax(result, this.injector, this.serviceIdentifier);
+                    }
+                    return result;
+                };
+            }
+        }
+    }
+    toRoute(EventSourceableType) {
+        if (!isEventSourceableType(EventSourceableType)) {
+            throw new InvalidEventSourceableError(kernel.describer.describe(EventSourceableType));
+        }
+        const Router = this.injector.get(BINDINGS.Router);
+        const router = new Router(EventSourceableType, EventSourceableType.resolveInitializingMessage(), EventSourceableType.resolveRoutedCommands(), EventSourceableType.resolveRoutedEvents());
+        this.injector.injectInto(router);
+        this.originalSyntax.toConstantValue(router);
+        this.injector._trackScope('Transient', this.serviceIdentifier);
+    }
 }
 class Injector extends Container {
+    constructor() {
+        super(...arguments);
+        this._scopeRegistry = new Map([
+            ['Singleton', new Set()],
+            ['Transient', new Set()],
+            ['Request', new Set()],
+        ]);
+    }
+    _trackScope(scope, serviceIdentifier) {
+        for (const identifiers of this._scopeRegistry.values()) {
+            identifiers.delete(serviceIdentifier);
+        }
+        this._scopeRegistry.get(scope).add(serviceIdentifier);
+    }
     bind(serviceIdentifier) {
-        const bindingToSyntax = super.bind(serviceIdentifier);
-        bindingToSyntax.toRoute = (EventSourceableType) => {
-            if (!isEventSourceableType(EventSourceableType)) {
-                throw new InvalidEventSourceableError(kernel.describer.describe(EventSourceableType));
-            }
-            const Router = this.get(BINDINGS.Router);
-            const router = new Router(EventSourceableType, EventSourceableType.resolveInitializingMessage(), EventSourceableType.resolveRoutedCommands(), EventSourceableType.resolveRoutedEvents());
-            this.injectInto(router);
-            bindingToSyntax.toConstantValue(router);
-        };
-        return bindingToSyntax;
+        const originalSyntax = super.bind(serviceIdentifier);
+        return new TrackedBindingToSyntax(originalSyntax, this, serviceIdentifier);
+    }
+    unbind(serviceIdentifier) {
+        super.unbind(serviceIdentifier);
+        for (const identifiers of this._scopeRegistry.values()) {
+            identifiers.delete(serviceIdentifier);
+        }
+        return Promise.resolve();
+    }
+    unbindAll() {
+        super.unbindAll();
+        for (const identifiers of this._scopeRegistry.values()) {
+            identifiers.clear();
+        }
+        return Promise.resolve();
     }
     injectInto(value) {
-        const mappings = Reflect.getMetadata(METADATA_KEY.TAGGED_PROP, value.constructor);
-        if (mappings) {
-            for (const [key, metadatas] of Object.entries(mappings)) {
-                for (const metadata of metadatas) {
-                    if (metadata.key === 'inject') {
-                        const id = metadata.value;
-                        value[key] = this.get(id);
+        const metadata = getInversifyMetadata(value.constructor);
+        if (metadata === null || metadata === void 0 ? void 0 : metadata.properties) {
+            for (const [propertyName, propertyMetadata,] of metadata.properties.entries()) {
+                const serviceId = propertyMetadata.value;
+                if (propertyMetadata.optional) {
+                    try {
+                        value[propertyName] = this.get(serviceId);
                     }
+                    catch (error) {
+                        value[propertyName] = undefined;
+                    }
+                }
+                else {
+                    value[propertyName] = this.get(serviceId);
                 }
             }
         }
-        if (hasPostConstruct(value)) {
+        if (hasPostConstruct(value.constructor)) {
             executePostConstruct(value);
         }
     }
     async injectIntoAsync(value) {
-        const mappings = Reflect.getMetadata(METADATA_KEY.TAGGED_PROP, value.constructor);
-        if (mappings) {
-            for (const [key, metadatas] of Object.entries(mappings)) {
-                for (const metadata of metadatas) {
-                    if (metadata.key === 'inject') {
-                        const id = metadata.value;
-                        value[key] = await this.getAsync(id);
+        const metadata = getInversifyMetadata(value.constructor);
+        if (metadata === null || metadata === void 0 ? void 0 : metadata.properties) {
+            for (const [propertyName, propertyMetadata,] of metadata.properties.entries()) {
+                const serviceId = propertyMetadata.value;
+                if (propertyMetadata.optional) {
+                    try {
+                        value[propertyName] = await this.getAsync(serviceId);
                     }
+                    catch (error) {
+                        value[propertyName] = undefined;
+                    }
+                }
+                else {
+                    value[propertyName] = await this.getAsync(serviceId);
                 }
             }
         }
-        if (hasPostConstruct(value)) {
+        if (hasPostConstruct(value.constructor)) {
             await executePostConstructAsync(value);
         }
     }
     findByScope(scope) {
-        const lookup = this._bindingDictionary;
-        const identifiers = [];
-        lookup.traverse((key) => {
-            const bindings = lookup.get(key);
-            for (const binding of bindings) {
-                if (binding.scope === scope) {
-                    identifiers.push(binding.serviceIdentifier);
-                }
-            }
-        });
-        return identifiers;
+        const identifiers = this._scopeRegistry.get(scope);
+        return identifiers ? Array.from(identifiers) : [];
     }
 }
 
@@ -1812,9 +2106,21 @@ class Log {
 }
 
 var Config_1;
-let Config = Config_1 = class Config extends Struct {
+const CONFIG_INCLUDED_KEY = Symbol('eveble:config-included-key');
+const CONFIG_MERGED_KEY = Symbol('eveble:config-merged-key');
+let Config = Config_1 = class Config extends Serializable {
     constructor() {
         super();
+        Object.defineProperty(this, CONFIG_INCLUDED_KEY, {
+            enumerable: false,
+            writable: true,
+            value: {},
+        });
+        Object.defineProperty(this, CONFIG_MERGED_KEY, {
+            enumerable: false,
+            writable: true,
+            value: {},
+        });
     }
     isConfigurable(path) {
         return has(this.getPropTypes(), path);
@@ -1836,26 +2142,26 @@ let Config = Config_1 = class Config extends Struct {
                 propTypes[key] = value;
             }
         }
-        if (isEmpty(this.merged)) {
+        if (isEmpty(this[CONFIG_MERGED_KEY])) {
             return propTypes;
         }
         let mergedPropTypes = {};
-        for (const mergedCfg of Object.values(this.merged || {})) {
+        for (const mergedCfg of Object.values(this[CONFIG_MERGED_KEY] || {})) {
             const mergedConfigPropTypes = mergedCfg.getPropTypes();
             mergedPropTypes = merge(mergedPropTypes, mergedConfigPropTypes, {
-                isMergeableObject: isPlainRecord,
+                isMergeableObject: isPlainRecord$1,
             });
         }
         propTypes = merge(mergedPropTypes, propTypes, {
-            isMergeableObject: isPlainRecord,
+            isMergeableObject: isPlainRecord$1,
         });
-        return convertObjectToCollection(propTypes);
+        return convertObjectToCollection$1(propTypes);
     }
     has(path) {
         const hasValue = has(this, path);
         if (hasValue)
             return true;
-        for (const config of Object.values(this.included || {})) {
+        for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || {})) {
             if (config.has(path)) {
                 return true;
             }
@@ -1865,12 +2171,12 @@ let Config = Config_1 = class Config extends Struct {
     get(path, runtimeDefaultValue) {
         let foundValue = get(this, path);
         if (foundValue !== undefined) {
-            if (isPlainRecord(foundValue)) {
+            if (isPlainRecord$1(foundValue)) {
                 return { ...foundValue };
             }
             return foundValue;
         }
-        for (const config of Object.values(this.included || [])) {
+        for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || [])) {
             foundValue = config.getExact(path);
             if (foundValue !== undefined) {
                 return foundValue;
@@ -1884,12 +2190,12 @@ let Config = Config_1 = class Config extends Struct {
     getExact(path) {
         let foundValue = get(this, path);
         if (foundValue !== undefined) {
-            if (isPlainRecord(foundValue)) {
+            if (isPlainRecord$1(foundValue)) {
                 return { ...foundValue };
             }
             return foundValue;
         }
-        for (const config of Object.values(this.included || [])) {
+        for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || [])) {
             foundValue = config.getExact(path);
             if (foundValue !== undefined) {
                 return foundValue;
@@ -1900,12 +2206,12 @@ let Config = Config_1 = class Config extends Struct {
     getDefault(path) {
         let foundDefaultValue = get(this.getPropertyInitializers(), path);
         if (foundDefaultValue !== undefined) {
-            if (isPlainRecord(foundDefaultValue)) {
+            if (isPlainRecord$1(foundDefaultValue)) {
                 return { ...foundDefaultValue };
             }
             return foundDefaultValue;
         }
-        for (const config of Object.values(this.included || {})) {
+        for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || {})) {
             foundDefaultValue = config.getDefault(path);
             if (foundDefaultValue !== undefined) {
                 return foundDefaultValue;
@@ -1917,7 +2223,7 @@ let Config = Config_1 = class Config extends Struct {
         const hasDefaultValue = has(this.getPropertyInitializers(), path);
         if (hasDefaultValue)
             return true;
-        for (const config of Object.values(this.included || {})) {
+        for (const config of Object.values(this[CONFIG_INCLUDED_KEY] || {})) {
             if (config.hasDefault(path)) {
                 return true;
             }
@@ -1925,7 +2231,7 @@ let Config = Config_1 = class Config extends Struct {
         return hasDefaultValue;
     }
     set(path, value) {
-        const copy = this.toPlainObject();
+        const copy = deepClone(this);
         set(copy, path, value);
         this.validateProps(copy, this.getPropTypes());
         set(this, path, value);
@@ -1937,12 +2243,12 @@ let Config = Config_1 = class Config extends Struct {
         this.findDiffAndUpdate(this, props, this);
     }
     include(config) {
-        if (!instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21 }, "has": { kind: 21 }, "get": { kind: 21 }, "getExact": { kind: 21 }, "getDefault": { kind: 21 }, "hasDefault": { kind: 21 }, "set": { kind: 21 }, "assign": { kind: 21 }, "include": { kind: 21 }, "merge": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(config)) {
+        if (!instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21, modifiers: 0 }, "has": { kind: 21, modifiers: 0 }, "get": { kind: 21, modifiers: 0 }, "getExact": { kind: 21, modifiers: 0 }, "getDefault": { kind: 21, modifiers: 0 }, "hasDefault": { kind: 21, modifiers: 0 }, "set": { kind: 21, modifiers: 0 }, "assign": { kind: 21, modifiers: 0 }, "include": { kind: 21, modifiers: 0 }, "merge": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 } } })(config)) {
             throw new InvalidConfigError(getTypeName(this), kernel.describer.describe(config));
         }
-        if (this.included === undefined)
-            this.included = {};
-        this.included[getTypeName(config)] = config;
+        if (this[CONFIG_INCLUDED_KEY] === undefined)
+            this[CONFIG_INCLUDED_KEY] = {};
+        this[CONFIG_INCLUDED_KEY][getTypeName(config)] = config;
     }
     static from(props) {
         const propTypes = this.getPropTypes();
@@ -1969,15 +2275,15 @@ let Config = Config_1 = class Config extends Struct {
         return new this(processedProps);
     }
     merge(config) {
-        if (!instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21 }, "has": { kind: 21 }, "get": { kind: 21 }, "getExact": { kind: 21 }, "getDefault": { kind: 21 }, "hasDefault": { kind: 21 }, "set": { kind: 21 }, "assign": { kind: 21 }, "include": { kind: 21 }, "merge": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(config)) {
+        if (!instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21, modifiers: 0 }, "has": { kind: 21, modifiers: 0 }, "get": { kind: 21, modifiers: 0 }, "getExact": { kind: 21, modifiers: 0 }, "getDefault": { kind: 21, modifiers: 0 }, "hasDefault": { kind: 21, modifiers: 0 }, "set": { kind: 21, modifiers: 0 }, "assign": { kind: 21, modifiers: 0 }, "include": { kind: 21, modifiers: 0 }, "merge": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 } } })(config)) {
             throw new InvalidConfigError(getTypeName(this), kernel.describer.describe(config));
         }
         const configCopy = deepClone(config);
         delete configCopy.included;
         this.findDiffAndUpdate(this, this, configCopy);
-        if (this.merged === undefined)
-            this.merged = {};
-        this.merged[getTypeName(config)] = config;
+        if (this[CONFIG_MERGED_KEY] === undefined)
+            this[CONFIG_MERGED_KEY] = {};
+        this[CONFIG_MERGED_KEY][getTypeName(config)] = config;
     }
     findDiffAndUpdate(target, left, right) {
         const differences = diff(left, right);
@@ -1999,7 +2305,7 @@ let Config = Config_1 = class Config extends Struct {
 };
 Config = Config_1 = __decorate([
     delegate(),
-    define()({ kind: 19, name: "Config", properties: { "included": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "merged": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } }, extends: { kind: 18, type: Struct, arguments: [] } }),
+    Type()({ kind: 19, name: "Config", properties: { [CONFIG_INCLUDED_KEY]: { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, [CONFIG_MERGED_KEY]: { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } }, constructors: [{ modifiers: 0, parameters: [] }], extends: { kind: 18, type: Serializable, arguments: [] } }),
     __metadata("design:paramtypes", [])
 ], Config);
 
@@ -2052,7 +2358,7 @@ let LogTransportConfig = class LogTransportConfig extends Config {
     }
 };
 LogTransportConfig = __decorate([
-    define()({ kind: 19, name: "LogTransportConfig", properties: { "isEnabled": { kind: 17, initializer: () => true, types: [{ kind: 12 }, { kind: 4 }] }, "level": { kind: 17, initializer: () => 'info', types: [{ kind: 12 }, { kind: 2 }] }, "logColors": { kind: 17, initializer: () => ({
+    Type()({ kind: 19, name: "LogTransportConfig", properties: { "isEnabled": { kind: 17, initializer: () => true, modifiers: 1, types: [{ kind: 12 }, { kind: 4 }] }, "level": { kind: 17, initializer: () => 'info', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "logColors": { kind: 17, initializer: () => ({
                     emerg: 'bold redBG',
                     alert: 'bold yellow',
                     crit: 'bold red',
@@ -2061,21 +2367,21 @@ LogTransportConfig = __decorate([
                     notice: 'blue',
                     info: 'white',
                     debug: 'bold cyan',
-                }), types: [{ kind: 12 }, { kind: 15, properties: {} }] }, "partsColors": { kind: 17, initializer: () => ({
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: {} }] }, "partsColors": { kind: 17, initializer: () => ({
                     initial: 'white',
                     separator: 'white',
                     timestamp: 'white',
                     label: 'white',
                     target: 'white',
                     method: 'white',
-                }), types: [{ kind: 12 }, { kind: 15, properties: { "initial": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "separator": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "target": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "method": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "label": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] } } }] }, "messages": { kind: 17, initializer: () => ({
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "initial": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "separator": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "target": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "method": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "label": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] } } }] }, "messages": { kind: 17, initializer: () => ({
                     start: chalk `{gray start}`,
                     exit: chalk `{gray exit}`,
-                }), types: [{ kind: 12 }, { kind: 15, properties: { "start": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "exit": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] } } }] }, "parts": { kind: 17, initializer: () => ({
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "start": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "exit": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] } } }] }, "parts": { kind: 17, initializer: () => ({
                     initial: '',
                     separator: ' ',
                     label: '',
-                }), types: [{ kind: 12 }, { kind: 15, properties: { "initial": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "separator": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "label": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] } } }] }, "flags": { kind: 17, initializer: () => ({
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "initial": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "separator": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] }, "label": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }] } } }] }, "flags": { kind: 17, initializer: () => ({
                     isTimestamped: true,
                     isLabeled: false,
                     showTarget: true,
@@ -2084,7 +2390,7 @@ LogTransportConfig = __decorate([
                     isWholeLineColored: true,
                     includeStackTrace: true,
                     isAbbreviatingSources: false,
-                }), types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, types: [{ kind: 12 }, { kind: 3 }] } }, extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "level": { kind: 999, modifiers: 0 }, "logColors": { kind: 999, modifiers: 0 }, "partsColors": { kind: 999, modifiers: 0 }, "messages": { kind: 999, modifiers: 0 }, "parts": { kind: 999, modifiers: 0 }, "flags": { kind: 999, modifiers: 0 }, "timestampFormat": { kind: 999, modifiers: 0 }, "abbreviationLength": { kind: 999, modifiers: 0 }, "inspectDepth": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], LogTransportConfig);
 
@@ -2111,7 +2417,7 @@ let LoggingConfig = class LoggingConfig extends Config {
     }
 };
 LoggingConfig = __decorate([
-    define()({ kind: 19, name: "LoggingConfig", properties: { "isEnabled": { kind: 17, initializer: () => true, types: [{ kind: 12 }, { kind: 4 }] }, "levels": { kind: 17, initializer: () => ({
+    Type()({ kind: 19, name: "LoggingConfig", properties: { "isEnabled": { kind: 17, initializer: () => true, modifiers: 1, types: [{ kind: 12 }, { kind: 4 }] }, "levels": { kind: 17, initializer: () => ({
                     emerg: 0,
                     alert: 1,
                     crit: 2,
@@ -2120,11 +2426,11 @@ LoggingConfig = __decorate([
                     notice: 5,
                     info: 6,
                     debug: 7,
-                }), types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "transports": { kind: 17, initializer: () => ({
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "transports": { kind: 17, initializer: () => ({
                     console: new LogTransportConfig({
                         level: getenv.string('LOGGING_LEVEL', 'info'),
                     }),
-                }), types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: LogTransportConfig, arguments: [] }] } } }] } }, extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: LogTransportConfig, arguments: [] }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "levels": { kind: 999, modifiers: 0 }, "transports": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], LoggingConfig);
 
@@ -2136,7 +2442,7 @@ let EvebleConfig = class EvebleConfig extends Config {
     }
 };
 EvebleConfig = __decorate([
-    define()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "CommitStore": { kind: 999, modifiers: 0 }, "Snapshotter": { kind: 999, modifiers: 0 }, "CommandScheduler": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], EvebleConfig);
 
@@ -2181,7 +2487,7 @@ AppConfig.defaultMongoDBOptions = {
     useUnifiedTopology: true,
 };
 AppConfig = AppConfig_1 = __decorate([
-    define()({ kind: 19, name: "AppConfig", properties: { "appId": { kind: 17, initializer: () => getenv.string('APP_ID', AppConfig_1.generateId()), types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "workerId": { kind: 17, initializer: () => getenv.string('WORKER_ID', AppConfig_1.generateId()), types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "logging": { kind: 17, initializer: () => new LoggingConfig(), types: [{ kind: 12 }, { kind: 18, type: LoggingConfig, arguments: [] }] }, "conversion": { kind: 17, initializer: () => ({ type: 'runtime' }), types: [{ kind: 12 }, { kind: 15, properties: { "type": { kind: 17, types: [{ kind: 5, value: "manual" }, { kind: 5, value: "runtime" }] } } }] }, "validation": { kind: 17, initializer: () => ({ type: 'runtime' }), types: [{ kind: 12 }, { kind: 15, properties: { "type": { kind: 17, types: [{ kind: 5, value: "manual" }, { kind: 5, value: "runtime" }] } } }] }, "description": { kind: 17, initializer: () => ({ formatting: 'default' }), types: [{ kind: 12 }, { kind: 15, properties: { "formatting": { kind: 17, types: [{ kind: 5, value: "compact" }, { kind: 5, value: "debug" }, { kind: 5, value: "default" }] } } }] }, "eveble": { kind: 17, initializer: () => new EvebleConfig(), types: [{ kind: 12 }, { kind: 18, type: EvebleConfig, arguments: [] }] }, "clients": { kind: 17, initializer: () => ({
+    Type()({ kind: 19, name: "AppConfig", properties: { "appId": { kind: 17, initializer: () => getenv.string('APP_ID', AppConfig_1.generateId()), modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "workerId": { kind: 17, initializer: () => getenv.string('WORKER_ID', AppConfig_1.generateId()), modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "logging": { kind: 17, initializer: () => new LoggingConfig(), modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: LoggingConfig, arguments: [] }] }, "conversion": { kind: 17, initializer: () => ({ type: 'runtime' }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "type": { kind: 17, modifiers: 0, types: [{ kind: 5, value: "manual" }, { kind: 5, value: "runtime" }] } } }] }, "validation": { kind: 17, initializer: () => ({ type: 'runtime' }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "type": { kind: 17, modifiers: 0, types: [{ kind: 5, value: "manual" }, { kind: 5, value: "runtime" }] } } }] }, "description": { kind: 17, initializer: () => ({ formatting: 'default' }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "formatting": { kind: 17, modifiers: 0, types: [{ kind: 5, value: "compact" }, { kind: 5, value: "debug" }, { kind: 5, value: "default" }] } } }] }, "eveble": { kind: 17, initializer: () => new EvebleConfig(), modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: EvebleConfig, arguments: [] }] }, "clients": { kind: 17, initializer: () => ({
                     MongoDB: {
                         CommitStore: AppConfig_1.defaultMongoDBOptions,
                         Snapshotter: AppConfig_1.defaultMongoDBOptions,
@@ -2192,7 +2498,7 @@ AppConfig = AppConfig_1 = __decorate([
                             processEvery: 180000,
                         },
                     },
-                }), types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Agenda": { kind: 17, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Agenda": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "appId": { kind: 999, modifiers: 0 }, "workerId": { kind: 999, modifiers: 0 }, "logging": { kind: 999, modifiers: 0 }, "conversion": { kind: 999, modifiers: 0 }, "validation": { kind: 999, modifiers: 0 }, "description": { kind: 999, modifiers: 0 }, "eveble": { kind: 999, modifiers: 0 }, "clients": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@6050": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@6052": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], AppConfig);
 
@@ -2206,7 +2512,7 @@ var STATES$1;
     STATES["stopped"] = "stopped";
     STATES["shutdown"] = "shutdown";
 })(STATES$1 || (STATES$1 = {}));
-class Module extends classes(StatefulMixin) {
+class Module extends derive(StatefulTrait) {
     constructor(props = {}) {
         super();
         if (props.config)
@@ -2329,14 +2635,14 @@ class Module extends classes(StatefulMixin) {
     }
     validateModules(modules) {
         for (const module of modules) {
-            if (!instanceOf({ kind: 15, name: "Module", properties: { "config": { kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21 }, "has": { kind: 21 }, "get": { kind: 21 }, "getExact": { kind: 21 }, "getDefault": { kind: 21 }, "hasDefault": { kind: 21 }, "set": { kind: 21 }, "assign": { kind: 21 }, "include": { kind: 21 }, "merge": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } }, "initialize": { kind: 21 }, "start": { kind: 21 }, "stop": { kind: 21 }, "reset": { kind: 21 }, "shutdown": { kind: 21 }, "invokeAction": { kind: 21 }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "isInState": { kind: 21 }, "isInOneOfStates": { kind: 21 }, "getState": { kind: 21 }, "setState": { kind: 21 }, "hasState": { kind: 21 }, "validateState": { kind: 21 }, "getSelectableStates": { kind: 21 } } })(module)) {
+            if (!instanceOf({ kind: 15, name: "Module", properties: { "config": { kind: 15, modifiers: 0, name: "Configurable", properties: { "isConfigurable": { kind: 21, modifiers: 0 }, "has": { kind: 21, modifiers: 0 }, "get": { kind: 21, modifiers: 0 }, "getExact": { kind: 21, modifiers: 0 }, "getDefault": { kind: 21, modifiers: 0 }, "hasDefault": { kind: 21, modifiers: 0 }, "set": { kind: 21, modifiers: 0 }, "assign": { kind: 21, modifiers: 0 }, "include": { kind: 21, modifiers: 0 }, "merge": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 } } }, "initialize": { kind: 21, modifiers: 0 }, "start": { kind: 21, modifiers: 0 }, "stop": { kind: 21, modifiers: 0 }, "reset": { kind: 21, modifiers: 0 }, "shutdown": { kind: 21, modifiers: 0 }, "invokeAction": { kind: 21, modifiers: 0 }, "state": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "isInState": { kind: 21, modifiers: 0 }, "isInOneOfStates": { kind: 21, modifiers: 0 }, "getState": { kind: 21, modifiers: 0 }, "setState": { kind: 21, modifiers: 0 }, "hasState": { kind: 21, modifiers: 0 }, "validateState": { kind: 21, modifiers: 0 }, "getSelectableStates": { kind: 21, modifiers: 0 } } })(module)) {
                 const typeName = getTypeName(this.constructor);
                 throw new InvalidModuleError(typeName, kernel.describer.describe(module));
             }
         }
     }
     validateConfig(config) {
-        if (!instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21 }, "has": { kind: 21 }, "get": { kind: 21 }, "getExact": { kind: 21 }, "getDefault": { kind: 21 }, "hasDefault": { kind: 21 }, "set": { kind: 21 }, "assign": { kind: 21 }, "include": { kind: 21 }, "merge": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 } } })(config)) {
+        if (!instanceOf({ kind: 15, name: "Configurable", properties: { "isConfigurable": { kind: 21, modifiers: 0 }, "has": { kind: 21, modifiers: 0 }, "get": { kind: 21, modifiers: 0 }, "getExact": { kind: 21, modifiers: 0 }, "getDefault": { kind: 21, modifiers: 0 }, "hasDefault": { kind: 21, modifiers: 0 }, "set": { kind: 21, modifiers: 0 }, "assign": { kind: 21, modifiers: 0 }, "include": { kind: 21, modifiers: 0 }, "merge": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 } } })(config)) {
             const typeName = getTypeName(this.constructor);
             throw new InvalidConfigError(typeName, kernel.describer.describe(config));
         }
@@ -2474,7 +2780,7 @@ const DEFAULTS = {
     LOGGING_LEVELS,
 };
 
-let RFC5424LoggingMixin = class RFC5424LoggingMixin {
+const RFC5424LoggingTrait = trait((base) => class extends base {
     emerg(entry, ...args) {
         this.log('emerg', entry, ...args);
     }
@@ -2502,10 +2808,7 @@ let RFC5424LoggingMixin = class RFC5424LoggingMixin {
     log(entry, ...args) {
         return entry && args ? undefined : undefined;
     }
-};
-RFC5424LoggingMixin = __decorate([
-    injectable()
-], RFC5424LoggingMixin);
+});
 
 var Logger_1;
 var STATES;
@@ -2514,7 +2817,7 @@ var STATES;
     STATES["stopped"] = "stopped";
     STATES["running"] = "running";
 })(STATES || (STATES = {}));
-let Logger = Logger_1 = class Logger extends classes(StatefulMixin, RFC5424LoggingMixin) {
+let Logger = Logger_1 = class Logger extends derive(StatefulTrait, RFC5424LoggingTrait) {
     constructor(levels = LOGGING_LEVELS) {
         super();
         this.levels = levels;
@@ -2596,7 +2899,7 @@ Logger = Logger_1 = __decorate([
     __metadata("design:paramtypes", [Object])
 ], Logger);
 
-class LogTransport extends RFC5424LoggingMixin {
+class LogTransport extends derive(RFC5424LoggingTrait) {
     constructor(level, config) {
         super();
         this.level = level;
@@ -3333,8 +3636,9 @@ EJSONSerializerAdapter = __decorate([
     __metadata("design:paramtypes", [String])
 ], EJSONSerializerAdapter);
 
-let HandlingMixin = class HandlingMixin {
+const HandlingTrait = trait((base) => class extends base {
     constructor() {
+        super();
         Object.defineProperty(this, HANDLERS, {
             value: new Map(),
             enumerable: getenv.bool('EVEBLE_SHOW_INTERNALS', false),
@@ -3405,7 +3709,9 @@ let HandlingMixin = class HandlingMixin {
         this[HANDLEABLE_TYPES].push(...normalizedTypes);
     }
     getHandleableTypes() {
-        return isEmpty(this[HANDLEABLE_TYPES]) ? [Message] : this[HANDLEABLE_TYPES];
+        return isEmpty(this[HANDLEABLE_TYPES])
+            ? [Message]
+            : this[HANDLEABLE_TYPES];
     }
     ensureHandleability(messageType, handleableTypes = this.getHandleableTypes()) {
         if (!this.isHandleabe(messageType, handleableTypes)) {
@@ -3459,78 +3765,71 @@ let HandlingMixin = class HandlingMixin {
         }
         return typeNames;
     }
-};
-HandlingMixin = __decorate([
-    injectable(),
-    __metadata("design:paramtypes", [])
-], HandlingMixin);
+});
 
-let OneToOneHandlingMixin = class OneToOneHandlingMixin extends HandlingMixin {
-    initialize() {
-        this.setupHandlers({
-            handlers: this.handles(),
-            handleableTypes: [Command],
-            isBoundable: true,
-        });
-        this.setupHandlers({
-            handlers: this.subscribes(),
-            handleableTypes: [Event],
-            isBoundable: true,
-        });
-    }
-    registerHandler(messageType, handler, shouldOverride = false) {
-        if (!this.isHandleabe(messageType)) {
-            throw new UnhandleableTypeError(getTypeName(this.constructor), kernel.describer.describe(this.getHandleableTypes()), kernel.describer.describe(messageType));
+const OneToOneHandlingTrait = trait([HandlingTrait], (base) => {
+    const klass = class extends base {
+        initialize() {
+            this.setupHandlers({
+                handlers: this.handles(),
+                handleableTypes: [Command],
+                isBoundable: true,
+            });
+            this.setupHandlers({
+                handlers: this.subscribes(),
+                handleableTypes: [Event],
+                isBoundable: true,
+            });
         }
-        if (!isFunction(handler)) {
-            throw new InvalidHandlerError(getTypeName(this.constructor), messageType.getTypeName(), kernel.describer.describe(handler));
-        }
-        if (this.hasHandler(messageType) && !shouldOverride) {
-            throw new HandlerExistError(getTypeName(this.constructor), messageType.getTypeName());
-        }
-        this[HANDLERS].set(messageType, handler);
-    }
-    getHandler(messageType) {
-        if (!(messageType.prototype instanceof Message)) {
-            throw new InvalidMessageableType(kernel.describer.describe(messageType));
-        }
-        return this.hasHandler(messageType)
-            ? this[HANDLERS].get(messageType)
-            : undefined;
-    }
-    getHandlerOrThrow(messageType) {
-        const handler = this.getHandler(messageType);
-        if (handler === undefined) {
-            throw new HandlerNotFoundError(getTypeName(this.constructor), messageType.getTypeName());
-        }
-        return handler;
-    }
-    getTypeByHandler(handlerReference) {
-        for (const [messageType, handler] of this[HANDLERS].entries()) {
-            const unboundHandler = handler.original;
-            if (handlerReference === unboundHandler || handlerReference === handler) {
-                return messageType;
+        registerHandler(messageType, handler, shouldOverride = false) {
+            if (!this.isHandleabe(messageType)) {
+                throw new UnhandleableTypeError(getTypeName(this.constructor), kernel.describer.describe(this.getHandleableTypes()), kernel.describer.describe(messageType));
             }
+            if (!isFunction(handler)) {
+                throw new InvalidHandlerError(getTypeName(this.constructor), messageType.getTypeName(), kernel.describer.describe(handler));
+            }
+            if (this.hasHandler(messageType) && !shouldOverride) {
+                throw new HandlerExistError(getTypeName(this.constructor), messageType.getTypeName());
+            }
+            this[HANDLERS].set(messageType, handler);
         }
-        return undefined;
-    }
-    async handle(message) {
-        const handler = this.getHandlerOrThrow(message.constructor);
-        const result = await handler(message);
-        return result;
-    }
-};
-__decorate([
-    postConstruct(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], OneToOneHandlingMixin.prototype, "initialize", null);
-OneToOneHandlingMixin = __decorate([
-    injectable()
-], OneToOneHandlingMixin);
+        getHandler(messageType) {
+            if (!(messageType.prototype instanceof Message)) {
+                throw new InvalidMessageableType(kernel.describer.describe(messageType));
+            }
+            return this.hasHandler(messageType)
+                ? this[HANDLERS].get(messageType)
+                : undefined;
+        }
+        getHandlerOrThrow(messageType) {
+            const handler = this.getHandler(messageType);
+            if (handler === undefined) {
+                throw new HandlerNotFoundError(getTypeName(this.constructor), messageType.getTypeName());
+            }
+            return handler;
+        }
+        getTypeByHandler(handlerReference) {
+            for (const [messageType, handler] of this[HANDLERS].entries()) {
+                const unboundHandler = handler.original;
+                if (handlerReference === unboundHandler ||
+                    handlerReference === handler) {
+                    return messageType;
+                }
+            }
+            return undefined;
+        }
+        async handle(message) {
+            const handler = this.getHandlerOrThrow(message.constructor);
+            const result = await handler(message);
+            return result;
+        }
+    };
+    const descriptor = Object.getOwnPropertyDescriptor(trait.prototype, 'initialize');
+    postConstruct()(klass.prototype, 'initialize', descriptor);
+    return klass;
+});
 
-let CommandBus = class CommandBus extends classes(HookableMixin, OneToOneHandlingMixin) {
+let CommandBus = class CommandBus extends derive(HookableTrait, OneToOneHandlingTrait) {
     constructor() {
         super();
         this.setHandleableTypes([Command]);
@@ -3560,88 +3859,84 @@ CommandBus = __decorate([
 ], CommandBus);
 Object.getPrototypeOf(CommandBus.prototype).constructor = Object;
 
-let OneToManyHandlingMixin = class OneToManyHandlingMixin extends HandlingMixin {
-    initialize() {
-        this.setupHandlers({
-            handlers: this.subscribes(),
-            handleableTypes: [Event],
-            isBoundable: true,
-        });
-    }
-    registerHandler(messageType, handler, shouldOverride = false) {
-        if (!this.isHandleabe(messageType)) {
-            throw new UnhandleableTypeError(getTypeName(this.constructor), kernel.describer.describe(this.getHandleableTypes()), kernel.describer.describe(messageType));
+const OneToManyHandlingTrait = trait([HandlingTrait], (base) => {
+    const klass = class extends base {
+        initialize() {
+            this.setupHandlers({
+                handlers: this.subscribes(),
+                handleableTypes: [Event],
+                isBoundable: true,
+            });
         }
-        if (!isFunction(handler)) {
-            throw new InvalidHandlerError(getTypeName(this.constructor), messageType.getTypeName(), kernel.describer.describe(handler));
-        }
-        if (!this.hasHandler(messageType) || shouldOverride) {
-            this[HANDLERS].set(messageType, [handler]);
-        }
-        else {
-            this[HANDLERS].get(messageType).push(handler);
-        }
-    }
-    getHandler(messageType) {
-        if (!(messageType.prototype instanceof Message)) {
-            throw new InvalidMessageableType(kernel.describer.describe(messageType));
-        }
-        return this.hasHandler(messageType)
-            ? this[HANDLERS].get(messageType)
-            : undefined;
-    }
-    getHandlerOrThrow(messageType) {
-        const handlers = this.getHandler(messageType);
-        if (handlers === undefined) {
-            throw new HandlerNotFoundError(getTypeName(this.constructor), getTypeName(messageType));
-        }
-        return handlers;
-    }
-    getTypeByHandler(handlerReference) {
-        for (const [messageType, handlers] of this[HANDLERS].entries()) {
-            const unboundHandlers = handlers.map((handler) => handler.original || handler);
-            if (unboundHandlers.includes(handlerReference) ||
-                handlers.includes(handlerReference)) {
-                return messageType;
+        registerHandler(messageType, handler, shouldOverride = false) {
+            if (!this.isHandleabe(messageType)) {
+                throw new UnhandleableTypeError(getTypeName(this.constructor), kernel.describer.describe(this.getHandleableTypes()), kernel.describer.describe(messageType));
+            }
+            if (!isFunction(handler)) {
+                throw new InvalidHandlerError(getTypeName(this.constructor), messageType.getTypeName(), kernel.describer.describe(handler));
+            }
+            if (!this.hasHandler(messageType) || shouldOverride) {
+                this[HANDLERS].set(messageType, [handler]);
+            }
+            else {
+                this[HANDLERS].get(messageType).push(handler);
             }
         }
-        return undefined;
-    }
-    async handle(message, execution = 'sequential') {
-        switch (execution) {
-            case 'sequential':
-                await this.handleSequential(message);
-                break;
-            case 'concurrent':
-                await this.handleConcurrent(message);
-                break;
-            default:
-                throw new UnsupportedExecutionTypeError(getTypeName(this.constructor), execution);
+        getHandler(messageType) {
+            if (!(messageType.prototype instanceof Message)) {
+                throw new InvalidMessageableType(kernel.describer.describe(messageType));
+            }
+            return this.hasHandler(messageType)
+                ? this[HANDLERS].get(messageType)
+                : undefined;
         }
-    }
-    async handleSequential(message) {
-        const handlers = this.getHandler(message.constructor) || [];
-        for (const handler of handlers) {
-            await handler(message);
+        getHandlerOrThrow(messageType) {
+            const handlers = this.getHandler(messageType);
+            if (handlers === undefined) {
+                throw new HandlerNotFoundError(getTypeName(this.constructor), getTypeName(messageType));
+            }
+            return handlers;
         }
-    }
-    async handleConcurrent(message) {
-        const handlers = this.getHandler(message.constructor) || [];
-        const promises = handlers.map((handler) => handler(message));
-        return Promise.all(promises);
-    }
-};
-__decorate([
-    postConstruct(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], OneToManyHandlingMixin.prototype, "initialize", null);
-OneToManyHandlingMixin = __decorate([
-    injectable()
-], OneToManyHandlingMixin);
+        getTypeByHandler(handlerReference) {
+            for (const [messageType, handlers] of this[HANDLERS].entries()) {
+                const unboundHandlers = handlers.map((handler) => handler.original || handler);
+                if (unboundHandlers.includes(handlerReference) ||
+                    handlers.includes(handlerReference)) {
+                    return messageType;
+                }
+            }
+            return undefined;
+        }
+        async handle(message, execution = 'sequential') {
+            switch (execution) {
+                case 'sequential':
+                    await this.handleSequential(message);
+                    break;
+                case 'concurrent':
+                    await this.handleConcurrent(message);
+                    break;
+                default:
+                    throw new UnsupportedExecutionTypeError(getTypeName(this.constructor), execution);
+            }
+        }
+        async handleSequential(message) {
+            const handlers = this.getHandler(message.constructor) || [];
+            for (const handler of handlers) {
+                await handler(message);
+            }
+        }
+        async handleConcurrent(message) {
+            const handlers = this.getHandler(message.constructor) || [];
+            const promises = handlers.map((handler) => handler(message));
+            return Promise.all(promises);
+        }
+    };
+    const descriptor = Object.getOwnPropertyDescriptor(trait.prototype, 'initialize');
+    postConstruct()(klass.prototype, 'initialize', descriptor);
+    return klass;
+});
 
-let EventBus = class EventBus extends classes(HookableMixin, OneToManyHandlingMixin) {
+let EventBus = class EventBus extends derive(HookableTrait, OneToManyHandlingTrait) {
     constructor() {
         super();
         this.setHandleableTypes([Event]);
@@ -3676,7 +3971,7 @@ Object.getPrototypeOf(EventBus.prototype).constructor = Object;
 let InfrastructureError = class InfrastructureError extends SerializableError {
 };
 InfrastructureError = __decorate([
-    define('InfrastructureError')({ kind: 19, name: "InfrastructureError", properties: {}, extends: { kind: 18, type: SerializableError, arguments: [] } })
+    Type('InfrastructureError')({ kind: 19, name: "InfrastructureError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: SerializableError, arguments: [] } })
 ], InfrastructureError);
 let CommitConcurrencyError = class CommitConcurrencyError extends InfrastructureError {
     constructor(eventSourceableType, id, expectedVersion, currentVersion) {
@@ -3684,7 +3979,7 @@ let CommitConcurrencyError = class CommitConcurrencyError extends Infrastructure
     }
 };
 CommitConcurrencyError = __decorate([
-    define('CommitConcurrencyError')({ kind: 19, name: "CommitConcurrencyError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('CommitConcurrencyError')({ kind: 19, name: "CommitConcurrencyError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "eventSourceableType", modifiers: 0, type: { kind: 2 } }, { name: "id", modifiers: 0, type: { kind: 2 } }, { name: "expectedVersion", modifiers: 0, type: { kind: 2 } }, { name: "currentVersion", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String, String])
 ], CommitConcurrencyError);
 let EventsNotFoundError = class EventsNotFoundError extends InfrastructureError {
@@ -3693,7 +3988,7 @@ let EventsNotFoundError = class EventsNotFoundError extends InfrastructureError 
     }
 };
 EventsNotFoundError = __decorate([
-    define('EventsNotFoundError')({ kind: 19, name: "EventsNotFoundError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('EventsNotFoundError')({ kind: 19, name: "EventsNotFoundError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "EventSourceableTypeName", modifiers: 0, type: { kind: 2 } }, { name: "id", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], EventsNotFoundError);
 let AddingCommitFailedError = class AddingCommitFailedError extends InfrastructureError {
@@ -3702,7 +3997,7 @@ let AddingCommitFailedError = class AddingCommitFailedError extends Infrastructu
     }
 };
 AddingCommitFailedError = __decorate([
-    define('AddingCommitFailedError')({ kind: 19, name: "AddingCommitFailedError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('AddingCommitFailedError')({ kind: 19, name: "AddingCommitFailedError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "storageName", modifiers: 0, type: { kind: 2 } }, { name: "commitId", modifiers: 0, type: { kind: 2 } }, { name: "appId", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], AddingCommitFailedError);
 let UpdatingCommitError = class UpdatingCommitError extends InfrastructureError {
@@ -3711,7 +4006,7 @@ let UpdatingCommitError = class UpdatingCommitError extends InfrastructureError 
     }
 };
 UpdatingCommitError = __decorate([
-    define('UpdatingCommitError')({ kind: 19, name: "UpdatingCommitError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('UpdatingCommitError')({ kind: 19, name: "UpdatingCommitError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "storageName", modifiers: 0, type: { kind: 2 } }, { name: "commitId", modifiers: 0, type: { kind: 2 } }, { name: "appId", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], UpdatingCommitError);
 let AddingSnapshotError = class AddingSnapshotError extends InfrastructureError {
@@ -3720,7 +4015,7 @@ let AddingSnapshotError = class AddingSnapshotError extends InfrastructureError 
     }
 };
 AddingSnapshotError = __decorate([
-    define('AddingSnapshotError')({ kind: 19, name: "AddingSnapshotError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('AddingSnapshotError')({ kind: 19, name: "AddingSnapshotError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "storageName", modifiers: 0, type: { kind: 2 } }, { name: "EventSourceableTypeName", modifiers: 0, type: { kind: 2 } }, { name: "eventSourceableId", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], AddingSnapshotError);
 let UpdatingSnapshotError = class UpdatingSnapshotError extends InfrastructureError {
@@ -3729,7 +4024,7 @@ let UpdatingSnapshotError = class UpdatingSnapshotError extends InfrastructureEr
     }
 };
 UpdatingSnapshotError = __decorate([
-    define('UpdatingSnapshotError')({ kind: 19, name: "UpdatingSnapshotError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('UpdatingSnapshotError')({ kind: 19, name: "UpdatingSnapshotError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "storageName", modifiers: 0, type: { kind: 2 } }, { name: "EventSourceableTypeName", modifiers: 0, type: { kind: 2 } }, { name: "eventSourceableId", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], UpdatingSnapshotError);
 let StorageNotFoundError = class StorageNotFoundError extends InfrastructureError {
@@ -3738,13 +4033,13 @@ let StorageNotFoundError = class StorageNotFoundError extends InfrastructureErro
     }
 };
 StorageNotFoundError = __decorate([
-    define('StorageNotFoundError')({ kind: 19, name: "StorageNotFoundError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('StorageNotFoundError')({ kind: 19, name: "StorageNotFoundError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "storageName", modifiers: 0, type: { kind: 2 } }, { name: "clientType", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], StorageNotFoundError);
 let RouterError = class RouterError extends InfrastructureError {
 };
 RouterError = __decorate([
-    define('RouterError')({ kind: 19, name: "RouterError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } })
+    Type('RouterError')({ kind: 19, name: "RouterError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } })
 ], RouterError);
 let MissingEventSourceableError = class MissingEventSourceableError extends RouterError {
     constructor(routerName) {
@@ -3752,7 +4047,7 @@ let MissingEventSourceableError = class MissingEventSourceableError extends Rout
     }
 };
 MissingEventSourceableError = __decorate([
-    define('MissingEventSourceableError')({ kind: 19, name: "MissingEventSourceableError", properties: {}, extends: { kind: 18, type: RouterError, arguments: [] } }),
+    Type('MissingEventSourceableError')({ kind: 19, name: "MissingEventSourceableError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "routerName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: RouterError, arguments: [] } }),
     __metadata("design:paramtypes", [String])
 ], MissingEventSourceableError);
 let MissingInitializingMessageError = class MissingInitializingMessageError extends RouterError {
@@ -3761,7 +4056,7 @@ let MissingInitializingMessageError = class MissingInitializingMessageError exte
     }
 };
 MissingInitializingMessageError = __decorate([
-    define('MissingInitializingMessageError')({ kind: 19, name: "MissingInitializingMessageError", properties: {}, extends: { kind: 18, type: RouterError, arguments: [] } }),
+    Type('MissingInitializingMessageError')({ kind: 19, name: "MissingInitializingMessageError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "routerName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: RouterError, arguments: [] } }),
     __metadata("design:paramtypes", [String])
 ], MissingInitializingMessageError);
 let CannotRouteMessageError = class CannotRouteMessageError extends RouterError {
@@ -3770,7 +4065,7 @@ let CannotRouteMessageError = class CannotRouteMessageError extends RouterError 
     }
 };
 CannotRouteMessageError = __decorate([
-    define('CannotRouteMessageError')({ kind: 19, name: "CannotRouteMessageError", properties: {}, extends: { kind: 18, type: RouterError, arguments: [] } }),
+    Type('CannotRouteMessageError')({ kind: 19, name: "CannotRouteMessageError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "routerName", modifiers: 0, type: { kind: 2 } }, { name: "messageTypeName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: RouterError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], CannotRouteMessageError);
 let UnresolvableIdentifierFromMessageError = class UnresolvableIdentifierFromMessageError extends RouterError {
@@ -3779,7 +4074,7 @@ let UnresolvableIdentifierFromMessageError = class UnresolvableIdentifierFromMes
     }
 };
 UnresolvableIdentifierFromMessageError = __decorate([
-    define('UnresolvableIdentifierFromMessageError')({ kind: 19, name: "UnresolvableIdentifierFromMessageError", properties: {}, extends: { kind: 18, type: RouterError, arguments: [] } }),
+    Type('UnresolvableIdentifierFromMessageError')({ kind: 19, name: "UnresolvableIdentifierFromMessageError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "routerName", modifiers: 0, type: { kind: 2 } }, { name: "eventTypeName", modifiers: 0, type: { kind: 2 } }, { name: "esTypeName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: RouterError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], UnresolvableIdentifierFromMessageError);
 let InitializingIdentifierAlreadyExistsError = class InitializingIdentifierAlreadyExistsError extends RouterError {
@@ -3788,13 +4083,13 @@ let InitializingIdentifierAlreadyExistsError = class InitializingIdentifierAlrea
     }
 };
 InitializingIdentifierAlreadyExistsError = __decorate([
-    define('InitializingIdentifierAlreadyExistsError')({ kind: 19, name: "InitializingIdentifierAlreadyExistsError", properties: {}, extends: { kind: 18, type: RouterError, arguments: [] } }),
+    Type('InitializingIdentifierAlreadyExistsError')({ kind: 19, name: "InitializingIdentifierAlreadyExistsError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "routerName", modifiers: 0, type: { kind: 2 } }, { name: "id", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: RouterError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], InitializingIdentifierAlreadyExistsError);
 let SnapshotterError = class SnapshotterError extends InfrastructureError {
 };
 SnapshotterError = __decorate([
-    define('SnapshotterError')({ kind: 19, name: "SnapshotterError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } })
+    Type('SnapshotterError')({ kind: 19, name: "SnapshotterError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } })
 ], SnapshotterError);
 let UndefinedSnapshotterFrequencyError = class UndefinedSnapshotterFrequencyError extends SnapshotterError {
     constructor() {
@@ -3802,7 +4097,7 @@ let UndefinedSnapshotterFrequencyError = class UndefinedSnapshotterFrequencyErro
     }
 };
 UndefinedSnapshotterFrequencyError = __decorate([
-    define('UndefinedSnapshotterFrequencyError')({ kind: 19, name: "UndefinedSnapshotterFrequencyError", properties: {}, extends: { kind: 18, type: SnapshotterError, arguments: [] } }),
+    Type('UndefinedSnapshotterFrequencyError')({ kind: 19, name: "UndefinedSnapshotterFrequencyError", properties: {}, constructors: [{ modifiers: 0, parameters: [] }], extends: { kind: 18, type: SnapshotterError, arguments: [] } }),
     __metadata("design:paramtypes", [])
 ], UndefinedSnapshotterFrequencyError);
 let UndefinedSnapshotterError = class UndefinedSnapshotterError extends InfrastructureError {
@@ -3811,13 +4106,13 @@ let UndefinedSnapshotterError = class UndefinedSnapshotterError extends Infrastr
     }
 };
 UndefinedSnapshotterError = __decorate([
-    define('UndefinedSnapshotterError')({ kind: 19, name: "UndefinedSnapshotterError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
+    Type('UndefinedSnapshotterError')({ kind: 19, name: "UndefinedSnapshotterError", properties: {}, constructors: [{ modifiers: 0, parameters: [] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } }),
     __metadata("design:paramtypes", [])
 ], UndefinedSnapshotterError);
 let ProjectionRebuildingError = class ProjectionRebuildingError extends InfrastructureError {
 };
 ProjectionRebuildingError = __decorate([
-    define('ProjectionRebuildingError')({ kind: 19, name: "ProjectionRebuildingError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } })
+    Type('ProjectionRebuildingError')({ kind: 19, name: "ProjectionRebuildingError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } })
 ], ProjectionRebuildingError);
 let ProjectionAlreadyRebuildingError = class ProjectionAlreadyRebuildingError extends ProjectionRebuildingError {
     constructor(projectionName) {
@@ -3825,7 +4120,7 @@ let ProjectionAlreadyRebuildingError = class ProjectionAlreadyRebuildingError ex
     }
 };
 ProjectionAlreadyRebuildingError = __decorate([
-    define('ProjectionAlreadyRebuildingError')({ kind: 19, name: "ProjectionAlreadyRebuildingError", properties: {}, extends: { kind: 18, type: ProjectionRebuildingError, arguments: [] } }),
+    Type('ProjectionAlreadyRebuildingError')({ kind: 19, name: "ProjectionAlreadyRebuildingError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "projectionName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ProjectionRebuildingError, arguments: [] } }),
     __metadata("design:paramtypes", [String])
 ], ProjectionAlreadyRebuildingError);
 let ProjectionNotRebuildingError = class ProjectionNotRebuildingError extends ProjectionRebuildingError {
@@ -3834,13 +4129,13 @@ let ProjectionNotRebuildingError = class ProjectionNotRebuildingError extends Pr
     }
 };
 ProjectionNotRebuildingError = __decorate([
-    define('ProjectionNotRebuildingError')({ kind: 19, name: "ProjectionNotRebuildingError", properties: {}, extends: { kind: 18, type: ProjectionRebuildingError, arguments: [] } }),
+    Type('ProjectionNotRebuildingError')({ kind: 19, name: "ProjectionNotRebuildingError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "projectionName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ProjectionRebuildingError, arguments: [] } }),
     __metadata("design:paramtypes", [String])
 ], ProjectionNotRebuildingError);
 let ClientError = class ClientError extends InfrastructureError {
 };
 ClientError = __decorate([
-    define('ClientError')({ kind: 19, name: "ClientError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } })
+    Type('ClientError')({ kind: 19, name: "ClientError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } })
 ], ClientError);
 let InactiveClientError = class InactiveClientError extends ClientError {
     constructor(targetName, clientId) {
@@ -3848,13 +4143,13 @@ let InactiveClientError = class InactiveClientError extends ClientError {
     }
 };
 InactiveClientError = __decorate([
-    define('InactiveClientError')({ kind: 19, name: "InactiveClientError", properties: {}, extends: { kind: 18, type: ClientError, arguments: [] } }),
+    Type('InactiveClientError')({ kind: 19, name: "InactiveClientError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "targetName", modifiers: 0, type: { kind: 2 } }, { name: "clientId", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ClientError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String])
 ], InactiveClientError);
 let SchedulerError = class SchedulerError extends InfrastructureError {
 };
 SchedulerError = __decorate([
-    define('SchedulerError')({ kind: 19, name: "SchedulerError", properties: {}, extends: { kind: 18, type: InfrastructureError, arguments: [] } })
+    Type('SchedulerError')({ kind: 19, name: "SchedulerError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: InfrastructureError, arguments: [] } })
 ], SchedulerError);
 let CommandSchedulingError = class CommandSchedulingError extends SchedulerError {
     constructor(jobName, assignmentId, assignerType, assignerId, error) {
@@ -3862,7 +4157,7 @@ let CommandSchedulingError = class CommandSchedulingError extends SchedulerError
     }
 };
 CommandSchedulingError = __decorate([
-    define('CommandSchedulingError')({ kind: 19, name: "CommandSchedulingError", properties: {}, extends: { kind: 18, type: SchedulerError, arguments: [] } }),
+    Type('CommandSchedulingError')({ kind: 19, name: "CommandSchedulingError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "jobName", modifiers: 0, type: { kind: 2 } }, { name: "assignmentId", modifiers: 0, type: { kind: 2 } }, { name: "assignerType", modifiers: 0, type: { kind: 2 } }, { name: "assignerId", modifiers: 0, type: { kind: 2 } }, { name: "error", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: SchedulerError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String, String, String])
 ], CommandSchedulingError);
 let CommandUnschedulingError = class CommandUnschedulingError extends SchedulerError {
@@ -3871,11 +4166,11 @@ let CommandUnschedulingError = class CommandUnschedulingError extends SchedulerE
     }
 };
 CommandUnschedulingError = __decorate([
-    define('CommandUnschedulingError')({ kind: 19, name: "CommandUnschedulingError", properties: {}, extends: { kind: 18, type: SchedulerError, arguments: [] } }),
+    Type('CommandUnschedulingError')({ kind: 19, name: "CommandUnschedulingError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "jobName", modifiers: 0, type: { kind: 2 } }, { name: "assignmentId", modifiers: 0, type: { kind: 2 } }, { name: "assignerType", modifiers: 0, type: { kind: 2 } }, { name: "assignerId", modifiers: 0, type: { kind: 2 } }, { name: "error", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: SchedulerError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String, String, String])
 ], CommandUnschedulingError);
 
-class History extends Array {
+let History = class History extends Array {
     constructor(events) {
         super();
         this.push(...events);
@@ -3883,7 +4178,11 @@ class History extends Array {
     getInitializingMessage() {
         return this[0];
     }
-}
+};
+History = __decorate([
+    Type$1()({ kind: 19, name: "History", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "events", modifiers: 0, type: { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Array, arguments: [{ kind: 1 }] } }),
+    __metadata("design:paramtypes", [Array])
+], History);
 
 let EventSourceableRepository = class EventSourceableRepository {
     async save(eventSourceable) {
@@ -4029,9 +4328,9 @@ EventSourceableRepository = __decorate([
 ], EventSourceableRepository);
 
 var CommitReceiver_1;
-let CommitReceiver = CommitReceiver_1 = class CommitReceiver extends classes(Serializable, StatefulMixin) {
+let CommitReceiver = CommitReceiver_1 = class CommitReceiver extends derive(StatefulTrait, Serializable) {
     constructor(props = {}) {
-        super([props]);
+        super(props);
         if (props.state) {
             this.setState(props.state);
         }
@@ -4067,7 +4366,7 @@ CommitReceiver.STATES = {
     failed: 'failed',
 };
 CommitReceiver = CommitReceiver_1 = __decorate([
-    define$1('CommitReceiver')({ kind: 19, name: "CommitReceiver", properties: { "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "appId": { kind: 2 }, "workerId": { kind: 17, types: [{ kind: 12 }, { kind: 2 }] }, "receivedAt": { kind: 18, type: Date, arguments: [] }, "publishedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, extends: { kind: 999 } }),
+    Type$1('CommitReceiver')({ kind: 19, name: "CommitReceiver", properties: { "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "appId": { kind: 2, modifiers: 1 }, "workerId": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "receivedAt": { kind: 18, modifiers: 1, type: Date, arguments: [] }, "publishedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], CommitReceiver);
 let Commit = class Commit extends Serializable {
@@ -4093,7 +4392,7 @@ let Commit = class Commit extends Serializable {
     }
 };
 Commit = __decorate([
-    define$1('Commit')({ kind: 19, name: "Commit", properties: { "id": { kind: 2 }, "sourceId": { kind: 2 }, "version": { kind: 3 }, "eventSourceableType": { kind: 2 }, "commands": { kind: 18, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "getId": { kind: 21 }, "isDeliverable": { kind: 21 }, "isScheduled": { kind: 21 }, "schedule": { kind: 21 }, "getAssignment": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, "events": { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "version": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, "insertedAt": { kind: 18, type: Date, arguments: [] }, "sentBy": { kind: 2 }, "receivers": { kind: 18, type: Array, arguments: [{ kind: 18, type: CommitReceiver, arguments: [] }] } }, extends: { kind: 18, type: Serializable, arguments: [] } })
+    Type$1('Commit')({ kind: 19, name: "Commit", properties: { "id": { kind: 2, modifiers: 1 }, "sourceId": { kind: 2, modifiers: 1 }, "version": { kind: 3, modifiers: 1 }, "eventSourceableType": { kind: 2, modifiers: 1 }, "commands": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "getId": { kind: 21, modifiers: 0 }, "isDeliverable": { kind: 21, modifiers: 0 }, "isScheduled": { kind: 21, modifiers: 0 }, "schedule": { kind: 21, modifiers: 0 }, "getAssignment": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] }, "events": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] }, "insertedAt": { kind: 18, modifiers: 1, type: Date, arguments: [] }, "sentBy": { kind: 2, modifiers: 1 }, "receivers": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: CommitReceiver, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 18, type: Serializable, arguments: [] } })
 ], Commit);
 
 let CommitStore = class CommitStore {
@@ -4378,86 +4677,78 @@ CommitPublisher = __decorate([
     __metadata("design:paramtypes", [])
 ], CommitPublisher);
 
-let CommandHandlingMixin = class CommandHandlingMixin extends OneToOneHandlingMixin {
-    initialize() {
-        this.setupHandlers({
-            handlers: this.handles(),
-            registrator: this.registerCommandHandler.bind(this),
-            handleableTypes: [Command],
-        });
-    }
-    registerCommandHandler(commandType, handler, shouldOverride = false) {
-        this.ensureHandleability(commandType, [Command]);
-        const boundHandler = handler.bind(this);
-        boundHandler.original = handler;
-        this.commandBus.registerHandler(commandType, boundHandler, shouldOverride);
-        this.registerHandler(commandType, boundHandler, shouldOverride);
-    }
-    async send(command) {
-        const result = await this.commandBus.send(command);
-        return result;
-    }
-};
-__decorate([
-    inject(BINDINGS.CommandBus),
-    __metadata("design:type", Object)
-], CommandHandlingMixin.prototype, "commandBus", void 0);
-__decorate([
-    postConstruct(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], CommandHandlingMixin.prototype, "initialize", null);
-CommandHandlingMixin = __decorate([
-    injectable()
-], CommandHandlingMixin);
+const CommandHandlingTrait = trait([OneToOneHandlingTrait], (base) => {
+    const klass = class extends base {
+        initialize() {
+            this.setupCommandHandlers();
+        }
+        setupCommandHandlers() {
+            this.setupHandlers({
+                handlers: this.handles(),
+                registrator: this.registerCommandHandler.bind(this),
+                handleableTypes: [Command],
+            });
+        }
+        registerCommandHandler(commandType, handler, shouldOverride = false) {
+            this.ensureHandleability(commandType, [Command]);
+            const boundHandler = handler.bind(this);
+            boundHandler.original = handler;
+            this.commandBus.registerHandler(commandType, boundHandler, shouldOverride);
+            this.registerHandler(commandType, boundHandler, shouldOverride);
+        }
+        async send(command) {
+            const result = await this.commandBus.send(command);
+            return result;
+        }
+    };
+    const descriptor = Object.getOwnPropertyDescriptor(trait.prototype, 'initialize');
+    inject(BINDINGS.CommandBus)(klass.prototype, 'commandBus');
+    postConstruct()(klass.prototype, 'initialize', descriptor);
+    return klass;
+});
 
-let EventHandlingMixin = class EventHandlingMixin extends OneToManyHandlingMixin {
-    initialize() {
-        this.setupHandlers({
-            handlers: this.subscribes(),
-            registrator: this.registerEventHandler.bind(this),
-            handleableTypes: [Event],
-        });
-    }
-    registerEventHandler(eventType, handler, shouldOverride = false) {
-        this.ensureHandleability(eventType, [Event]);
-        const boundHandler = handler.bind(this);
-        boundHandler.original = handler;
-        this.eventBus.subscribeTo(eventType, boundHandler, shouldOverride);
-        this.registerHandler(eventType, boundHandler, shouldOverride);
-    }
-    subscribeTo(eventType, handler, shouldOverride) {
-        this.registerEventHandler(eventType, handler, shouldOverride);
-    }
-    getSubscribedEvents() {
-        return this.getHandledEvents();
-    }
-    async on(event) {
-        await this.handle(event);
-    }
-    async publish(event) {
-        await this.eventBus.publish(event);
-    }
-};
-__decorate([
-    inject(BINDINGS.EventBus),
-    __metadata("design:type", Object)
-], EventHandlingMixin.prototype, "eventBus", void 0);
-__decorate([
-    postConstruct(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], EventHandlingMixin.prototype, "initialize", null);
-EventHandlingMixin = __decorate([
-    injectable()
-], EventHandlingMixin);
+const EventHandlingTrait = trait([OneToManyHandlingTrait], (base) => {
+    const klass = class extends base {
+        initialize() {
+            this.setupEventHandlers();
+        }
+        setupEventHandlers() {
+            this.setupHandlers({
+                handlers: this.subscribes(),
+                registrator: this.registerEventHandler.bind(this),
+                handleableTypes: [Event],
+            });
+        }
+        registerEventHandler(eventType, handler, shouldOverride = false) {
+            this.ensureHandleability(eventType, [Event]);
+            const boundHandler = handler.bind(this);
+            boundHandler.original = handler;
+            this.eventBus.subscribeTo(eventType, boundHandler, shouldOverride);
+            this.registerHandler(eventType, boundHandler, shouldOverride);
+        }
+        subscribeTo(eventType, handler, shouldOverride) {
+            this.registerEventHandler(eventType, handler, shouldOverride);
+        }
+        getSubscribedEvents() {
+            return this.getHandledEvents();
+        }
+        async on(event) {
+            await this.handle(event);
+        }
+        async publish(event) {
+            await this.eventBus.publish(event);
+        }
+    };
+    const descriptor = Object.getOwnPropertyDescriptor(trait.prototype, 'initialize');
+    inject(BINDINGS.EventBus)(klass.prototype, 'eventBus');
+    postConstruct()(klass.prototype, 'initialize', descriptor);
+    return klass;
+});
 
-let Service = class Service extends classes(CommandHandlingMixin, EventHandlingMixin) {
+let Service = class Service extends derive(CommandHandlingTrait, EventHandlingTrait) {
     initialize() {
-        super.class(CommandHandlingMixin).initialize();
-        super.class(EventHandlingMixin).initialize();
+        this.setupCommandHandlers();
+        this.setupEventHandlers();
     }
 };
 __decorate([
@@ -4477,7 +4768,6 @@ __decorate([
 Service = __decorate([
     injectable()
 ], Service);
-Object.getPrototypeOf(Service.prototype).constructor = Object;
 
 let ScheduleCommand = class ScheduleCommand extends Command {
     isDeliverable() {
@@ -4493,13 +4783,13 @@ let ScheduleCommand = class ScheduleCommand extends Command {
     }
 };
 ScheduleCommand = __decorate([
-    define('ScheduleCommand')({ kind: 19, name: "ScheduleCommand", properties: { "command": { kind: 15, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "getId": { kind: 21 }, "isDeliverable": { kind: 21 }, "isScheduled": { kind: 21 }, "schedule": { kind: 21 }, "getAssignment": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } } }, extends: { kind: 18, type: Command, arguments: [{ kind: 18, type: ScheduleCommand, arguments: [] }] } })
+    Type('ScheduleCommand')({ kind: 19, name: "ScheduleCommand", properties: { "command": { kind: 15, modifiers: 1, name: "Command", properties: { "targetId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "getId": { kind: 21, modifiers: 0 }, "isDeliverable": { kind: 21, modifiers: 0 }, "isScheduled": { kind: 21, modifiers: 0 }, "schedule": { kind: 21, modifiers: 0 }, "getAssignment": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 999 } }] }], extends: { kind: 18, type: Command, arguments: [{ kind: 18, type: ScheduleCommand, arguments: [] }] } })
 ], ScheduleCommand);
 
 let UnscheduleCommand = class UnscheduleCommand extends Command {
 };
 UnscheduleCommand = __decorate([
-    define('UnscheduleCommand')({ kind: 19, name: "UnscheduleCommand", properties: { "assignmentId": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "commandType": { kind: 2 }, "assignerId": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "assignerType": { kind: 2 } }, extends: { kind: 18, type: Command, arguments: [{ kind: 18, type: UnscheduleCommand, arguments: [] }] } })
+    Type('UnscheduleCommand')({ kind: 19, name: "UnscheduleCommand", properties: { "assignmentId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "commandType": { kind: 2, modifiers: 0 }, "assignerId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "assignerType": { kind: 2, modifiers: 0 } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 999 } }] }], extends: { kind: 18, type: Command, arguments: [{ kind: 18, type: UnscheduleCommand, arguments: [] }] } })
 ], UnscheduleCommand);
 
 let CommandSchedulingService = class CommandSchedulingService extends Service {
@@ -4663,7 +4953,7 @@ Snapshotter = __decorate([
 let DomainException = class DomainException extends Event {
 };
 DomainException = __decorate([
-    define('DomainException')({ kind: 19, name: "DomainException", properties: { "thrower": { kind: 2 }, "error": { kind: 18, type: DomainError, arguments: [] } }, extends: { kind: 18, type: Event, arguments: [{ kind: 18, type: DomainException, arguments: [] }] } })
+    Type('DomainException')({ kind: 19, name: "DomainException", properties: { "thrower": { kind: 2, modifiers: 0 }, "error": { kind: 18, modifiers: 0, type: DomainError, arguments: [] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 999 } }] }], extends: { kind: 18, type: Event, arguments: [{ kind: 18, type: DomainException, arguments: [] }] } })
 ], DomainException);
 
 class Router {
@@ -4729,7 +5019,7 @@ class Router {
             const isInitializable = await this.isInitializable(eventSourceableId);
             if (isInitializable === false) {
                 const error = new InitializingIdentifierAlreadyExistsError(this.EventSourceableType.getTypeName(), message.getId().toString());
-                this.log.error(new Log(`failed handling message '${message.getTypeName()}' do to error: ${error}`)
+                this.log.error(new Log(`failed handling message '${message.getTypeName()}' do to error: ${error.name}: ${error.message}`)
                     .on(this)
                     .in(this.initializingMessageHandler)
                     .with('message', message));
@@ -4784,7 +5074,7 @@ class Router {
             return await fn.call(this);
         }
         catch (error) {
-            this.log.error(new Log(`failed handling '${message.getTypeName()}' do to error: ${error}`)
+            this.log.error(new Log(`failed handling '${message.getTypeName()}' do to error: ${error.name}: ${error.message}`)
                 .on(this)
                 .in(this.handleOrThrowDomainError)
                 .with('message', message));
@@ -4999,7 +5289,7 @@ let InvalidStateTransitionError = class InvalidStateTransitionError extends Asse
     }
 };
 InvalidStateTransitionError = __decorate([
-    define('InvalidStateTransitionError')({ kind: 19, name: "InvalidStateTransitionError", properties: { "entityName": { kind: 2 }, "entityId": { kind: 2 }, "currentState": { kind: 2 }, "expectedStates": { kind: 18, type: Array, arguments: [{ kind: 2 }] }, "action": { kind: 2 } }, extends: { kind: 18, type: AssertionError, arguments: [] } }),
+    Type('InvalidStateTransitionError')({ kind: 19, name: "InvalidStateTransitionError", properties: { "entityName": { kind: 2, modifiers: 0 }, "entityId": { kind: 2, modifiers: 0 }, "currentState": { kind: 2, modifiers: 0 }, "expectedStates": { kind: 18, modifiers: 0, type: Array, arguments: [{ kind: 2 }] }, "action": { kind: 2, modifiers: 0 } }, constructors: [{ modifiers: 0, parameters: [{ name: "entityName", modifiers: 0, type: { kind: 2 } }, { name: "entityId", modifiers: 0, type: { kind: 2 } }, { name: "currentState", modifiers: 0, type: { kind: 2 } }, { name: "expected", modifiers: 0, type: { kind: 2 } }, { name: "action", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: AssertionError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String, String, String])
 ], InvalidStateTransitionError);
 class StatefulAssertion extends Assertion {
@@ -5068,7 +5358,7 @@ let InvalidStatusTransitionError = class InvalidStatusTransitionError extends As
     }
 };
 InvalidStatusTransitionError = __decorate([
-    define('InvalidStatusTransitionError')({ kind: 19, name: "InvalidStatusTransitionError", properties: { "entityName": { kind: 2 }, "entityId": { kind: 2 }, "currentStatus": { kind: 2 }, "expectedStatuses": { kind: 18, type: Array, arguments: [{ kind: 2 }] }, "action": { kind: 2 } }, extends: { kind: 18, type: AssertionError, arguments: [] } }),
+    Type('InvalidStatusTransitionError')({ kind: 19, name: "InvalidStatusTransitionError", properties: { "entityName": { kind: 2, modifiers: 0 }, "entityId": { kind: 2, modifiers: 0 }, "currentStatus": { kind: 2, modifiers: 0 }, "expectedStatuses": { kind: 18, modifiers: 0, type: Array, arguments: [{ kind: 2 }] }, "action": { kind: 2, modifiers: 0 } }, constructors: [{ modifiers: 0, parameters: [{ name: "entityName", modifiers: 0, type: { kind: 2 } }, { name: "entityId", modifiers: 0, type: { kind: 2 } }, { name: "currentStatus", modifiers: 0, type: { kind: 2 } }, { name: "expected", modifiers: 0, type: { kind: 2 } }, { name: "action", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: AssertionError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String, String, String])
 ], InvalidStatusTransitionError);
 class StatusfulAssertion extends Assertion {
@@ -5341,7 +5631,7 @@ class Eveble extends Module {
     }
 }
 
-class Client extends StatefulMixin {
+class Client extends derive(StatefulTrait) {
     constructor(props = {}) {
         super();
         Object.assign(this, props);
@@ -5368,7 +5658,7 @@ let MongoDBCollectionConfig = class MongoDBCollectionConfig extends Config {
     }
 };
 MongoDBCollectionConfig = __decorate([
-    define()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2 }, "indexes": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2, modifiers: 1 }, "indexes": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "indexes": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBCollectionConfig);
 let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends Config {
@@ -5378,7 +5668,7 @@ let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends Config {
     }
 };
 MongoDBDatabaseConfig = __decorate([
-    define()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2 }, "collections": { kind: 18, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2, modifiers: 1 }, "collections": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "collections": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBDatabaseConfig);
 class MongoDBClient extends Client {
@@ -5691,7 +5981,7 @@ __decorate([
 ], AgendaClient.prototype, "mongoClient", void 0);
 
 var AgendaCommandScheduler_1;
-let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandScheduler extends StatefulMixin {
+let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandScheduler extends derive(StatefulTrait) {
     constructor(jobName = 'send scheduled command', options = {}) {
         super();
         this.jobName = jobName;
@@ -5890,9 +6180,9 @@ AgendaCommandScheduler = AgendaCommandScheduler_1 = __decorate([
     __metadata("design:paramtypes", [Object, Object])
 ], AgendaCommandScheduler);
 
-let ScheduledJob = class ScheduledJob extends classes(Struct, StatefulMixin) {
+let ScheduledJob = class ScheduledJob extends derive(StatefulTrait, Struct) {
     constructor(props = {}) {
-        super([props]);
+        super(props);
         if (props.state) {
             this.setState(props.state);
         }
@@ -5907,7 +6197,7 @@ ScheduledJob.STATES = {
     removed: 'removed',
 };
 ScheduledJob = __decorate([
-    define()({ kind: 19, name: "ScheduledJob", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "name": { kind: 2 }, "data": { kind: 15, name: "__type", properties: {} }, "priority": { kind: 17, types: [{ kind: 3 }, { kind: 5, value: "lowest" }, { kind: 5, value: "low" }, { kind: 5, value: "normal" }, { kind: 5, value: "high" }, { kind: 5, value: "highest" }] }, "nextRunAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "completedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lockedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lastRunAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, extends: { kind: 999 } }),
+    Type()({ kind: 19, name: "ScheduledJob", properties: { "id": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "name": { kind: 2, modifiers: 1 }, "data": { kind: 15, modifiers: 1, name: "__type", properties: {} }, "priority": { kind: 17, modifiers: 1, types: [{ kind: 3 }, { kind: 5, value: "lowest" }, { kind: 5, value: "low" }, { kind: 5, value: "normal" }, { kind: 5, value: "high" }, { kind: 5, value: "highest" }] }, "nextRunAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "completedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lockedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lastRunAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], ScheduledJob);
 
@@ -6407,7 +6697,7 @@ CommitMongoDBStorage = __decorate([
 ], CommitMongoDBStorage);
 
 var CommitMongoDBObserver_1;
-let CommitMongoDBObserver = CommitMongoDBObserver_1 = class CommitMongoDBObserver extends StatefulMixin {
+let CommitMongoDBObserver = CommitMongoDBObserver_1 = class CommitMongoDBObserver extends derive(StatefulTrait) {
     constructor() {
         super();
         this.setState(CommitMongoDBObserver_1.STATES.created);
@@ -6719,7 +7009,12 @@ class App extends BaseApp {
         loadENV(envFilePath);
         const processedProps = { ...props };
         if (isPlainObject(props.config)) {
-            processedProps.config = AppConfig.from(props.config);
+            const configData = props.config;
+            if (configData.logging &&
+                !(configData.logging instanceof LoggingConfig)) {
+                configData.logging = new LoggingConfig(configData.logging);
+            }
+            processedProps.config = AppConfig.from(configData);
         }
         if (props.config === undefined) {
             processedProps.config = new AppConfig({
@@ -6876,10 +7171,13 @@ class App extends BaseApp {
     }
 }
 
-let EventSourceable = class EventSourceable extends classes(Entity, OneToOneHandlingMixin) {
+let EventSourceable = class EventSourceable extends derive(OneToOneHandlingTrait, Entity) {
     constructor(props) {
         const processedProps = { version: 0, ...props };
-        super([processedProps]);
+        super(processedProps);
+        if (!this.id) {
+            this.construct({ version: 0, ...props });
+        }
         if (this.state !== undefined) {
             this.setState(this.state);
         }
@@ -6907,6 +7205,10 @@ let EventSourceable = class EventSourceable extends classes(Entity, OneToOneHand
             handleableTypes: [Event],
             isBoundable: true,
         });
+    }
+    construct(props = {}) {
+        const processedProps = { version: 0, ...props };
+        Object.assign(this, this.processProps(processedProps));
     }
     processProps(props = {}) {
         const processedProps = this.onConstruction(props);
@@ -7060,10 +7362,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EventSourceable.prototype, "initialize", null);
 EventSourceable = __decorate([
-    define('EventSourceable')({ kind: 19, name: "EventSourceable", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 3 }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, [COMMANDS_KEY]: { kind: 18, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "getId": { kind: 21 }, "isDeliverable": { kind: 21 }, "isScheduled": { kind: 21 }, "schedule": { kind: 21 }, "getAssignment": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, [EVENTS_KEY]: { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "version": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] } }, extends: { kind: 999 } }),
+    Type('EventSourceable')({ kind: 19, name: "EventSourceable", properties: { "id": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 3, modifiers: 1 }, "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "metadata": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "schemaVersion": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, [COMMANDS_KEY]: { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "getId": { kind: 21, modifiers: 0 }, "isDeliverable": { kind: 21, modifiers: 0 }, "isScheduled": { kind: 21, modifiers: 0 }, "schedule": { kind: 21, modifiers: 0 }, "getAssignment": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] }, [EVENTS_KEY]: { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: {} } }] }], extends: { kind: 999 } }),
     __metadata("design:paramtypes", [Object])
 ], EventSourceable);
-EventSourceable.enableSerializableLists();
 
 let Aggregate = class Aggregate extends EventSourceable {
     constructor(arg) {
@@ -7092,7 +7393,7 @@ let Aggregate = class Aggregate extends EventSourceable {
     }
 };
 Aggregate = __decorate([
-    define('Aggregate')({ kind: 19, name: "Aggregate", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 3 }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, [COMMANDS_KEY]: { kind: 18, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "getId": { kind: 21 }, "isDeliverable": { kind: 21 }, "isScheduled": { kind: 21 }, "schedule": { kind: 21 }, "getAssignment": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, [EVENTS_KEY]: { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "version": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] } }, extends: { kind: 18, type: EventSourceable, arguments: [] } }),
+    Type('Aggregate')({ kind: 19, name: "Aggregate", properties: { "id": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 3, modifiers: 1 }, "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "metadata": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "schemaVersion": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, [COMMANDS_KEY]: { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "getId": { kind: 21, modifiers: 0 }, "isDeliverable": { kind: 21, modifiers: 0 }, "isScheduled": { kind: 21, modifiers: 0 }, "schedule": { kind: 21, modifiers: 0 }, "getAssignment": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] }, [EVENTS_KEY]: { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "arg", modifiers: 0, type: { kind: 17, types: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "getId": { kind: 21, modifiers: 0 }, "isDeliverable": { kind: 21, modifiers: 0 }, "isScheduled": { kind: 21, modifiers: 0 }, "schedule": { kind: 21, modifiers: 0 }, "getAssignment": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }, { kind: 15, name: "__type", properties: {} }, { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] }] } }] }], extends: { kind: 18, type: EventSourceable, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], Aggregate);
 
@@ -7148,14 +7449,14 @@ let Process = class Process extends EventSourceable {
     }
 };
 Process = __decorate([
-    define('Process')({ kind: 19, name: "Process", properties: { "id": { kind: 17, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 3 }, "state": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "schemaVersion": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, [COMMANDS_KEY]: { kind: 18, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "getId": { kind: 21 }, "isDeliverable": { kind: 21 }, "isScheduled": { kind: 21 }, "schedule": { kind: 21 }, "getAssignment": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] }, [EVENTS_KEY]: { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21 } } }] }, "version": { kind: 17, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21 }, "timestamp": { kind: 17, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21 }, "assignMetadata": { kind: 21 }, "hasMetadata": { kind: 21 }, "getMetadata": { kind: 21 }, "setCorrelationId": { kind: 21 }, "getCorrelationId": { kind: 21 }, "hasCorrelationId": { kind: 21 }, "getTypeName": { kind: 21 }, "toString": { kind: 21 }, "getPropTypes": { kind: 21 }, "toPlainObject": { kind: 21 }, "validateProps": { kind: 21 }, "getPropertyInitializers": { kind: 21 }, "equals": { kind: 21 }, "getSchemaVersion": { kind: 21 }, "transformLegacyProps": { kind: 21 }, "registerLegacyTransformer": { kind: 21 }, "overrideLegacyTransformer": { kind: 21 }, "hasLegacyTransformer": { kind: 21 }, "getLegacyTransformers": { kind: 21 }, "getLegacyTransformer": { kind: 21 } } }] } }, extends: { kind: 18, type: EventSourceable, arguments: [] } }),
+    Type('Process')({ kind: 19, name: "Process", properties: { "id": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "version": { kind: 3, modifiers: 1 }, "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "status": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "metadata": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "schemaVersion": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, [COMMANDS_KEY]: { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "getId": { kind: 21, modifiers: 0 }, "isDeliverable": { kind: 21, modifiers: 0 }, "isScheduled": { kind: 21, modifiers: 0 }, "schedule": { kind: 21, modifiers: 0 }, "getAssignment": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] }, [EVENTS_KEY]: { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "arg", modifiers: 0, type: { kind: 17, types: [{ kind: 15, name: "Command", properties: { "targetId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "getId": { kind: 21, modifiers: 0 }, "isDeliverable": { kind: 21, modifiers: 0 }, "isScheduled": { kind: 21, modifiers: 0 }, "schedule": { kind: 21, modifiers: 0 }, "getAssignment": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }, { kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }, { kind: 15, name: "__type", properties: {} }, { kind: 18, type: Array, arguments: [{ kind: 15, name: "Event", properties: { "sourceId": { kind: 17, modifiers: 0, types: [{ kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "version": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] }, "getId": { kind: 21, modifiers: 0 }, "timestamp": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "metadata": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "getTimestamp": { kind: 21, modifiers: 0 }, "assignMetadata": { kind: 21, modifiers: 0 }, "hasMetadata": { kind: 21, modifiers: 0 }, "getMetadata": { kind: 21, modifiers: 0 }, "setCorrelationId": { kind: 21, modifiers: 0 }, "getCorrelationId": { kind: 21, modifiers: 0 }, "hasCorrelationId": { kind: 21, modifiers: 0 }, "getTypeName": { kind: 21, modifiers: 0 }, "toString": { kind: 21, modifiers: 0 }, "getPropTypes": { kind: 21, modifiers: 0 }, "toPlainObject": { kind: 21, modifiers: 0 }, "validateProps": { kind: 21, modifiers: 0 }, "getPropertyInitializers": { kind: 21, modifiers: 0 }, "equals": { kind: 21, modifiers: 0 }, "getSchemaVersion": { kind: 21, modifiers: 0 }, "transformLegacyProps": { kind: 21, modifiers: 0 }, "registerLegacyTransformer": { kind: 21, modifiers: 0 }, "overrideLegacyTransformer": { kind: 21, modifiers: 0 }, "hasLegacyTransformer": { kind: 21, modifiers: 0 }, "getLegacyTransformers": { kind: 21, modifiers: 0 }, "getLegacyTransformer": { kind: 21, modifiers: 0 } } }] }] } }] }], extends: { kind: 18, type: EventSourceable, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], Process);
 
 let RebuildingResult = class RebuildingResult extends Struct {
 };
 RebuildingResult = __decorate([
-    define()({ kind: 19, name: "RebuildingResult", properties: { "projectionsNames": { kind: 18, type: Array, arguments: [{ kind: 2 }] }, "duration": { kind: 3 }, "message": { kind: 2 } }, extends: { kind: 18, type: Struct, arguments: [] } })
+    Type()({ kind: 19, name: "RebuildingResult", properties: { "projectionsNames": { kind: 18, modifiers: 0, type: Array, arguments: [{ kind: 2 }] }, "duration": { kind: 3, modifiers: 0 }, "message": { kind: 2, modifiers: 0 } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 18, type: Struct, arguments: [] } })
 ], RebuildingResult);
 class ProjectionRebuilder {
     async rebuild(projections) {
@@ -7269,14 +7570,14 @@ __decorate([
     __metadata("design:type", Object)
 ], ProjectionRebuilder.prototype, "log", void 0);
 
-class Projection extends classes(EventHandlingMixin, StatefulMixin) {
+class Projection extends derive(EventHandlingTrait, StatefulTrait) {
     constructor() {
-        super([]);
+        super();
         this.setState(Projection.STATES.projecting);
         this.queuedEvents = [];
     }
     initialize() {
-        super.class(EventHandlingMixin).initialize();
+        super.initialize();
     }
     async on(event, isRebuildEvent = false) {
         if (!this.hasHandler(event.constructor)) {
@@ -7399,4 +7700,4 @@ function loggerLoader(injector, level, consoleTransportConfig = new LogTransport
     return logger;
 }
 
-export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, AgendaClient, AgendaCommandScheduler, AgendaCommandSchedulerModule, AgendaScheduledJobTransformer, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, can as Can, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingMixin, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, DefinableMixin, delegate as Delegate, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableMixin, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingMixin, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, handle as Handle, HandlerExistError, HandlerNotFoundError, HandlingError, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableMixin, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, initial as Initial, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingMixin, OneToOneHandlingMixin, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, RFC5424LoggingMixin, route as Route, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableMixin, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulMixin, StatusError, StatusfulAssertion, StatusfulMixin, StorageNotFoundError, StringifingConverter, Struct, subscribe as Subscribe, TransportExistsError, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, version as Version, VersionableError, VersionableMixin, can, convertObjectToCollection, createEJSON, delegate, handle, hasPostConstruct, initial, isDefinable, isEventSourceableType, isPlainRecord, isRecord, loadENV, loggerLoader, route, subscribe, toPlainObject, version };
+export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, AgendaClient, AgendaCommandScheduler, AgendaCommandSchedulerModule, AgendaScheduledJobTransformer, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, can as Can, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingTrait, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, delegate as Delegate, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableTrait, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingTrait, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, handle as Handle, HandlerExistError, HandlerNotFoundError, HandlingError, HandlingTrait, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableTrait, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, initial as Initial, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingTrait, OneToOneHandlingTrait, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, RFC5424LoggingTrait, route as Route, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableTrait, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulTrait, StatusError, StatusfulAssertion, StatusfulTrait, StorageNotFoundError, StringifingConverter, Struct, subscribe as Subscribe, TransportExistsError, TypeTrait, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, version as Version, VersionableError, VersionableTrait, can, convertObjectToCollection, createEJSON, debugInversifyMetadata, delegate, getAllClassProperties, getInjectedParameterIndices, getInjectedPropertyDetails, getInjectedPropertyNames, getInversifyMetadata, getMetadataSummary, getPostConstructMethodNames, getPreDestroyMethodNames, getPropertiesToValidate, handle, hasPostConstruct, hasPreDestroy, initial, isEventSourceableType, isInjectableClass, isPlainRecord, isPropertyInjected, isRecord, isTyped, loadENV, loggerLoader, route, subscribe, toPlainObject, version };

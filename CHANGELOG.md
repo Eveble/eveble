@@ -1,3 +1,81 @@
+# [3.0.0](https://github.com/Eveble/eveble/compare/v2.6.1...v3.0.0) (2025-10-06)
+
+
+### Bug Fixes
+
+* .eslintrc ([66b06ee](https://github.com/Eveble/eveble/commit/66b06eef6a72a7a8eb350e547d9f6acb0c7bb5da))
+* circular dependency on Subscribe annotation ([a60eeb0](https://github.com/Eveble/eveble/commit/a60eeb0452af0e43968e75aa9810e7a3ed81105c))
+* config merging and including ([a79ac0b](https://github.com/Eveble/eveble/commit/a79ac0b58f310a3cad1be9ccde90700fafa77e2a))
+* **deps:** replace @parisholley/inversify-async with inversify at v7.10.2 ([8a35bb7](https://github.com/Eveble/eveble/commit/8a35bb78e0491d9d04ce785496ff01fbfca489ee))
+* EjsonableTrait trait definition ([8e374c0](https://github.com/Eveble/eveble/commit/8e374c088207496c046c6fc6be21a6cafb6efc64))
+* EventSourceable edge cases ([d199877](https://github.com/Eveble/eveble/commit/d199877c5fe214b9ed7adf7485f8bc2539517458))
+* export OneToOneHandlingTrait ([c0fbc7d](https://github.com/Eveble/eveble/commit/c0fbc7df129aec9a38fd197015087d85ba8e02f3))
+* exports ([ef2a6af](https://github.com/Eveble/eveble/commit/ef2a6afca5c1a946b3e61a925a9e9f55460bdf5a))
+* issue with History as a type passed on constructor on Aggregate, Process ([2aecd49](https://github.com/Eveble/eveble/commit/2aecd49161483c471a97a6b486eaa0d6bef06753))
+* make History a Type ([7c2ff2f](https://github.com/Eveble/eveble/commit/7c2ff2f00a042153b1665d2549f4400c4e0643e7))
+* path ([0ab6ca7](https://github.com/Eveble/eveble/commit/0ab6ca733ca9c931dd2d1e4af0bab24807df052c))
+* paths ([8ae313d](https://github.com/Eveble/eveble/commit/8ae313d2c12173d1f9af27639ff28cd997289137))
+* paths ([867867e](https://github.com/Eveble/eveble/commit/867867e828c6afeb5d3a01371dff905bb4373ff1))
+* paths ([94fd860](https://github.com/Eveble/eveble/commit/94fd8609d4001b3d77f039a3e181a8a06d0fb347))
+* paths ([04db993](https://github.com/Eveble/eveble/commit/04db993155483a2b38257e67a840663d05cd74fe))
+* remove automated List conversion on Serializable ([e63d9e5](https://github.com/Eveble/eveble/commit/e63d9e5c08f7dcfd83f98659d51a8c536ce7fe6e))
+* remove log part ([7435e30](https://github.com/Eveble/eveble/commit/7435e303535821191fe318bda0161ef26ff93652))
+* rename file name ([2897cb4](https://github.com/Eveble/eveble/commit/2897cb4285e4755b30923331782cecfca9d009f0))
+* replace mixins with traits ([3bc6983](https://github.com/Eveble/eveble/commit/3bc6983e07b3811ca3aca9540374b2fbf6d8cc17))
+* replace traits protected methods with public and symbol keys to string causing issue on build with rollup ([656a388](https://github.com/Eveble/eveble/commit/656a38830f02a78b890c494a40b60ac450dc89a5))
+* Serializable "in" array conversion to List with new typend version ([aa6b919](https://github.com/Eveble/eveble/commit/aa6b919c375a61ba6f7a49120bf415c8441334a6))
+* set on Config use deepClone ([3e40127](https://github.com/Eveble/eveble/commit/3e40127dbfc9696d56c6f950440afedc5bdfe072))
+* Struct  path ([c9cbdb6](https://github.com/Eveble/eveble/commit/c9cbdb61bcb6fb2f7e10cda5ee49da922a6bc206))
+* types ([229a3ff](https://github.com/Eveble/eveble/commit/229a3ffc823c13c2def85098c9b47e798d1e9a19))
+* unique symbol to symbol for TS >=4.0 ([4e1dd45](https://github.com/Eveble/eveble/commit/4e1dd45c04786784b42c78cdd00b1ddc51c93df5))
+* update config processing on App construction ([8a84465](https://github.com/Eveble/eveble/commit/8a844650e650eab75567d24f1917236865935ac4))
+* update interface change from Definable to Typed ([1491d90](https://github.com/Eveble/eveble/commit/1491d90ab4bb4ba808f76609e7e2d8d29c6874f5))
+* update inversify helpers to use whole inheritance tree ([b020fda](https://github.com/Eveble/eveble/commit/b020fdad25a48a60189eab9c71fcb82247e79fd8))
+* update logs ([906ca7e](https://github.com/Eveble/eveble/commit/906ca7ed13ca7fc670aad0b00be26189b301e25e))
+* update types ([8a48a4e](https://github.com/Eveble/eveble/commit/8a48a4e47f5bec43ba03cc0d7c521a926f512fb2))
+
+
+* refactor!: convert EventHandlingMixin to EventHandlingTrait ([c961de7](https://github.com/Eveble/eveble/commit/c961de75408c33dd70c5daa6282729ce69107053))
+* refactor!: convert CommandHandlingMixin to CommandHandlingTrait ([3bab763](https://github.com/Eveble/eveble/commit/3bab763e55a49e5dc3af4b83555ba3aea34635fd))
+* refactor!: convert OneToManyHandlingMixin to OneToManyHandlingTrait ([d11ec9e](https://github.com/Eveble/eveble/commit/d11ec9e487dce00c994925f803fffd40dc329fa6))
+* refactor!: convert OneToOneHandlingMixin to OneToOneHandlingTrait ([4e4922b](https://github.com/Eveble/eveble/commit/4e4922b36227e45d6008f0007d95aab94866498a))
+* refactor!: convert HandlingMixin to HandlingTrait ([502912c](https://github.com/Eveble/eveble/commit/502912ced8437662355a6d072b94769712a9f3a5))
+* refactor!: convert RFC5424LoggingMixin to RFC5424LoggingTrait ([72f36c5](https://github.com/Eveble/eveble/commit/72f36c5d1ba2801ad76db08a5cc351d665bed8de))
+* refactor!: convert SerializableMixin to SerializableTrait ([5340156](https://github.com/Eveble/eveble/commit/534015620f7fd7c2b3f02a768c419b9a69267a01))
+* refactor!: convert StatusfulMixin to StatusfulTrait ([53ab074](https://github.com/Eveble/eveble/commit/53ab07455b53bbb0c9125da0b690524efe358ff6))
+* refactor!: convert StatefulMixin to StatefulTrait ([1535874](https://github.com/Eveble/eveble/commit/1535874ff04a3f65af31f3512df949184e021ba1))
+* refactor!: convert VersionableMixin to VersionableTrait ([ff18241](https://github.com/Eveble/eveble/commit/ff182415bd69512ffc1c7808bdf265c02f4e3b1b))
+* refactor!: convert EjsonableMixin to EjsonableTrait ([8bd8c32](https://github.com/Eveble/eveble/commit/8bd8c328cf755c4e0824f877ea39d8c437b9df0d))
+* refactor!: update Struct to use TypeTrait, HookableTrait ([8831a35](https://github.com/Eveble/eveble/commit/8831a358c90d95844f77b09d5c7f47fa2f719b1c))
+* refactor!: convert HookableMixin to HookableTrait ([d14f9c3](https://github.com/Eveble/eveble/commit/d14f9c34dc2544521984d99e9576c710d0254166))
+* refactor!: convert DefinableMixin to TypeTrait ([4c4a7e7](https://github.com/Eveble/eveble/commit/4c4a7e7e6ae4e05f97b899cfd69720cfd43c0f10))
+* refactor!: replace "define" decorator with typend new api "Type" ([34073f2](https://github.com/Eveble/eveble/commit/34073f2e82ca470d5386b8d441e80fad0a6f8947))
+
+
+### Features
+
+* add ability to exclude prop types on TypeTrait ([75a3ae5](https://github.com/Eveble/eveble/commit/75a3ae5d9e6701b5c0620dea464d7cfa090edf3a))
+* add methods to List ([1bd7d9a](https://github.com/Eveble/eveble/commit/1bd7d9a321a1e4b0dbc97dee3143a001037c5f8a))
+
+
+### BREAKING CHANGES
+
+* convert EventHandlingMixin to EventHandlingTrait
+* convert CommandHandlingMixin to CommandHandlingTrait
+* convert OneToManyHandlingMixin to OneToManyHandlingTrait
+* convert OneToOneHandlingMixin to OneToOneHandlingTrait
+* convert HandlingMixin to HandlingTrait
+* convert RFC5424LoggingMixin to RFC5424LoggingTrait
+* convert SerializableMixin to SerializableTrait
+* convert StatusfulMixin to StatusfulTrait
+* convert StatefulMixin to StatefulTrait
+* convert VersionableMixin to VersionableTrait
+* convert EjsonableMixin to EjsonableTrait
+* update Struct to use TypeTrait, HookableTrait
+* convert HookableMixin to HookableTrait
+* convert DefinableMixin to TypeTrait
+* replace "define" decorator with typend new api "Type"
+
 ## [2.6.1](https://github.com/Eveble/eveble/compare/v2.6.0...v2.6.1) (2024-02-29)
 
 

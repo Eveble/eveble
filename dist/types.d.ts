@@ -1,61 +1,64 @@
-import { interfaces as inversifyTypes } from '@parisholley/inversify-async';
+import { Container, ServiceIdentifier, BindingScope, BindToFluentSyntax } from 'inversify';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
 import Agenda from 'agenda';
 import { SAVE_STATE_METHOD_KEY, ROLLBACK_STATE_METHOD_KEY } from './constants/literal-keys';
 export declare namespace types {
-    type Class<T = unknown, Arguments extends any[] = any[]> = new (...arguments_: Arguments) => T;
-    interface Constructor<T> {
+    export type Class<T = unknown, Arguments extends any[] = any[]> = new (...arguments_: Arguments) => T;
+    export interface Constructor<T> {
         new (...args: any[]): T;
     }
+    type AllPropertyKeys<T> = T extends any ? keyof T : never;
     type NonMethodKeys<T> = {
-        [P in keyof T]: T[P] extends Function ? never : P;
+        [K in keyof T]: T[K] extends Function ? never : K;
     }[keyof T];
-    type ConstructorType<T> = Pick<T, NonMethodKeys<T>>;
-    type AnyFunction = (...args: any[]) => any;
-    type Prototype = Record<keyof any, any>;
-    type Primitive = any | string | number | boolean | symbol | void | undefined | null | never | unknown;
-    type ErrorProps = {
+    export type ConstructorType<T> = {
+        [K in AllPropertyKeys<T> as K extends NonMethodKeys<T> ? K : never]: T[K];
+    };
+    export type AnyFunction = (...args: any[]) => any;
+    export type Prototype = Record<keyof any, any>;
+    export type Primitive = any | string | number | boolean | symbol | void | undefined | null | never | unknown;
+    export type ErrorProps = {
         name?: string;
         message: string;
         stack?: string;
         code?: number;
     };
-    type Props = Record<keyof any, any>;
-    type PropTypes = Record<keyof any, typendTypes.Expectation>;
-    type ConfigProps = {
+    export type Props = Record<keyof any, any>;
+    export type PropTypes = Record<keyof any, typendTypes.Expectation>;
+    export type ConfigProps = {
         [path: string]: any;
     };
-    type ClassDecorator = <TFunction extends Function>(target: TFunction) => TFunction | void;
-    type PropertyDecorator = (target: Record<keyof any, any>, propertyKey: string | symbol) => void;
-    type MethodDecorator = <T>(target: Record<keyof any, any>, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
-    type ParameterDecorator = (target: Record<keyof any, any>, propertyKey: string | symbol, parameterIndex: number) => void;
-    interface Stringifiable {
+    export type ClassDecorator = <TFunction extends Function>(target: TFunction) => TFunction | void;
+    export type PropertyDecorator = (target: Record<keyof any, any>, propertyKey: string | symbol) => void;
+    export type MethodDecorator = <T>(target: Record<keyof any, any>, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
+    export type ParameterDecorator = (target: Record<keyof any, any>, propertyKey: string | symbol, parameterIndex: number) => void;
+    export interface Stringifiable {
         toString(): string;
     }
-    type TypeName = string;
-    interface Injector extends inversifyTypes.Container {
+    export type TypeName = string;
+    export interface Injector extends Container {
         injectInto(value: any): void;
         injectIntoAsync(value: any): Promise<void>;
-        bind<T>(serviceIdentifier: inversifyTypes.ServiceIdentifier<T>): inversifyTypes.BindingToSyntax<T> & {
+        bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T> & {
             toRoute(EventSourceableType: EventSourceableType): void;
         };
-        findByScope(scope: inversifyTypes.BindingScope): inversifyTypes.ServiceIdentifier<any>[];
+        findByScope(scope: BindingScope): ServiceIdentifier<any>[];
     }
-    type Validator = {
+    export type Validator = {
         validate(value: any, expectation: any, isStrict?: boolean): boolean;
         isValid(value: any, expectation: any, isStrict?: boolean): boolean;
         isInstanceOf(value: any, expectation: any): boolean;
     };
-    type Describer = {
+    export type Describer = {
         describe(source: any): string;
         setFormatting(formatting: typendTypes.DescriberFormatting): void;
     };
-    interface Converter {
+    export interface Converter {
         convert(reflectedType: any): any;
         reflect(reflectedType: any): any;
     }
-    interface Library {
+    export interface Library {
         registerType(typeName: TypeName, type: Serializable, shouldOverride?: boolean): void;
         overrideType(typeName: TypeName, type: Serializable): void;
         getType(typeName: TypeName): Serializable | undefined;
@@ -66,7 +69,7 @@ export declare namespace types {
         isInState(state: State | State[]): boolean;
         setState(state: State): void;
     }
-    type KernelConfig = {
+    export type KernelConfig = {
         conversion: {
             type: 'manual' | 'runtime';
         };
@@ -77,15 +80,15 @@ export declare namespace types {
             formatting: 'default' | 'compact' | 'debug';
         };
     };
-    interface Definable {
+    export interface Typed {
         getPropTypes(): Record<keyof any, any>;
         toPlainObject(): Props;
         validateProps(props: Props, propTypes: PropTypes, isStrict?: boolean): boolean;
         getPropertyInitializers(): Props;
         equals(other: any): boolean;
     }
-    type Type = any;
-    interface Hookable {
+    export type Type = any;
+    export interface Hookable {
         registerHook(action: string, id: string, hook: Hook, shouldOverride?: boolean): void;
         overrideHook(action: string, id: string, hook: Hook): void;
         getHook(action: string, id: string): Hook | undefined;
@@ -96,12 +99,12 @@ export declare namespace types {
         hasAction(action: string): boolean;
         removeHook(action: string, id: string): void;
     }
-    type Hook = AnyFunction;
-    namespace hooks {
+    export type Hook = AnyFunction;
+    export namespace hooks {
         type Mappings = Record<string, Hook>;
         type Actions = Record<string, Mappings>;
     }
-    namespace node {
+    export namespace node {
         namespace util {
             type InspectOptions = {
                 showHidden?: boolean;
@@ -110,7 +113,7 @@ export declare namespace types {
             };
         }
     }
-    interface Configurable extends Definable {
+    export interface Configurable extends Typed {
         isConfigurable(path: string): boolean;
         has(path: string): boolean;
         get<T>(path: string, runtimeDefaultValue?: any): T;
@@ -122,8 +125,8 @@ export declare namespace types {
         include(config: Configurable): void;
         merge(config: Configurable): void;
     }
-    type State = string | number | undefined;
-    interface Stateful {
+    export type State = string | number | undefined;
+    export interface Stateful {
         state: State;
         isInState(state: State | State[]): boolean;
         isInOneOfStates(states: State | State[]): boolean;
@@ -133,7 +136,7 @@ export declare namespace types {
         validateState(stateOrStates: State | State[], error?: Error): boolean;
         getSelectableStates(): Record<string, State>;
     }
-    interface Versionable {
+    export interface Versionable {
         getSchemaVersion(): number | undefined;
         transformLegacyProps(props: Props): Props;
         registerLegacyTransformer(schemaVersion: number, transformer: Hook, shouldOverride: boolean): void;
@@ -142,11 +145,11 @@ export declare namespace types {
         getLegacyTransformers(): LegacyTransformers;
         getLegacyTransformer(schemaVersion: number): Hook;
     }
-    type LegacyTransformers = Map<number, Hook>;
-    interface Loggable {
+    export type LegacyTransformers = Map<number, Hook>;
+    export interface Loggable {
         log: Logger | undefined;
     }
-    interface LogEntry {
+    export interface LogEntry {
         readonly message: string;
         readonly options: LogFormatting;
         readonly metadata: Map<string, LogMetadata>;
@@ -165,20 +168,20 @@ export declare namespace types {
         level: LogLevel;
         setLevel(level: LogLevel): this;
     }
-    type LogFormatting = {
+    export type LogFormatting = {
         isSimple?: boolean;
         isColored?: boolean;
         inspectDepth?: number;
     };
-    interface LogMetadata {
+    export interface LogMetadata {
         readonly description: string;
         readonly value?: any;
         readonly keys?: string[];
     }
-    type LogLevel = string;
-    type LogLevels = Record<string, Priority>;
-    type Priority = number;
-    type RFC5424Levels = {
+    export type LogLevel = string;
+    export type LogLevels = Record<string, Priority>;
+    export type Priority = number;
+    export type RFC5424Levels = {
         emerg(entry: string | LogEntry, ...args: any[]): void;
         alert(entry: string | LogEntry, ...args: any[]): void;
         crit(entry: string | LogEntry, ...args: any[]): void;
@@ -188,13 +191,13 @@ export declare namespace types {
         info(entry: string | LogEntry, ...args: any[]): void;
         debug(entry: string | LogEntry, ...args: any[]): void;
     };
-    interface LogTransport extends RFC5424Levels {
+    export interface LogTransport extends RFC5424Levels {
         readonly level: LogLevel;
         logger: Logger;
         isLoggable(level: LogLevel): boolean;
         log(level: LogLevel, entry: string | LogEntry, ...args: any[]): void;
     }
-    interface Logger extends RFC5424Levels, Stateful {
+    export interface Logger extends RFC5424Levels, Stateful {
         readonly levels: LogLevels;
         start(): void;
         stop(): void;
@@ -209,14 +212,14 @@ export declare namespace types {
         getTransports(): Map<string, LogTransport>;
         log(level: LogLevel, entry: string | LogEntry, ...args: any[]): void;
     }
-    interface LogFormatter {
+    export interface LogFormatter {
         format(entry: winston.LogEntry | LogEntry, options?: Configurable): string;
     }
-    interface LogConverter {
+    export interface LogConverter {
         convertArguments(entry: winston.LogEntry | LogEntry, options?: Configurable): any;
         convertMetadata(metadata: LogMetadata, entry: winston.LogEntry | LogEntry, options?: Configurable): any;
     }
-    interface BaseApp extends Stateful {
+    export interface BaseApp extends Stateful {
         injector: Injector;
         config: Configurable;
         initialize(): Promise<void>;
@@ -226,14 +229,14 @@ export declare namespace types {
         shutdown(): Promise<void>;
         invokeAction(actionName: string, options: ActionInvokingOptions): Promise<void>;
     }
-    interface App extends BaseApp {
+    export interface App extends BaseApp {
         send(command: Command): Promise<any>;
         publish(event: Event): Promise<void>;
     }
-    interface AppType {
+    export interface AppType {
         new (props?: ModuleProps): App;
     }
-    interface Module extends Stateful {
+    export interface Module extends Stateful {
         config: Configurable;
         initialize(app: BaseApp, injector: Injector): Promise<void>;
         start(): Promise<void>;
@@ -242,30 +245,30 @@ export declare namespace types {
         shutdown(): Promise<void>;
         invokeAction(actionName: string, options: ActionInvokingOptions): Promise<void>;
     }
-    interface ModuleType {
+    export interface ModuleType {
         new (props?: ModuleProps): Module;
     }
-    type ActionInvokingOptions = {
+    export type ActionInvokingOptions = {
         isLoggable: boolean;
     };
-    type AppProps = ModuleProps & {
+    export type AppProps = ModuleProps & {
         injector?: Injector;
     };
-    type ModuleProps = {
+    export type ModuleProps = {
         [key: string]: any | {
             modules?: Module[];
         };
     };
-    interface Serializable extends Definable, Versionable {
+    export interface Serializable extends Typed, Versionable {
         getTypeName(): TypeName;
         toString(): TypeName | string;
     }
-    interface Ejsonable extends Serializable {
+    export interface Ejsonable extends Serializable {
         typeName(): TypeName;
         toJSONValue(): Record<string, any>;
     }
-    type Execution = 'sequential' | 'concurrent';
-    interface Message extends Serializable {
+    export type Execution = 'sequential' | 'concurrent';
+    export interface Message extends Serializable {
         timestamp?: Date;
         metadata?: Record<string, any>;
         getTimestamp(): Date;
@@ -276,12 +279,12 @@ export declare namespace types {
         getCorrelationId(key: string): string | undefined;
         hasCorrelationId(key: string): boolean;
     }
-    interface MessageType<T extends Message> {
+    export interface MessageType<T extends Message> {
         new (props: Props): T;
         getTypeName(): TypeName;
     }
-    type Handler = (message: Message) => any;
-    interface Controller {
+    export type Handler = (message: Message) => any;
+    export interface Controller {
         initialize(): void;
         handles(): Map<MessageType<Command>, Handler>;
         subscribes(): Map<MessageType<Event>, Handler>;
@@ -300,7 +303,7 @@ export declare namespace types {
         getHandled(messageType: MessageType<Message>): MessageType<Message>[];
         handle(message: Message, execution?: Execution): Promise<any>;
     }
-    interface Command extends Message {
+    export interface Command extends Message {
         targetId: string | Stringifiable;
         getId(): string | Stringifiable;
         isDeliverable(): boolean;
@@ -308,27 +311,27 @@ export declare namespace types {
         schedule(assignment: Assignment): void;
         getAssignment(): Assignment | undefined;
     }
-    interface Event extends Message {
+    export interface Event extends Message {
         sourceId: string | Stringifiable;
         version?: number;
         getId(): string | Stringifiable;
     }
-    interface Sender extends Controller {
+    export interface Sender extends Controller {
         send(command: Command): Promise<any>;
     }
-    interface Publisher extends Controller {
+    export interface Publisher extends Controller {
         publish(event: Event): Promise<void>;
         subscribeTo(event: any, handler: Handler, shouldOverride?: boolean): void;
     }
-    interface CommandBus extends Sender {
+    export interface CommandBus extends Sender {
         onSend(id: string, hook: Hook, shouldOverride?: boolean): void;
         getHandledTypesNames(): TypeName[];
     }
-    interface EventBus extends Publisher {
+    export interface EventBus extends Publisher {
         onPublish(id: string, hook: Hook, shouldOverride?: boolean): void;
         getHandledTypesNames(): TypeName[];
     }
-    interface Serializer {
+    export interface Serializer {
         registerType(typeName: TypeName, type: Type, shouldOverride?: boolean): void;
         overrideType(typeName: TypeName, type: Type): void;
         hasType(typeName: TypeName): boolean;
@@ -353,8 +356,8 @@ export declare namespace types {
         toData(arg: Record<string | number, any>): Record<string | number, any>;
         fromData(data: Record<string | number, any>): Record<string | number, any>;
     }
-    type Status = string | number | undefined;
-    interface Statusful {
+    export type Status = string | number | undefined;
+    export interface Statusful {
         status: Status;
         isInStatus(status: Status | Status[]): boolean;
         isInOneOfStatuses(status: Status | Status[]): boolean;
@@ -364,10 +367,10 @@ export declare namespace types {
         validateStatus(statusOrStatuses: Status | Status[], error?: Error): boolean;
         getSelectableStatuses(): Record<string, Status>;
     }
-    interface Identifiable extends Serializable {
+    export interface Identifiable extends Serializable {
         getId(): string | Stringifiable;
     }
-    interface List<T> extends Array<T> {
+    export interface List<T> extends Array<T> {
         create(...sources: Record<string, any>[]): T;
         add(element: T): void;
         overrideBy(key: string, value: any, element: T): void;
@@ -377,6 +380,7 @@ export declare namespace types {
         getByIdOrThrow(id: string | Stringifiable): T;
         findById(id: string | Stringifiable): T;
         findBy(key: string, value: any): T;
+        findByOrFail(key: string, value: any): T;
         hasBy(key: string, value: any): boolean;
         hasSame(element: T): boolean;
         hasById(id: string | Stringifiable): boolean;
@@ -384,13 +388,16 @@ export declare namespace types {
         replaceBy(key: string, value: any, element: T): void;
         removeById(id: string | Stringifiable): void;
         removeBy(key: string, value: any): void;
+        deleteById(id: string | Stringifiable): void;
+        deleteBy(key: string, value: any): void;
         first(): T | undefined;
         last(): T | undefined;
+        toPlainObject(): any[];
     }
-    interface Assertion {
+    export interface Assertion {
         getApi(): Map<string, Function>;
     }
-    interface Asserter {
+    export interface Asserter {
         setAction(action: Stringifiable | MessageType<Message>): void;
         getAction(): Stringifiable | MessageType<Message> | undefined;
         hasAction(): boolean;
@@ -404,13 +411,13 @@ export declare namespace types {
         hasApi(path: string): boolean;
         hasAssertion(assertionCtor: any): boolean;
     }
-    interface Entity extends Serializable, Stateful, Statusful, Identifiable {
+    export interface Entity extends Serializable, Stateful, Statusful, Identifiable {
         on(action: string | Stringifiable): any;
         [SAVE_STATE_METHOD_KEY](): void;
         [ROLLBACK_STATE_METHOD_KEY](): void;
         isStateSaved(): boolean;
     }
-    type EntityType<T> = Omit<Pick<T, NonMethodKeys<T>>, 'state' | 'status' | 'can' | 'is' | 'schemaVersion' | 'ensure' | 'ableTo'> & {
+    export type EntityType<T> = Omit<Pick<T, NonMethodKeys<T>>, 'state' | 'status' | 'can' | 'is' | 'schemaVersion' | 'ensure' | 'ableTo'> & {
         id: string | Stringifiable;
         state?: State;
         status?: Status;
@@ -420,7 +427,7 @@ export declare namespace types {
         ableTo?: never;
         ensure?: never;
     };
-    interface EventSourceable extends Entity, Controller {
+    export interface EventSourceable extends Entity, Controller {
         getVersion(): number;
         getEvents(): Event[];
         getCommands(): Command[];
@@ -434,7 +441,7 @@ export declare namespace types {
         eventProps(): Record<keyof any, any>;
         incrementVersion(): void;
     }
-    interface EventSourceableType {
+    export interface EventSourceableType {
         new (props: Props): EventSourceable;
         resolveInitializingMessage(): MessageType<Command | Event> | undefined;
         resolveRoutedCommands(): MessageType<Command>[];
@@ -443,7 +450,7 @@ export declare namespace types {
         getTypeName(): TypeName;
         from(...sources: Record<string, any>[]): EventSourceable;
     }
-    interface Router {
+    export interface Router {
         EventSourceableType: EventSourceableType;
         InitializingMessageType: MessageType<Command | Event>;
         routedCommands: MessageType<Command>[];
@@ -452,10 +459,10 @@ export declare namespace types {
         setupCommandHandler(CommandType: MessageType<Command>): void;
         setupEventHandler(EventType: MessageType<Event>): void;
     }
-    interface RouterType {
+    export interface RouterType {
         new (EventSourceableType?: EventSourceableType, InitializingMessageType?: MessageType<Command | Event>, routedCommands?: MessageType<Command>[], routedEvents?: MessageType<Event>[]): Router;
     }
-    interface CommitReceiver extends Serializable, Stateful {
+    export interface CommitReceiver extends Serializable, Stateful {
         state: State;
         appId: string;
         workerId?: string;
@@ -467,7 +474,7 @@ export declare namespace types {
         flagAsTimeouted(workerId: string | Stringifiable): void;
         flagAsFailed(workerId: string | Stringifiable): void;
     }
-    interface Commit extends Serializable {
+    export interface Commit extends Serializable {
         id: string;
         sourceId: string;
         version: number;
@@ -482,11 +489,11 @@ export declare namespace types {
         addReceiver(receiver: CommitReceiver): void;
         getReceiver(appId: string): CommitReceiver | undefined;
     }
-    type StorageIdentifiers = {
+    export type StorageIdentifiers = {
         commitId?: string;
         snapshotId?: string;
     };
-    interface EventSourceableRepository {
+    export interface EventSourceableRepository {
         save(eventSourceable: EventSourceable): Promise<StorageIdentifiers>;
         find(EventSourceableType: EventSourceableType, eventSourceableId: string | Stringifiable): Promise<EventSourceable | undefined>;
         hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
@@ -494,7 +501,7 @@ export declare namespace types {
         getSnapshotOf(EventSourceableType: EventSourceableType, eventSourceableId: string | Stringifiable): Promise<EventSourceable | undefined>;
         isSnapshotting(): boolean;
     }
-    interface CommitStore {
+    export interface CommitStore {
         createCommit(eventSourceable: EventSourceable): Promise<Commit>;
         generateId(): Promise<string>;
         save(commit: Commit): Promise<string>;
@@ -503,7 +510,7 @@ export declare namespace types {
         findById(commitId: string): Promise<Commit | undefined>;
         hasBySourceId(eventSourceableId: string | Stringifiable): Promise<boolean>;
     }
-    interface CommitStorage {
+    export interface CommitStorage {
         save(commit: Commit): Promise<string>;
         findLastVersionById(eventSourceableId: string | Stringifiable): Promise<number | undefined>;
         generateId(): Promise<string>;
@@ -516,7 +523,7 @@ export declare namespace types {
         flagAndResolveCommitAsTimeouted(commitId: string, appId: string, workerId: string, failedAt: Date): Promise<Commit | undefined>;
         lockCommit(commitId: string, appId: string, workerId: string, registeredAndNotReceivedYetFilter: Record<string, any>): Promise<Commit | undefined>;
     }
-    interface CommitPublisher {
+    export interface CommitPublisher {
         startPublishing(): Promise<void>;
         stopPublishing(): Promise<void>;
         publishChanges(commit: Commit): Promise<void>;
@@ -524,36 +531,36 @@ export declare namespace types {
         getHandledCommandTypes(): TypeName[];
         isInProgress(commitId: string): boolean;
     }
-    interface CommitObserver {
+    export interface CommitObserver {
         startObserving(commitPublisher: CommitPublisher): Promise<void>;
         pauseObserving(): Promise<void>;
         stopObserving(): Promise<void>;
         isObserving(): boolean;
     }
-    interface Snapshotter {
+    export interface Snapshotter {
         makeSnapshotOf(eventSourceable: EventSourceable): Promise<string | undefined>;
         getSnapshotOf(EventSourceableType: EventSourceableType, eventSourceableId: string | Stringifiable): Promise<EventSourceable | undefined>;
     }
-    interface SnapshotStorage {
+    export interface SnapshotStorage {
         save(eventSourceable: EventSourceable): Promise<string | undefined>;
         findById(EventSourceableType: EventSourceableType, eventSourceableId: string | Stringifiable): Promise<EventSourceable | undefined>;
         update(eventSourceable: EventSourceable, lastSnapshot?: EventSourceable): Promise<boolean>;
     }
-    interface Projection {
+    export interface Projection {
         on(event: Event, isRebuildEvent?: boolean): Promise<void>;
         enterRebuildMode(): Promise<void>;
         exitRebuildMode(): Promise<void>;
         invokeAction(actionName: string): Promise<void>;
         getProjectionName(): string;
     }
-    interface ProjectionRebuilder {
+    export interface ProjectionRebuilder {
         rebuild(projections: Projection[]): {
             projectionsNames: string[];
             duration: number;
             message: string;
         };
     }
-    interface Client extends Stateful {
+    export interface Client extends Stateful {
         getId(): string | Stringifiable;
         initialize(): Promise<void>;
         connect(): Promise<void>;
@@ -561,23 +568,23 @@ export declare namespace types {
         reconnect(): Promise<void>;
         isConnected(): boolean;
     }
-    interface Assignment extends Serializable {
+    export interface Assignment extends Serializable {
         assignmentId: string | Stringifiable;
         deliverAt: Date;
         assignerId: string | Stringifiable;
         assignerType: TypeName;
     }
-    interface ScheduleCommand {
+    export interface ScheduleCommand {
         command: Command;
         getAssignment(): Assignment;
     }
-    interface UnscheduleCommand {
+    export interface UnscheduleCommand {
         assignmentId: string | Stringifiable;
         commandType: TypeName;
         assignerId: string | Stringifiable;
         assignerType: TypeName;
     }
-    interface CommandScheduler extends Stateful {
+    export interface CommandScheduler extends Stateful {
         initialize(): Promise<void>;
         startScheduling(): Promise<void>;
         stopScheduling(): Promise<void>;
@@ -587,7 +594,7 @@ export declare namespace types {
         unscheduleAll(): Promise<void>;
         getInterval(): number;
     }
-    interface ScheduledJob extends Definable, Hookable, Stateful {
+    export interface ScheduledJob extends Typed, Hookable, Stateful {
         id: string | Stringifiable;
         state: State;
         name: string;
@@ -599,22 +606,22 @@ export declare namespace types {
         lastRunAt?: Date;
         failedAt?: Date;
     }
-    interface AgendaJobTransformer {
+    export interface AgendaJobTransformer {
         transform(job: Agenda.Job): ScheduledJob;
     }
-    interface CommitSerializer {
+    export interface CommitSerializer {
         serialize(commit: Commit): Record<string, any>;
         deserialize(serializedCommit: Record<string, any>): Commit;
     }
-    interface SnapshotSerializer {
+    export interface SnapshotSerializer {
         serialize(eventSourceable: EventSourceable): Record<string, any>;
         deserialize(EventSourceableType: EventSourceableType, serializedEventSourceable: string): EventSourceable;
     }
-    type MongoDBSerializedType = {
+    export type MongoDBSerializedType = {
         _type: string;
         [key: string]: any;
     };
-    interface MongoDBSerializedCommit {
+    export interface MongoDBSerializedCommit {
         _id: string;
         id: string;
         sourceId: string;
@@ -628,6 +635,7 @@ export declare namespace types {
         sentBy: string;
         receivers: Partial<CommitReceiver>[];
     }
-    interface Service extends Sender, Publisher {
+    export interface Service extends Sender, Publisher {
     }
+    export {};
 }

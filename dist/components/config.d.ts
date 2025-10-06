@@ -1,8 +1,10 @@
-import { Struct } from './struct';
 import { types } from '../types';
-export declare class Config extends Struct implements types.Configurable {
-    included?: Record<string, types.Configurable>;
-    merged?: Record<string, types.Configurable>;
+import { Serializable } from './serializable';
+export declare const CONFIG_INCLUDED_KEY: unique symbol;
+export declare const CONFIG_MERGED_KEY: unique symbol;
+export declare class Config extends Serializable implements types.Configurable {
+    [CONFIG_INCLUDED_KEY]?: Record<string, types.Configurable>;
+    [CONFIG_MERGED_KEY]?: Record<string, types.Configurable>;
     constructor();
     isConfigurable(path: string): boolean;
     getPropTypes(): types.Props;
