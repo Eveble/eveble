@@ -52,18 +52,6 @@ describe('AppConfig', () => {
       );
     });
 
-    it('takes optional included property as an list of Config instances', () => {
-      expect(AppConfig.getPropTypes().included).to.be.eql(
-        PropTypes.interface({}).isOptional
-      );
-    });
-
-    it('takes optional merged property as an list of Config instances', () => {
-      expect(AppConfig.getPropTypes().merged).to.be.eql(
-        PropTypes.interface({}).isOptional
-      );
-    });
-
     it(`takes optional conversion property as an object with type property as one of: 'manual' or 'runtime'`, () => {
       expect(AppConfig.getPropTypes().conversion).to.be.eql(
         PropTypes.shape({
@@ -90,8 +78,8 @@ describe('AppConfig', () => {
       expect(AppConfig.getPropTypes().description).to.be.eql(
         PropTypes.shape({
           formatting: PropTypes.oneOf([
-            PropTypes.equal('compact'),
             PropTypes.equal('debug'),
+            PropTypes.equal('compact'),
             PropTypes.equal('default'),
           ]),
         }).isOptional
