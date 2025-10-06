@@ -182,7 +182,9 @@ export class Router implements types.Router {
         );
         this.log.error(
           new Log(
-            `failed handling message '${message.getTypeName()}' do to error: ${error}`
+            `failed handling message '${message.getTypeName()}' do to error: ${
+              error.name
+            }: ${error.message}`
           )
             .on(this)
             .in(this.initializingMessageHandler)
@@ -303,7 +305,9 @@ export class Router implements types.Router {
     } catch (error) {
       this.log.error(
         new Log(
-          `failed handling '${message.getTypeName()}' do to error: ${error}`
+          `failed handling '${message.getTypeName()}' do to error: ${
+            error.name
+          }: ${error.message}`
         )
           .on(this)
           .in(this.handleOrThrowDomainError)
