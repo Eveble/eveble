@@ -35,8 +35,8 @@ import {
   convert,
   reflect,
   // Annotations
-  internal,
-  validable,
+  Internal,
+  Validable,
   // Patterns
   any,
   iof,
@@ -70,7 +70,6 @@ import {
   Kernel,
   kernel,
   Library,
-  define,
   KernelError,
   UnavailableSerializerError,
   UnavailableAsserterError,
@@ -267,7 +266,7 @@ import {
   HookNotFoundError,
 } from '../../src/traits/hookable.trait';
 import { OneToManyHandlingTrait } from '../../src/traits/one-to-many-handling.trait';
-import { OneToOneHandlingTrait } from '../../src/mixins/one-to-one-handling-mixin';
+import { OneToOneHandlingTrait } from '../../src/traits/one-to-one-handling.trait';
 import { RFC5424LoggingTrait } from '../../src/traits/rfc-5424-logging.trait';
 import {
   StatefulTrait,
@@ -647,8 +646,6 @@ import {
   Version,
   Type,
   EvebleType,
-  Internal,
-  Validable,
   Serializable,
 } from '../../src/index';
 
