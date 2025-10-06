@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { pick } from 'lodash';
 import deepClone from '@jsbits/deep-clone';
 import { Type, kernel } from '@eveble/core';
@@ -26,8 +27,8 @@ export class Entity
   extends derive(StatefulTrait, StatusfulTrait, Serializable)
   implements types.Entity
 {
-  // eslint-disable-next-line no-undef
   // Hack against Type 'unique symbol' cannot be used as an index type.ts(2538)
+  // eslint-disable-next-line no-undef
   [key: symbol]: any;
 
   protected static asserter: types.Asserter;
