@@ -13,7 +13,7 @@ import {
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
-import { InvalidStateError } from '../../../src/mixins/stateful-mixin';
+import { InvalidStateError } from '../../../src/traits/stateful.trait';
 import { Injector } from '../../../src/core/injector';
 
 chai.use(sinonChai);

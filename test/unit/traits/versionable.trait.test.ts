@@ -5,8 +5,8 @@ import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { types } from '../../../src/types';
 import { version } from '../../../src/annotations/version';
-import { HookableTrait } from '../../../src/mixins/hookable-mixin';
-import { TypeTrait } from '../../../src/mixins/definable-mixin';
+import { HookableTrait } from '../../../src/traits/hookable.trait';
+import { TypeTrait } from '../../../src/traits/type.trait';
 import {
   InvalidLegacyTransformerError,
   NotVersionableError,
@@ -14,7 +14,7 @@ import {
   LegacyTransformerAlreadyExistsError,
   VersionableTrait,
   InvalidSchemaVersionError,
-} from '../../../src/mixins/versionable-mixin';
+} from '../../../src/traits/versionable.trait';
 
 describe(`VersionableTrait`, () => {
   describe('prop types', () => {

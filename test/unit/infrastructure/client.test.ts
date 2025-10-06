@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Client } from '../../../src/app/client';
-import { StatefulTrait } from '../../../src/mixins/stateful-mixin';
+import { StatefulTrait } from '../../../src/traits/stateful.trait';
 
 describe(`Client`, () => {
   it(`has StatefulTrait mixin on prototype chain applied`, () => {

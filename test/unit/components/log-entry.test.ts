@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { Type } from '@eveble/core';
 import { Log, LogMetadata } from '../../../src/components/log-entry';
-import { TypeTrait } from '../../../src/mixins/definable-mixin';
+import { TypeTrait } from '../../../src/traits/type.trait';
 
 describe('Log', () => {
   @Type('MyClass')

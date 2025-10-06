@@ -1,9 +1,8 @@
 import { Type } from '@eveble/core';
 import { Entity } from '../../../src/domain/entity';
 import { can } from '../../../src/decorators/can';
-import { StateError } from '../../../src/mixins/stateful-mixin';
+import { StateError } from '../../../src/traits/stateful.trait';
 import { types } from '../../../src/types';
-// import { PriorityOutOfRangeError } from './task-errors';
 
 @Type()
 export class NoQuittingFoolError extends StateError {

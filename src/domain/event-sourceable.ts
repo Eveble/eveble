@@ -7,7 +7,7 @@ import getenv from 'getenv';
 import { Type, kernel } from '@eveble/core';
 import deepClone from '@jsbits/deep-clone';
 import { Entity } from './entity';
-import { OneToOneHandlingTrait } from '../mixins/one-to-one-handling-mixin';
+import { OneToOneHandlingTrait } from '../traits/one-to-one-handling.trait';
 import { types } from '../types';
 import { Command, Assignment } from '../components/command';
 import { HandlerNotFoundError } from '../messaging/messaging-errors';

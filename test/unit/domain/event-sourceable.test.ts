@@ -7,7 +7,7 @@ import { Type } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { History } from '../../../src/domain/history';
 import { Guid } from '../../../src/domain/value-objects/guid';
-import { OneToOneHandlingTrait } from '../../../src/mixins/one-to-one-handling-mixin';
+import { OneToOneHandlingTrait } from '../../../src/traits/one-to-one-handling.trait';
 import { Entity } from '../../../src/domain/entity';
 import { EVENTS_KEY, COMMANDS_KEY } from '../../../src/constants/literal-keys';
 import { Command, Assignment } from '../../../src/components/command';
