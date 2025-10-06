@@ -1,13 +1,14 @@
 import getenv from 'getenv';
 import { Collection, Cursor } from 'mongodb';
 import { inject, injectable } from 'inversify';
+import { derive } from '@traits-ts/core';
 import { types } from '../../types';
 import { BINDINGS } from '../../constants/bindings';
 import { StatefulTrait } from '../../traits/stateful.trait';
 import { Log } from '../../components/log-entry';
 
 @injectable()
-export class CommitMongoDBObserver extends StatefulTrait {
+export class CommitMongoDBObserver extends derive(StatefulTrait) {
   @inject(BINDINGS.MongoDB.collections.Commits)
   protected collection: Collection;
 

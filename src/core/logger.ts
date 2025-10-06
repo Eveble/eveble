@@ -1,6 +1,6 @@
-import { classes } from 'polytype';
 import { injectable } from 'inversify';
 import { kernel } from '@eveble/core';
+import { derive } from '@traits-ts/core';
 import { InvalidTransportIdError, TransportExistsError } from './core-errors';
 import { StatefulTrait } from '../traits/stateful.trait';
 import { LOGGING_LEVELS } from '../constants/defaults';
@@ -16,7 +16,7 @@ enum STATES {
 
 @injectable()
 export class Logger
-  extends classes(StatefulTrait, RFC5424LoggingTrait)
+  extends derive(StatefulTrait, RFC5424LoggingTrait)
   implements types.Logger
 {
   static STATES = STATES;

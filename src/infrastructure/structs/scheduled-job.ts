@@ -1,5 +1,5 @@
-import { classes } from 'polytype';
 import { Type } from '@eveble/core';
+import { derive } from '@traits-ts/core';
 import { StatefulTrait } from '../../traits/stateful.trait';
 import { types } from '../../types';
 import { Guid } from '../../domain/value-objects/guid';
@@ -7,7 +7,7 @@ import { Struct } from '../../components/struct';
 
 @Type()
 export class ScheduledJob
-  extends classes(Struct, StatefulTrait)
+  extends derive(StatefulTrait, Struct)
   implements types.ScheduledJob
 {
   static STATES = {
@@ -56,7 +56,7 @@ export class ScheduledJob
    * https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
    */
   constructor(props: types.Props = {}) {
-    super([props]);
+    super(props);
     if (props.state) {
       this.setState(props.state);
     }

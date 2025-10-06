@@ -1,12 +1,12 @@
-import { classes } from 'polytype';
 import { Type } from 'typend';
+import { derive } from '@traits-ts/core';
 import { types } from '../../types';
 import { StatefulTrait } from '../../traits/stateful.trait';
 import { Serializable } from '../../components/serializable';
 
 @Type('CommitReceiver')
 export class CommitReceiver
-  extends classes(Serializable, StatefulTrait)
+  extends derive(StatefulTrait, Serializable)
   implements types.CommitReceiver
 {
   static STATES = {
@@ -38,7 +38,7 @@ export class CommitReceiver
    * https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
    */
   constructor(props: types.Props = {}) {
-    super([props]);
+    super(props);
     if (props.state) {
       this.setState(props.state);
     }

@@ -1,8 +1,9 @@
+import { derive } from '@traits-ts/core';
 import { Guid } from '../domain/value-objects/guid';
 import { types } from '../types';
 import { StatefulTrait } from '../traits/stateful.trait';
 
-export class Client extends StatefulTrait {
+export class Client extends derive(StatefulTrait) {
   static STATES = {
     constructed: 'constructed',
     initialized: 'initialized',

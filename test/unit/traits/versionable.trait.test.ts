@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { classes } from 'polytype';
 import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
+import { derive } from '@traits-ts/core';
 import { types } from '../../../src/types';
 import { version } from '../../../src/annotations/version';
 import { HookableTrait } from '../../../src/traits/hookable.trait';
@@ -21,7 +21,7 @@ describe(`VersionableTrait`, () => {
     it('enforces with Versionable schemaVersion prop type as optional number', () => {
       @Type('MyClass', { isRegistrable: false })
       class MyClass
-        extends classes(TypeTrait, VersionableTrait)
+        extends derive(TypeTrait, VersionableTrait)
         implements types.Versionable
       {
         schemaVersion: number | undefined;
@@ -35,7 +35,7 @@ describe(`VersionableTrait`, () => {
 
   describe('registration of legacy transformers', () => {
     it('throws InvalidSchemaVersionError if provided schema version is not a number', () => {
-      class MyClass extends VersionableTrait {}
+      class MyClass extends derive(VersionableTrait) {}
 
       expect(() =>
         MyClass.prototype.registerLegacyTransformer('1' as any, sinon.stub())
@@ -46,7 +46,7 @@ describe(`VersionableTrait`, () => {
     });
 
     it('throws LegacyTransformerAlreadyExistsError when hook would be overridden', () => {
-      class MyClass extends VersionableTrait {}
+      class MyClass extends derive(VersionableTrait) {}
 
       MyClass.prototype.registerLegacyTransformer(1, sinon.stub());
       expect(() =>
@@ -58,7 +58,7 @@ describe(`VersionableTrait`, () => {
     });
 
     it('registers transformer for schema version', () => {
-      class MyClass extends VersionableTrait {}
+      class MyClass extends derive(VersionableTrait) {}
 
       const schemaVersion = 1;
       const transformer = sinon.stub();
@@ -69,7 +69,7 @@ describe(`VersionableTrait`, () => {
     });
 
     it('allows for explicit transformer overriding', () => {
-      class MyClass extends VersionableTrait {}
+      class MyClass extends derive(VersionableTrait) {}
 
       const schemaVersion = 1;
       const transformer = sinon.stub();
@@ -88,7 +88,7 @@ describe(`VersionableTrait`, () => {
     });
 
     it(`throws LegacyTransformerNotFoundError if legacy transformer for schema version can't be found`, () => {
-      class MyClass extends VersionableTrait {}
+      class MyClass extends derive(VersionableTrait) {}
 
       expect(() => MyClass.prototype.getLegacyTransformer(1)).to.throw(
         LegacyTransformerNotFoundError,
@@ -97,7 +97,7 @@ describe(`VersionableTrait`, () => {
     });
 
     it('returns legacy transformer by schema version', () => {
-      class MyClass extends VersionableTrait {}
+      class MyClass extends derive(VersionableTrait) {}
 
       const schemaVersion = 1;
       const transformer = sinon.stub();
@@ -109,7 +109,7 @@ describe(`VersionableTrait`, () => {
 
     describe('evaluation', () => {
       it('returns true if legacy transformer for schema version is registered', () => {
-        class MyClass extends VersionableTrait {}
+        class MyClass extends derive(VersionableTrait) {}
 
         const schemaVersion = 1;
         const transformer = sinon.stub();
@@ -118,7 +118,7 @@ describe(`VersionableTrait`, () => {
           .true;
       });
       it('returns false if legacy transformer for schema version does not exist', () => {
-        class MyClass extends VersionableTrait {}
+        class MyClass extends derive(VersionableTrait) {}
 
         const schemaVersion = 1;
         expect(MyClass.prototype.hasLegacyTransformer(schemaVersion)).to.be
@@ -146,7 +146,7 @@ describe(`VersionableTrait`, () => {
 
     it('throws NotVersionableError if provided class does not implement Hookable interface', () => {
       const ctor = (): any => {
-        class MyClass extends VersionableTrait {
+        class MyClass extends derive(VersionableTrait) {
           @version(1)
           transformToVersion1(): any {
             return undefined;
@@ -162,7 +162,7 @@ describe(`VersionableTrait`, () => {
 
     it('throws InvalidLegacyTransformerError if provided annotation is not applied to method', () => {
       const ctor = (): any => {
-        class MyClass extends VersionableTrait {
+        class MyClass extends derive(VersionableTrait) {
           @version(1)
           myPropKey: string;
         }
@@ -177,7 +177,7 @@ describe(`VersionableTrait`, () => {
 
   describe('transforming legacy schema', () => {
     it('does not register onConstruction versionable hook before first legacy transformer is annotated', () => {
-      class MyClass extends classes(VersionableTrait, HookableTrait) {
+      class MyClass extends derive(VersionableTrait, HookableTrait) {
         key: string;
       }
       expect(MyClass.prototype.hasHook('onConstruction', 'versionable')).to.be
@@ -185,7 +185,7 @@ describe(`VersionableTrait`, () => {
     });
 
     it('register an onConstruction versionable hook after first legacy transformer is annotated', () => {
-      class MyClass extends classes(VersionableTrait, HookableTrait) {
+      class MyClass extends derive(VersionableTrait, HookableTrait) {
         key: string;
 
         @version(1)
@@ -202,7 +202,7 @@ describe(`VersionableTrait`, () => {
     });
 
     it.skip('does not leak legacy transformers in parent-child relation', () => {
-      class Parent extends classes(VersionableTrait, HookableTrait) {
+      class Parent extends derive(VersionableTrait, HookableTrait) {
         key: string;
 
         @version(1)
@@ -238,7 +238,7 @@ describe(`VersionableTrait`, () => {
 
     context('v0', () => {
       it('does not transform types that have no legacy transformers assigned', () => {
-        class MyClass extends VersionableTrait {
+        class MyClass extends derive(VersionableTrait) {
           key: string;
         }
         const propsV0 = {
@@ -252,7 +252,7 @@ describe(`VersionableTrait`, () => {
 
     context('v1', () => {
       it('transforms legacy props that are 1 version behind', () => {
-        class MyClass extends classes(VersionableTrait, HookableTrait) {
+        class MyClass extends derive(VersionableTrait, HookableTrait) {
           key: string;
 
           @version(1)
@@ -274,7 +274,7 @@ describe(`VersionableTrait`, () => {
       });
 
       it('does not transform schema is up-to-date', () => {
-        class MyClass extends classes(VersionableTrait, HookableTrait) {
+        class MyClass extends derive(VersionableTrait, HookableTrait) {
           key: string;
 
           @version(1)
@@ -295,7 +295,7 @@ describe(`VersionableTrait`, () => {
 
     context('vN', () => {
       it('transforms legacy props that are 2 version behind', () => {
-        class MyClass extends classes(VersionableTrait, HookableTrait) {
+        class MyClass extends derive(VersionableTrait, HookableTrait) {
           key: string;
 
           @version(1)
@@ -323,7 +323,7 @@ describe(`VersionableTrait`, () => {
       });
 
       it('does not transform schema is up-to-date', () => {
-        class MyClass extends classes(VersionableTrait, HookableTrait) {
+        class MyClass extends derive(VersionableTrait, HookableTrait) {
           key: string;
 
           @version(1)

@@ -1,11 +1,12 @@
 import { get } from 'lodash';
 import { inject, postConstruct } from 'inversify';
+import { derive } from '@traits-ts/core';
 import { types } from '../types';
 import { RFC5424LoggingTrait } from '../traits/rfc-5424-logging.trait';
 import { LogTransportConfig } from '../configs/log-transport-config';
 import { BINDINGS } from '../constants/bindings';
 
-export abstract class LogTransport extends RFC5424LoggingTrait {
+export abstract class LogTransport extends derive(RFC5424LoggingTrait) {
   public readonly level: types.LogLevel;
 
   public readonly config?: LogTransportConfig;

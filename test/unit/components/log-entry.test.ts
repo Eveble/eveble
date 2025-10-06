@@ -1,11 +1,12 @@
 import { expect } from 'chai';
 import { Type } from '@eveble/core';
+import { derive } from '@traits-ts/core';
 import { Log, LogMetadata } from '../../../src/components/log-entry';
 import { TypeTrait } from '../../../src/traits/type.trait';
 
 describe('Log', () => {
   @Type('MyClass')
-  class MyClass extends TypeTrait {
+  class MyClass extends derive(TypeTrait) {
     myMethod(first: string, second: string, third: string): void {
       Object.assign(this, { first, second, third });
     }

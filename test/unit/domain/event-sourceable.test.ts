@@ -4,6 +4,7 @@ import sinonChai from 'sinon-chai';
 import { PropTypes, ValidationError } from 'typend';
 import sinon from 'sinon';
 import { Type } from '@eveble/core';
+import { derived } from '@traits-ts/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { History } from '../../../src/domain/history';
 import { Guid } from '../../../src/domain/value-objects/guid';

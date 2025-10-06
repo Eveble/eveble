@@ -1,9 +1,9 @@
 import { isFunction, capitalize } from 'lodash';
 import { getTypeName } from '@eveble/helpers';
 import { instanceOf } from 'typend';
-import { classes } from 'polytype';
 import getenv from 'getenv';
 import { kernel } from '@eveble/core';
+import { derive } from '@traits-ts/core';
 import { StatefulTrait } from '../traits/stateful.trait';
 import {
   AppMissingError,
@@ -31,7 +31,7 @@ enum STATES {
 }
 
 export abstract class Module
-  extends classes(StatefulTrait)
+  extends derive(StatefulTrait)
   implements types.Stateful, types.Module
 {
   static STATES = STATES;

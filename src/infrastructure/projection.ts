@@ -1,6 +1,6 @@
 import { inject, postConstruct } from 'inversify';
-import { classes } from 'polytype';
 import { isFunction } from 'lodash';
+import { derive } from '@traits-ts/core';
 import {
   ProjectionAlreadyRebuildingError,
   ProjectionNotRebuildingError,
@@ -12,7 +12,7 @@ import { types } from '../types';
 import { Log } from '../components/log-entry';
 
 export class Projection
-  extends classes(EventHandlingTrait, StatefulTrait)
+  extends derive(EventHandlingTrait, StatefulTrait)
   implements types.Projection
 {
   @inject(BINDINGS.EventBus)
@@ -32,7 +32,7 @@ export class Projection
    * Creates an instance of `Projection`.
    */
   constructor() {
-    super([]);
+    super();
     this.setState(Projection.STATES.projecting);
     this.queuedEvents = [];
   }
@@ -42,7 +42,7 @@ export class Projection
    */
   @postConstruct()
   public initialize(): void {
-    super.class(EventHandlingTrait).initialize();
+    super.initialize();
   }
 
   /**

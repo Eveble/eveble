@@ -2,6 +2,7 @@ import { inject, injectable } from 'inversify';
 import Agenda, { AgendaConfiguration } from 'agenda';
 import { Collection } from 'mongodb';
 import { isEmpty } from 'lodash';
+import { derive } from '@traits-ts/core';
 import { Assignment } from '../../components/command';
 import {
   InactiveClientError,
@@ -19,7 +20,7 @@ import { AgendaClient } from '../../app/clients/agenda-client';
 
 @injectable()
 export class AgendaCommandScheduler
-  extends StatefulTrait
+  extends derive(StatefulTrait)
   implements types.CommandScheduler
 {
   static STATES = {
