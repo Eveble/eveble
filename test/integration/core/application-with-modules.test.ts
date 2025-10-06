@@ -52,7 +52,9 @@ describe('building applications based on modules', () => {
       dependency: any;
 
       async onInitialize(): Promise<void> {
-        this.injector.rebind(MY_BINDINGS.Dependency).toConstantValue(appValue);
+        this.injector
+          .rebindSync(MY_BINDINGS.Dependency)
+          .toConstantValue(appValue);
       }
     }
 
