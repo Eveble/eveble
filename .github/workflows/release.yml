@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x, 22.x]
+        node-version: [22.x]
         mongodb-version: ['7.0']
     permissions:
       packages: write
@@ -46,7 +46,7 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.12.0
         with:
-          mongodb-version: ${{ matrix.mongodb-version }}
+          mongodb-version: "${{ matrix.mongodb-version }}"
           mongodb-username: admin
           mongodb-password: password
           mongodb-replica-set: test-rs
