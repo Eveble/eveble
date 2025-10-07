@@ -47,7 +47,7 @@ jobs:
         uses: supercharge/mongodb-github-action@1.12.0
         with:
           mongodb-version: "${{ matrix.mongodb-version }}"
-          mongodb-db: eveble
+          mongodb-db: eveble_testing
           mongodb-replica-set: test-rs
           mongodb-port: 27017
 
