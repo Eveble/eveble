@@ -8,10 +8,7 @@ import { types } from '../types';
 
 @Type()
 export class AppConfig extends Config {
-  static defaultMongoDBOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  };
+  static defaultMongoDBOptions = {};
 
   public appId?: string | types.Stringifiable = getenv.string(
     'APP_ID',

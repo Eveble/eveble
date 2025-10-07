@@ -40,10 +40,8 @@ export class MongoDBClient extends Client implements types.Client {
   @inject(BINDINGS.MongoDB.library)
   protected MongoDB: any;
 
-  static defaultOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  };
+  // MongoDB v6: Remove deprecated v3 options (useNewUrlParser, useUnifiedTopology)
+  static defaultOptions = {};
 
   public id: string | Guid;
 
@@ -172,24 +170,44 @@ export class MongoDBClient extends Client implements types.Client {
    * @async
    */
   public async disconnect(): Promise<void> {
-    if (!this.isInState(Client.STATES.stopped)) {
-      if (!this.isConnected()) {
-        return;
-      }
+    // MongoDB v6: Handle graceful shutdown - check if already disconnected or not initialized
+    if (!this._library || this.isInState(Client.STATES.disconnected)) {
+      return;
     }
+
+    // If we're in stopped state, just mark as disconnected without trying to close
+    if (this.isInState(Client.STATES.stopped)) {
+      this.setState(Client.STATES.disconnected);
+      delete this._library;
+      return;
+    }
+
     this.log.debug(
       new Log(`disconnecting client '${this.getId()}'`)
         .on(this)
         .in(this.disconnect)
     );
-    await this._library?.close();
-    this.setState(Client.STATES.disconnected);
-    delete this._library;
-    this.log.debug(
-      new Log(`disconnected client '${this.getId()}'`)
-        .on(this)
-        .in(this.disconnect)
-    );
+
+    try {
+      // MongoDB v6: close() with false parameter allows pending operations to complete
+      await this._library.close(false);
+      this.setState(Client.STATES.disconnected);
+      delete this._library;
+      this.log.debug(
+        new Log(`disconnected client '${this.getId()}'`)
+          .on(this)
+          .in(this.disconnect)
+      );
+    } catch (error) {
+      // During shutdown, log warning but don't throw
+      this.log.warning(
+        new Log(`error during disconnect: ${error}`)
+          .on(this)
+          .in(this.disconnect)
+      );
+      this.setState(Client.STATES.disconnected);
+      delete this._library;
+    }
   }
 
   /**
@@ -213,11 +231,29 @@ export class MongoDBClient extends Client implements types.Client {
    * @returns Returns `true` if client is connected, else `false`.
    */
   public isConnected(): boolean {
-    return (
-      this._library !== undefined &&
-      this.isInState(Client.STATES.connected) &&
-      this._library?.isConnected()
-    );
+    // MongoDB v6: isConnected() method was removed
+    // Check library existence and state
+    if (!this._library) {
+      return false;
+    }
+
+    try {
+      // Check topology state in v6
+      const topology = (this._library as any).topology;
+      if (!topology) {
+        return false;
+      }
+
+      // In v6, check if topology is not closed/destroyed
+      const topologyState = topology.s?.state || topology.description?.type;
+      const isTopologyConnected =
+        topologyState !== 'closed' && topologyState !== 'Unknown';
+
+      return this.isInState(Client.STATES.connected) && isTopologyConnected;
+    } catch {
+      // Fallback to state-only check if topology inspection fails
+      return this.isInState(Client.STATES.connected);
+    }
   }
 
   /**

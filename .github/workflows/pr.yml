@@ -1,87 +1,53 @@
-name: Pull Request
-
-env:
-  isFork: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
-
-on: [pull_request]
-
-jobs:
-  assign_reviewers:
-    runs-on: ubuntu-latest
-    name: 👩🏼‍🔬 Assign reviewers
-    steps:
-      - uses: kentaro-m/auto-assign-action@v1.2.5
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-  misspell:
-    runs-on: ubuntu-latest
-    name: 📝 Fix misspells
-    steps:
-      - uses: actions/checkout@v3
-      - uses: reviewdog/action-misspell@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          locale: 'US'
-          ignore: optimise
-  lint_commits:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: 🔎 Lint commits
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v5
-      - name: [failed] 🏷️ Remove conventional label
-        uses: actions/github-script@v6
-        if: failure() && contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            if ('${{ contains(github.event.pull_request.labels.*.name, 'conventional') }}' == 'true') {
-              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-                name: 'conventional'
-              })
-            }
-      - name: [success] 🏷️ Add conventional label
-        uses: actions/github-script@v6
-        if: contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['conventional']
-            })
-  test:
+test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [18.x]
-    services:
-      mongodb:
-        image: mongo:4.2
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: password
     env:
       USERNAME: ${{ github.event.github.actor }}
+      MONGO_URI: mongodb://root:password@localhost:27017/?replicaSet=rs0&authSource=admin
     name: ✅ Test
     steps:
       - uses: actions/checkout@v3
+
+      - name: 🐳 Start MongoDB Replica Set
+        run: |
+          docker run -d \
+            --name mongodb-rs \
+            -p 27017:27017 \
+            -e MONGO_INITDB_ROOT_USERNAME=root \
+            -e MONGO_INITDB_ROOT_PASSWORD=password \
+            mongo:7.0 \
+            --replSet rs0 --bind_ip_all
+
+          # Wait for MongoDB to be ready
+          sleep 5
+
+          # Initialize replica set
+          docker exec mongodb-rs mongosh --eval "
+            rs.initiate({
+              _id: 'rs0',
+              members: [{ _id: 0, host: 'localhost:27017' }]
+            })
+          "
+
+          # Wait for replica set to be ready
+          sleep 5
+
       - name: ⚙️ Setup Node@${{ matrix.node-version}}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://npm.pkg.github.com/'
           scope: ${{ env.USERNAME }}
-      - name: 🚧  Install dependencies
+
+      - name: 🚧 Install dependencies
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
+
       - run: yarn test
+
       - name: [failed] 🏷️ Remove test label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
@@ -93,6 +59,7 @@ jobs:
                 name: 'tested'
               })
             }
+
       - name: [success] 🏷️ Add test label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
@@ -101,259 +68,4 @@ jobs:
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['tested']
-            })
-  test_coverage:
-    runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongo:4.2
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: password
-    env:
-      USERNAME: ${{ github.event.github.actor }}
-    name: 📈 Validate test coverage
-    steps:
-      - uses: actions/checkout@v3
-      - name: ⚙️ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: ${{ env.USERNAME }}
-      - name: 🚧  Install dependencies
-        run: yarn install
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
-      - run: yarn test:coverage
-      - run: yarn coverage:ci # Generate coverage.lcov report
-      - uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.lcov
-          fail_ci_if_error: true
-      - name: [failed] 🏷️ Remove covered label
-        uses: actions/github-script@v6
-        if: failure() && contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            if ('${{ contains(github.event.pull_request.labels.*.name, 'covered') }}' == 'true') {
-              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-                name: 'covered'
-              })
-            }
-      - name: [success] 🏷️ Add covered label
-        uses: actions/github-script@v6
-        if: contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['covered']
-            })
-  test_lint:
-    name: Test lint(with reviewdog)
-    runs-on: ubuntu-latest
-    env:
-      USERNAME: ${{ github.event.github.actor }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Lint and report push
-        uses: reviewdog/action-eslint@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-check
-          eslint_flags: 'src/**/*.ts'
-      - name: [failed] 🏷️ Remove linted label
-        uses: actions/github-script@v6
-        if: failure()
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            if ('${{ contains(github.event.pull_request.labels.*.name, 'linted') }}' == 'true') {
-              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-                name: 'linted'
-              })
-            }
-      - name: [success] 🏷️ Add linted label
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['linted']
-            })
-  format:
-    name: Format and push code back
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      USERNAME: ${{ github.event.github.actor }}
-    steps:
-      - uses: actions/checkout@v3 # checkout for forks
-        if: contains(env.isFork, 'true')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/checkout@v3 # checkout for PR
-        if: contains(env.isFork, 'false')
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-      - name: ⚙️ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: ${{ env.USERNAME }}
-      - name: 🚧  Install dependencies
-        run: yarn install
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
-      - run: yarn test:format
-      - name: Format and commit changes if check failed
-        if: failure() && github.actor != 'github-actions' && contains(env.isFork, 'false')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          yarn format
-          sudo yarn clean
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "GitHub Action"
-          git add -A
-          git diff-index --quiet HEAD || git commit --allow-empty -m "style: add format changes 🤖" -a
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
-      - name: [failed] 🏷️ Remove formatted label
-        uses: actions/github-script@v6
-        if: failure() && contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            if ('${{ contains(github.event.pull_request.labels.*.name, 'formatted') }}' == 'true') {
-              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-                name: 'formatted'
-              })
-            }
-      - name: [success] 🏷️ Add formatted label
-        uses: actions/github-script@v6
-        if: contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['formatted']
-            })
-  assign_authors:
-    name: Assign authors
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v3 # checkout for forks
-        if: contains(env.isFork, 'true')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/checkout@v3 # checkout for PR
-        if: contains(env.isFork, 'false')
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-      - name: Update AUTHORS file
-        if: github.actor != 'github-actions' && contains(env.isFork, 'false')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "GitHub Action"
-          git log --format='%aN <%aE>%n%cN <%cE>' | sort -u > AUTHORS
-          sed -i '/semantic-release-bot/d' AUTHORS
-          sed -i '/GitHub <noreply@github.com>/d' AUTHORS
-          sed -i '/github.com/d' AUTHORS
-          sed -i '/dependabot/d' AUTHORS
-          git add -A
-          git diff-index --quiet HEAD || git commit --allow-empty -m "chore: update AUTHORS 📓" -a
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
-  build:
-    runs-on: ubuntu-latest
-    name: Build
-    env:
-      USERNAME: ${{ github.event.github.actor }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: ⚙️ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: ${{ env.USERNAME }}
-      - name: 🚧  Install dependencies
-        run: yarn install
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
-      - run: yarn build
-      - name: [failed] 🏷️ Remove builds label
-        uses: actions/github-script@v6
-        if: failure() && contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            if ('${{ contains(github.event.pull_request.labels.*.name, 'builds') }}' == 'true') {
-              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-                name: 'builds'
-              })
-            }
-      - name: [success] 🏷️ Add builds label
-        uses: actions/github-script@v6
-        if: contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['builds']
-            })
-  build_docs:
-    runs-on: ubuntu-latest
-    name: 📄 Build documentation
-    env:
-      USERNAME: ${{ github.event.github.actor }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: ⚙️ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: ${{ env.USERNAME }}
-      - name: 🚧  Install dependencies
-        run: yarn install
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
-      - name: 🚧  Install dependencies on Docusaurus
-        run: |
-          cd ./website
-          yarn install
-      - run: yarn docs:build
-      - name: [failed] 🏷️ Remove documented label
-        uses: actions/github-script@v6
-        if: failure() && contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            if ('${{ contains(github.event.pull_request.labels.*.name, 'documented') }}' == 'true') {
-              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-                name: 'documented'
-              })
-            }
-      - name: [success] 🏷️ Add documented label
-        uses: actions/github-script@v6
-        if: contains(env.isFork, 'false')
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['documented']
             })

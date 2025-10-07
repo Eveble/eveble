@@ -138,10 +138,7 @@ describe('AppConfig', () => {
       });
 
       it('has default values for clients property', () => {
-        const defaultMongoDBOptions = {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        };
+        const defaultMongoDBOptions = {};
         expect(new AppConfig().clients).to.be.eql({
           MongoDB: {
             CommitStore: defaultMongoDBOptions,

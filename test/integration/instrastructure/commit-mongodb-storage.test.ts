@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
-import { Collection } from 'mongodb';
+import { Collection, Filter } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
 import { Type, kernel } from '@eveble/core';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
@@ -230,7 +230,7 @@ describe(`CommitMongoDBStorage`, () => {
       );
       const foundCommit = await collections.commitStore.findOne({
         _id: commit.id,
-      });
+      } as Filter<any>);
       expect(foundCommit).to.be.eql(expectedCommit);
     });
 

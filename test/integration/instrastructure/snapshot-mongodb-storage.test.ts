@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
-import { Collection } from 'mongodb';
+import { Collection, Filter } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
 import { Type, kernel } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
@@ -108,7 +108,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     };
     const foundSnapshot = await collections.snapshotter.findOne({
       _id: eventSourceableId,
-    });
+    } as Filter<any>);
     expect(foundSnapshot).to.be.eql(expectedSnapshot);
   });
 
@@ -126,7 +126,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     };
     const foundUpdatedSnapshot = await collections.snapshotter.findOne({
       _id: eventSourceableId,
-    });
+    } as Filter<any>);
     expect(foundUpdatedSnapshot).to.be.eql(expectedUpdatedSnapshot);
   });
 

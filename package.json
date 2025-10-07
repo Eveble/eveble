@@ -68,7 +68,7 @@
     "uuid": "^9.0.0",
     "winston": "^3.3.3",
     "agenda": "^3.1.0",
-    "mongodb": "^3.5.9",
+    "mongodb": "^6.20.0",
     "saslprep": "^1.0.3",
     "dotenv": "^16.0.3",
     "dotenv-expand": "^10.0.0",

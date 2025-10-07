@@ -1,15 +1,14 @@
 import { inject, injectable } from 'inversify';
 import {
   Collection,
-  InsertOneWriteOpResult,
-  UpdateWriteOpResult,
-  FindOneOptions,
-  FilterQuery,
-  UpdateQuery,
-  FindOneAndUpdateOption,
-  FindAndModifyWriteOpResultObject,
+  InsertOneResult,
+  UpdateResult,
+  FindOptions,
+  Filter,
+  UpdateFilter,
+  FindOneAndUpdateOptions,
+  ModifyResult,
 } from 'mongodb';
-import { get } from 'lodash';
 import { types } from '../../types';
 import {
   CommitConcurrencyError,
@@ -39,10 +38,10 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    */
   async save(commit: types.Commit): Promise<string> {
     const serializedCommit = this.commitSerializer.serialize(commit);
-    let output: InsertOneWriteOpResult<any>;
+    let output: InsertOneResult<any>;
     try {
       output = await this.collection.insertOne(serializedCommit);
-    } catch (error) {
+    } catch (error: any) {
       // Duplicate key error index
       if (error.code === 11000) {
         const foundDuplicatedVersion = (await this.findLastVersionById(
@@ -67,7 +66,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
         commit.sentBy
       );
     }
-    return output.insertedId;
+    return output.insertedId.toString();
   }
 
   /**
@@ -87,15 +86,15 @@ export class CommitMongoDBStorage implements types.CommitStorage {
   public async findLastVersionById(
     eventSourceableId: string | Guid
   ): Promise<number | undefined> {
-    const query = { sourceId: eventSourceableId.toString() };
-    const sort: any = {
-      sort: [['version', 'desc']],
+    const query = { sourceId: eventSourceableId.toString() } as Filter<any>;
+    const options: FindOptions = {
+      sort: { version: -1 },
       projection: { version: 1 },
     };
 
     const foundSerializedCommit: any = await this.collection.findOne(
       query,
-      sort
+      options
     );
 
     if (foundSerializedCommit != null) {
@@ -112,7 +111,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
   public async findById(commitId: string): Promise<types.Commit | undefined> {
     const query = {
       _id: commitId,
-    };
+    } as Filter<any>;
 
     const foundSerializedCommit = await this.collection.findOne(query);
     if (foundSerializedCommit != null) {
@@ -130,7 +129,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
   public async hasBySourceId(
     eventSourceableId: string | Guid
   ): Promise<boolean> {
-    const query = { sourceId: eventSourceableId.toString() };
+    const query = { sourceId: eventSourceableId.toString() } as Filter<any>;
     return (await this.collection.findOne(query)) != null;
   }
 
@@ -149,7 +148,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
       sourceId: eventSourceableId.toString(),
       version: { $gte: versionOffset },
     };
-    const options: any = { sort: [['version', 'asc']] };
+    const options: FindOptions = { sort: { version: 1 } };
 
     return this.findAndReturnDeserializedCommits(query, options);
   }
@@ -318,8 +317,8 @@ export class CommitMongoDBStorage implements types.CommitStorage {
         },
       },
     };
-    const options = {
-      returnOriginal: false,
+    const options: FindOneAndUpdateOptions = {
+      returnDocument: 'after',
     };
     return this.findOneAndUpdate(filter, update, options);
   }
@@ -332,8 +331,8 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * @return List of instances implementing `Commit` interface.
    */
   protected async findAndReturnDeserializedCommits(
-    query: FilterQuery<any> = {},
-    options: FindOneOptions<any> = {}
+    query: Filter<any> = {},
+    options: FindOptions<any> = {}
   ): Promise<types.Commit[]> {
     const foundSerializedCommits = await this.findCommits(query, options);
 
@@ -352,10 +351,10 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * @return Returned serialized commits from MongoDB collection.
    */
   protected async findCommits(
-    query: FilterQuery<any> = {},
-    options: FindOneOptions<any> = {}
+    query: Filter<any> = {},
+    options: FindOptions<any> = {}
   ): Promise<Record<string, any>[]> {
-    const cursor = await this.collection.find(query, options);
+    const cursor = this.collection.find(query, options);
     const foundSerializedCommits = await cursor.toArray();
     return foundSerializedCommits;
   }
@@ -368,8 +367,8 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * @returns Returns `true` if update operation was successful, else `false`.
    */
   protected async updateOne(
-    filter: FilterQuery<any> = {},
-    update: UpdateQuery<any> = {}
+    filter: Filter<any> = {},
+    update: UpdateFilter<any> = {}
   ): Promise<boolean> {
     const output = await this.collection.updateOne(filter, update);
     if (output !== undefined && this.isSuccessfulUpdate(output, 1)) {
@@ -388,10 +387,10 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    * @returns Updated instance implementing `Commit` interface, else `undefined`.
    */
   async findOneAndUpdate(
-    filter: FilterQuery<any> = {},
-    update: UpdateQuery<any> = {},
-    options: FindOneAndUpdateOption<any> = {
-      returnOriginal: false,
+    filter: Filter<any> = {},
+    update: UpdateFilter<any> = {},
+    options: FindOneAndUpdateOptions = {
+      returnDocument: 'after',
     }
   ): Promise<types.Commit | undefined> {
     const output = await this.collection.findOneAndUpdate(
@@ -400,40 +399,42 @@ export class CommitMongoDBStorage implements types.CommitStorage {
       options
     );
 
-    if (output !== undefined && this.isSuccessfulUpdate(output, 1)) {
-      const foundSerializedCommit = output.value;
-      return this.commitSerializer.deserialize(foundSerializedCommit);
+    if (output !== null) {
+      return this.commitSerializer.deserialize(output);
     }
     return undefined;
   }
 
   /**
    * Evaluates if output of insert operation is successful.
-   * @param output - Output response from MongoDB as an object implementing `InsertOneWriteOpResult`.
+   * @param output - Output response from MongoDB as an object implementing `InsertOneResult`.
    * @param expectedNumber - The number of expected inserted documents to MongoDB collection.
    * @returns Returns `true` if insert operation was successful, else `false`.
    */
   protected isSuccessfulInsert(
-    output: InsertOneWriteOpResult<any>,
+    output: InsertOneResult<any>,
     expectedNumber: number
   ): boolean {
-    return output.insertedCount === expectedNumber;
+    return output.acknowledged && output.insertedId !== null;
   }
 
   /**
    * Evaluates if output of update operation is successful.
-   * @param output - Output response from MongoDB as an object implementing `UpdateWriteOpResult`.
+   * @param output - Output response from MongoDB as an object implementing `UpdateResult`.
    * @param expectedNumber - The number of expected updated documents to MongoDB collection.
    * @returns Returns `true` if update operation was successful, else `false`.
    */
   protected isSuccessfulUpdate(
-    output: UpdateWriteOpResult | FindAndModifyWriteOpResultObject<any>,
+    output: UpdateResult | ModifyResult<any>,
     expectedNumber: number
   ): boolean {
-    const didUpdateOne = get(output, 'result.nModified') === expectedNumber;
-    const didFindAndUpdatedOne =
-      get(output, 'lastErrorObject.n') === expectedNumber;
-    return didUpdateOne || didFindAndUpdatedOne;
+    if ('modifiedCount' in output) {
+      return output.modifiedCount === expectedNumber;
+    }
+    if ('ok' in output && 'value' in output) {
+      return output.ok === 1 && output.value !== null;
+    }
+    return false;
   }
 
   /**

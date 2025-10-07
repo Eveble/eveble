@@ -84,10 +84,8 @@ describe(`CommitMongoDBStorage`, () => {
 
   before(async () => {
     const mongoUrl = getenv.string('EVEBLE_COMMITSTORE_MONGODB_URL');
-    const mongoClientOptions = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    };
+    const mongoClientOptions = {};
+    // Remove deprecated options for v6
     mongoClient = await MongoClient.connect(mongoUrl, mongoClientOptions);
   });
 
@@ -127,7 +125,7 @@ describe(`CommitMongoDBStorage`, () => {
 
       collectionMock.expects('insertOne').withArgs(serializedCommit).resolves({
         insertedId: commitId,
-        insertedCount: 1,
+        acknowledged: true,
       });
 
       const result = await storage.save(commit);
@@ -146,7 +144,7 @@ describe(`CommitMongoDBStorage`, () => {
       collectionMock
         .expects('insertOne')
         .withArgs(serializedCommit)
-        .resolves({ insertedCount: 0 });
+        .resolves({ acknowledged: false, insertedId: null });
 
       await expect(
         storage.save(generateCommit(commitId, eventSourceableId, 1))
@@ -175,7 +173,7 @@ describe(`CommitMongoDBStorage`, () => {
         sourceId: eventSourceableId,
       };
       const options = {
-        sort: [['version', 'desc']],
+        sort: { version: -1 },
         projection: {
           version: 1,
         },
@@ -201,7 +199,7 @@ describe(`CommitMongoDBStorage`, () => {
         sourceId: eventSourceableId,
       };
       const options = {
-        sort: [['version', 'desc']],
+        sort: { version: -1 },
         projection: {
           version: 1,
         },
@@ -281,12 +279,12 @@ describe(`CommitMongoDBStorage`, () => {
         },
       };
       const options = {
-        sort: [['version', 'asc']],
+        sort: { version: 1 },
       };
       collectionMock
         .expects('find')
         .withArgs(query, options)
-        .resolves(findResult);
+        .returns(findResult);
 
       const firstCommitId = new Guid().toString();
       const secondCommitId = new Guid().toString();
@@ -324,7 +322,7 @@ describe(`CommitMongoDBStorage`, () => {
       };
       const findResultMock = sinon.mock(findResult);
 
-      collectionMock.expects('find').resolves(findResult);
+      collectionMock.expects('find').returns(findResult);
 
       findResultMock.expects('toArray').resolves([]);
 
@@ -359,7 +357,7 @@ describe(`CommitMongoDBStorage`, () => {
       };
       const findResultMock = sinon.mock(findResult);
 
-      collectionMock.expects('find').withArgs({}, {}).resolves(findResult);
+      collectionMock.expects('find').withArgs({}, {}).returns(findResult);
 
       findResultMock
         .expects('toArray')
@@ -408,15 +406,10 @@ describe(`CommitMongoDBStorage`, () => {
         },
       };
 
-      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
-
-      collectionMock
-        .expects('updateOne')
-        .withArgs(filter, update)
-        .resolves({
-          result: { ok: 1, nModified: 1 },
-          value: serializedCommit,
-        });
+      collectionMock.expects('updateOne').withArgs(filter, update).resolves({
+        modifiedCount: 1,
+        acknowledged: true,
+      });
 
       const result = await storage.flagCommitAsPublished(
         commitId,
@@ -432,7 +425,7 @@ describe(`CommitMongoDBStorage`, () => {
     it(`throws UpdatingCommitError when commit can't be updated to published`, async () => {
       collectionMock
         .expects('updateOne')
-        .resolves({ result: { ok: 1, nModified: 0 } });
+        .resolves({ modifiedCount: 0, acknowledged: true });
 
       await expect(
         storage.flagCommitAsPublished(commitId, appId, workerId, now)
@@ -467,7 +460,7 @@ describe(`CommitMongoDBStorage`, () => {
       collectionMock
         .expects('updateOne')
         .withArgs(filter, update)
-        .resolves({ result: { ok: 1, nModified: 1 } });
+        .resolves({ modifiedCount: 1, acknowledged: true });
 
       const result = await storage.flagCommitAsFailed(
         commitId,
@@ -483,7 +476,7 @@ describe(`CommitMongoDBStorage`, () => {
     it(`throws UpdatingCommitError when commit can't be updated to failed`, async () => {
       collectionMock
         .expects('updateOne')
-        .resolves({ result: { ok: 1, nModified: 0 } });
+        .resolves({ modifiedCount: 0, acknowledged: true });
 
       expect(
         storage.flagCommitAsFailed(commitId, appId, workerId, now)
@@ -522,10 +515,7 @@ describe(`CommitMongoDBStorage`, () => {
       collectionMock
         .expects('findOneAndUpdate')
         .withArgs(query, update)
-        .resolves({
-          result: { ok: 1, nModified: 1 },
-          value: serializedCommit,
-        });
+        .resolves(serializedCommit);
       commitSerializer.deserialize.withArgs(serializedCommit).returns(commit);
 
       const foundCommit = await storage.flagAndResolveCommitAsTimeouted(
@@ -572,7 +562,7 @@ describe(`CommitMongoDBStorage`, () => {
         },
       };
       const options = {
-        returnOriginal: false,
+        returnDocument: 'after',
       };
 
       const commit = generateCommit(commitId, eventSourceableId, 1);
@@ -581,10 +571,7 @@ describe(`CommitMongoDBStorage`, () => {
       collectionMock
         .expects('findOneAndUpdate')
         .withArgs(filter, update, options)
-        .resolves({
-          result: { ok: 1, nModified: 1 },
-          value: serializedCommit,
-        });
+        .resolves(serializedCommit);
       commitSerializer.deserialize.withArgs(serializedCommit).returns(commit);
 
       const foundCommit = await storage.lockCommit(

@@ -23,12 +23,12 @@ describe(`MongoDBClient`, () => {
   let props: Record<string, any>;
 
   before(() => {
-    // Properties
+    // Properties - removed deprecated options for v6
     props = {
       id: new Guid(),
       url: 'mongodb://localhost:27017/eveble',
       options: {
-        autoReconnect: true,
+        maxPoolSize: 10,
       },
     };
   });
@@ -159,10 +159,8 @@ describe(`MongoDBClient`, () => {
       });
       expect(instance.id).to.be.equal(props.id);
       expect(instance.url).to.be.equal(props.url);
-      expect(instance.options).to.be.eql({
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
+      // Default options are now empty in v6
+      expect(instance.options).to.be.eql({});
     });
 
     it(`sets the client state to constructed when client is constructed`, async () => {
@@ -194,11 +192,7 @@ describe(`MongoDBClient`, () => {
 
         expect(client.library).to.be.equal(mongoClientInstance);
         expect(MongoClient).to.be.calledWithNew;
-        expect(MongoClient).to.be.calledWith(props.url, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          ...props.options,
-        });
+        expect(MongoClient).to.be.calledWith(props.url, props.options);
         expect(mongoClientInstance.connect).to.not.be.called;
       });
 
@@ -292,7 +286,7 @@ describe(`MongoDBClient`, () => {
         await client.initialize();
 
         await client.connect();
-        mongoClientInstance.isConnected.returns(true);
+        // Note: isConnected() now uses state checking, not a method call
         await client.connect();
 
         expect(mongoClientInstance.connect).to.be.calledOnce;
@@ -362,8 +356,6 @@ describe(`MongoDBClient`, () => {
 
     describe('evaluating connected client', () => {
       it('returns true if client is connected', async () => {
-        mongoClientInstance.isConnected.returns(true);
-
         await injector.injectIntoAsync(client);
         await client.initialize();
 
@@ -378,8 +370,6 @@ describe(`MongoDBClient`, () => {
 
     describe('disconnecting', () => {
       it(`disconnects client from MongoDB`, async () => {
-        mongoClientInstance.isConnected.returns(true);
-
         await injector.injectIntoAsync(client);
         await client.initialize();
 
@@ -389,8 +379,6 @@ describe(`MongoDBClient`, () => {
       });
 
       it(`logs information about client being disconnected`, async () => {
-        mongoClientInstance.isConnected.returns(true);
-
         await injector.injectIntoAsync(client);
         await client.initialize();
 
@@ -409,8 +397,6 @@ describe(`MongoDBClient`, () => {
       });
 
       it(`sets client state to disconnected upon disconnection`, async () => {
-        mongoClientInstance.isConnected.returns(true);
-
         await injector.injectIntoAsync(client);
         await client.initialize();
 
@@ -420,8 +406,6 @@ describe(`MongoDBClient`, () => {
       });
 
       it(`destroys MongoClient library instance`, async () => {
-        mongoClientInstance.isConnected.returns(true);
-
         await injector.injectIntoAsync(client);
         await client.initialize();
 
@@ -437,9 +421,7 @@ describe(`MongoDBClient`, () => {
         await client.initialize();
 
         await client.connect();
-        mongoClientInstance.isConnected.returns(true);
         await client.disconnect();
-        mongoClientInstance.isConnected.returns(false);
         await client.reconnect();
         expect(mongoClientInstance.close).to.be.calledOnce;
         expect(mongoClientInstance.connect).to.be.calledTwice;

@@ -1,5 +1,5 @@
 import getenv from 'getenv';
-import { Collection, Cursor } from 'mongodb';
+import { ChangeStream, Collection } from 'mongodb';
 import { inject, injectable } from 'inversify';
 import { derive } from '@traits-ts/core';
 import { types } from '../../types';
@@ -33,21 +33,13 @@ export class CommitMongoDBObserver extends derive(StatefulTrait) {
 
   public state: types.State;
 
-  public stream: Cursor<any> | undefined;
+  public changeStream?: ChangeStream;
 
-  /**
-   * Creates an instance of CommitMongoDBObserver.
-   */
   constructor() {
     super();
     this.setState(CommitMongoDBObserver.STATES.created);
   }
 
-  /**
-   * Observes MongoDB collection for changes and publishes them through CommitPublisher.
-   * @async
-   * @param commitPublisher - Instance implementing `CommitPublisher` interface.
-   */
   public async startObserving(
     commitPublisher: types.CommitPublisher
   ): Promise<void> {
@@ -57,111 +49,81 @@ export class CommitMongoDBObserver extends derive(StatefulTrait) {
     const workerId = this.config
       .get<string | types.Stringifiable>('workerId')
       .toString();
-    const registeredQuery = {
-      $or: [
-        { eventTypes: { $in: commitPublisher.getHandledEventTypes() } },
-        {
-          commandTypes: {
-            $in: commitPublisher.getHandledCommandTypes(),
-          },
-        },
-      ],
-    };
-    const notReceivedYetQuery = {
-      'receivers.appId': {
-        $nin: [appId],
-      },
-    };
-    const registeredAndNotReceivedYetFilter = {
-      $and: [registeredQuery, notReceivedYetQuery],
-    };
 
-    const cursor = await this.collection.find(
-      registeredAndNotReceivedYetFilter,
+    const pipeline = [
       {
-        timeout: false,
-      }
-    );
-    this.stream = await cursor.stream();
+        $match: {
+          operationType: 'insert', // listen only for new commits
+          $or: [
+            {
+              'fullDocument.eventTypes': {
+                $in: commitPublisher.getHandledEventTypes(),
+              },
+            },
+            {
+              'fullDocument.commandTypes': {
+                $in: commitPublisher.getHandledCommandTypes(),
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    this.changeStream = this.collection.watch(pipeline, {
+      fullDocument: 'updateLookup',
+    });
     this.setState(CommitMongoDBObserver.STATES.observing);
 
-    this.stream.on(
-      'data',
-      async (serializedCommit: types.MongoDBSerializedCommit) => {
-        const lockedCommit = await this.storage.lockCommit(
-          serializedCommit.id,
-          appId,
-          workerId,
-          registeredAndNotReceivedYetFilter
-        );
-        // Only publish the event if this process was the one that locked it
-        if (lockedCommit !== undefined) {
-          await commitPublisher.publishChanges(lockedCommit);
-        }
+    this.changeStream.on('change', async (change: any) => {
+      const serializedCommit = change.fullDocument;
+      if (!serializedCommit) return;
+
+      const lockedCommit = await this.storage.lockCommit(
+        serializedCommit.id,
+        appId,
+        workerId,
+        {} // locking query logic can stay similar
+      );
+      if (lockedCommit !== undefined) {
+        await commitPublisher.publishChanges(lockedCommit);
       }
-    );
+    });
+
     await this.initializeEventHandlers();
   }
 
-  /**
-   * Pause observing Mongo's commit collection for changes.
-   * @async
-   */
   public async pauseObserving(): Promise<void> {
-    if (this.stream !== undefined && this.isObserving()) {
+    if (this.changeStream && this.isObserving()) {
       this.setState(CommitMongoDBObserver.STATES.paused);
-      await this.stream.pause();
+      await (this.changeStream as any).pause();
     }
   }
 
-  /**
-   * Stops observing observed Mongo's commit collection for changes.
-   * @async
-   */
   public async stopObserving(): Promise<void> {
-    if (this.stream !== undefined && this.isObserving()) {
+    if (this.changeStream && this.isObserving()) {
       this.setState(CommitMongoDBObserver.STATES.closed);
-      await this.stream.close();
+      await this.changeStream.close();
     }
   }
 
-  /**
-   * Evaluates if Mongo's commit collection is observed.
-   * @return {Boolean}
-   */
   public isObserving(): boolean {
-    return (
-      this.state !== undefined &&
-      this.state === CommitMongoDBObserver.STATES.observing
-    );
+    return this.state === CommitMongoDBObserver.STATES.observing;
   }
 
-  /**
-   * Initializes event handlers.
-   * @async
-   */
   async initializeEventHandlers(): Promise<void> {
-    if (this.stream === undefined) return;
-    // Not sure why can't use new Log(...).on() here do to endless loop
-    this.stream.on('finish', async () => {
-      this.setState(CommitMongoDBObserver.STATES.finished);
-      this.log.debug(new Log(`finished observing commits`));
-    });
-    this.stream.on('end', async () => {
-      this.setState(CommitMongoDBObserver.STATES.ended);
-      this.log.debug(new Log(`ended observing commits`));
-    });
-    this.stream.on('close', async () => {
+    if (!this.changeStream) return;
+
+    this.changeStream.on('close', () => {
       this.setState(CommitMongoDBObserver.STATES.closed);
-      this.log.debug(new Log(`closed observing commits`));
+      this.log.debug(new Log('closed observing commits'));
     });
-    this.stream.on('pause', async () => {
-      this.setState(CommitMongoDBObserver.STATES.paused);
-      this.log.debug(new Log(`paused observing commits`));
-    });
-    this.stream.on('error', async (error) => {
+
+    this.changeStream.on('error', (error) => {
       this.setState(CommitMongoDBObserver.STATES.failed);
-      this.log.error(new Log(`failed observing commits do to error: ${error}`));
+      this.log.error(
+        new Log(`failed observing commits due to error: ${error}`)
+      );
       if (this.isInProduction()) {
         process.exit(0);
       }

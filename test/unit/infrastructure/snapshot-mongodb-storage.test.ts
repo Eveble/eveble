@@ -39,11 +39,8 @@ describe(`SnapshotMongoDBStorage`, () => {
 
   before(async () => {
     const mongoUrl = getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_URL');
-    const mongoClientOptions = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    };
-    mongoClient = await MongoClient.connect(mongoUrl, mongoClientOptions);
+    // Remove deprecated options for v6
+    mongoClient = await MongoClient.connect(mongoUrl);
 
     eventSourceableId = new Guid().toString();
     eventSourceable = new MyEventSourceable({
@@ -92,7 +89,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     const docId = 'mongo-id';
     collectionMock.expects('insertOne').withArgs(snapshot).resolves({
       insertedId: docId,
-      insertedCount: 1,
+      acknowledged: true,
     });
 
     const result = await storage.save(eventSourceable);
@@ -103,7 +100,8 @@ describe(`SnapshotMongoDBStorage`, () => {
 
   it(`throws AddingSnapshotError on unsuccessful document insertion`, async () => {
     collectionMock.expects('insertOne').withArgs(snapshot).resolves({
-      insertedCount: 0,
+      acknowledged: false,
+      insertedId: null,
     });
 
     await expect(storage.save(eventSourceable)).to.eventually.be.rejectedWith(
@@ -126,7 +124,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     collectionMock
       .expects('updateOne')
       .withArgs(filter, update)
-      .resolves({ result: { nModified: 1 } });
+      .resolves({ modifiedCount: 1, acknowledged: true });
 
     await storage.update(eventSourceable);
 
@@ -146,7 +144,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     collectionMock
       .expects('updateOne')
       .withArgs(filter, update)
-      .resolves({ result: { nModified: 0 } });
+      .resolves({ modifiedCount: 0, acknowledged: true });
 
     await expect(storage.update(eventSourceable)).to.eventually.be.rejectedWith(
       UpdatingSnapshotError,

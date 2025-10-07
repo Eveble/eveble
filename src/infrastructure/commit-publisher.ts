@@ -89,7 +89,6 @@ export class CommitPublisher {
       for (const command of commit.commands) {
         await this.sendCommand(command);
       }
-
       if (!receiver.isInState(CommitReceiver.STATES.timeouted)) {
         receiver.flagAsPublished(workerId);
         await this.storage.flagCommitAsPublished(

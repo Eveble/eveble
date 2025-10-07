@@ -21,7 +21,8 @@ describe(`MongoDB client`, () => {
   const url = getenv.string('EVEBLE_COMMITSTORE_MONGODB_URL');
   const databaseName =
     getenv.string('EVEBLE_COMMITSTORE_MONGODB_DBNAME') || 'eveble_testing';
-  const options = { useNewUrlParser: true, useUnifiedTopology: true };
+  // useNewUrlParser and useUnifiedTopology are deprecated in v4+ and removed in v6
+  const options = {};
   // Injector
   let injector: Injector;
   let log: any;

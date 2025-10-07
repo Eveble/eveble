@@ -192,6 +192,7 @@ describe(`Observing and publishing new commits`, () => {
     it(`starts publishing commits by observing changes done on storage`, async () => {
       const commandHandler = sinon.stub();
       commandBus.registerHandler(MyCommand, commandHandler);
+
       const eventHandler = sinon.stub();
       eventBus.registerHandler(MyEvent, eventHandler);
 
@@ -210,12 +211,15 @@ describe(`Observing and publishing new commits`, () => {
         sendingAppId,
         sendingWorkerId
       );
+
       await storage.save(commitToPublishAsSendingApp);
 
-      await delay(500); // Simulate time passing while observing changes
+      await delay(500);
+
       const foundCommitAfterObserving = (await storage.findById(
         commitId
       )) as Commit;
+
       const receivers = foundCommitAfterObserving?.receivers;
       expect(receivers).to.be.instanceof(Array);
       expect(receivers).to.have.length(2);
@@ -263,6 +267,7 @@ describe(`Observing and publishing new commits`, () => {
       const foundCommitAfterObserving = (await storage.findById(
         commitId
       )) as Commit;
+
       const receivers = foundCommitAfterObserving?.receivers;
       expect(receivers).to.be.instanceof(Array);
       expect(receivers).to.have.length(1);

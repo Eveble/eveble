@@ -1,12 +1,11 @@
 import { inject, injectable } from 'inversify';
 import {
   Collection,
-  UpdateWriteOpResult,
-  InsertOneWriteOpResult,
-  FilterQuery,
-  UpdateQuery,
+  UpdateResult,
+  InsertOneResult,
+  Filter,
+  UpdateFilter,
 } from 'mongodb';
-import { get } from 'lodash';
 import {
   AddingSnapshotError,
   UpdatingSnapshotError,
@@ -39,7 +38,7 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
         eventSourceable.getId().toString()
       );
     }
-    return output.insertedId;
+    return output.insertedId.toString();
   }
 
   /**
@@ -53,7 +52,7 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
   public async update(
     eventSourceable: types.EventSourceable
   ): Promise<boolean> {
-    const filter = { _id: eventSourceable.getId().toString() };
+    const filter = { _id: eventSourceable.getId().toString() } as Filter<any>;
     const snapshot = this.snapshotSerializer.serialize(eventSourceable);
     const update = {
       $set: { snapshot: snapshot.snapshot },
@@ -81,7 +80,7 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
     EventSourceableType: types.EventSourceableType, // Can be skipped since were using EJSON serializer
     eventSourceableId: string | Guid
   ): Promise<types.EventSourceable | undefined> {
-    const query = { _id: eventSourceableId.toString() };
+    const query = { _id: eventSourceableId.toString() } as Filter<any>;
     const foundSerializedSnapshot = await this.collection.findOne(query);
     if (foundSerializedSnapshot) {
       return this.snapshotSerializer.deserialize(
@@ -100,8 +99,8 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
    * @returns Returns `true` if update operation was successful, else `false`.
    */
   protected async updateOne(
-    filter: FilterQuery<any> = {},
-    update: UpdateQuery<any> = {}
+    filter: Filter<any> = {},
+    update: UpdateFilter<any> = {}
   ): Promise<boolean> {
     const output = await this.collection.updateOne(filter, update);
     if (output !== undefined && this.isSuccessfulUpdate(output, 1)) {
@@ -113,30 +112,27 @@ export class SnapshotMongoDBStorage implements types.SnapshotStorage {
 
   /**
    * Evaluates if output of insert operation is successful.
-   * @param output - Output response from MongoDB as an object implementing `InsertOneWriteOpResult`.
+   * @param output - Output response from MongoDB as an object implementing `InsertOneResult`.
    * @param expectedNumber - The number of expected inserted documents to MongoDB collection.
    * @returns Returns `true` if insert operation was successful, else `false`.
    */
   protected isSuccessfulInsert(
-    output: InsertOneWriteOpResult<any>,
-    expectedNumber: number
+    output: InsertOneResult<any>,
+    _expectedNumber: number
   ): boolean {
-    return output.insertedCount === expectedNumber;
+    return output.acknowledged && output.insertedId !== null;
   }
 
   /**
    * Evaluates if output of update operation is successful.
-   * @param output - Output response from MongoDB as an object implementing `UpdateWriteOpResult`.
+   * @param output - Output response from MongoDB as an object implementing `UpdateResult`.
    * @param expectedNumber - The number of expected updated documents to MongoDB collection.
    * @returns Returns `true` if update operation was successful, else `false`.
    */
   protected isSuccessfulUpdate(
-    output: UpdateWriteOpResult,
+    output: UpdateResult,
     expectedNumber: number
   ): boolean {
-    const didUpdateOne = get(output, 'result.nModified') === expectedNumber;
-    const didFindAndUpdatedOne =
-      get(output, 'lastErrorObject.n') === expectedNumber;
-    return didUpdateOne || didFindAndUpdatedOne;
+    return output.modifiedCount === expectedNumber;
   }
 }
