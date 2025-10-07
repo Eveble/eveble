@@ -51,10 +51,6 @@ jobs:
           mongodb-replica-set: test-rs
           mongodb-port: 27017
 
-      - name: Wait for MongoDB to be ready
-        run: |
-          timeout 60 bash -c 'until mongosh --host localhost:27017 --eval "db.adminCommand({ping: 1})" > /dev/null 2>&1; do sleep 2; done'
-
       - name: Create MongoDB admin user
         run: |
           mongosh --host localhost:27017 --eval "
