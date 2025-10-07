@@ -43,20 +43,58 @@ jobs:
         run: |
           echo IS_PRIVATE: ${{ env.IS_PRIVATE }}
 
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.12.0
-        with:
-          mongodb-version: "${{ matrix.mongodb-version }}"
-          mongodb-username: admin
-          mongodb-password: password
-          mongodb-db: eveble
-          mongodb-replica-set: test-rs
-          mongodb-port: 27017
-
-      - name: Wait for MongoDB to be ready
+      - name: Start MongoDB Replica Set
         run: |
-          timeout 60 bash -c 'until mongosh --host localhost:27017 -u admin -p password --authenticationDatabase admin --eval "db.adminCommand({ping: 1})" > /dev/null 2>&1; do sleep 2; done'
+          # Create docker network
+          docker network create mongo-cluster || true
 
+          # Start MongoDB container with replica set
+          docker run -d \
+            --name mongodb \
+            --network mongo-cluster \
+            -p 27017:27017 \
+            -e MONGO_INITDB_ROOT_USERNAME=admin \
+            -e MONGO_INITDB_ROOT_PASSWORD=password \
+            mongo:${{ matrix.mongodb-version }} \
+            --replSet test-rs \
+            --bind_ip_all
+
+          # Wait for MongoDB to start
+          echo "Waiting for MongoDB to start..."
+          timeout 60 bash -c 'until docker exec mongodb mongosh --quiet --eval "db.version()" > /dev/null 2>&1; do sleep 2; echo "Still waiting..."; done'
+
+          # Initialize replica set
+          echo "Initializing replica set..."
+          docker exec mongodb mongosh --eval '
+            rs.initiate({
+              _id: "test-rs",
+              members: [{ _id: 0, host: "localhost:27017" }]
+            })
+          '
+
+          # Wait for replica set to be ready
+          echo "Waiting for replica set to be ready..."
+          timeout 60 bash -c 'until docker exec mongodb mongosh --quiet --eval "rs.status().ok" | grep -q "1"; do sleep 2; echo "Still waiting for RS..."; done'
+
+          # Create admin user
+          echo "Creating admin user..."
+          docker exec mongodb mongosh --eval '
+            db = db.getSiblingDB("admin");
+            db.createUser({
+              user: "admin",
+              pwd: "password",
+              roles: [{ role: "root", db: "admin" }]
+            });
+          '
+
+          echo "MongoDB replica set is ready!"
+
+      - name: Verify MongoDB Connection
+        run: |
+          mongosh "mongodb://admin:password@localhost:27017/?replicaSet=test-rs&authSource=admin" --eval "
+            db.adminCommand({ ping: 1 })
+            rs.status()
+          "
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v3
