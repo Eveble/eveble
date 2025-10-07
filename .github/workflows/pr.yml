@@ -60,7 +60,7 @@ jobs:
         node-version: [18.x]
     env:
       USERNAME: ${{ github.event.github.actor }}
-      MONGO_URI: mongodb://root:password@localhost:27017/?replicaSet=rs0&authSource=admin
+      MONGO_URI: mongodb://172.17.0.1:27017/?replicaSet=rs0
     name: ✅ Test
     steps:
       - uses: actions/checkout@v3
@@ -68,54 +68,30 @@ jobs:
       - name: 🐳 Start MongoDB Replica Set
         run: |
           # Start MongoDB with replica set
-          docker run -d \
-            --name mongodb-rs \
+          docker run --rm -d \
             -p 27017:27017 \
-            -e MONGO_INITDB_ROOT_USERNAME=root \
-            -e MONGO_INITDB_ROOT_PASSWORD=password \
+            --name mongodb-rs \
             mongo:6.0 \
             mongod --replSet rs0 --bind_ip_all
 
           # Wait for MongoDB to start
           echo "Waiting for MongoDB to start..."
-          for i in {1..30}; do
-            if docker exec mongodb-rs mongosh --quiet --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
-              echo "MongoDB is ready!"
-              break
-            fi
-            echo "Waiting... ($i/30)"
-            sleep 2
-          done
+          sleep 5
 
-          # Check if container is running
-          if ! docker ps | grep mongodb-rs; then
-            echo "Container failed to start. Logs:"
-            docker logs mongodb-rs
-            exit 1
-          fi
-
-          # Initialize replica set
+          # Initialize replica set using Docker bridge gateway IP
           echo "Initializing replica set..."
-          docker exec mongodb-rs mongosh --eval "
-            rs.initiate({
-              _id: 'rs0',
-              members: [{ _id: 0, host: 'localhost:27017' }]
-            })
-          "
+          docker run --rm mongo:6.0 \
+            mongosh --host 172.17.0.1 --eval \
+            'rs.initiate({_id: "rs0", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
 
           # Wait for replica set to be ready
           echo "Waiting for replica set to be ready..."
-          for i in {1..30}; do
-            if docker exec mongodb-rs mongosh --quiet --eval "rs.status().ok" 2>/dev/null | grep -q "1"; then
-              echo "Replica set is ready!"
-              break
-            fi
-            echo "Waiting for replica set... ($i/30)"
-            sleep 2
-          done
+          sleep 5
 
           # Verify replica set status
-          docker exec mongodb-rs mongosh --eval "rs.status()"
+          echo "Replica set status:"
+          docker run --rm mongo:6.0 \
+            mongosh --host 172.17.0.1 --eval 'rs.status()'
 
       - name: ⚙️ Setup Node@${{ matrix.node-version}}
         uses: actions/setup-node@v3
