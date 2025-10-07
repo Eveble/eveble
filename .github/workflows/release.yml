@@ -47,16 +47,31 @@ jobs:
         uses: supercharge/mongodb-github-action@1.12.0
         with:
           mongodb-version: "${{ matrix.mongodb-version }}"
-          mongodb-username: admin
-          mongodb-password: password
           mongodb-db: eveble
           mongodb-replica-set: test-rs
           mongodb-port: 27017
 
       - name: Wait for MongoDB to be ready
         run: |
-          timeout 60 bash -c 'until mongosh --host localhost:27017 -u admin -p password --authenticationDatabase admin --eval "db.adminCommand({ping: 1})" > /dev/null 2>&1; do sleep 2; done'
+          timeout 60 bash -c 'until mongosh --host localhost:27017 --eval "db.adminCommand({ping: 1})" > /dev/null 2>&1; do sleep 2; done'
 
+      - name: Create MongoDB admin user
+        run: |
+          mongosh --host localhost:27017 --eval "
+            db = db.getSiblingDB('admin');
+            db.createUser({
+              user: 'admin',
+              pwd: 'password',
+              roles: [
+                { role: 'root', db: 'admin' },
+                { role: 'readWriteAnyDatabase', db: 'admin' }
+              ]
+            });
+          "
+
+      - name: Verify MongoDB authentication
+        run: |
+          mongosh --host localhost:27017 -u admin -p password --authenticationDatabase admin --eval "db.adminCommand({ping: 1})"
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v3
@@ -86,9 +101,9 @@ jobs:
       - name: ✅ Test
         run: yarn test
         env:
-          MONGO_URI: mongodb://root:password@localhost:27017/?replicaSet=rs0&authSource=admin
+          MONGO_URI: mongodb://admin:password@localhost:27017/eveble?replicaSet=test-rs&authSource=admin
 
-      - name: 🗝️ Build
+      - name: 🗃️ Build
         run: yarn build
 
       - name: 🚀 [public]Release
@@ -130,7 +145,7 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_version }}
           echo @${{ env.USERNAME }}
 
-      - name: 🔀 Setup Node with GitHub Package Registry
+      - name: 📦 Setup Node with GitHub Package Registry
         if: steps.semantic.outputs.new_release_published == 'true'
         uses: actions/setup-node@v3
         with:
@@ -160,7 +175,7 @@ jobs:
       - name: Fix 404 Page not found for Github in case .nojekyll is missing in ./website/static
         run: touch ./website/build/.nojekyll
 
-      - name: 🤔 Deploy documentation to GitHub Pages
+      - name: 🤖 Deploy documentation to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
