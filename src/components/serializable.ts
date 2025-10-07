@@ -19,11 +19,6 @@ export class Serializable
   /**
    * Creates an instance of Serializable.
    * @param props - Properties of the type required for construction.
-   * @remarks
-   * Since were dealing with special cases, mixins and limits of TypeScript, we
-   * use of "invoking multiple base constructors" from polytype to pass props to Struct's
-   * constructor:
-   * https://www.npmjs.com/package/polytype#invoking-multiple-base-constructors
    */
   constructor(props: types.Props = {}) {
     super(props);

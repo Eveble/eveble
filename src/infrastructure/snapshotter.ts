@@ -1,8 +1,4 @@
-import {
-  inject,
-  postConstruct,
-  injectable,
-} from 'inversify';
+import { inject, postConstruct, injectable } from 'inversify';
 import { UndefinedSnapshotterFrequencyError } from './infrastructure-errors';
 import { BINDINGS } from '../constants/bindings';
 import { types } from '../types';
