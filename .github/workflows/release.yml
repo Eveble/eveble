@@ -73,6 +73,14 @@ jobs:
         run: |
           docker exec mongodb mongosh --host localhost:27017 -u admin -p password --authenticationDatabase admin --eval "db.adminCommand({ping: 1})"
 
+      - name: Verify replica set status
+        run: |
+          docker exec mongodb mongosh --host localhost:27017 -u admin -p password --authenticationDatabase admin --eval "rs.status()"
+
+      - name: Test connection from host
+        run: |
+          docker exec mongodb mongosh 'mongodb://admin:password@localhost:27017/eveble_testing?replicaSet=test-rs&authSource=admin&directConnection=true' --eval "db.runCommand({ping: 1})"
+
       - name: ⤵️ Checkout
         uses: actions/checkout@v3
         with:
@@ -101,9 +109,16 @@ jobs:
       - name: ✅ Test
         run: yarn test
         env:
+          NODE_ENV: test
+          EVEBLE_COMMITSTORE_CLIENT: 'mongodb'
           EVEBLE_COMMITSTORE_MONGODB_URL: 'mongodb://admin:password@localhost:27017/eveble_testing?replicaSet=test-rs&authSource=admin&directConnection=true'
+          EVEBLE_COMMITSTORE_MONGODB_DBNAME: 'eveble_testing'
+          EVEBLE_SNAPSHOTTER_CLIENT: 'mongodb'
           EVEBLE_SNAPSHOTTER_MONGODB_URL: 'mongodb://admin:password@localhost:27017/eveble_testing?replicaSet=test-rs&authSource=admin&directConnection=true'
+          EVEBLE_SNAPSHOTTER_MONGODB_DBNAME: 'eveble_testing'
+          EVEBLE_COMMAND_SCHEDULER_CLIENT: 'pulse'
           EVEBLE_COMMAND_SCHEDULER_MONGODB_URL: 'mongodb://admin:password@localhost:27017/eveble_testing?replicaSet=test-rs&authSource=admin&directConnection=true'
+          EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME: 'eveble_testing'
 
       - name: 🗃️ Build
         run: yarn build
