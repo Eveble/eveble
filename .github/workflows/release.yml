@@ -41,35 +41,46 @@ jobs:
 
       - name: 🐳 Start MongoDB Replica Set
         run: |
-          # Start MongoDB with replica set and authentication enabled
-          docker run --rm -d \
+          echo "Starting MongoDB (auth + replica set)..."
+          docker run -d \
             -p 27017:27017 \
             --name mongodb-rs \
             -e MONGO_INITDB_ROOT_USERNAME=admin \
             -e MONGO_INITDB_ROOT_PASSWORD=password \
             -e MONGO_INITDB_DATABASE=admin \
             mongo:6.0 \
-            mongod --replSet rs0 --bind_ip_all --auth
+            --replSet rs0 --bind_ip_all --auth
 
           echo "Waiting for MongoDB to start..."
-          sleep 10
+          for i in {1..10}; do
+            if docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval "db.runCommand({ ping: 1 })" &>/dev/null; then
+              echo "✅ MongoDB is up!"
+              break
+            fi
+            echo "Waiting for MongoDB... ($i/10)"
+            sleep 3
+          done
 
           echo "Initializing replica set..."
-          docker exec mongodb-rs mongosh --eval \
-            'rs.initiate({_id: "rs0", members: [{_id: 0, host: "localhost:27017"}]})'
+          docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval '
+            rs.initiate({
+              _id: "rs0",
+              members: [{ _id: 0, host: "localhost:27017" }]
+            });
+          '
 
-          echo "Waiting for replica set to be ready..."
+          echo "Waiting for replica set to become PRIMARY..."
           sleep 10
 
-          echo "Creating eveble database and user..."
-          docker exec -i mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval '
+          echo "Creating eveble database user..."
+          docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval '
             use eveble;
             db.createUser({
               user: "admin",
               pwd: "password",
               roles: [
-                { role: "root", db: "admin" },
-                { role: "readWrite", db: "eveble" }
+                { role: "readWrite", db: "eveble" },
+                { role: "dbAdmin", db: "eveble" }
               ]
             });
           '
