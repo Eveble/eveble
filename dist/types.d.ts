@@ -1,7 +1,7 @@
 import { Container, ServiceIdentifier, BindingScope, BindToFluentSyntax } from 'inversify';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
-import Agenda from 'agenda';
+import { Job } from '@pulsecron/pulse';
 import { SAVE_STATE_METHOD_KEY, ROLLBACK_STATE_METHOD_KEY } from './constants/literal-keys';
 export declare namespace types {
     export type Class<T = unknown, Arguments extends any[] = any[]> = new (...arguments_: Arguments) => T;
@@ -606,8 +606,8 @@ export declare namespace types {
         lastRunAt?: Date;
         failedAt?: Date;
     }
-    export interface AgendaJobTransformer {
-        transform(job: Agenda.Job): ScheduledJob;
+    export interface PulseJobTransformer {
+        transform(job: Job): ScheduledJob;
     }
     export interface CommitSerializer {
         serialize(commit: Commit): Record<string, any>;

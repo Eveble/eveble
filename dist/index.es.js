@@ -12,8 +12,8 @@ import getenv from 'getenv';
 import decache from 'decache';
 import dotenv from 'dotenv-extended';
 import { v4 } from 'uuid';
-import Agenda from 'agenda';
-import { MongoClient } from 'mongodb';
+import Pulse from '@pulsecron/pulse';
+import { Collection as Collection$1, MongoClient } from 'mongodb';
 import * as winston from 'winston';
 import chalk from 'chalk';
 import { Container, injectable, inject, postConstruct } from 'inversify';
@@ -67,12 +67,12 @@ const BINDINGS = {
             ScheduledCommands: Symbol.for('MongoDB.collections.ScheduledCommands'),
         },
     },
-    Agenda: {
-        library: Symbol.for('Agenda.library'),
+    Pulse: {
+        library: Symbol.for('Pulse.library'),
         clients: {
-            CommandScheduler: Symbol.for('Agenda.clients.CommandScheduler'),
+            CommandScheduler: Symbol.for('Pulse.clients.CommandScheduler'),
         },
-        jobTransformer: Symbol.for('Agenda.jobTransformer'),
+        jobTransformer: Symbol.for('Pulse.jobTransformer'),
     },
     CommandScheduler: Symbol.for('CommandScheduler'),
     CommandSchedulingService: Symbol.for('CommandSchedulingService'),
@@ -2390,7 +2390,7 @@ LogTransportConfig = __decorate([
                     isWholeLineColored: true,
                     includeStackTrace: true,
                     isAbbreviatingSources: false,
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "level": { kind: 999, modifiers: 0 }, "logColors": { kind: 999, modifiers: 0 }, "partsColors": { kind: 999, modifiers: 0 }, "messages": { kind: 999, modifiers: 0 }, "parts": { kind: 999, modifiers: 0 }, "flags": { kind: 999, modifiers: 0 }, "timestampFormat": { kind: 999, modifiers: 0 }, "abbreviationLength": { kind: 999, modifiers: 0 }, "inspectDepth": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "level": { kind: 999, modifiers: 0 }, "logColors": { kind: 999, modifiers: 0 }, "partsColors": { kind: 999, modifiers: 0 }, "messages": { kind: 999, modifiers: 0 }, "parts": { kind: 999, modifiers: 0 }, "flags": { kind: 999, modifiers: 0 }, "timestampFormat": { kind: 999, modifiers: 0 }, "abbreviationLength": { kind: 999, modifiers: 0 }, "inspectDepth": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], LogTransportConfig);
 
@@ -2430,7 +2430,7 @@ LoggingConfig = __decorate([
                     console: new LogTransportConfig({
                         level: getenv.string('LOGGING_LEVEL', 'info'),
                     }),
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: LogTransportConfig, arguments: [] }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "levels": { kind: 999, modifiers: 0 }, "transports": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: LogTransportConfig, arguments: [] }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "levels": { kind: 999, modifiers: 0 }, "transports": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], LoggingConfig);
 
@@ -2442,7 +2442,7 @@ let EvebleConfig = class EvebleConfig extends Config {
     }
 };
 EvebleConfig = __decorate([
-    Type()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "CommitStore": { kind: 999, modifiers: 0 }, "Snapshotter": { kind: 999, modifiers: 0 }, "CommandScheduler": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "CommitStore": { kind: 999, modifiers: 0 }, "Snapshotter": { kind: 999, modifiers: 0 }, "CommandScheduler": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], EvebleConfig);
 
@@ -2463,7 +2463,7 @@ let AppConfig = AppConfig_1 = class AppConfig extends Config {
                 Snapshotter: AppConfig_1.defaultMongoDBOptions,
                 CommandScheduler: AppConfig_1.defaultMongoDBOptions,
             },
-            Agenda: {
+            Pulse: {
                 CommandScheduler: {
                     processEvery: 180000,
                 },
@@ -2482,10 +2482,7 @@ let AppConfig = AppConfig_1 = class AppConfig extends Config {
         return v4().toString();
     }
 };
-AppConfig.defaultMongoDBOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-};
+AppConfig.defaultMongoDBOptions = {};
 AppConfig = AppConfig_1 = __decorate([
     Type()({ kind: 19, name: "AppConfig", properties: { "appId": { kind: 17, initializer: () => getenv.string('APP_ID', AppConfig_1.generateId()), modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "workerId": { kind: 17, initializer: () => getenv.string('WORKER_ID', AppConfig_1.generateId()), modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "Stringifiable", properties: { "toString": { kind: 21, modifiers: 0 } } }] }, "logging": { kind: 17, initializer: () => new LoggingConfig(), modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: LoggingConfig, arguments: [] }] }, "conversion": { kind: 17, initializer: () => ({ type: 'runtime' }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "type": { kind: 17, modifiers: 0, types: [{ kind: 5, value: "manual" }, { kind: 5, value: "runtime" }] } } }] }, "validation": { kind: 17, initializer: () => ({ type: 'runtime' }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "type": { kind: 17, modifiers: 0, types: [{ kind: 5, value: "manual" }, { kind: 5, value: "runtime" }] } } }] }, "description": { kind: 17, initializer: () => ({ formatting: 'default' }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "formatting": { kind: 17, modifiers: 0, types: [{ kind: 5, value: "compact" }, { kind: 5, value: "debug" }, { kind: 5, value: "default" }] } } }] }, "eveble": { kind: 17, initializer: () => new EvebleConfig(), modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: EvebleConfig, arguments: [] }] }, "clients": { kind: 17, initializer: () => ({
                     MongoDB: {
@@ -2493,12 +2490,12 @@ AppConfig = AppConfig_1 = __decorate([
                         Snapshotter: AppConfig_1.defaultMongoDBOptions,
                         CommandScheduler: AppConfig_1.defaultMongoDBOptions,
                     },
-                    Agenda: {
+                    Pulse: {
                         CommandScheduler: {
                             processEvery: 180000,
                         },
                     },
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Agenda": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "appId": { kind: 999, modifiers: 0 }, "workerId": { kind: 999, modifiers: 0 }, "logging": { kind: 999, modifiers: 0 }, "conversion": { kind: 999, modifiers: 0 }, "validation": { kind: 999, modifiers: 0 }, "description": { kind: 999, modifiers: 0 }, "eveble": { kind: 999, modifiers: 0 }, "clients": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@6050": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@6052": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Pulse": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "appId": { kind: 999, modifiers: 0 }, "workerId": { kind: 999, modifiers: 0 }, "logging": { kind: 999, modifiers: 0 }, "conversion": { kind: 999, modifiers: 0 }, "validation": { kind: 999, modifiers: 0 }, "description": { kind: 999, modifiers: 0 }, "eveble": { kind: 999, modifiers: 0 }, "clients": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@6177": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@6179": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], AppConfig);
 
@@ -5658,7 +5655,7 @@ let MongoDBCollectionConfig = class MongoDBCollectionConfig extends Config {
     }
 };
 MongoDBCollectionConfig = __decorate([
-    Type()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2, modifiers: 1 }, "indexes": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "indexes": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2, modifiers: 1 }, "indexes": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "indexes": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBCollectionConfig);
 let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends Config {
@@ -5668,7 +5665,7 @@ let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends Config {
     }
 };
 MongoDBDatabaseConfig = __decorate([
-    Type()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2, modifiers: 1 }, "collections": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "collections": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7115": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7116": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2, modifiers: 1 }, "collections": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "collections": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBDatabaseConfig);
 class MongoDBClient extends Client {
@@ -5746,21 +5743,32 @@ class MongoDBClient extends Client {
         }
     }
     async disconnect() {
-        var _a;
-        if (!this.isInState(Client.STATES.stopped)) {
-            if (!this.isConnected()) {
-                return;
-            }
+        if (!this._library || this.isInState(Client.STATES.disconnected)) {
+            return;
+        }
+        if (this.isInState(Client.STATES.stopped)) {
+            this.setState(Client.STATES.disconnected);
+            delete this._library;
+            return;
         }
         this.log.debug(new Log(`disconnecting client '${this.getId()}'`)
             .on(this)
             .in(this.disconnect));
-        await ((_a = this._library) === null || _a === void 0 ? void 0 : _a.close());
-        this.setState(Client.STATES.disconnected);
-        delete this._library;
-        this.log.debug(new Log(`disconnected client '${this.getId()}'`)
-            .on(this)
-            .in(this.disconnect));
+        try {
+            await this._library.close(false);
+            this.setState(Client.STATES.disconnected);
+            delete this._library;
+            this.log.debug(new Log(`disconnected client '${this.getId()}'`)
+                .on(this)
+                .in(this.disconnect));
+        }
+        catch (error) {
+            this.log.warning(new Log(`error during disconnect: ${error}`)
+                .on(this)
+                .in(this.disconnect));
+            this.setState(Client.STATES.disconnected);
+            delete this._library;
+        }
     }
     async reconnect() {
         this.log.debug(new Log(`reconnecting client '${this.getId()}'`)
@@ -5772,10 +5780,22 @@ class MongoDBClient extends Client {
         }
     }
     isConnected() {
-        var _a;
-        return (this._library !== undefined &&
-            this.isInState(Client.STATES.connected) &&
-            ((_a = this._library) === null || _a === void 0 ? void 0 : _a.isConnected()));
+        var _a, _b;
+        if (!this._library) {
+            return false;
+        }
+        try {
+            const topology = this._library.topology;
+            if (!topology) {
+                return false;
+            }
+            const topologyState = ((_a = topology.s) === null || _a === void 0 ? void 0 : _a.state) || ((_b = topology.description) === null || _b === void 0 ? void 0 : _b.type);
+            const isTopologyConnected = topologyState !== 'closed' && topologyState !== 'Unknown';
+            return this.isInState(Client.STATES.connected) && isTopologyConnected;
+        }
+        catch (_c) {
+            return this.isInState(Client.STATES.connected);
+        }
     }
     getDatabase(name) {
         var _a;
@@ -5808,10 +5828,7 @@ class MongoDBClient extends Client {
         }
     }
 }
-MongoDBClient.defaultOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-};
+MongoDBClient.defaultOptions = {};
 __decorate([
     inject(BINDINGS.log),
     __metadata("design:type", Object)
@@ -5821,7 +5838,7 @@ __decorate([
     __metadata("design:type", Object)
 ], MongoDBClient.prototype, "MongoDB", void 0);
 
-class AgendaClient extends Client {
+class PulseClient extends Client {
     async initialize() {
         this.log.debug(new Log(`initializing client '${this.getId()}'`)
             .on(this)
@@ -5831,7 +5848,7 @@ class AgendaClient extends Client {
             .with('collectionName', this.collectionName));
         try {
             const database = this.mongoClient.getDatabase(this.databaseName);
-            this._library = new this.Agenda({
+            this._library = new this.Pulse({
                 mongo: database,
                 collection: this.collectionName,
                 ...this.options,
@@ -5843,11 +5860,10 @@ class AgendaClient extends Client {
                 .with('url', this.mongoClient.url)
                 .with('options', this.options)
                 .with('collectionName', this.collectionName));
-            this.setState(AgendaClient.STATES.initialized);
-            this.setState('initialized');
+            this.setState(PulseClient.STATES.initialized);
         }
         catch (error) {
-            this.setState(AgendaClient.STATES.failed);
+            this.setState(PulseClient.STATES.failed);
             this.log.error(new Log(`failed to initialize client '${this.getId()}' do to error: ${error}`)
                 .on(this)
                 .in(this.initialize)
@@ -5859,36 +5875,46 @@ class AgendaClient extends Client {
     }
     get library() {
         this.validateState([
-            AgendaClient.STATES.initialized,
-            AgendaClient.STATES.connected,
-            AgendaClient.STATES.paused,
-            AgendaClient.STATES.stopped,
-            AgendaClient.STATES.disconnected,
+            PulseClient.STATES.initialized,
+            PulseClient.STATES.connected,
+            PulseClient.STATES.paused,
+            PulseClient.STATES.stopped,
+            PulseClient.STATES.disconnected,
         ]);
         return this._library;
     }
     async connect() {
         this.validateState([
-            AgendaClient.STATES.initialized,
-            AgendaClient.STATES.connected,
-            AgendaClient.STATES.stopped,
+            PulseClient.STATES.initialized,
+            PulseClient.STATES.connected,
+            PulseClient.STATES.stopped,
         ]);
         if (this.isConnected()) {
             return;
         }
         this.log.debug(new Log(`connecting client '${this.getId()}'`).on(this).in(this.connect));
         try {
-            await this.library.start();
-            this.setState(AgendaClient.STATES.connected);
+            this.setState(PulseClient.STATES.connected);
             this.log.debug(new Log(`connected client '${this.getId()}'`).on(this).in(this.connect));
         }
         catch (error) {
-            this.setState(AgendaClient.STATES.failed);
+            this.setState(PulseClient.STATES.failed);
             this.log.error(new Log(`failed connection on client '${this.getId()}' do to error: ${error}`)
                 .on(this)
                 .in(this.connect));
             throw error;
         }
+    }
+    async startProcessing(jobName) {
+        if (!this.isConnected()) {
+            throw new Error('Pulse client must be connected before starting processing');
+        }
+        this.log.debug(new Log(`starting job processing on client '${this.getId()}'`)
+            .on(this)
+            .in(this.startProcessing)
+            .with('jobName', jobName)
+            .with('processEvery', this.getInterval()));
+        await this.library.start();
     }
     async stop() {
         if (!this.isConnected()) {
@@ -5896,11 +5922,12 @@ class AgendaClient extends Client {
         }
         this.log.debug(new Log(`stopping client '${this.getId()}'`).on(this).in(this.stop));
         await this.library.stop();
-        this.setState(AgendaClient.STATES.stopped);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        this.setState(PulseClient.STATES.stopped);
         this.log.debug(new Log(`stopped client '${this.getId()}'`).on(this).in(this.stop));
     }
     async disconnect() {
-        if (!this.isInState(AgendaClient.STATES.stopped)) {
+        if (!this.isInState(PulseClient.STATES.stopped)) {
             if (!this.isConnected()) {
                 return;
             }
@@ -5909,7 +5936,7 @@ class AgendaClient extends Client {
             .on(this)
             .in(this.disconnect));
         await this.stop();
-        this.setState(AgendaClient.STATES.disconnected);
+        this.setState(PulseClient.STATES.disconnected);
         delete this._library;
         this.log.debug(new Log(`disconnected client '${this.getId()}'`)
             .on(this)
@@ -5919,7 +5946,7 @@ class AgendaClient extends Client {
         this.log.debug(new Log(`reconnecting client '${this.getId()}'`)
             .on(this)
             .in(this.reconnect));
-        this.setState(AgendaClient.STATES.paused);
+        this.setState(PulseClient.STATES.paused);
         if (!this.isConnected()) {
             await this.initialize();
             await this.connect();
@@ -5927,7 +5954,7 @@ class AgendaClient extends Client {
     }
     isConnected() {
         return (this._library !== undefined &&
-            this.isInState(AgendaClient.STATES.connected) &&
+            this.isInState(PulseClient.STATES.connected) &&
             this.mongoClient.isConnected());
     }
     getInterval() {
@@ -5970,48 +5997,108 @@ class AgendaClient extends Client {
 __decorate([
     inject(BINDINGS.log),
     __metadata("design:type", Object)
-], AgendaClient.prototype, "log", void 0);
+], PulseClient.prototype, "log", void 0);
 __decorate([
-    inject(BINDINGS.Agenda.library),
+    inject(BINDINGS.Pulse.library),
     __metadata("design:type", Object)
-], AgendaClient.prototype, "Agenda", void 0);
+], PulseClient.prototype, "Pulse", void 0);
 __decorate([
     inject(BINDINGS.MongoDB.clients.CommandScheduler),
     __metadata("design:type", MongoDBClient)
-], AgendaClient.prototype, "mongoClient", void 0);
+], PulseClient.prototype, "mongoClient", void 0);
 
-var AgendaCommandScheduler_1;
-let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandScheduler extends derive(StatefulTrait) {
+let ScheduledJob = class ScheduledJob extends derive(StatefulTrait, Struct) {
+    constructor(props = {}) {
+        super(props);
+        if (props.state) {
+            this.setState(props.state);
+        }
+    }
+};
+ScheduledJob.STATES = {
+    enqueued: 'enqueued',
+    started: 'started',
+    locked: 'locked',
+    failed: 'failed',
+    completed: 'completed',
+    removed: 'removed',
+};
+ScheduledJob = __decorate([
+    Type()({ kind: 19, name: "ScheduledJob", properties: { "id": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "name": { kind: 2, modifiers: 1 }, "data": { kind: 15, modifiers: 1, name: "__type", properties: {} }, "priority": { kind: 17, modifiers: 1, types: [{ kind: 3 }, { kind: 5, value: "lowest" }, { kind: 5, value: "low" }, { kind: 5, value: "normal" }, { kind: 5, value: "high" }, { kind: 5, value: "highest" }] }, "nextRunAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "completedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lockedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lastRunAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 999 } }),
+    __metadata("design:paramtypes", [Object])
+], ScheduledJob);
+
+let PulseScheduledJobTransformer = class PulseScheduledJobTransformer {
+    transform(job) {
+        const props = this.pickProps(job);
+        props.state = this.determineState(job);
+        return new ScheduledJob(props);
+    }
+    pickProps(job) {
+        const { attrs } = job;
+        const props = pick(attrs, Object.keys(ScheduledJob.getPropTypes()));
+        Object.keys(props).forEach((key) => props[key] === null && delete props[key]);
+        if (attrs.lastFinishedAt !== undefined) {
+            props.completedAt = attrs.lastFinishedAt;
+        }
+        props.id = attrs._id.toString();
+        return props;
+    }
+    determineState(job) {
+        const { attrs } = job;
+        if (attrs.failedAt instanceof Date) {
+            return ScheduledJob.STATES.failed;
+        }
+        if (attrs.lastFinishedAt instanceof Date) {
+            return ScheduledJob.STATES.completed;
+        }
+        if (attrs.lockedAt instanceof Date) {
+            return ScheduledJob.STATES.locked;
+        }
+        if (attrs.nextRunAt instanceof Date) {
+            return ScheduledJob.STATES.enqueued;
+        }
+        return undefined;
+    }
+};
+PulseScheduledJobTransformer = __decorate([
+    injectable()
+], PulseScheduledJobTransformer);
+
+var PulseCommandScheduler_1;
+let PulseCommandScheduler = PulseCommandScheduler_1 = class PulseCommandScheduler extends derive(StatefulTrait) {
     constructor(jobName = 'send scheduled command', options = {}) {
         super();
         this.jobName = jobName;
         this.options = options;
-        this.setState(AgendaCommandScheduler_1.STATES.constructed);
+        this.setState(PulseCommandScheduler_1.STATES.constructed);
     }
     async startScheduling() {
-        if (this.isInState(AgendaCommandScheduler_1.STATES.active)) {
+        if (this.isInState(PulseCommandScheduler_1.STATES.active)) {
             return;
         }
         await this.initialize();
-        this.setState(AgendaCommandScheduler_1.STATES.active);
+        this.setState(PulseCommandScheduler_1.STATES.active);
     }
     async stopScheduling() {
-        if (this.isInState(AgendaCommandScheduler_1.STATES.stopped)) {
+        if (this.isInState(PulseCommandScheduler_1.STATES.stopped)) {
             return;
         }
-        this.setState(AgendaCommandScheduler_1.STATES.stopped);
+        await this.pulseClient.library.cancel({ name: this.jobName });
+        this.setState(PulseCommandScheduler_1.STATES.stopped);
     }
     async initialize() {
-        if (!this.agendaClient.isConnected()) {
-            const error = new InactiveClientError(this.constructor.name, this.agendaClient.getId().toString());
-            this.log.error(new Log('inactive Agenda client').on(this).in(this.initialize));
+        if (!this.pulseClient.isConnected()) {
+            const error = new InactiveClientError(this.constructor.name, this.pulseClient.getId().toString());
+            this.log.error(new Log('inactive Pulse client').on(this).in(this.initialize));
             throw error;
         }
-        await this.defineJob(this.jobName, this.options, this.handleScheduledCommand);
-        this.log.debug(new Log(`defined new Agenda job '${this.jobName}' for client with id '${this.agendaClient.getId()}'`)
+        await this.defineJob(this.jobName, this.options, async (job) => this.handleScheduledCommand(job));
+        this.log.debug(new Log(`defined new Pulse job '${this.jobName}' for client with id '${this.pulseClient.getId()}'`)
             .on(this)
             .in(this.initialize));
-        this.setState(AgendaCommandScheduler_1.STATES.initialized);
+        await this.pulseClient.startProcessing(this.jobName);
+        this.setState(PulseCommandScheduler_1.STATES.initialized);
     }
     async schedule(scheduleCommand) {
         const serializedData = this.serializeScheduleCommandToData(scheduleCommand);
@@ -6024,7 +6111,10 @@ let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandSched
             .with('scheduled command', scheduleCommand));
         try {
             const when = scheduleCommand.getDeliveryDate();
-            await this.agendaClient.library.schedule(when, this.jobName, serializedData);
+            const job = await this.pulseClient.library.schedule(when, this.jobName, serializedData);
+            if (job && typeof job.save === 'function') {
+                await job.save();
+            }
             this.log.debug(new Log(`scheduled command '${assignmentId}'`)
                 .on(this)
                 .in(this.schedule)
@@ -6051,8 +6141,8 @@ let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandSched
             .in(this.unschedule)
             .with('unschedule command', unscheduleCommand));
         try {
-            const removedCount = await this.agendaClient.library.cancel(mongoQuery);
-            const isSuccessful = removedCount > 0;
+            const removedCount = await this.pulseClient.library.cancel(mongoQuery);
+            const isSuccessful = (removedCount !== null && removedCount !== void 0 ? removedCount : 0) > 0;
             if (isSuccessful) {
                 this.log.debug(new Log(`unscheduled command '${assignmentId}'`)
                     .on(this)
@@ -6095,7 +6185,7 @@ let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandSched
         }
         const mongoSort = { data: -1 };
         const mongoLimit = 1;
-        const jobs = await this.agendaClient.library.jobs(mongoQuery, mongoSort, mongoLimit);
+        const jobs = await this.pulseClient.library.jobs(mongoQuery, mongoSort, mongoLimit);
         if (isEmpty(jobs)) {
             return undefined;
         }
@@ -6125,12 +6215,15 @@ let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandSched
         }
     }
     getInterval() {
-        return this.agendaClient.getInterval() || 1;
+        return this.pulseClient.getInterval() || 1;
     }
     async defineJob(jobName, options = {}, handler) {
-        const boundHandler = handler.bind(this);
-        boundHandler.original = handler;
-        this.agendaClient.library.define(jobName, options, boundHandler);
+        this.pulseClient.library.define(jobName, handler, options);
+        const definitions = this.pulseClient.library._definitions || {};
+        if (!definitions[jobName]) {
+            this.log.error(new Log(`failed defining job '${jobName}'`).on(this).in(this.defineJob));
+            throw new Error(`Failed to define job: ${jobName}`);
+        }
     }
     serializeScheduleCommandToData(scheduleCommand) {
         const { command } = scheduleCommand;
@@ -6145,128 +6238,69 @@ let AgendaCommandScheduler = AgendaCommandScheduler_1 = class AgendaCommandSched
         return data;
     }
 };
-AgendaCommandScheduler.STATES = {
+PulseCommandScheduler.STATES = {
     constructed: 'constructed',
     initialized: 'initialized',
     active: 'active',
     stopped: 'stopped',
 };
 __decorate([
-    inject(BINDINGS.Agenda.clients.CommandScheduler),
-    __metadata("design:type", AgendaClient)
-], AgendaCommandScheduler.prototype, "agendaClient", void 0);
+    inject(BINDINGS.Pulse.clients.CommandScheduler),
+    __metadata("design:type", PulseClient)
+], PulseCommandScheduler.prototype, "pulseClient", void 0);
 __decorate([
     inject(BINDINGS.CommandBus),
     __metadata("design:type", Object)
-], AgendaCommandScheduler.prototype, "commandBus", void 0);
+], PulseCommandScheduler.prototype, "commandBus", void 0);
 __decorate([
     inject(BINDINGS.log),
     __metadata("design:type", Object)
-], AgendaCommandScheduler.prototype, "log", void 0);
+], PulseCommandScheduler.prototype, "log", void 0);
 __decorate([
     inject(BINDINGS.Serializer),
     __metadata("design:type", Object)
-], AgendaCommandScheduler.prototype, "serializer", void 0);
+], PulseCommandScheduler.prototype, "serializer", void 0);
 __decorate([
     inject(BINDINGS.MongoDB.collections.ScheduledCommands),
-    __metadata("design:type", Object)
-], AgendaCommandScheduler.prototype, "collection", void 0);
+    __metadata("design:type", Collection$1)
+], PulseCommandScheduler.prototype, "collection", void 0);
 __decorate([
-    inject(BINDINGS.Agenda.jobTransformer),
+    inject(BINDINGS.Pulse.jobTransformer),
     __metadata("design:type", Object)
-], AgendaCommandScheduler.prototype, "jobTransformer", void 0);
-AgendaCommandScheduler = AgendaCommandScheduler_1 = __decorate([
+], PulseCommandScheduler.prototype, "jobTransformer", void 0);
+PulseCommandScheduler = PulseCommandScheduler_1 = __decorate([
     injectable(),
     __metadata("design:paramtypes", [Object, Object])
-], AgendaCommandScheduler);
+], PulseCommandScheduler);
 
-let ScheduledJob = class ScheduledJob extends derive(StatefulTrait, Struct) {
-    constructor(props = {}) {
-        super(props);
-        if (props.state) {
-            this.setState(props.state);
-        }
-    }
-};
-ScheduledJob.STATES = {
-    enqueued: 'enqueued',
-    started: 'started',
-    locked: 'locked',
-    failed: 'failed',
-    completed: 'completed',
-    removed: 'removed',
-};
-ScheduledJob = __decorate([
-    Type()({ kind: 19, name: "ScheduledJob", properties: { "id": { kind: 17, modifiers: 1, types: [{ kind: 2 }, { kind: 18, type: Guid, arguments: [] }] }, "state": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 2 }, { kind: 3 }] }, "name": { kind: 2, modifiers: 1 }, "data": { kind: 15, modifiers: 1, name: "__type", properties: {} }, "priority": { kind: 17, modifiers: 1, types: [{ kind: 3 }, { kind: 5, value: "lowest" }, { kind: 5, value: "low" }, { kind: 5, value: "normal" }, { kind: 5, value: "high" }, { kind: 5, value: "highest" }] }, "nextRunAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "completedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lockedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "lastRunAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] }, "failedAt": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Date, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, initializer: () => ({}), name: "__type", properties: {} } }] }], extends: { kind: 999 } }),
-    __metadata("design:paramtypes", [Object])
-], ScheduledJob);
-
-let AgendaScheduledJobTransformer = class AgendaScheduledJobTransformer {
-    transform(job) {
-        const props = this.pickProps(job);
-        props.state = this.determineState(job);
-        return new ScheduledJob(props);
-    }
-    pickProps(job) {
-        const { attrs } = job;
-        const props = pick(attrs, Object.keys(ScheduledJob.getPropTypes()));
-        Object.keys(props).forEach((key) => props[key] === null && delete props[key]);
-        if (attrs.lastFinishedAt !== undefined) {
-            props.completedAt = attrs.lastFinishedAt;
-        }
-        props.id = attrs._id.toString();
-        return props;
-    }
-    determineState(job) {
-        const { attrs } = job;
-        if (attrs.failedAt instanceof Date) {
-            return ScheduledJob.STATES.failed;
-        }
-        if (attrs.lastFinishedAt instanceof Date) {
-            return ScheduledJob.STATES.completed;
-        }
-        if (attrs.lockedAt instanceof Date) {
-            return ScheduledJob.STATES.locked;
-        }
-        if (attrs.nextRunAt instanceof Date) {
-            return ScheduledJob.STATES.enqueued;
-        }
-        return undefined;
-    }
-};
-AgendaScheduledJobTransformer = __decorate([
-    injectable()
-], AgendaScheduledJobTransformer);
-
-class AgendaCommandSchedulerModule extends Module {
+class PulseCommandSchedulerModule extends Module {
     async beforeInitialize() {
         await this.initializeTopLevelDependencies();
         await this.initializeMongoDBClientForCommandScheduler();
-        await this.initializeAgendaClientForCommandScheduler();
+        await this.initializePulseClientForCommandScheduler();
     }
     async onInitialize() {
         await this.initializeCommandScheduler();
     }
     async onStart() {
         var _a;
-        await ((_a = this.agendaClient) === null || _a === void 0 ? void 0 : _a.connect());
+        await ((_a = this.pulseClient) === null || _a === void 0 ? void 0 : _a.connect());
     }
     async onStop() {
         var _a;
-        await ((_a = this.agendaClient) === null || _a === void 0 ? void 0 : _a.stop());
+        await ((_a = this.pulseClient) === null || _a === void 0 ? void 0 : _a.stop());
     }
     async onShutdown() {
-        var _a, _b;
-        await ((_a = this.agendaClient) === null || _a === void 0 ? void 0 : _a.disconnect());
-        await ((_b = this.mongoClient) === null || _b === void 0 ? void 0 : _b.disconnect());
+        var _a;
+        await ((_a = this.pulseClient) === null || _a === void 0 ? void 0 : _a.disconnect());
     }
     async initializeTopLevelDependencies() {
         var _a;
         this.injector
-            .bind(BINDINGS.Agenda.jobTransformer)
-            .to(AgendaScheduledJobTransformer)
+            .bind(BINDINGS.Pulse.jobTransformer)
+            .to(PulseScheduledJobTransformer)
             .inSingletonScope();
-        (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'Agenda.ScheduledJobTransformer' in singleton scope`)
+        (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'Pulse.ScheduledJobTransformer' in singleton scope`)
             .on(this)
             .in(this.initializeTopLevelDependencies));
     }
@@ -6276,7 +6310,6 @@ class AgendaCommandSchedulerModule extends Module {
         const options = {
             ...this.config.get('clients.MongoDB.CommandScheduler'),
             ssl: getenv.bool(`EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL`),
-            useUnifiedTopology: false,
         };
         const databaseName = getenv.string('EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME');
         const collectionName = getenv.string('EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION');
@@ -6303,14 +6336,14 @@ class AgendaCommandSchedulerModule extends Module {
             .on(this)
             .in(this.initializeMongoDBClientForCommandScheduler));
     }
-    async initializeAgendaClientForCommandScheduler() {
+    async initializePulseClientForCommandScheduler() {
         var _a;
         const databaseName = getenv.string('EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME');
         const collectionName = getenv.string('EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION');
-        const options = this.config.get('clients.Agenda.CommandScheduler');
+        const options = this.config.get('clients.Pulse.CommandScheduler');
         options.processEvery = getenv.int('EVEBLE_COMMAND_SCHEDULER_INTERVAL');
-        const client = new AgendaClient({
-            id: 'Agenda.clients.CommandScheduler',
+        const client = new PulseClient({
+            id: 'Pulse.clients.CommandScheduler',
             databaseName,
             collectionName,
             options,
@@ -6318,20 +6351,20 @@ class AgendaCommandSchedulerModule extends Module {
         this.injector.injectInto(client);
         await client.initialize();
         this.injector
-            .bind(BINDINGS.Agenda.clients.CommandScheduler)
+            .bind(BINDINGS.Pulse.clients.CommandScheduler)
             .toConstantValue(client);
-        (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'Agenda.clients.CommandScheduler' as constant value`)
+        (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'Pulse.clients.CommandScheduler' as constant value`)
             .on(this)
-            .in(this.initializeAgendaClientForCommandScheduler));
-        this.agendaClient = this.injector.get(BINDINGS.Agenda.clients.CommandScheduler);
+            .in(this.initializePulseClientForCommandScheduler));
+        this.pulseClient = this.injector.get(BINDINGS.Pulse.clients.CommandScheduler);
     }
     async initializeCommandScheduler() {
         var _a;
         this.injector
             .bind(BINDINGS.CommandScheduler)
-            .to(AgendaCommandScheduler)
+            .to(PulseCommandScheduler)
             .inSingletonScope();
-        (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'CommandScheduler' to 'AgendaCommandScheduler' in singleton scope`)
+        (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'CommandScheduler' to 'PulseCommandScheduler' in singleton scope`)
             .on(this)
             .in(this.initializeCommandScheduler));
     }
@@ -6344,7 +6377,7 @@ let SnapshotMongoDBStorage = class SnapshotMongoDBStorage {
         if (!this.isSuccessfulInsert(output, 1)) {
             throw new AddingSnapshotError(this.constructor.name, eventSourceable.getTypeName(), eventSourceable.getId().toString());
         }
-        return output.insertedId;
+        return output.insertedId.toString();
     }
     async update(eventSourceable) {
         const filter = { _id: eventSourceable.getId().toString() };
@@ -6373,18 +6406,16 @@ let SnapshotMongoDBStorage = class SnapshotMongoDBStorage {
         }
         return false;
     }
-    isSuccessfulInsert(output, expectedNumber) {
-        return output.insertedCount === expectedNumber;
+    isSuccessfulInsert(output, _expectedNumber) {
+        return output.acknowledged && output.insertedId !== null;
     }
     isSuccessfulUpdate(output, expectedNumber) {
-        const didUpdateOne = get(output, 'result.nModified') === expectedNumber;
-        const didFindAndUpdatedOne = get(output, 'lastErrorObject.n') === expectedNumber;
-        return didUpdateOne || didFindAndUpdatedOne;
+        return output.modifiedCount === expectedNumber;
     }
 };
 __decorate([
     inject(BINDINGS.MongoDB.collections.Snapshots),
-    __metadata("design:type", Object)
+    __metadata("design:type", Collection$1)
 ], SnapshotMongoDBStorage.prototype, "collection", void 0);
 __decorate([
     inject(BINDINGS.SnapshotSerializer),
@@ -6505,18 +6536,18 @@ let CommitMongoDBStorage = class CommitMongoDBStorage {
         if (!this.isSuccessfulInsert(output, 1)) {
             throw new AddingCommitFailedError(this.constructor.name, commit.id, commit.sentBy);
         }
-        return output.insertedId;
+        return output.insertedId.toString();
     }
     async generateId() {
         return new Guid().toString();
     }
     async findLastVersionById(eventSourceableId) {
         const query = { sourceId: eventSourceableId.toString() };
-        const sort = {
-            sort: [['version', 'desc']],
+        const options = {
+            sort: { version: -1 },
             projection: { version: 1 },
         };
-        const foundSerializedCommit = await this.collection.findOne(query, sort);
+        const foundSerializedCommit = await this.collection.findOne(query, options);
         if (foundSerializedCommit != null) {
             return foundSerializedCommit.version;
         }
@@ -6541,7 +6572,7 @@ let CommitMongoDBStorage = class CommitMongoDBStorage {
             sourceId: eventSourceableId.toString(),
             version: { $gte: versionOffset },
         };
-        const options = { sort: [['version', 'asc']] };
+        const options = { sort: { version: 1 } };
         return this.findAndReturnDeserializedCommits(query, options);
     }
     async getAllCommits() {
@@ -6637,7 +6668,7 @@ let CommitMongoDBStorage = class CommitMongoDBStorage {
             },
         };
         const options = {
-            returnOriginal: false,
+            returnDocument: 'after',
         };
         return this.findOneAndUpdate(filter, update, options);
     }
@@ -6650,7 +6681,7 @@ let CommitMongoDBStorage = class CommitMongoDBStorage {
         return commits;
     }
     async findCommits(query = {}, options = {}) {
-        const cursor = await this.collection.find(query, options);
+        const cursor = this.collection.find(query, options);
         const foundSerializedCommits = await cursor.toArray();
         return foundSerializedCommits;
     }
@@ -6662,22 +6693,25 @@ let CommitMongoDBStorage = class CommitMongoDBStorage {
         return false;
     }
     async findOneAndUpdate(filter = {}, update = {}, options = {
-        returnOriginal: false,
+        returnDocument: 'after',
     }) {
         const output = await this.collection.findOneAndUpdate(filter, update, options);
-        if (output !== undefined && this.isSuccessfulUpdate(output, 1)) {
-            const foundSerializedCommit = output.value;
-            return this.commitSerializer.deserialize(foundSerializedCommit);
+        if (output !== null) {
+            return this.commitSerializer.deserialize(output);
         }
         return undefined;
     }
     isSuccessfulInsert(output, expectedNumber) {
-        return output.insertedCount === expectedNumber;
+        return output.acknowledged && output.insertedId !== null;
     }
     isSuccessfulUpdate(output, expectedNumber) {
-        const didUpdateOne = get(output, 'result.nModified') === expectedNumber;
-        const didFindAndUpdatedOne = get(output, 'lastErrorObject.n') === expectedNumber;
-        return didUpdateOne || didFindAndUpdatedOne;
+        if ('modifiedCount' in output) {
+            return output.modifiedCount === expectedNumber;
+        }
+        if ('ok' in output && 'value' in output) {
+            return output.ok === 1 && output.value !== null;
+        }
+        return false;
     }
     getExpectedVersionOnStorage(commit) {
         const decremented = commit.version - 1;
@@ -6686,7 +6720,7 @@ let CommitMongoDBStorage = class CommitMongoDBStorage {
 };
 __decorate([
     inject(BINDINGS.MongoDB.collections.Commits),
-    __metadata("design:type", Object)
+    __metadata("design:type", Collection$1)
 ], CommitMongoDBStorage.prototype, "collection", void 0);
 __decorate([
     inject(BINDINGS.CommitSerializer),
@@ -6709,31 +6743,34 @@ let CommitMongoDBObserver = CommitMongoDBObserver_1 = class CommitMongoDBObserve
         const workerId = this.config
             .get('workerId')
             .toString();
-        const registeredQuery = {
-            $or: [
-                { eventTypes: { $in: commitPublisher.getHandledEventTypes() } },
-                {
-                    commandTypes: {
-                        $in: commitPublisher.getHandledCommandTypes(),
-                    },
+        const pipeline = [
+            {
+                $match: {
+                    operationType: 'insert',
+                    $or: [
+                        {
+                            'fullDocument.eventTypes': {
+                                $in: commitPublisher.getHandledEventTypes(),
+                            },
+                        },
+                        {
+                            'fullDocument.commandTypes': {
+                                $in: commitPublisher.getHandledCommandTypes(),
+                            },
+                        },
+                    ],
                 },
-            ],
-        };
-        const notReceivedYetQuery = {
-            'receivers.appId': {
-                $nin: [appId],
             },
-        };
-        const registeredAndNotReceivedYetFilter = {
-            $and: [registeredQuery, notReceivedYetQuery],
-        };
-        const cursor = await this.collection.find(registeredAndNotReceivedYetFilter, {
-            timeout: false,
+        ];
+        this.changeStream = this.collection.watch(pipeline, {
+            fullDocument: 'updateLookup',
         });
-        this.stream = await cursor.stream();
         this.setState(CommitMongoDBObserver_1.STATES.observing);
-        this.stream.on('data', async (serializedCommit) => {
-            const lockedCommit = await this.storage.lockCommit(serializedCommit.id, appId, workerId, registeredAndNotReceivedYetFilter);
+        this.changeStream.on('change', async (change) => {
+            const serializedCommit = change.fullDocument;
+            if (!serializedCommit)
+                return;
+            const lockedCommit = await this.storage.lockCommit(serializedCommit.id, appId, workerId, {});
             if (lockedCommit !== undefined) {
                 await commitPublisher.publishChanges(lockedCommit);
             }
@@ -6741,43 +6778,30 @@ let CommitMongoDBObserver = CommitMongoDBObserver_1 = class CommitMongoDBObserve
         await this.initializeEventHandlers();
     }
     async pauseObserving() {
-        if (this.stream !== undefined && this.isObserving()) {
+        if (this.changeStream && this.isObserving()) {
             this.setState(CommitMongoDBObserver_1.STATES.paused);
-            await this.stream.pause();
+            await this.changeStream.pause();
         }
     }
     async stopObserving() {
-        if (this.stream !== undefined && this.isObserving()) {
+        if (this.changeStream && this.isObserving()) {
             this.setState(CommitMongoDBObserver_1.STATES.closed);
-            await this.stream.close();
+            await this.changeStream.close();
         }
     }
     isObserving() {
-        return (this.state !== undefined &&
-            this.state === CommitMongoDBObserver_1.STATES.observing);
+        return this.state === CommitMongoDBObserver_1.STATES.observing;
     }
     async initializeEventHandlers() {
-        if (this.stream === undefined)
+        if (!this.changeStream)
             return;
-        this.stream.on('finish', async () => {
-            this.setState(CommitMongoDBObserver_1.STATES.finished);
-            this.log.debug(new Log(`finished observing commits`));
-        });
-        this.stream.on('end', async () => {
-            this.setState(CommitMongoDBObserver_1.STATES.ended);
-            this.log.debug(new Log(`ended observing commits`));
-        });
-        this.stream.on('close', async () => {
+        this.changeStream.on('close', () => {
             this.setState(CommitMongoDBObserver_1.STATES.closed);
-            this.log.debug(new Log(`closed observing commits`));
+            this.log.debug(new Log('closed observing commits'));
         });
-        this.stream.on('pause', async () => {
-            this.setState(CommitMongoDBObserver_1.STATES.paused);
-            this.log.debug(new Log(`paused observing commits`));
-        });
-        this.stream.on('error', async (error) => {
+        this.changeStream.on('error', (error) => {
             this.setState(CommitMongoDBObserver_1.STATES.failed);
-            this.log.error(new Log(`failed observing commits do to error: ${error}`));
+            this.log.error(new Log(`failed observing commits due to error: ${error}`));
             if (this.isInProduction()) {
                 process.exit(0);
             }
@@ -6798,7 +6822,7 @@ CommitMongoDBObserver.STATES = {
 };
 __decorate([
     inject(BINDINGS.MongoDB.collections.Commits),
-    __metadata("design:type", Object)
+    __metadata("design:type", Collection$1)
 ], CommitMongoDBObserver.prototype, "collection", void 0);
 __decorate([
     inject(BINDINGS.CommitStorage),
@@ -7108,7 +7132,7 @@ class App extends BaseApp {
             .on(this)
             .in(this.initializeExternalDependencies));
         const components = {
-            'Agenda.library': Agenda,
+            'Pulse.library': Pulse,
             'MongoDB.library': MongoClient,
         };
         for (const [id, component] of Object.entries(components)) {
@@ -7127,9 +7151,9 @@ class App extends BaseApp {
             !this.injector.isBound(BINDINGS.CommandScheduler)) {
             const client = getenv.string('EVEBLE_COMMAND_SCHEDULER_CLIENT');
             switch (client) {
-                case 'agenda':
-                    this.modules.unshift(new AgendaCommandSchedulerModule());
-                    (_b = this.log) === null || _b === void 0 ? void 0 : _b.debug(new Log(`added 'CommandScheduler' as 'AgendaCommandSchedulerModule' to application modules`)
+                case 'pulse':
+                    this.modules.unshift(new PulseCommandSchedulerModule());
+                    (_b = this.log) === null || _b === void 0 ? void 0 : _b.debug(new Log(`added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`)
                         .on(this)
                         .in(this.initializeSchedulers));
                     break;
@@ -7700,4 +7724,4 @@ function loggerLoader(injector, level, consoleTransportConfig = new LogTransport
     return logger;
 }
 
-export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, AgendaClient, AgendaCommandScheduler, AgendaCommandSchedulerModule, AgendaScheduledJobTransformer, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, can as Can, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingTrait, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, delegate as Delegate, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableTrait, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingTrait, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, handle as Handle, HandlerExistError, HandlerNotFoundError, HandlingError, HandlingTrait, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableTrait, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, initial as Initial, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingTrait, OneToOneHandlingTrait, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, RFC5424LoggingTrait, route as Route, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableTrait, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulTrait, StatusError, StatusfulAssertion, StatusfulTrait, StorageNotFoundError, StringifingConverter, Struct, subscribe as Subscribe, TransportExistsError, TypeTrait, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, version as Version, VersionableError, VersionableTrait, can, convertObjectToCollection, createEJSON, debugInversifyMetadata, delegate, getAllClassProperties, getInjectedParameterIndices, getInjectedPropertyDetails, getInjectedPropertyNames, getInversifyMetadata, getMetadataSummary, getPostConstructMethodNames, getPreDestroyMethodNames, getPropertiesToValidate, handle, hasPostConstruct, hasPreDestroy, initial, isEventSourceableType, isInjectableClass, isPlainRecord, isPropertyInjected, isRecord, isTyped, loadENV, loggerLoader, route, subscribe, toPlainObject, version };
+export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, can as Can, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingTrait, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, delegate as Delegate, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableTrait, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingTrait, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, handle as Handle, HandlerExistError, HandlerNotFoundError, HandlingError, HandlingTrait, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableTrait, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, initial as Initial, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingTrait, OneToOneHandlingTrait, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, PulseClient, PulseCommandScheduler, PulseCommandSchedulerModule, PulseScheduledJobTransformer, RFC5424LoggingTrait, route as Route, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableTrait, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulTrait, StatusError, StatusfulAssertion, StatusfulTrait, StorageNotFoundError, StringifingConverter, Struct, subscribe as Subscribe, TransportExistsError, TypeTrait, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, version as Version, VersionableError, VersionableTrait, can, convertObjectToCollection, createEJSON, debugInversifyMetadata, delegate, getAllClassProperties, getInjectedParameterIndices, getInjectedPropertyDetails, getInjectedPropertyNames, getInversifyMetadata, getMetadataSummary, getPostConstructMethodNames, getPreDestroyMethodNames, getPropertiesToValidate, handle, hasPostConstruct, hasPreDestroy, initial, isEventSourceableType, isInjectableClass, isPlainRecord, isPropertyInjected, isRecord, isTyped, loadENV, loggerLoader, route, subscribe, toPlainObject, version };

@@ -1,11 +1,11 @@
-import Agenda, { AgendaConfiguration } from 'agenda';
+import { type Job, DefineOptions } from '@pulsecron/pulse';
 import { Collection } from 'mongodb';
 import { types } from '../../types';
 import { ScheduleCommand } from '../../domain/schedule-command';
 import { UnscheduleCommand } from '../../domain/unschedule-command';
 import { Guid } from '../../domain/value-objects/guid';
-import { AgendaClient } from '../../app/clients/agenda-client';
-declare const AgendaCommandScheduler_base: (new () => {
+import { PulseClient } from '../../app/clients/pulse-client';
+declare const PulseCommandScheduler_base: (new () => {
     [x: string]: any;
     state: types.State;
     setState(state: types.State): void;
@@ -29,23 +29,23 @@ declare const AgendaCommandScheduler_base: (new () => {
         getSelectableStates(): Record<string, types.State>;
     };
 };
-export declare class AgendaCommandScheduler extends AgendaCommandScheduler_base implements types.CommandScheduler {
+export declare class PulseCommandScheduler extends PulseCommandScheduler_base implements types.CommandScheduler {
     static STATES: {
         constructed: string;
         initialized: string;
         active: string;
         stopped: string;
     };
-    readonly agendaClient: AgendaClient;
+    readonly pulseClient: PulseClient;
     protected commandBus: types.CommandBus;
     protected log: types.Logger;
     protected serializer: types.Serializer;
     protected collection: Collection;
-    protected jobTransformer: types.AgendaJobTransformer;
+    protected jobTransformer: types.PulseJobTransformer;
     state: types.State;
     readonly jobName: string;
-    readonly options?: AgendaConfiguration;
-    constructor(jobName?: string, options?: AgendaConfiguration);
+    readonly options?: DefineOptions;
+    constructor(jobName?: string, options?: DefineOptions);
     startScheduling(): Promise<void>;
     stopScheduling(): Promise<void>;
     initialize(): Promise<void>;
@@ -53,9 +53,9 @@ export declare class AgendaCommandScheduler extends AgendaCommandScheduler_base 
     unschedule(unscheduleCommand: UnscheduleCommand): Promise<boolean>;
     unscheduleAll(): Promise<void>;
     getJob(commandType: string, assignerId: string | Guid, assignerType: string, assignmentId?: string | Guid): Promise<types.ScheduledJob | undefined>;
-    handleScheduledCommand(job: Agenda.Job): Promise<void>;
+    handleScheduledCommand(job: Job): Promise<void>;
     getInterval(): number;
-    protected defineJob(jobName: string, options: Agenda.JobOptions | undefined, handler: (job: Agenda.Job) => Promise<void>): Promise<void>;
+    protected defineJob(jobName: string, options: DefineOptions | undefined, handler: (job: Job) => Promise<void>): Promise<void>;
     protected serializeScheduleCommandToData(scheduleCommand: ScheduleCommand): Record<string, any>;
 }
 export {};

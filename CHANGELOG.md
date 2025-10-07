@@ -1,3 +1,13 @@
+# [4.0.0](https://github.com/Eveble/eveble/compare/v3.0.0...v4.0.0) (2025-10-07)
+
+
+* refactor!: replace outdated agenda with @pulsecron/pulse at v1.6.8 ([f7be27e](https://github.com/Eveble/eveble/commit/f7be27e19581990119b4ec0f45425051c7523872))
+
+
+### BREAKING CHANGES
+
+* replace outdated agenda with @pulsecron/pulse at v1.6.8
+
 # [3.0.0](https://github.com/Eveble/eveble/compare/v2.6.1...v3.0.0) (2025-10-06)
 
 

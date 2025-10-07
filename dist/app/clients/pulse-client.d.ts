@@ -1,21 +1,22 @@
-import Agenda from 'agenda';
+import { Pulse } from '@pulsecron/pulse';
 import { Client } from '../client';
 import { types } from '../../types';
 import { MongoDBClient } from './mongodb-client';
 import { Guid } from '../../domain/value-objects/guid';
-export declare class AgendaClient extends Client implements types.Client {
+export declare class PulseClient extends Client implements types.Client {
     protected log: types.Logger;
-    protected Agenda: any;
+    protected Pulse: any;
     readonly mongoClient: MongoDBClient;
     id: string | Guid;
     state: types.State;
     readonly databaseName: string;
     readonly collectionName: string;
     readonly options?: Record<string, any>;
-    protected _library?: Agenda;
+    protected _library?: Pulse;
     initialize(): Promise<void>;
-    get library(): Agenda;
+    get library(): Pulse;
     connect(): Promise<void>;
+    startProcessing(jobName: string): Promise<void>;
     stop(): Promise<void>;
     disconnect(): Promise<void>;
     reconnect(): Promise<void>;

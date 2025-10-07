@@ -1,4 +1,4 @@
-import { Collection, Cursor } from 'mongodb';
+import { ChangeStream, Collection } from 'mongodb';
 import { types } from '../../types';
 declare const CommitMongoDBObserver_base: (new () => {
     [x: string]: any;
@@ -39,7 +39,7 @@ export declare class CommitMongoDBObserver extends CommitMongoDBObserver_base {
         failed: string;
     };
     state: types.State;
-    stream: Cursor<any> | undefined;
+    changeStream?: ChangeStream;
     constructor();
     startObserving(commitPublisher: types.CommitPublisher): Promise<void>;
     pauseObserving(): Promise<void>;

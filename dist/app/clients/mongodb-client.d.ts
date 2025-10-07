@@ -16,10 +16,7 @@ export declare class MongoDBDatabaseConfig extends Config {
 export declare class MongoDBClient extends Client implements types.Client {
     protected log: types.Logger;
     protected MongoDB: any;
-    static defaultOptions: {
-        useNewUrlParser: boolean;
-        useUnifiedTopology: boolean;
-    };
+    static defaultOptions: {};
     id: string | Guid;
     state: types.State;
     url: string;

@@ -41,7 +41,7 @@ export declare const BINDINGS: {
             ScheduledCommands: symbol;
         };
     };
-    Agenda: {
+    Pulse: {
         library: symbol;
         clients: {
             CommandScheduler: symbol;

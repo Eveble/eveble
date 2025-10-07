@@ -1,8 +1,8 @@
-import { AgendaClient } from '../clients/agenda-client';
+import { PulseClient } from '../clients/pulse-client';
 import { MongoDBClient } from '../clients/mongodb-client';
 import { Module } from '../../core/module';
-export declare class AgendaCommandSchedulerModule extends Module {
-    agendaClient?: AgendaClient;
+export declare class PulseCommandSchedulerModule extends Module {
+    pulseClient?: PulseClient;
     mongoClient?: MongoDBClient;
     protected beforeInitialize(): Promise<void>;
     protected onInitialize(): Promise<void>;
@@ -11,6 +11,6 @@ export declare class AgendaCommandSchedulerModule extends Module {
     protected onShutdown(): Promise<void>;
     initializeTopLevelDependencies(): Promise<void>;
     initializeMongoDBClientForCommandScheduler(): Promise<void>;
-    initializeAgendaClientForCommandScheduler(): Promise<void>;
+    initializePulseClientForCommandScheduler(): Promise<void>;
     initializeCommandScheduler(): Promise<void>;
 }

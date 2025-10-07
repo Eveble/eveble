@@ -1,4 +1,4 @@
-import { Collection, InsertOneWriteOpResult, UpdateWriteOpResult, FindOneOptions, FilterQuery, UpdateQuery, FindOneAndUpdateOption, FindAndModifyWriteOpResultObject } from 'mongodb';
+import { Collection, InsertOneResult, UpdateResult, FindOptions, Filter, UpdateFilter, FindOneAndUpdateOptions, ModifyResult } from 'mongodb';
 import { types } from '../../types';
 import { Guid } from '../../domain/value-objects/guid';
 export declare class CommitMongoDBStorage implements types.CommitStorage {
@@ -15,11 +15,11 @@ export declare class CommitMongoDBStorage implements types.CommitStorage {
     flagCommitAsFailed(commitId: string, appId: string, workerId: string, failedAt: Date): Promise<boolean>;
     flagAndResolveCommitAsTimeouted(commitId: string, appId: string, workerId: string, failedAt: Date): Promise<types.Commit | undefined>;
     lockCommit(commitId: string, appId: string, workerId: string, registeredAndNotReceivedYetFilter: Record<string, any>): Promise<types.Commit | undefined>;
-    protected findAndReturnDeserializedCommits(query?: FilterQuery<any>, options?: FindOneOptions<any>): Promise<types.Commit[]>;
-    protected findCommits(query?: FilterQuery<any>, options?: FindOneOptions<any>): Promise<Record<string, any>[]>;
-    protected updateOne(filter?: FilterQuery<any>, update?: UpdateQuery<any>): Promise<boolean>;
-    findOneAndUpdate(filter?: FilterQuery<any>, update?: UpdateQuery<any>, options?: FindOneAndUpdateOption<any>): Promise<types.Commit | undefined>;
-    protected isSuccessfulInsert(output: InsertOneWriteOpResult<any>, expectedNumber: number): boolean;
-    protected isSuccessfulUpdate(output: UpdateWriteOpResult | FindAndModifyWriteOpResultObject<any>, expectedNumber: number): boolean;
+    protected findAndReturnDeserializedCommits(query?: Filter<any>, options?: FindOptions<any>): Promise<types.Commit[]>;
+    protected findCommits(query?: Filter<any>, options?: FindOptions<any>): Promise<Record<string, any>[]>;
+    protected updateOne(filter?: Filter<any>, update?: UpdateFilter<any>): Promise<boolean>;
+    findOneAndUpdate(filter?: Filter<any>, update?: UpdateFilter<any>, options?: FindOneAndUpdateOptions): Promise<types.Commit | undefined>;
+    protected isSuccessfulInsert(output: InsertOneResult<any>, expectedNumber: number): boolean;
+    protected isSuccessfulUpdate(output: UpdateResult | ModifyResult<any>, expectedNumber: number): boolean;
     protected getExpectedVersionOnStorage(commit: types.Commit): number;
 }

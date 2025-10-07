@@ -3,10 +3,7 @@ import { LoggingConfig } from './logging-config';
 import { EvebleConfig } from './eveble-config';
 import { types } from '../types';
 export declare class AppConfig extends Config {
-    static defaultMongoDBOptions: {
-        useNewUrlParser: boolean;
-        useUnifiedTopology: boolean;
-    };
+    static defaultMongoDBOptions: {};
     appId?: string | types.Stringifiable;
     workerId?: string | types.Stringifiable;
     logging?: LoggingConfig;
@@ -26,7 +23,7 @@ export declare class AppConfig extends Config {
             Snapshotter?: Record<string, any>;
             CommandScheduler?: Record<string, any>;
         };
-        Agenda?: {
+        Pulse?: {
             CommandScheduler?: Record<string, any>;
         };
     };
