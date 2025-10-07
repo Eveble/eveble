@@ -60,38 +60,40 @@ jobs:
         node-version: [18.x]
     env:
       USERNAME: ${{ github.event.github.actor }}
-      MONGO_URI: mongodb://172.17.0.1:27017/?replicaSet=rs0
+      MONGO_URI: mongodb://admin:password@172.17.0.1:27017/eveble?replicaSet=rs0&authSource=admin&directConnection=true
     name: ✅ Test
     steps:
       - uses: actions/checkout@v3
 
       - name: 🐳 Start MongoDB Replica Set
         run: |
-          # Start MongoDB with replica set
+          # Start MongoDB with replica set and authentication
           docker run --rm -d \
             -p 27017:27017 \
             --name mongodb-rs \
+            -e MONGO_INITDB_ROOT_USERNAME=admin \
+            -e MONGO_INITDB_ROOT_PASSWORD=password \
             mongo:6.0 \
             mongod --replSet rs0 --bind_ip_all
 
           # Wait for MongoDB to start
           echo "Waiting for MongoDB to start..."
-          sleep 5
+          sleep 10
 
           # Initialize replica set using Docker bridge gateway IP
           echo "Initializing replica set..."
           docker run --rm mongo:6.0 \
-            mongosh --host 172.17.0.1 --eval \
+            mongosh --host 172.17.0.1 -u admin -p password --authenticationDatabase admin --eval \
             'rs.initiate({_id: "rs0", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
 
           # Wait for replica set to be ready
           echo "Waiting for replica set to be ready..."
-          sleep 5
+          sleep 10
 
           # Verify replica set status
           echo "Replica set status:"
           docker run --rm mongo:6.0 \
-            mongosh --host 172.17.0.1 --eval 'rs.status()'
+            mongosh --host 172.17.0.1 -u admin -p password --authenticationDatabase admin --eval 'rs.status()'
 
       - name: ⚙️ Setup Node@${{ matrix.node-version}}
         uses: actions/setup-node@v3
@@ -131,36 +133,65 @@ jobs:
 
   test_coverage:
     runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongo:4.2
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: password
     env:
       USERNAME: ${{ github.event.github.actor }}
+      MONGO_URI: mongodb://admin:password@172.17.0.1:27017/eveble?replicaSet=rs0&authSource=admin&directConnection=true
     name: 📈 Validate test coverage
     steps:
       - uses: actions/checkout@v3
+
+      - name: 🐳 Start MongoDB Replica Set
+        run: |
+          # Start MongoDB with replica set and authentication
+          docker run --rm -d \
+            -p 27017:27017 \
+            --name mongodb-rs \
+            -e MONGO_INITDB_ROOT_USERNAME=admin \
+            -e MONGO_INITDB_ROOT_PASSWORD=password \
+            mongo:6.0 \
+            mongod --replSet rs0 --bind_ip_all
+
+          # Wait for MongoDB to start
+          echo "Waiting for MongoDB to start..."
+          sleep 10
+
+          # Initialize replica set using Docker bridge gateway IP
+          echo "Initializing replica set..."
+          docker run --rm mongo:6.0 \
+            mongosh --host 172.17.0.1 -u admin -p password --authenticationDatabase admin --eval \
+            'rs.initiate({_id: "rs0", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
+
+          # Wait for replica set to be ready
+          echo "Waiting for replica set to be ready..."
+          sleep 10
+
+          # Verify replica set status
+          echo "Replica set status:"
+          docker run --rm mongo:6.0 \
+            mongosh --host 172.17.0.1 -u admin -p password --authenticationDatabase admin --eval 'rs.status()'
+
       - name: ⚙️ Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: 'https://npm.pkg.github.com/'
           scope: ${{ env.USERNAME }}
-      - name: 🚧  Install dependencies
+
+      - name: 🚧 Install dependencies
         run: yarn install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
+
       - run: yarn test:coverage
+
       - run: yarn coverage:ci # Generate coverage.lcov report
+
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.lcov
           fail_ci_if_error: true
+
       - name: [failed] 🏷️ Remove covered label
         uses: actions/github-script@v6
         if: failure() && contains(env.isFork, 'false')
@@ -172,6 +203,7 @@ jobs:
                 name: 'covered'
               })
             }
+
       - name: [success] 🏷️ Add covered label
         uses: actions/github-script@v6
         if: contains(env.isFork, 'false')
