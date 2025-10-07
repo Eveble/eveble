@@ -71,7 +71,7 @@ export const getCollectionName = function (targetName: string): string {
     case 'scheduler':
       collectionName =
         getenv.string('EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION') ||
-        'agendaJobs';
+        'pulseJobs';
       break;
     default:
       collectionName = 'test';

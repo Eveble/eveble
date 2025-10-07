@@ -30,8 +30,6 @@ export const setupSchedulerMongo = async function (
   const collectionName = getCollectionName(target);
   const options = {
     ssl: isSSL(target),
-    useNewUrlParser: true,
-    useUnifiedTopology: false,
   };
 
   const mongoClient = new MongoDBClient({
