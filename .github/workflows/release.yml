@@ -26,6 +26,10 @@ jobs:
   release:
     name: Release to Github, GitHub Packages, NPM
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+        mongodb-version: ['7.0']
     permissions:
       packages: write
       contents: write
@@ -39,33 +43,15 @@ jobs:
         run: |
           echo IS_PRIVATE: ${{ env.IS_PRIVATE }}
 
-      - name: 🐳 Start MongoDB Replica Set
-        run: |
-          # Start MongoDB with replica set
-          docker run --rm -d \
-            -p 27017:27017 \
-            --name mongodb-rs \
-            mongo:6.0 \
-            mongod --replSet rs0 --bind_ip_all
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.12.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+          mongodb-username: admin
+          mongodb-password: password
+          mongodb-replica-set: test-rs
+          mongodb-port: 27017
 
-          # Wait for MongoDB to start
-          echo "Waiting for MongoDB to start..."
-          sleep 5
-
-          # Initialize replica set using Docker bridge gateway IP
-          echo "Initializing replica set..."
-          docker run --rm mongo:6.0 \
-            mongosh --host 172.17.0.1 --eval \
-            'rs.initiate({_id: "rs0", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
-
-          # Wait for replica set to be ready
-          echo "Waiting for replica set to be ready..."
-          sleep 5
-
-          # Verify replica set status
-          echo "Replica set status:"
-          docker run --rm mongo:6.0 \
-            mongosh --host 172.17.0.1 --eval 'rs.status()'
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v3
