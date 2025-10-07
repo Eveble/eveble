@@ -51,9 +51,13 @@ jobs:
           mongodb-replica-set: test-rs
           mongodb-port: 27017
 
+      - name: Wait for MongoDB to be ready
+        run: |
+          timeout 60 bash -c 'until docker exec mongodb mongosh --host localhost:27017 --eval "db.adminCommand({ping: 1})" > /dev/null 2>&1; do sleep 2; done'
+
       - name: Create MongoDB admin user
         run: |
-          mongosh --host 127.0.0.1:2:27017 --eval "
+          docker exec mongodb mongosh --host localhost:27017 --eval "
             db = db.getSiblingDB('admin');
             db.createUser({
               user: 'admin',
@@ -67,7 +71,7 @@ jobs:
 
       - name: Verify MongoDB authentication
         run: |
-          mongosh --host 127.0.0.1:2:27017 -u admin -p password --authenticationDatabase admin --eval "db.adminCommand({ping: 1})"
+          docker exec mongodb mongosh --host localhost:27017 -u admin -p password --authenticationDatabase admin --eval "db.adminCommand({ping: 1})"
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v3
