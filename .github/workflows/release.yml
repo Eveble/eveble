@@ -48,7 +48,7 @@ jobs:
             -e MONGO_INITDB_ROOT_USERNAME=root \
             -e MONGO_INITDB_ROOT_PASSWORD=password \
             mongo:6.0 \
-            --replSet rs0 --bind_ip_all
+            mongod --replSet rs0 --bind_ip_all
 
           # Wait for MongoDB to start
           echo "Waiting for MongoDB to start..."

@@ -67,18 +67,35 @@ jobs:
 
       - name: 🐳 Start MongoDB Replica Set
         run: |
+          # Start MongoDB with replica set
           docker run -d \
             --name mongodb-rs \
             -p 27017:27017 \
             -e MONGO_INITDB_ROOT_USERNAME=root \
             -e MONGO_INITDB_ROOT_PASSWORD=password \
-            mongo:7.0 \
-            --replSet rs0 --bind_ip_all
+            mongo:6.0 \
+            mongod --replSet rs0 --bind_ip_all
 
-          # Wait for MongoDB to be ready
-          sleep 5
+          # Wait for MongoDB to start
+          echo "Waiting for MongoDB to start..."
+          for i in {1..30}; do
+            if docker exec mongodb-rs mongosh --quiet --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
+              echo "MongoDB is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+
+          # Check if container is running
+          if ! docker ps | grep mongodb-rs; then
+            echo "Container failed to start. Logs:"
+            docker logs mongodb-rs
+            exit 1
+          fi
 
           # Initialize replica set
+          echo "Initializing replica set..."
           docker exec mongodb-rs mongosh --eval "
             rs.initiate({
               _id: 'rs0',
@@ -87,7 +104,18 @@ jobs:
           "
 
           # Wait for replica set to be ready
-          sleep 5
+          echo "Waiting for replica set to be ready..."
+          for i in {1..30}; do
+            if docker exec mongodb-rs mongosh --quiet --eval "rs.status().ok" 2>/dev/null | grep -q "1"; then
+              echo "Replica set is ready!"
+              break
+            fi
+            echo "Waiting for replica set... ($i/30)"
+            sleep 2
+          done
+
+          # Verify replica set status
+          docker exec mongodb-rs mongosh --eval "rs.status()"
 
       - name: ⚙️ Setup Node@${{ matrix.node-version}}
         uses: actions/setup-node@v3
