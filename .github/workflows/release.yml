@@ -89,12 +89,6 @@ jobs:
 
           echo "MongoDB replica set is ready!"
 
-      - name: Verify MongoDB Connection
-        run: |
-          mongosh "mongodb://admin:password@localhost:27017/?replicaSet=test-rs&authSource=admin" --eval "
-            db.adminCommand({ ping: 1 })
-            rs.status()
-          "
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v3
