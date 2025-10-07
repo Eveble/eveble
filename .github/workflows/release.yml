@@ -47,7 +47,7 @@ jobs:
         uses: supercharge/mongodb-github-action@1.12.0
         with:
           mongodb-version: "${{ matrix.mongodb-version }}"
-          mongodb-db: eveble_testing
+          mongodb-db: eveble
           mongodb-replica-set: test-rs
           mongodb-port: 27017
 
@@ -101,7 +101,9 @@ jobs:
       - name: ✅ Test
         run: yarn test
         env:
-          MONGO_URI: mongodb://admin:password@localhost:27017/eveble?replicaSet=test-rs&authSource=admin
+          EVEBLE_COMMITSTORE_MONGODB_URL: 'mongodb://admin:password@localhost:27017/eveble_testing?replicaSet=test-rs&authSource=admin&directConnection=true'
+          EVEBLE_SNAPSHOTTER_MONGODB_URL: 'mongodb://admin:password@localhost:27017/eveble_testing?replicaSet=test-rs&authSource=admin&directConnection=true'
+          EVEBLE_COMMAND_SCHEDULER_MONGODB_URL: 'mongodb://admin:password@localhost:27017/eveble_testing?replicaSet=test-rs&authSource=admin&directConnection=true'
 
       - name: 🗃️ Build
         run: yarn build
