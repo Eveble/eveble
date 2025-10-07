@@ -1,4 +1,29 @@
-release:
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Through out this whole github action there are two distinct flows that
+# allows for releasing on npm & github OR github only.
+# This allows for separation on public repositories and private ones
+# without publishing release to npm.
+# Job names are prefixed with [public] & [private] tags.
+# The switch is based on top of conditional:
+# if: ${{ env.IS_PRIVATE != 'true' }}
+# and environment variable "IS_PRIVATE" set to `true` or `false`
+# that can be defined inside Github's repository `Settings`
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Evaluates on push event if release is necessary and if so - create a release Pull Request
+name: Push to release branches
+on:
+  push:
+    branches: [master, next, alpha, beta]
+# Setting an environment variable with the value of a configuration variable
+env:
+  IS_PRIVATE: ${{ vars.IS_PRIVATE }}
+  USERNAME: ${{ github.event.github.actor }}
+  EVEBLE_TYPES_AUTH_TOKEN: ${{ secrets.EVEBLE_TYPES_AUTH_TOKEN }}
+  NODE_VERSION: 18
+  SEMANTIC_VERSION: 19.0.5
+jobs:
+  # Release with semantic-release an auto-merged branch to: Github repository, NPM, Github package registry
+  release:
     name: Release to Github, GitHub Packages, NPM
     runs-on: ubuntu-latest
     permissions:
