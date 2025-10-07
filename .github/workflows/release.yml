@@ -41,48 +41,39 @@ jobs:
 
       - name: 🐳 Start MongoDB Replica Set
         run: |
-          # Start MongoDB with replica set and authentication
+          # Start MongoDB with replica set and authentication enabled
           docker run --rm -d \
             -p 27017:27017 \
             --name mongodb-rs \
             -e MONGO_INITDB_ROOT_USERNAME=admin \
             -e MONGO_INITDB_ROOT_PASSWORD=password \
+            -e MONGO_INITDB_DATABASE=admin \
             mongo:6.0 \
-            mongod --replSet rs0 --bind_ip_all
+            mongod --replSet rs0 --bind_ip_all --auth
 
-          # Wait for MongoDB to be ready
-          echo "Waiting for MongoDB to be ready..."
-          for i in {1..60}; do
-            if docker exec mongodb-rs mongosh --quiet --eval "db.adminCommand('ping').ok" > /dev/null 2>&1; then
-              echo "MongoDB is ready!"
-              break
-            fi
-            if [ $i -eq 60 ]; then
-              echo "Timeout waiting for MongoDB to start"
-              docker logs mongodb-rs
-              exit 1
-            fi
-            echo "Attempt $i/60..."
-            sleep 2
-          done
+          echo "Waiting for MongoDB to start..."
+          sleep 10
 
-          # Initialize replica set using Docker bridge gateway IP
           echo "Initializing replica set..."
-          docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval \
-            'rs.initiate({_id: "rs0", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
+          docker exec mongodb-rs mongosh --eval \
+            'rs.initiate({_id: "rs0", members: [{_id: 0, host: "localhost:27017"}]})'
 
-          # Wait for replica set to be ready
           echo "Waiting for replica set to be ready..."
-          for i in {1..30}; do
-            if docker exec mongodb-rs mongosh --quiet -u admin -p password --authenticationDatabase admin --eval "rs.status().ok" 2>/dev/null | grep -q "1"; then
-              echo "Replica set is ready!"
-              break
-            fi
-            echo "Waiting for replica set... ($i/30)"
-            sleep 2
-          done
+          sleep 10
 
-          # Verify replica set status
+          echo "Creating eveble database and user..."
+          docker exec -i mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval '
+            use eveble;
+            db.createUser({
+              user: "admin",
+              pwd: "password",
+              roles: [
+                { role: "root", db: "admin" },
+                { role: "readWrite", db: "eveble" }
+              ]
+            });
+          '
+
           echo "Replica set status:"
           docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval 'rs.status()'
 
