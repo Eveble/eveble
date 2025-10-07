@@ -94,7 +94,7 @@ describe('AppConfig', () => {
             Snapshotter: PropTypes.object.isOptional,
             CommandScheduler: PropTypes.object.isOptional,
           }).isOptional,
-          Agenda: PropTypes.shape({
+          Pulse: PropTypes.shape({
             CommandScheduler: PropTypes.object.isOptional,
           }).isOptional,
         }).isOptional
@@ -145,7 +145,7 @@ describe('AppConfig', () => {
             Snapshotter: defaultMongoDBOptions,
             CommandScheduler: defaultMongoDBOptions,
           },
-          Agenda: {
+          Pulse: {
             CommandScheduler: {
               processEvery: 180000,
             },

@@ -7,7 +7,7 @@ import {
 } from 'inversify';
 import { types as typendTypes } from 'typend';
 import winston from 'winston';
-import Agenda from 'agenda';
+import { Job } from '@pulsecron/pulse';
 import {
   SAVE_STATE_METHOD_KEY,
   ROLLBACK_STATE_METHOD_KEY,
@@ -924,8 +924,8 @@ export namespace types {
     failedAt?: Date;
   }
 
-  export interface AgendaJobTransformer {
-    transform(job: Agenda.Job): ScheduledJob;
+  export interface PulseJobTransformer {
+    transform(job: Job): ScheduledJob;
   }
 
   export interface CommitSerializer {

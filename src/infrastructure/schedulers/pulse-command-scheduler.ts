@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import Agenda, { AgendaConfiguration } from 'agenda';
+import { type Job, DefineOptions } from '@pulsecron/pulse';
 import { Collection } from 'mongodb';
 import { isEmpty } from 'lodash';
 import { derive } from '@traits-ts/core';
@@ -16,10 +16,10 @@ import { Log } from '../../components/log-entry';
 import { ScheduleCommand } from '../../domain/schedule-command';
 import { UnscheduleCommand } from '../../domain/unschedule-command';
 import { Guid } from '../../domain/value-objects/guid';
-import { AgendaClient } from '../../app/clients/agenda-client';
+import { PulseClient } from '../../app/clients/pulse-client';
 
 @injectable()
-export class AgendaCommandScheduler
+export class PulseCommandScheduler
   extends derive(StatefulTrait)
   implements types.CommandScheduler
 {
@@ -30,8 +30,8 @@ export class AgendaCommandScheduler
     stopped: 'stopped',
   };
 
-  @inject(BINDINGS.Agenda.clients.CommandScheduler)
-  public readonly agendaClient: AgendaClient;
+  @inject(BINDINGS.Pulse.clients.CommandScheduler)
+  public readonly pulseClient: PulseClient;
 
   @inject(BINDINGS.CommandBus)
   protected commandBus: types.CommandBus;
@@ -45,89 +45,90 @@ export class AgendaCommandScheduler
   @inject(BINDINGS.MongoDB.collections.ScheduledCommands)
   protected collection: Collection;
 
-  @inject(BINDINGS.Agenda.jobTransformer)
-  protected jobTransformer: types.AgendaJobTransformer;
+  @inject(BINDINGS.Pulse.jobTransformer)
+  protected jobTransformer: types.PulseJobTransformer;
 
   public state: types.State;
 
   public readonly jobName: string;
 
-  public readonly options?: AgendaConfiguration;
+  public readonly options?: DefineOptions;
 
   /**
-   * Creates an instance of AgendaCommandScheduler.
-   * @param jobName - Name of the job that is being scheduled on Agenda.
-   * @param options - Optional options passed to Agenda client.
+   * Creates an instance of PulseCommandScheduler.
+   * @param jobName - Name of the job that is being scheduled on Pulse.
+   * @param options - Optional options passed to Pulse job definition.
    */
-  constructor(
-    jobName = 'send scheduled command',
-    options: AgendaConfiguration = {}
-  ) {
+  constructor(jobName = 'send scheduled command', options: DefineOptions = {}) {
     super();
     this.jobName = jobName;
     this.options = options;
-    this.setState(AgendaCommandScheduler.STATES.constructed);
+    this.setState(PulseCommandScheduler.STATES.constructed);
   }
 
   /**
    * Starts processing on CommandScheduler.
    */
   public async startScheduling(): Promise<void> {
-    if (this.isInState(AgendaCommandScheduler.STATES.active)) {
+    if (this.isInState(PulseCommandScheduler.STATES.active)) {
       return;
     }
     await this.initialize();
-    this.setState(AgendaCommandScheduler.STATES.active);
+    this.setState(PulseCommandScheduler.STATES.active);
   }
 
   /**
    * Stops processing on CommandScheduler.
    */
   public async stopScheduling(): Promise<void> {
-    if (this.isInState(AgendaCommandScheduler.STATES.stopped)) {
+    if (this.isInState(PulseCommandScheduler.STATES.stopped)) {
       return;
     }
-    this.setState(AgendaCommandScheduler.STATES.stopped);
+
+    await this.pulseClient.library.cancel({ name: this.jobName });
+
+    this.setState(PulseCommandScheduler.STATES.stopped);
   }
 
   /**
-   * Initializes Agenda command scheduler.
+   * Initializes Pulse command scheduler.
    * @async
    * @throws {InactiveClientError}
-   * Thrown if agenda client is not connected.
+   * Thrown if pulse client is not connected.
    */
   public async initialize(): Promise<void> {
-    if (!this.agendaClient.isConnected()) {
+    if (!this.pulseClient.isConnected()) {
       const error = new InactiveClientError(
         this.constructor.name,
-        this.agendaClient.getId().toString()
+        this.pulseClient.getId().toString()
       );
 
       this.log.error(
-        new Log('inactive Agenda client').on(this).in(this.initialize)
+        new Log('inactive Pulse client').on(this).in(this.initialize)
       );
       throw error;
     }
 
-    await this.defineJob(
-      this.jobName,
-      this.options,
-      this.handleScheduledCommand
+    await this.defineJob(this.jobName, this.options, async (job: Job) =>
+      this.handleScheduledCommand(job)
     );
     this.log.debug(
       new Log(
-        `defined new Agenda job '${
+        `defined new Pulse job '${
           this.jobName
-        }' for client with id '${this.agendaClient.getId()}'`
+        }' for client with id '${this.pulseClient.getId()}'`
       )
         .on(this)
         .in(this.initialize)
     );
-    this.setState(AgendaCommandScheduler.STATES.initialized);
+
+    await (this.pulseClient as any).startProcessing(this.jobName);
+
+    this.setState(PulseCommandScheduler.STATES.initialized);
   }
 
   /**
-   * Schedules command with Agenda.
+   * Schedules command with Pulse.
    * @async
    * @param scheduleCommand - Instance of `ScheduleCommand`.
    * @throws {CommandSchedulingError}
@@ -147,11 +148,16 @@ export class AgendaCommandScheduler
     );
     try {
       const when = scheduleCommand.getDeliveryDate();
-      await this.agendaClient.library.schedule(
+      const job: any = await this.pulseClient.library.schedule(
         when,
         this.jobName,
         serializedData
       );
+
+      // Ensure the job is saved to the database
+      if (job && typeof job.save === 'function') {
+        await job.save();
+      }
 
       this.log.debug(
         new Log(`scheduled command '${assignmentId}'`)
@@ -180,7 +186,7 @@ export class AgendaCommandScheduler
   }
 
   /**
-   * Unschedules command from Agenda.
+   * Unschedules command from Pulse.
    * @async
    * @param unscheduleCommand - Instance of `UnscheduleCommand`.
    * @throws {CommandUnschedulingError}
@@ -207,8 +213,8 @@ export class AgendaCommandScheduler
     );
 
     try {
-      const removedCount = await this.agendaClient.library.cancel(mongoQuery);
-      const isSuccessful = removedCount > 0;
+      const removedCount = await this.pulseClient.library.cancel(mongoQuery);
+      const isSuccessful = (removedCount ?? 0) > 0;
       if (isSuccessful) {
         this.log.debug(
           new Log(`unscheduled command '${assignmentId}'`)
@@ -238,7 +244,7 @@ export class AgendaCommandScheduler
   }
 
   /**
-   * Unschedules all commands(jobs matching scheduler's job name) from Agenda.
+   * Unschedules all commands(jobs matching scheduler's job name) from Pulse.
    * @async
    */
   public async unscheduleAll(): Promise<void> {
@@ -288,8 +294,7 @@ export class AgendaCommandScheduler
 
     const mongoSort = { data: -1 };
     const mongoLimit = 1;
-    // Type is wrongly defined on @types/agenda
-    const jobs: Agenda.Job[] = await (this.agendaClient.library as any).jobs(
+    const jobs: Job[] = await (this.pulseClient.library as any).jobs(
       mongoQuery,
       mongoSort,
       mongoLimit
@@ -301,11 +306,11 @@ export class AgendaCommandScheduler
   }
 
   /**
-   * Agenda job handler for ScheduledCommand.
+   * Pulse job handler for ScheduledCommand.
    * @async
-   * @param job - Instance implementing `Agenda.Job` interface.
+   * @param job - Instance implementing `Job` interface.
    */
-  public async handleScheduledCommand(job: Agenda.Job): Promise<void> {
+  public async handleScheduledCommand(job: Job): Promise<void> {
     const serializedData = job.attrs.data;
     const command = this.serializer.parse(serializedData.command);
 
@@ -345,24 +350,31 @@ export class AgendaCommandScheduler
    * @return Interval for query frequency as a `number`, else `undefined`.
    */
   public getInterval(): number {
-    return this.agendaClient.getInterval() || 1;
+    return this.pulseClient.getInterval() || 1;
   }
 
   /**
-   * Defines a new job on Agenda.
+   * Defines a new job on Pulse.
    * @async
    * @param jobName - Name of a job to define.
-   * @param options - Options for Agenda job implementing `Agenda.JobOptions` interface.
+   * @param options - Options for Pulse job implementing `DefineOptions` interface.
    * @param handler - Async function that will handle job upon scheduling it.
    */
   protected async defineJob(
     jobName: string,
-    options: Agenda.JobOptions = {},
-    handler: (job: Agenda.Job) => Promise<void>
+    options: DefineOptions = {},
+    handler: (job: Job) => Promise<void>
   ): Promise<void> {
-    const boundHandler = handler.bind(this);
-    boundHandler.original = handler;
-    this.agendaClient.library.define(jobName, options, boundHandler);
+    this.pulseClient.library.define(jobName, handler, options);
+
+    const definitions = (this.pulseClient.library as any)._definitions || {};
+
+    if (!definitions[jobName]) {
+      this.log.error(
+        new Log(`failed defining job '${jobName}'`).on(this).in(this.defineJob)
+      );
+      throw new Error(`Failed to define job: ${jobName}`);
+    }
   }
 
   /**

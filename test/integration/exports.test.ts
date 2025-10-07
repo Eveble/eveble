@@ -92,7 +92,7 @@ import { can } from '../../src/decorators/can';
 // App
 import { App } from '../../src/app/app';
 import { Eveble } from '../../src/app/eveble';
-import { AgendaCommandSchedulerModule } from '../../src/app/modules/agenda-command-scheduler-module';
+import { PulseCommandSchedulerModule } from '../../src/app/modules/pulse-command-scheduler-module';
 import { MongoDBCommitStorageModule } from '../../src/app/modules/mongodb-commit-storage-module';
 import { MongoDBSnapshotStorageModule } from '../../src/app/modules/mongodb-snapshot-storage-module';
 // Components
@@ -185,9 +185,9 @@ import { UnscheduleCommand } from '../../src/domain/unschedule-command';
 import { Process } from '../../src/domain/process';
 import { ValueObject } from '../../src/domain/value-object';
 // Infrastructure
-import { AgendaClient } from '../../src/app/clients/agenda-client';
+import { PulseClient } from '../../src/app/clients/pulse-client';
 import { MongoDBClient } from '../../src/app/clients/mongodb-client';
-import { AgendaCommandScheduler } from '../../src/infrastructure/schedulers/agenda-command-scheduler';
+import { PulseCommandScheduler } from '../../src/infrastructure/schedulers/pulse-command-scheduler';
 import { CommitSerializer } from '../../src/infrastructure/serializers/commit-serializer';
 import { SnapshotSerializer } from '../../src/infrastructure/serializers/snapshot-serializer';
 import { CommitMongoDBObserver } from '../../src/infrastructure/storages/commit-mongodb-observer';
@@ -198,7 +198,7 @@ import {
   CommitReceiver,
 } from '../../src/infrastructure/structs/commit';
 import { ScheduledJob } from '../../src/infrastructure/structs/scheduled-job';
-import { AgendaScheduledJobTransformer } from '../../src/infrastructure/transformers/agenda-scheduled-job-transformer';
+import { PulseScheduledJobTransformer } from '../../src/infrastructure/transformers/pulse-scheduled-job-transformer';
 import { Client } from '../../src/app/client';
 import { CommandSchedulingService } from '../../src/infrastructure/command-scheduling-service';
 import { CommitPublisher } from '../../src/infrastructure/commit-publisher';
@@ -408,7 +408,7 @@ import {
   // App
   App as AppExported,
   Eveble as EvebleExported,
-  AgendaCommandSchedulerModule as AgendaCommandSchedulerModuleExported,
+  PulseCommandSchedulerModule as PulseCommandSchedulerModuleExported,
   MongoDBCommitStorageModule as MongoDBCommitStorageModuleExported,
   MongoDBSnapshotStorageModule as MongoDBSnapshotStorageModuleExported,
   // Components
@@ -512,9 +512,9 @@ import {
   EventIdMismatchError as EventIdMismatchErrorExported,
   InvalidInitializingMessageError as InvalidInitializingMessageErrorExported,
   // Infrastructure
-  AgendaClient as AgendaClientExported,
+  PulseClient as PulseClientExported,
   MongoDBClient as MongoDBClientExported,
-  AgendaCommandScheduler as AgendaCommandSchedulerExported,
+  PulseCommandScheduler as PulseCommandSchedulerExported,
   CommitSerializer as CommitSerializerExported,
   SnapshotSerializer as SnapshotSerializerExported,
   CommitMongoDBObserver as CommitMongoDBObserverExported,
@@ -523,7 +523,7 @@ import {
   Commit as CommitExported,
   CommitReceiver as CommitReceiverExported,
   ScheduledJob as ScheduledJobExported,
-  AgendaScheduledJobTransformer as AgendaScheduledJobTransformerExported,
+  PulseScheduledJobTransformer as PulseScheduledJobTransformerExported,
   Client as ClientExported,
   CommandSchedulingService as CommandSchedulingServiceExported,
   CommitPublisher as CommitPublisherExported,
@@ -903,9 +903,9 @@ describe(`exports`, () => {
       it('Eveble', () => {
         expect(EvebleExported).to.be.equal(Eveble);
       });
-      it('AgendaCommandSchedulerModule', () => {
-        expect(AgendaCommandSchedulerModuleExported).to.be.equal(
-          AgendaCommandSchedulerModule
+      it('PulseCommandSchedulerModule', () => {
+        expect(PulseCommandSchedulerModuleExported).to.be.equal(
+          PulseCommandSchedulerModule
         );
       });
       it('MongoDBCommitStorageModule', () => {
@@ -1242,16 +1242,14 @@ describe(`exports`, () => {
     });
   });
   describe('infrastructure', () => {
-    it('AgendaClient', () => {
-      expect(AgendaClientExported).to.be.equal(AgendaClient);
+    it('PulseClient', () => {
+      expect(PulseClientExported).to.be.equal(PulseClient);
     });
     it('MongoDBClient', () => {
       expect(MongoDBClientExported).to.be.equal(MongoDBClient);
     });
-    it('AgendaCommandScheduler', () => {
-      expect(AgendaCommandSchedulerExported).to.be.equal(
-        AgendaCommandScheduler
-      );
+    it('PulseCommandScheduler', () => {
+      expect(PulseCommandSchedulerExported).to.be.equal(PulseCommandScheduler);
     });
     it('CommitSerializer', () => {
       expect(CommitSerializerExported).to.be.equal(CommitSerializer);
@@ -1279,9 +1277,9 @@ describe(`exports`, () => {
     it('ScheduledJob', () => {
       expect(ScheduledJobExported).to.be.equal(ScheduledJob);
     });
-    it('AgendaScheduledJobTransformer', () => {
-      expect(AgendaScheduledJobTransformerExported).to.be.equal(
-        AgendaScheduledJobTransformer
+    it('PulseScheduledJobTransformer', () => {
+      expect(PulseScheduledJobTransformerExported).to.be.equal(
+        PulseScheduledJobTransformer
       );
     });
     it('Client', () => {

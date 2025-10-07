@@ -1,4 +1,4 @@
-import Agenda, { Job } from 'agenda';
+import { Pulse, Job } from '@pulsecron/pulse';
 import { inject } from 'inversify';
 import { Client } from '../client';
 import { types } from '../../types';
@@ -7,12 +7,12 @@ import { Log } from '../../components/log-entry';
 import { MongoDBClient } from './mongodb-client';
 import { Guid } from '../../domain/value-objects/guid';
 
-export class AgendaClient extends Client implements types.Client {
+export class PulseClient extends Client implements types.Client {
   @inject(BINDINGS.log)
   protected log: types.Logger;
 
-  @inject(BINDINGS.Agenda.library)
-  protected Agenda: any;
+  @inject(BINDINGS.Pulse.library)
+  protected Pulse: any;
 
   @inject(BINDINGS.MongoDB.clients.CommandScheduler)
   public readonly mongoClient: MongoDBClient;
@@ -27,7 +27,7 @@ export class AgendaClient extends Client implements types.Client {
 
   public readonly options?: Record<string, any>;
 
-  protected _library?: Agenda;
+  protected _library?: Pulse;
 
   /**
    * Initializes client.
@@ -44,11 +44,12 @@ export class AgendaClient extends Client implements types.Client {
     );
     try {
       const database = this.mongoClient.getDatabase(this.databaseName);
-      this._library = new this.Agenda({
+      this._library = new this.Pulse({
         mongo: database,
         collection: this.collectionName,
         ...this.options,
       });
+
       await this.initializeEventHandlers();
       this.log.debug(
         new Log(`successfully initialized client '${this.getId()}'`)
@@ -58,10 +59,9 @@ export class AgendaClient extends Client implements types.Client {
           .with('options', this.options)
           .with('collectionName', this.collectionName)
       );
-      this.setState(AgendaClient.STATES.initialized);
-      this.setState('initialized');
+      this.setState(PulseClient.STATES.initialized);
     } catch (error) {
-      this.setState(AgendaClient.STATES.failed);
+      this.setState(PulseClient.STATES.failed);
       this.log.error(
         new Log(
           `failed to initialize client '${this.getId()}' do to error: ${error}`
@@ -79,30 +79,30 @@ export class AgendaClient extends Client implements types.Client {
 
   /**
    * Gets library instance.
-   * @returns `Agenda` instance.
+   * @returns `Pulse` instance.
    */
-  public get library(): Agenda {
+  public get library(): Pulse {
     this.validateState([
-      AgendaClient.STATES.initialized,
-      AgendaClient.STATES.connected,
-      AgendaClient.STATES.paused,
-      AgendaClient.STATES.stopped,
-      AgendaClient.STATES.disconnected,
+      PulseClient.STATES.initialized,
+      PulseClient.STATES.connected,
+      PulseClient.STATES.paused,
+      PulseClient.STATES.stopped,
+      PulseClient.STATES.disconnected,
     ]);
-    return this._library as Agenda;
+    return this._library as Pulse;
   }
 
   /**
-   * Connects to Agenda.
+   * Connects to Pulse.
    * @async
    * @throws {Error}
-   * Thrown if Agenda client can't be instantiated.
+   * Thrown if Pulse client can't be instantiated.
    */
   public async connect(): Promise<void> {
     this.validateState([
-      AgendaClient.STATES.initialized,
-      AgendaClient.STATES.connected,
-      AgendaClient.STATES.stopped,
+      PulseClient.STATES.initialized,
+      PulseClient.STATES.connected,
+      PulseClient.STATES.stopped,
     ]);
 
     if (this.isConnected()) {
@@ -112,13 +112,12 @@ export class AgendaClient extends Client implements types.Client {
       new Log(`connecting client '${this.getId()}'`).on(this).in(this.connect)
     );
     try {
-      await this.library.start();
-      this.setState(AgendaClient.STATES.connected);
+      this.setState(PulseClient.STATES.connected);
       this.log.debug(
         new Log(`connected client '${this.getId()}'`).on(this).in(this.connect)
       );
     } catch (error) {
-      this.setState(AgendaClient.STATES.failed);
+      this.setState(PulseClient.STATES.failed);
       this.log.error(
         new Log(
           `failed connection on client '${this.getId()}' do to error: ${error}`
@@ -132,7 +131,29 @@ export class AgendaClient extends Client implements types.Client {
   }
 
   /**
-   * Stops Agenda client.
+   * Starts Pulse job processing.
+   * Should be called after all jobs are defined.
+   * @async
+   */
+  public async startProcessing(jobName: string): Promise<void> {
+    if (!this.isConnected()) {
+      throw new Error(
+        'Pulse client must be connected before starting processing'
+      );
+    }
+    this.log.debug(
+      new Log(`starting job processing on client '${this.getId()}'`)
+        .on(this)
+        .in(this.startProcessing)
+        .with('jobName', jobName)
+        .with('processEvery', this.getInterval())
+    );
+
+    await this.library.start();
+  }
+
+  /**
+   * Stops Pulse client.
    * @async
    */
   public async stop(): Promise<void> {
@@ -142,19 +163,24 @@ export class AgendaClient extends Client implements types.Client {
     this.log.debug(
       new Log(`stopping client '${this.getId()}'`).on(this).in(this.stop)
     );
+
     await this.library.stop();
-    this.setState(AgendaClient.STATES.stopped);
+
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    this.setState(PulseClient.STATES.stopped);
     this.log.debug(
       new Log(`stopped client '${this.getId()}'`).on(this).in(this.stop)
     );
   }
 
   /**
-   * Disconnects Agenda client.
+   * Disconnects Pulse client.
    * @async
    */
   public async disconnect(): Promise<void> {
-    if (!this.isInState(AgendaClient.STATES.stopped)) {
+    if (!this.isInState(PulseClient.STATES.stopped)) {
       if (!this.isConnected()) {
         return;
       }
@@ -165,7 +191,7 @@ export class AgendaClient extends Client implements types.Client {
         .in(this.disconnect)
     );
     await this.stop();
-    this.setState(AgendaClient.STATES.disconnected);
+    this.setState(PulseClient.STATES.disconnected);
     delete this._library;
     this.log.debug(
       new Log(`disconnected client '${this.getId()}'`)
@@ -175,7 +201,7 @@ export class AgendaClient extends Client implements types.Client {
   }
 
   /**
-   * Reconnects Agenda.
+   * Reconnects Pulse.
    * @async
    */
   public async reconnect(): Promise<void> {
@@ -184,7 +210,7 @@ export class AgendaClient extends Client implements types.Client {
         .on(this)
         .in(this.reconnect)
     );
-    this.setState(AgendaClient.STATES.paused);
+    this.setState(PulseClient.STATES.paused);
     if (!this.isConnected()) {
       await this.initialize();
       await this.connect();
@@ -192,13 +218,13 @@ export class AgendaClient extends Client implements types.Client {
   }
 
   /**
-   * Evaluates if client is connected to Agenda.
+   * Evaluates if client is connected to Pulse.
    * @returns Returns `true` if client is connected, else `false`.
    */
   public isConnected(): boolean {
     return (
       this._library !== undefined &&
-      this.isInState(AgendaClient.STATES.connected) &&
+      this.isInState(PulseClient.STATES.connected) &&
       this.mongoClient.isConnected()
     );
   }

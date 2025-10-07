@@ -895,7 +895,7 @@ describe('BaseApp', () => {
             Snapshotter: AppConfig.defaultMongoDBOptions,
             CommandScheduler: AppConfig.defaultMongoDBOptions,
           },
-          Agenda: {
+          Pulse: {
             CommandScheduler: {
               processEvery: 180000,
             },
@@ -944,7 +944,7 @@ describe('BaseApp', () => {
             Snapshotter: AppConfig.defaultMongoDBOptions,
             CommandScheduler: AppConfig.defaultMongoDBOptions,
           },
-          Agenda: {
+          Pulse: {
             CommandScheduler: {
               processEvery: 180000,
             },

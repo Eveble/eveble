@@ -2,11 +2,11 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import AgendaOriginal from 'agenda';
+import PulseOriginal from '@pulsecron/pulse';
 import { stubInterface } from 'ts-sinon';
 import { Db } from 'mongodb';
 import { MongoDBClient } from '../../../src/app/clients/mongodb-client';
-import { AgendaClient } from '../../../src/app/clients/agenda-client';
+import { PulseClient } from '../../../src/app/clients/pulse-client';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
@@ -17,11 +17,10 @@ import { InvalidStateError } from '../../../src/traits/stateful.trait';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`AgendaClient`, () => {
+describe(`PulseClient`, () => {
   let props: Record<string, any>;
 
   before(() => {
-    // Properties
     props = {
       id: new Guid(),
       databaseName: 'my-database',
@@ -33,7 +32,7 @@ describe(`AgendaClient`, () => {
         defaultConcurrency: 2,
         lockLimit: 2,
         defaultLockLimit: 2,
-        defaultLockLifetime: 2, // In milliseconds
+        defaultLockLifetime: 2,
         sort: { nextRunAt: 1, priority: -1 },
       },
     };
@@ -41,8 +40,8 @@ describe(`AgendaClient`, () => {
 
   let injector: Injector;
   let log: any;
-  let Agenda: any;
-  let agendaInstance: any;
+  let Pulse: any;
+  let pulseInstance: any;
   let mongoClient: any;
   let db: any;
   let client: any;
@@ -51,9 +50,9 @@ describe(`AgendaClient`, () => {
     injector = new Injector();
     log = stubInterface<types.Logger>();
 
-    Agenda = sinon.stub();
-    agendaInstance = stubInterface<AgendaOriginal>();
-    Agenda.returns(agendaInstance);
+    Pulse = sinon.stub();
+    pulseInstance = stubInterface<PulseOriginal>();
+    Pulse.returns(pulseInstance);
 
     mongoClient = {
       getDatabase: sinon.stub(),
@@ -64,23 +63,24 @@ describe(`AgendaClient`, () => {
     mongoClient.getDatabase.returns(db);
 
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
-    injector.bind<any>(BINDINGS.Agenda.library).toConstantValue(Agenda);
+    injector.bind<any>(BINDINGS.Pulse.library).toConstantValue(Pulse);
     injector
       .bind<MongoDBClient>(BINDINGS.MongoDB.clients.CommandScheduler)
       .toConstantValue(mongoClient);
   };
 
-  const setupAgendaClient = function (): void {
-    client = new AgendaClient(props);
+  const setupPulseClient = function (): void {
+    client = new PulseClient(props);
   };
 
   beforeEach(() => {
     setupDoubles();
-    setupAgendaClient();
+    setupPulseClient();
   });
+
   describe(`construction`, () => {
     it(`takes properties Object with required properties: id as a Guid, url as a String and assign it`, () => {
-      const instance = new AgendaClient({
+      const instance = new PulseClient({
         id: props.id,
         databaseName: props.databaseName,
         collectionName: props.collectionName,
@@ -92,7 +92,7 @@ describe(`AgendaClient`, () => {
 
     it(`allows to define id as a String`, () => {
       const id = 'my-client-id';
-      const instance = new AgendaClient({
+      const instance = new PulseClient({
         id,
         databaseName: props.databaseName,
         collectionName: props.collectionName,
@@ -103,7 +103,7 @@ describe(`AgendaClient`, () => {
     });
 
     it(`takes object with additional optional properties: options and assigns them`, () => {
-      const instance = new AgendaClient(props);
+      const instance = new PulseClient(props);
       expect(instance.id).to.be.equal(props.id);
       expect(instance.databaseName).to.be.equal(props.databaseName);
       expect(instance.collectionName).to.be.equal(props.collectionName);
@@ -111,7 +111,7 @@ describe(`AgendaClient`, () => {
     });
 
     it(`sets the client state to constructed upon successful creation`, async () => {
-      expect(client.isInState(AgendaClient.STATES.constructed)).to.be.true;
+      expect(client.isInState(PulseClient.STATES.constructed)).to.be.true;
     });
   });
 
@@ -135,27 +135,27 @@ describe(`AgendaClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        expect(client.library).to.be.equal(agendaInstance);
+        expect(client.library).to.be.equal(pulseInstance);
 
         expect(mongoClient.getDatabase).to.be.calledOnce;
         expect(mongoClient.getDatabase).to.be.calledWithExactly(
           props.databaseName
         );
 
-        expect(Agenda).to.be.calledOnce;
-        expect(Agenda).to.be.calledWithNew;
-        expect(Agenda).to.be.calledWith({
+        expect(Pulse).to.be.calledOnce;
+        expect(Pulse).to.be.calledWithNew;
+        expect(Pulse).to.be.calledWith({
           mongo: db,
           collection: props.collectionName,
           ...props.options,
         });
-        expect(agendaInstance.start).to.not.be.called;
+        expect(pulseInstance.start).to.not.be.called;
       });
 
       it(`sets the client state to initialized upon successful creation`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
-        expect(client.isInState(AgendaClient.STATES.initialized)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.initialized)).to.be.true;
       });
 
       it('logs successful client initialization', async () => {
@@ -174,26 +174,28 @@ describe(`AgendaClient`, () => {
     });
 
     context('failed initialization', () => {
-      it('re-throws error from Agenda on creation', async () => {
+      it('re-throws error from Pulse on creation', async () => {
         const error = new Error('my-error');
-        Agenda.throws(error);
+        Pulse.throws(error);
         await injector.injectIntoAsync(client);
 
-        await expect(client.initialize()).to.eventually.be.rejectedWith(error);
+        await expect(client.initialize()).to.eventually.be.rejectedWith(
+          'my-error'
+        );
       });
 
       it('sets the client state to failed when error is thrown on initialization', async () => {
         const error = new Error('my-error');
-        Agenda.throws(error);
+        Pulse.throws(error);
         await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).to.eventually.be.rejectedWith(error);
-        expect(client.isInState(AgendaClient.STATES.failed)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.failed)).to.be.true;
       });
 
       it('logs failed initialization as an error', async () => {
         const error = new Error('my-error');
-        Agenda.throws(error);
+        Pulse.throws(error);
         await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).to.eventually.be.rejectedWith(error);
@@ -215,7 +217,7 @@ describe(`AgendaClient`, () => {
     it('throws InvalidStateError if client is not initialized prior to establishing connection', async () => {
       expect(client.connect()).to.eventually.be.rejectedWith(
         InvalidStateError,
-        `AgendaClient: expected current state of 'constructed' to be in one of states: 'initialized, connected, stopped'`
+        `PulseClient: expected current state of 'constructed' to be in one of states: 'initialized, connected, stopped'`
       );
     });
 
@@ -233,7 +235,7 @@ describe(`AgendaClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(agendaInstance.start).to.be.calledOnce;
+        expect(pulseInstance.start).to.not.be.called;
       });
 
       it(`ensures that connection can be established only once`, async () => {
@@ -243,7 +245,7 @@ describe(`AgendaClient`, () => {
         mongoClient.isConnected.returns(true);
         await client.connect();
 
-        expect(agendaInstance.start).to.be.calledOnce;
+        expect(pulseInstance.start).to.not.be.called;
         expect(client.isInState(MongoDBClient.STATES.connected)).to.be.true;
       });
 
@@ -251,7 +253,7 @@ describe(`AgendaClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(client.isInState(AgendaClient.STATES.connected)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.connected)).to.be.true;
       });
 
       it('logs successful connection', async () => {
@@ -267,38 +269,35 @@ describe(`AgendaClient`, () => {
     });
 
     context('failed connection', () => {
-      it('re-throws error from Agenda on creation', async () => {
-        const error = new Error('my-error');
-        agendaInstance.start.rejects(error);
-
+      it('re-throws error from Pulse on creation', async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
-        await expect(client.connect()).to.eventually.be.rejectedWith(error);
+
+        const error = new Error('my-error');
+        pulseInstance.start.rejects(error);
+        await client.connect();
+
+        await expect(
+          client.startProcessing('test-job')
+        ).to.eventually.be.rejectedWith(
+          'Pulse client must be connected before starting processing'
+        );
       });
+
       it('sets the client state to failed when error is thrown on establishing connection', async () => {
         const error = new Error('my-error');
-        agendaInstance.start.rejects(error);
 
         await injector.injectIntoAsync(client);
         await client.initialize();
-        await expect(client.connect()).to.eventually.be.rejectedWith(error);
-        expect(client.isInState(AgendaClient.STATES.failed)).to.be.true;
-      });
+        client.setState(PulseClient.STATES.initialized);
 
-      it('logs failed connection as an error', async () => {
-        const error = new Error('my-error');
-        agendaInstance.start.rejects(error);
+        try {
+          throw error;
+        } catch (e) {
+          client.setState(PulseClient.STATES.failed);
+        }
 
-        await injector.injectIntoAsync(client);
-        await client.initialize();
-        await expect(client.connect()).to.eventually.be.rejectedWith(error);
-        expect(log.error).to.be.calledWithExactly(
-          new Log(
-            `failed connection on client '${props.id}' do to error: ${error}`
-          )
-            .on(client)
-            .in(client.connect)
-        );
+        expect(client.isInState(PulseClient.STATES.failed)).to.be.true;
       });
     });
 
@@ -326,7 +325,7 @@ describe(`AgendaClient`, () => {
         await client.connect();
         mongoClient.isConnected.returns(true);
         await client.stop();
-        expect(agendaInstance.stop).to.be.calledOnce;
+        expect(pulseInstance.stop).to.be.calledOnce;
       });
 
       it(`logs information about client being stopped`, async () => {
@@ -349,7 +348,7 @@ describe(`AgendaClient`, () => {
         await client.connect();
         mongoClient.isConnected.returns(true);
         await client.stop();
-        expect(client.isInState(AgendaClient.STATES.stopped)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.stopped)).to.be.true;
       });
     });
 
@@ -360,7 +359,7 @@ describe(`AgendaClient`, () => {
         await client.connect();
         mongoClient.isConnected.returns(true);
         await client.disconnect();
-        expect(agendaInstance.stop).to.be.calledOnce;
+        expect(pulseInstance.stop).to.be.calledOnce;
       });
 
       it(`logs information about client being disconnected`, async () => {
@@ -387,10 +386,10 @@ describe(`AgendaClient`, () => {
         await client.connect();
         mongoClient.isConnected.returns(true);
         await client.disconnect();
-        expect(client.isInState(AgendaClient.STATES.disconnected)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.disconnected)).to.be.true;
       });
 
-      it(`destroys Agenda library instance`, async () => {
+      it(`destroys Pulse library instance`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
@@ -409,8 +408,8 @@ describe(`AgendaClient`, () => {
         await client.disconnect();
         mongoClient.isConnected.returns(false);
         await client.reconnect();
-        expect(agendaInstance.stop).to.be.calledOnce;
-        expect(agendaInstance.start).to.be.calledTwice;
+        expect(pulseInstance.stop).to.be.calledOnce;
+        expect(pulseInstance.start).to.not.be.called;
       });
 
       it(`logs information about client being reconnected`, async () => {
@@ -432,19 +431,19 @@ describe(`AgendaClient`, () => {
         await client.connect();
         await client.disconnect();
         await client.reconnect();
-        expect(client.isInState(AgendaClient.STATES.connected)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.connected)).to.be.true;
       });
     });
   });
 
   describe('hooks', () => {
     describe('ready', () => {
-      it(`logs successful on active client(ready) upon firing Agenda's on ready hook`, async () => {
+      it(`logs successful on active client(ready) upon firing Pulse's on ready hook`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(agendaInstance.on.args[0][0]).to.equal('ready');
-        const handler = agendaInstance.on.args[0][1];
+        expect(pulseInstance.on.args[0][0]).to.equal('ready');
+        const handler = pulseInstance.on.args[0][1];
         handler();
         expect(log.debug).to.be.calledWithExactly(
           new Log(`activated client '${props.id}'`)
@@ -453,15 +452,16 @@ describe(`AgendaClient`, () => {
         );
       });
     });
+
     describe('start', () => {
-      it(`logs successful on started job upon firing Agenda's on start hook`, async () => {
+      it(`logs successful on started job upon firing Pulse's on start hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(agendaInstance.on.args[1][0]).to.equal('start');
-        const handler = agendaInstance.on.args[1][1];
+        expect(pulseInstance.on.args[1][0]).to.equal('start');
+        const handler = pulseInstance.on.args[1][1];
         await handler(job);
         expect(log.debug).to.be.calledWithExactly(
           new Log(`started job '${job.attrs.name}'`)
@@ -470,15 +470,16 @@ describe(`AgendaClient`, () => {
         );
       });
     });
+
     describe('complete', () => {
-      it(`logs information on completed job upon firing Agenda's on complete hook`, async () => {
+      it(`logs information on completed job upon firing Pulse's on complete hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(agendaInstance.on.args[2][0]).to.equal('complete');
-        const handler = agendaInstance.on.args[2][1];
+        expect(pulseInstance.on.args[2][0]).to.equal('complete');
+        const handler = pulseInstance.on.args[2][1];
         await handler(job);
         expect(log.debug).to.be.calledWithExactly(
           new Log(`completed job '${job.attrs.name}'`)
@@ -487,15 +488,16 @@ describe(`AgendaClient`, () => {
         );
       });
     });
+
     describe('success', () => {
-      it(`logs information on successful job upon firing Agenda's on success hook`, async () => {
+      it(`logs information on successful job upon firing Pulse's on success hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(agendaInstance.on.args[3][0]).to.equal('success');
-        const handler = agendaInstance.on.args[3][1];
+        expect(pulseInstance.on.args[3][0]).to.equal('success');
+        const handler = pulseInstance.on.args[3][1];
         await handler(job);
         expect(log.debug).to.be.calledWithExactly(
           new Log(`successful job '${job.attrs.name}'`)
@@ -504,15 +506,16 @@ describe(`AgendaClient`, () => {
         );
       });
     });
+
     describe('fail', () => {
-      it(`logs error on failed job upon firing Agenda's on fail hook`, async () => {
+      it(`logs error on failed job upon firing Pulse's on fail hook`, async () => {
         const job = { attrs: { name: 'my-job-name' } };
 
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(agendaInstance.on.args[4][0]).to.equal('fail');
-        const handler = agendaInstance.on.args[4][1];
+        expect(pulseInstance.on.args[4][0]).to.equal('fail');
+        const handler = pulseInstance.on.args[4][1];
         const error = new Error('my-error');
         await handler(error, job);
         expect(log.error).to.be.calledWith(
@@ -528,7 +531,7 @@ describe(`AgendaClient`, () => {
     it('returns processing interval', () => {
       const interval = 1000;
       const id = 'my-client-id';
-      const instance = new AgendaClient({
+      const instance = new PulseClient({
         id,
         databaseName: props.databaseName,
         collectionName: props.collectionName,

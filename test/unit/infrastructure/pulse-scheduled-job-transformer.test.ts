@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { ObjectId } from 'mongodb';
-import { AgendaScheduledJobTransformer } from '../../../src/infrastructure/transformers/agenda-scheduled-job-transformer';
 import { ScheduledJob } from '../../../src/infrastructure/structs/scheduled-job';
+import { PulseScheduledJobTransformer } from '../../../src/infrastructure/transformers/pulse-scheduled-job-transformer';
 
-describe('AgendaScheduledJobTransformer', () => {
+describe('PulseScheduledJobTransformer', () => {
   let now: any;
   let job: any;
-  let transformer: AgendaScheduledJobTransformer;
+  let transformer: PulseScheduledJobTransformer;
 
   before(() => {
     now = new Date();
@@ -31,7 +31,7 @@ describe('AgendaScheduledJobTransformer', () => {
         lastModifiedBy: null,
       },
     };
-    transformer = new AgendaScheduledJobTransformer();
+    transformer = new PulseScheduledJobTransformer();
   });
 
   it(`transforms Agenda's Job to ScheduledJob`, () => {

@@ -1,28 +1,28 @@
 import { pick } from 'lodash';
-import Agenda from 'agenda';
+import { type Job } from '@pulsecron/pulse';
 import { injectable } from 'inversify';
 import { ScheduledJob } from '../structs/scheduled-job';
 import { types } from '../../types';
 
 @injectable()
-export class AgendaScheduledJobTransformer {
+export class PulseScheduledJobTransformer {
   /**
-   * Transforms Agenda job to framework-normalized ScheduledJob.
-   * @param job - Instance implementing `Agenda.Job` interface.
+   * Transforms Pulse job to framework-normalized ScheduledJob.
+   * @param job - Instance implementing `Job` interface.
    * @returns Instance implementing `ScheduledJob` interface.
    */
-  public transform(job: Agenda.Job): types.ScheduledJob {
+  public transform(job: Job): types.ScheduledJob {
     const props = this.pickProps(job);
     props.state = this.determineState(job);
     return new ScheduledJob(props);
   }
 
   /**
-   * Picks all applicable by ScheduledJob properties from Agenda's Job.
-   * @param job - Instance implementing `Agenda.Job` interface.
+   * Picks all applicable by ScheduledJob properties from Pulse's Job.
+   * @param job - Instance implementing `Job` interface.
    * @returns {Object}
    */
-  protected pickProps(job: Agenda.Job): Record<string, any> {
+  protected pickProps(job: Job): Record<string, any> {
     const { attrs } = job;
     const props: Record<string, any> = pick(
       attrs,
@@ -41,11 +41,11 @@ export class AgendaScheduledJobTransformer {
   }
 
   /**
-   * Determines Agenda's Job state.
-   * @param job - Instance implementing `Agenda.Job` interface.
+   * Determines Pulse's Job state.
+   * @param job - Instance implementing `Job` interface.
    * @returns Found applicable state, else `undefined`.
    */
-  protected determineState(job: Agenda.Job): types.State {
+  protected determineState(job: Job): types.State {
     const { attrs } = job;
     if (attrs.failedAt instanceof Date) {
       return ScheduledJob.STATES.failed;

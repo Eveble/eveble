@@ -1,6 +1,6 @@
 import getenv from 'getenv';
 import { isPlainObject, get } from 'lodash';
-import Agenda from 'agenda';
+import Pulse from '@pulsecron/pulse';
 import { MongoClient } from 'mongodb';
 import { BaseApp } from '../core/base-app';
 import { AppConfig } from '../configs/app-config';
@@ -9,7 +9,7 @@ import { LoggingConfig } from '../configs/logging-config';
 import { Eveble } from './eveble';
 import { Log } from '../components/log-entry';
 import { BINDINGS } from '../constants/bindings';
-import { AgendaCommandSchedulerModule } from './modules/agenda-command-scheduler-module';
+import { PulseCommandSchedulerModule } from './modules/pulse-command-scheduler-module';
 import { MongoDBSnapshotStorageModule } from './modules/mongodb-snapshot-storage-module';
 import { MongoDBCommitStorageModule } from './modules/mongodb-commit-storage-module';
 import { StorageNotFoundError } from '../infrastructure/infrastructure-errors';
@@ -238,7 +238,7 @@ export class App extends BaseApp {
     );
 
     const components = {
-      'Agenda.library': Agenda,
+      'Pulse.library': Pulse,
       'MongoDB.library': MongoClient,
     };
 
@@ -269,11 +269,11 @@ export class App extends BaseApp {
     ) {
       const client = getenv.string('EVEBLE_COMMAND_SCHEDULER_CLIENT');
       switch (client) {
-        case 'agenda':
-          this.modules.unshift(new AgendaCommandSchedulerModule());
+        case 'pulse':
+          this.modules.unshift(new PulseCommandSchedulerModule());
           this.log?.debug(
             new Log(
-              `added 'CommandScheduler' as 'AgendaCommandSchedulerModule' to application modules`
+              `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
             )
               .on(this)
               .in(this.initializeSchedulers)

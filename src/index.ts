@@ -16,7 +16,7 @@ export { can, can as Can } from './decorators/can';
 // App
 export { App } from './app/app';
 export { Eveble } from './app/eveble';
-export { AgendaCommandSchedulerModule } from './app/modules/agenda-command-scheduler-module';
+export { PulseCommandSchedulerModule } from './app/modules/pulse-command-scheduler-module';
 export { MongoDBCommitStorageModule } from './app/modules/mongodb-commit-storage-module';
 export { MongoDBSnapshotStorageModule } from './app/modules/mongodb-snapshot-storage-module';
 // Components
@@ -120,9 +120,9 @@ export { UnscheduleCommand } from './domain/unschedule-command';
 export { Process } from './domain/process';
 export { ValueObject } from './domain/value-object';
 // Infrastructure
-export { AgendaClient } from './app/clients/agenda-client';
+export { PulseClient } from './app/clients/pulse-client';
 export { MongoDBClient } from './app/clients/mongodb-client';
-export { AgendaCommandScheduler } from './infrastructure/schedulers/agenda-command-scheduler';
+export { PulseCommandScheduler } from './infrastructure/schedulers/pulse-command-scheduler';
 export { CommitSerializer } from './infrastructure/serializers/commit-serializer';
 export { SnapshotSerializer } from './infrastructure/serializers/snapshot-serializer';
 export { CommitMongoDBObserver } from './infrastructure/storages/commit-mongodb-observer';
@@ -130,7 +130,7 @@ export { CommitMongoDBStorage } from './infrastructure/storages/commit-mongodb-s
 export { SnapshotMongoDBStorage } from './infrastructure/storages/snapshot-mongodb-storage';
 export { Commit, CommitReceiver } from './infrastructure/structs/commit';
 export { ScheduledJob } from './infrastructure/structs/scheduled-job';
-export { AgendaScheduledJobTransformer } from './infrastructure/transformers/agenda-scheduled-job-transformer';
+export { PulseScheduledJobTransformer } from './infrastructure/transformers/pulse-scheduled-job-transformer';
 export { Client } from './app/client';
 export { CommandSchedulingService } from './infrastructure/command-scheduling-service';
 export { CommitPublisher } from './infrastructure/commit-publisher';

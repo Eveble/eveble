@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import sinonChai from 'sinon-chai';
 import { stubInterface } from 'ts-sinon';
 import sinon from 'sinon';
-import Agenda from 'agenda';
+import Pulse from '@pulsecron/pulse';
 import { MongoClient, Collection, Db } from 'mongodb';
 import { kernel, Type } from '@eveble/core';
 import { EvebleConfig } from '../../../src/configs/eveble-config';
@@ -20,7 +20,7 @@ import { BINDINGS } from '../../../src/constants/bindings';
 import { Injector } from '../../../src/core/injector';
 import { MongoDBCommitStorageModule } from '../../../src/app/modules/mongodb-commit-storage-module';
 import { MongoDBSnapshotStorageModule } from '../../../src/app/modules/mongodb-snapshot-storage-module';
-import { AgendaCommandSchedulerModule } from '../../../src/app/modules/agenda-command-scheduler-module';
+import { PulseCommandSchedulerModule } from '../../../src/app/modules/pulse-command-scheduler-module';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
 chai.use(sinonChai);
@@ -209,31 +209,31 @@ describe(`App`, () => {
         );
         await app.shutdown();
       });
-      describe('Agenda', () => {
-        it('binds Agenda library to injector', async () => {
+      describe('Pulse', () => {
+        it('binds Pulse library to injector', async () => {
           const app = new App({
             modules: [],
             injector,
           });
           await app.initialize();
-          const agenda = await app.injector.get<any>(BINDINGS.Agenda.library);
-          expect(agenda).to.be.equal(Agenda);
+          const pulse = await app.injector.get<any>(BINDINGS.Pulse.library);
+          expect(pulse).to.be.equal(Pulse);
           expect(log.debug).to.be.calledWithMatch(
-            new Log(`bound 'Agenda.library' as constant value`)
+            new Log(`bound 'Pulse.library' as constant value`)
               .on(app)
               .in('initializeExternalDependencies')
           );
           await app.shutdown();
         });
-        it('does not override existing Agenda library on injector', async () => {
-          const AgendaStub = sinon.stub();
-          const agendaInstance = stubInterface<Agenda>();
-          AgendaStub.returns(agendaInstance);
-          injector.bind(BINDINGS.Agenda.library).toConstantValue(AgendaStub);
+        it('does not override existing Pulse library on injector', async () => {
+          const PulseStub = sinon.stub();
+          const pulseInstance = stubInterface<Pulse>();
+          PulseStub.returns(pulseInstance);
+          injector.bind(BINDINGS.Pulse.library).toConstantValue(PulseStub);
           const app = new App({ injector, modules: [] });
           await app.initialize();
-          const agenda = await app.injector.get<any>(BINDINGS.Agenda.library);
-          expect(agenda).to.be.equal(AgendaStub);
+          const pulse = await app.injector.get<any>(BINDINGS.Pulse.library);
+          expect(pulse).to.be.equal(PulseStub);
           await app.shutdown();
         });
       });
@@ -295,7 +295,7 @@ describe(`App`, () => {
         await app.shutdown();
       });
 
-      describe('AgendaCommandSchedulerModule', () => {
+      describe('PulseCommandSchedulerModule', () => {
         it('does not include module if command scheduling is not enabled on configuration', async () => {
           const config = new AppConfig({
             appId: 'my-id',
@@ -358,12 +358,12 @@ describe(`App`, () => {
           expect(app.modules).to.have.length(4);
           expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
           expect(app.modules[1]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[2]).to.be.instanceof(AgendaCommandSchedulerModule);
+          expect(app.modules[2]).to.be.instanceof(PulseCommandSchedulerModule);
           expect(app.modules[3]).to.be.instanceof(Eveble);
           expect(log.debug).to.be.calledWithMatch(
             new Log(
               new Log(
-                `added 'CommandScheduler' as 'AgendaCommandSchedulerModule' to application modules`
+                `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
               )
                 .on(app)
                 .in('initializeSchedulers')
@@ -402,7 +402,7 @@ describe(`App`, () => {
           expect(app.modules).to.be.instanceof(Array);
           expect(app.modules).to.have.length(3);
           expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(AgendaCommandSchedulerModule);
+          expect(app.modules[1]).to.be.instanceof(PulseCommandSchedulerModule);
           expect(app.modules[2]).to.be.instanceof(Eveble);
 
           await app.shutdown();
@@ -425,7 +425,7 @@ describe(`App`, () => {
           expect(app.modules).to.be.instanceof(Array);
           expect(app.modules).to.have.length(3);
           expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(AgendaCommandSchedulerModule);
+          expect(app.modules[1]).to.be.instanceof(PulseCommandSchedulerModule);
           expect(app.modules[2]).to.be.instanceof(Eveble);
           expect(
             await app.injector.get<types.SnapshotStorage>(
@@ -450,7 +450,7 @@ describe(`App`, () => {
           expect(app.modules).to.have.length(4);
           expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
           expect(app.modules[1]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[2]).to.be.instanceof(AgendaCommandSchedulerModule);
+          expect(app.modules[2]).to.be.instanceof(PulseCommandSchedulerModule);
           expect(app.modules[3]).to.be.instanceof(Eveble);
           expect(log.debug).to.be.calledWithMatch(
             new Log(
@@ -485,7 +485,7 @@ describe(`App`, () => {
           expect(app.modules).to.be.instanceof(Array);
           expect(app.modules).to.have.length(3);
           expect(app.modules[0]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[1]).to.be.instanceof(AgendaCommandSchedulerModule);
+          expect(app.modules[1]).to.be.instanceof(PulseCommandSchedulerModule);
           expect(app.modules[2]).to.be.instanceof(Eveble);
           expect(
             await app.injector.get<types.CommitStorage>(BINDINGS.CommitStorage)

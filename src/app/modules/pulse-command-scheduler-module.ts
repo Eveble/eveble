@@ -1,16 +1,16 @@
 import getenv from 'getenv';
 import { Collection } from 'mongodb';
-import { AgendaClient } from '../clients/agenda-client';
+import { PulseClient } from '../clients/pulse-client';
 import { MongoDBClient } from '../clients/mongodb-client';
-import { AgendaCommandScheduler } from '../../infrastructure/schedulers/agenda-command-scheduler';
-import { AgendaScheduledJobTransformer } from '../../infrastructure/transformers/agenda-scheduled-job-transformer';
 import { Module } from '../../core/module';
 import { types } from '../../types';
 import { Log } from '../../components/log-entry';
 import { BINDINGS } from '../../constants/bindings';
+import { PulseScheduledJobTransformer } from '../../infrastructure/transformers/pulse-scheduled-job-transformer';
+import { PulseCommandScheduler } from '../../infrastructure/schedulers/pulse-command-scheduler';
 
-export class AgendaCommandSchedulerModule extends Module {
-  agendaClient?: AgendaClient;
+export class PulseCommandSchedulerModule extends Module {
+  pulseClient?: PulseClient;
 
   mongoClient?: MongoDBClient;
 
@@ -21,7 +21,7 @@ export class AgendaCommandSchedulerModule extends Module {
   protected async beforeInitialize(): Promise<void> {
     await this.initializeTopLevelDependencies();
     await this.initializeMongoDBClientForCommandScheduler();
-    await this.initializeAgendaClientForCommandScheduler();
+    await this.initializePulseClientForCommandScheduler();
   }
 
   /**
@@ -37,7 +37,7 @@ export class AgendaCommandSchedulerModule extends Module {
    * @async
    */
   protected async onStart(): Promise<void> {
-    await this.agendaClient?.connect();
+    await this.pulseClient?.connect();
   }
 
   /**
@@ -45,7 +45,7 @@ export class AgendaCommandSchedulerModule extends Module {
    * @async
    */
   protected async onStop(): Promise<void> {
-    await this.agendaClient?.stop();
+    await this.pulseClient?.stop();
   }
 
   /**
@@ -53,8 +53,7 @@ export class AgendaCommandSchedulerModule extends Module {
    * @async
    */
   protected async onShutdown(): Promise<void> {
-    await this.agendaClient?.disconnect();
-    await this.mongoClient?.disconnect();
+    await this.pulseClient?.disconnect();
   }
 
   /**
@@ -63,11 +62,11 @@ export class AgendaCommandSchedulerModule extends Module {
    */
   async initializeTopLevelDependencies(): Promise<void> {
     this.injector
-      .bind<types.AgendaJobTransformer>(BINDINGS.Agenda.jobTransformer)
-      .to(AgendaScheduledJobTransformer)
+      .bind<types.PulseJobTransformer>(BINDINGS.Pulse.jobTransformer)
+      .to(PulseScheduledJobTransformer as any)
       .inSingletonScope();
     this.log?.debug(
-      new Log(`bound 'Agenda.ScheduledJobTransformer' in singleton scope`)
+      new Log(`bound 'Pulse.ScheduledJobTransformer' in singleton scope`)
         .on(this)
         .in(this.initializeTopLevelDependencies)
     );
@@ -84,7 +83,6 @@ export class AgendaCommandSchedulerModule extends Module {
         'clients.MongoDB.CommandScheduler'
       ),
       ssl: getenv.bool(`EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL`),
-      useUnifiedTopology: false,
     };
     const databaseName = getenv.string(
       'EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME'
@@ -130,10 +128,10 @@ export class AgendaCommandSchedulerModule extends Module {
   }
 
   /**
-   * Initializes Agenda client for CommandScheduler.
+   * Initializes Pulse client for CommandScheduler.
    * @async
    */
-  async initializeAgendaClientForCommandScheduler(): Promise<void> {
+  async initializePulseClientForCommandScheduler(): Promise<void> {
     const databaseName = getenv.string(
       'EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME'
     );
@@ -141,11 +139,11 @@ export class AgendaCommandSchedulerModule extends Module {
       'EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION'
     );
     const options = this.config.get<Record<string, any>>(
-      'clients.Agenda.CommandScheduler'
+      'clients.Pulse.CommandScheduler'
     );
     options.processEvery = getenv.int('EVEBLE_COMMAND_SCHEDULER_INTERVAL');
-    const client = new AgendaClient({
-      id: 'Agenda.clients.CommandScheduler',
+    const client = new PulseClient({
+      id: 'Pulse.clients.CommandScheduler',
       databaseName,
       collectionName,
       options,
@@ -153,15 +151,15 @@ export class AgendaCommandSchedulerModule extends Module {
     this.injector.injectInto(client);
     await client.initialize();
     this.injector
-      .bind<AgendaClient>(BINDINGS.Agenda.clients.CommandScheduler)
+      .bind<PulseClient>(BINDINGS.Pulse.clients.CommandScheduler)
       .toConstantValue(client);
     this.log?.debug(
-      new Log(`bound 'Agenda.clients.CommandScheduler' as constant value`)
+      new Log(`bound 'Pulse.clients.CommandScheduler' as constant value`)
         .on(this)
-        .in(this.initializeAgendaClientForCommandScheduler)
+        .in(this.initializePulseClientForCommandScheduler)
     );
-    this.agendaClient = this.injector.get<AgendaClient>(
-      BINDINGS.Agenda.clients.CommandScheduler
+    this.pulseClient = this.injector.get<PulseClient>(
+      BINDINGS.Pulse.clients.CommandScheduler
     );
   }
 
@@ -172,11 +170,11 @@ export class AgendaCommandSchedulerModule extends Module {
   async initializeCommandScheduler(): Promise<void> {
     this.injector
       .bind<types.CommandScheduler>(BINDINGS.CommandScheduler)
-      .to(AgendaCommandScheduler)
+      .to(PulseCommandScheduler)
       .inSingletonScope();
     this.log?.debug(
       new Log(
-        `bound 'CommandScheduler' to 'AgendaCommandScheduler' in singleton scope`
+        `bound 'CommandScheduler' to 'PulseCommandScheduler' in singleton scope`
       )
         .on(this)
         .in(this.initializeCommandScheduler)

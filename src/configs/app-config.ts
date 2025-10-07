@@ -42,8 +42,8 @@ export class AppConfig extends Config {
       Snapshotter?: Record<string, any>; // MongoClientOptions, tsruntime fails to identify kind
       CommandScheduler?: Record<string, any>; // MongoClientOptions, tsruntime fails to identify kind
     };
-    Agenda?: {
-      CommandScheduler?: Record<string, any>; // AgendaConfiguration, tsruntime fails to identify kind
+    Pulse?: {
+      CommandScheduler?: Record<string, any>; // PulseConfiguration, tsruntime fails to identify kind
     };
   } = {
     MongoDB: {
@@ -51,7 +51,7 @@ export class AppConfig extends Config {
       Snapshotter: AppConfig.defaultMongoDBOptions,
       CommandScheduler: AppConfig.defaultMongoDBOptions,
     },
-    Agenda: {
+    Pulse: {
       CommandScheduler: {
         processEvery: 180000,
       },

@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
-import Agenda from 'agenda';
+import { Pulse } from '@pulsecron/pulse';
 import delay from 'delay';
 import { Collection } from 'mongodb';
 import { stubInterface } from 'ts-sinon';
@@ -13,8 +13,8 @@ import { Snapshotter } from '../../../src/infrastructure/snapshotter';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
-import { AgendaCommandScheduler } from '../../../src/infrastructure/schedulers/agenda-command-scheduler';
-import { AgendaClient } from '../../../src/app/clients/agenda-client';
+import { PulseCommandScheduler } from '../../../src/infrastructure/schedulers/pulse-command-scheduler';
+import { PulseClient } from '../../../src/app/clients/pulse-client';
 import { Router } from '../../../src/infrastructure/router';
 import { Task } from '../../domains/task-list/task';
 import { TaskList } from '../../domains/task-list/task-list';
@@ -47,7 +47,7 @@ import {
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
-import { AgendaScheduledJobTransformer } from '../../../src/infrastructure/transformers/agenda-scheduled-job-transformer';
+import { PulseScheduledJobTransformer } from '../../../src/infrastructure/transformers/pulse-scheduled-job-transformer';
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { CommandSchedulingService } from '../../../src/infrastructure/command-scheduling-service';
@@ -56,7 +56,7 @@ import { createEJSON } from '../../../src/utils/helpers';
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`Command scheduling`, () => {
+describe(`Command scheduling with Pulse`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
 
@@ -99,25 +99,25 @@ describe(`Command scheduling`, () => {
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
   };
 
-  const setupAgenda = async function (): Promise<void> {
-    injector.bind<any>(BINDINGS.Agenda.library).toConstantValue(Agenda);
+  const setupPulse = async function (): Promise<void> {
+    injector.bind<any>(BINDINGS.Pulse.library).toConstantValue(Pulse);
 
-    clients.agenda = new AgendaClient({
+    clients.pulse = new PulseClient({
       id: new Guid(),
       databaseName: getDatabaseName('scheduler'),
       collectionName: getCollectionName('scheduler'),
       options: {
-        processEvery: 10,
+        processEvery: '1 seconds',
       },
     });
 
-    await injector.injectIntoAsync(clients.agenda);
-    await clients.agenda.initialize();
-    await clients.agenda.connect();
+    await injector.injectIntoAsync(clients.pulse);
+    await clients.pulse.initialize();
+    await clients.pulse.connect();
 
     injector
-      .bind<types.Client>(BINDINGS.Agenda.clients.CommandScheduler)
-      .toConstantValue(clients.agenda);
+      .bind<types.Client>(BINDINGS.Pulse.clients.CommandScheduler)
+      .toConstantValue(clients.pulse);
   };
 
   const setupDefaultConfiguration = function (): void {
@@ -146,6 +146,7 @@ describe(`Command scheduling`, () => {
       .bind<types.CommitStorage>(BINDINGS.CommitStorage)
       .to(CommitMongoDBStorage)
       .inSingletonScope();
+
     injector
       .bind<types.CommitObserver>(BINDINGS.CommitObserver)
       .to(CommitMongoDBObserver)
@@ -182,8 +183,8 @@ describe(`Command scheduling`, () => {
     injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
     // Scheduling
     injector
-      .bind<types.AgendaJobTransformer>(BINDINGS.Agenda.jobTransformer)
-      .to(AgendaScheduledJobTransformer)
+      .bind<types.PulseJobTransformer>(BINDINGS.Pulse.jobTransformer)
+      .to(PulseScheduledJobTransformer as any)
       .inSingletonScope();
     injector
       .bind<CommandSchedulingService>(BINDINGS.CommandSchedulingService)
@@ -191,7 +192,7 @@ describe(`Command scheduling`, () => {
       .inSingletonScope();
     injector
       .bind<types.CommandScheduler>(BINDINGS.CommandScheduler)
-      .to(AgendaCommandScheduler)
+      .to(PulseCommandScheduler)
       .inSingletonScope();
     // Repository
     injector
@@ -243,20 +244,35 @@ describe(`Command scheduling`, () => {
     setupInjector();
 
     await setupCommitStoreMongo(injector, clients, collections);
+
     await setupSnapshotterMongo(injector, clients, collections);
+
     await setupSchedulerMongo(injector, clients, collections);
-    await setupAgenda();
+
+    await setupPulse();
+
     setupDefaultConfiguration();
+
     setupEvebleDependencies();
+
     setupDomainDependencies();
+
     setupKernel();
+
     setupTypes();
+
     initializeRouters();
+
     await initializeScheduler();
   });
 
   beforeEach(() => {
     setupDefaultConfiguration();
+
+    const scheduler = stubInterface<types.CommandScheduler>();
+
+    scheduler.schedule.resolves();
+    scheduler.unschedule.resolves(true);
   });
 
   afterEach(async () => {
@@ -266,9 +282,11 @@ describe(`Command scheduling`, () => {
   });
 
   after(async () => {
+    await (clients.pulse as PulseClient).stop();
+    await clients.pulse.disconnect();
+
     await clients.commitStore.disconnect();
     await clients.snapshotter.disconnect();
-    await clients.agenda.disconnect();
     await clients.scheduler.disconnect();
 
     kernel.setAsserter(undefined as any);
@@ -392,11 +410,11 @@ describe(`Command scheduling`, () => {
         priority: 2,
       });
 
-      const expireIn = 500;
+      const expireIn = 1000;
       taskCompletionPolicy.setExpirationDuration(expireIn);
 
       await commandBus.handle(createList);
-      await commandBus.handle(createTask); // Expiring Policy sends ExpireTask to Scheduler
+      await commandBus.handle(createTask);
 
       const scheduledJobEnqueued = await commandScheduler.getJob(
         ExpireTask.getTypeName(),
@@ -404,6 +422,7 @@ describe(`Command scheduling`, () => {
         'TaskList',
         taskId
       );
+
       await delay(expireIn + 500);
       const scheduledJobCompleted = await commandScheduler.getJob(
         ExpireTask.getTypeName(),
@@ -439,13 +458,13 @@ describe(`Command scheduling`, () => {
         priority: 2,
       });
 
-      const expireIn = 500;
+      const expireIn = 100;
       taskCompletionPolicy.setExpirationDuration(expireIn);
 
       await commandBus.handle(createList);
       await commandBus.handle(createTask);
 
-      await delay(expireIn + 500);
+      await delay(expireIn + 100);
       const scheduledJob = await commandScheduler.getJob(
         ExpireTask.getTypeName(),
         taskListId,
@@ -486,14 +505,14 @@ describe(`Command scheduling`, () => {
         id: taskId,
       });
 
-      const expireIn = 500;
+      const expireIn = 100;
       taskCompletionPolicy.setExpirationDuration(expireIn);
 
       await commandBus.handle(createList);
       await commandBus.handle(createTask);
       await commandBus.handle(completeTask);
 
-      await delay(expireIn + 500);
+      await delay(expireIn + 100);
       const scheduledJob = await commandScheduler.getJob(
         ExpireTask.getTypeName(),
         taskListId,
@@ -550,7 +569,11 @@ describe(`Command scheduling`, () => {
       await commandScheduler.schedule(scheduleCommand);
       await commandScheduler.schedule(scheduleCommand);
 
+      // Give Pulse time to persist jobs
+      await delay(50);
+
       const beforeUnschedule = await collection.find({}).toArray();
+
       expect(beforeUnschedule).to.be.instanceof(Array);
       expect(beforeUnschedule).to.have.length(3);
 

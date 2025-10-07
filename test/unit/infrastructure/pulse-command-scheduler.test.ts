@@ -3,13 +3,11 @@ import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import { stubInterface } from 'ts-sinon';
 import { Collection } from 'mongodb';
-import Agenda from 'agenda';
+import { type Job, DefineOptions } from '@pulsecron/pulse';
 import sinon from 'sinon';
 import { Type } from '@eveble/core';
-import { AgendaClient } from '../../../src/app/clients/agenda-client';
 import { Command, Assignment } from '../../../src/components/command';
 import { types } from '../../../src/types';
-import { AgendaCommandScheduler } from '../../../src/infrastructure/schedulers/agenda-command-scheduler';
 import { Log } from '../../../src/components/log-entry';
 import {
   InactiveClientError,
@@ -21,12 +19,14 @@ import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
+import { PulseCommandScheduler } from '../../../src/infrastructure/schedulers/pulse-command-scheduler';
+import { PulseClient } from '../../../src/app/clients/pulse-client';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe(`AgendaCommandScheduler`, () => {
-  @Type('AgendaCommandScheduler.MyCommand', { isRegistrable: false })
+describe(`PulseCommandScheduler`, () => {
+  @Type('PulseCommandScheduler.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
     name: string;
   }
@@ -35,18 +35,18 @@ describe(`AgendaCommandScheduler`, () => {
   let log: any;
   let injector: Injector;
   let commandBus: any;
-  let agendaClient: any;
+  let pulseClient: any;
   let serializer: any;
   let collection: any;
   let jobTransformer: any;
-  let agendaInstance: any;
-  let scheduler: AgendaCommandScheduler;
+  let pulseInstance: any;
+  let scheduler: PulseCommandScheduler;
 
-  // AgendaClient props
-  const agendaClientId = 'my-agenda-client-id';
+  // PulseClient props
+  const pulseClientId = 'my-pulse-client-id';
   // Scheduler props
   const jobName = 'my-job-name';
-  const options = {
+  const options: DefineOptions = {
     concurrency: 5,
     lockLimit: 5,
     lockLifetime: 5,
@@ -86,22 +86,30 @@ describe(`AgendaCommandScheduler`, () => {
   });
 
   // Returns
-  const serializedCommand = `{"$type":"AgendaCommandScheduler.MyCommand","$value":{"timestamp":{"$date":${Number(
+  const serializedCommand = `{"$type":"PulseCommandScheduler.MyCommand","$value":{"timestamp":{"$date":${Number(
     timestamp
   )}},"targetId":{"$type":"Guid","$value":{"id":"${targetId.toString()}"}},"name":"Foo"}}`;
 
   beforeEach(() => {
     log = stubInterface<types.Logger>();
     commandBus = stubInterface<types.CommandBus>();
-    agendaClient = stubInterface<AgendaClient>();
+    pulseClient = stubInterface<PulseClient>();
     serializer = stubInterface<types.Serializer>();
     collection = stubInterface<Collection>();
-    jobTransformer = stubInterface<types.AgendaJobTransformer>();
-    agendaInstance = stubInterface<Agenda>();
+    jobTransformer = stubInterface<types.PulseJobTransformer>();
+    pulseInstance = {
+      define: sinon.stub(),
+      schedule: sinon.stub(),
+      cancel: sinon.stub(),
+      jobs: sinon.stub(),
+      start: sinon.stub(),
+      stop: sinon.stub(),
+      _definitions: {},
+    };
 
-    agendaClient.library = agendaInstance;
-    agendaClient.isConnected.returns(true);
-    agendaClient.getId.returns(agendaClientId);
+    pulseClient.library = pulseInstance;
+    pulseClient.isConnected.returns(true);
+    pulseClient.getId.returns(pulseClientId);
 
     serializer.stringify.withArgs(command).returns(serializedCommand);
     serializer.parse.withArgs(serializedCommand).returns(command);
@@ -118,24 +126,24 @@ describe(`AgendaCommandScheduler`, () => {
       .bind<Collection>(BINDINGS.MongoDB.collections.ScheduledCommands)
       .toConstantValue(collection);
     injector
-      .bind<types.AgendaJobTransformer>(BINDINGS.Agenda.jobTransformer)
+      .bind<types.PulseJobTransformer>(BINDINGS.Pulse.jobTransformer)
       .toConstantValue(jobTransformer);
     injector
-      .bind<AgendaClient>(BINDINGS.Agenda.clients.CommandScheduler)
-      .toConstantValue(agendaClient);
+      .bind<PulseClient>(BINDINGS.Pulse.clients.CommandScheduler)
+      .toConstantValue(pulseClient);
 
-    scheduler = new AgendaCommandScheduler(jobName, options);
+    scheduler = new PulseCommandScheduler(jobName, options);
     injector.injectInto(scheduler);
   });
 
   describe(`construction`, () => {
     it(`takes jobName as a string and assigns it`, () => {
-      const instance = new AgendaCommandScheduler(jobName);
+      const instance = new PulseCommandScheduler(jobName);
       expect(instance.jobName).to.be.equal(jobName);
     });
 
-    it(`takes jobName and  options as an object and assigns them`, () => {
-      const instance = new AgendaCommandScheduler(jobName, options);
+    it(`takes jobName and options as an object and assigns them`, () => {
+      const instance = new PulseCommandScheduler(jobName, options);
       expect(instance.jobName).to.be.equal(jobName);
       expect(instance.options).to.be.equal(options);
     });
@@ -143,24 +151,31 @@ describe(`AgendaCommandScheduler`, () => {
 
   describe('initialization', () => {
     context('successful', () => {
-      it(`defines agenda job for scheduled command upon initialization`, async () => {
+      beforeEach(() => {
+        pulseInstance._definitions[jobName] = { name: jobName };
+      });
+
+      it(`defines pulse job for scheduled command upon initialization`, async () => {
         await scheduler.initialize();
 
-        expect(agendaInstance.define).to.be.calledOnce;
-        const calledArgs = agendaInstance.define.args[0];
+        expect(pulseInstance.define).to.be.calledOnce;
+        const calledArgs = pulseInstance.define.args[0];
         expect(calledArgs[0]).to.be.equal(jobName);
-        expect(calledArgs[1]).to.be.equal(options);
-        expect(calledArgs[2]).to.be.instanceof(Function);
+        expect(calledArgs[1]).to.be.instanceof(Function);
+        expect(calledArgs[2]).to.be.equal(options);
       });
 
       it('ensures that scheduled command job handler is bound to instance of scheduler', async () => {
+        const handleSSchduledCommandStub = sinon.stub();
+        scheduler.handleScheduledCommand = handleSSchduledCommandStub;
         await scheduler.initialize();
 
-        expect(agendaInstance.define).to.be.calledOnce;
-        const calledArgs = agendaInstance.define.args[0];
-        const boundHandler = calledArgs[2];
-        const unboundHandler = boundHandler.original;
-        expect(unboundHandler).to.be.equal(scheduler.handleScheduledCommand);
+        expect(pulseInstance.define).to.be.calledOnce;
+        const calledArgs = pulseInstance.define.args[0];
+        const boundHandler = calledArgs[1];
+        await boundHandler();
+
+        expect(handleSSchduledCommandStub).to.be.calledOnce;
       });
 
       it('logs successful scheduler initialization', async () => {
@@ -168,29 +183,37 @@ describe(`AgendaCommandScheduler`, () => {
 
         expect(log.debug).to.be.calledWithExactly(
           new Log(
-            `defined new Agenda job '${jobName}' for client with id '${agendaClientId}'`
+            `defined new Pulse job '${jobName}' for client with id '${pulseClientId}'`
           )
             .on(scheduler)
             .in(scheduler.initialize)
         );
       });
+
+      it('starts processing jobs after initialization', async () => {
+        await scheduler.initialize();
+
+        expect(pulseClient.startProcessing).to.be.calledOnce;
+        expect(pulseClient.startProcessing).to.be.calledWith(jobName);
+      });
     });
+
     context('failed', () => {
-      it('logs failed initialization do to inactive Agenda client', async () => {
-        agendaClient.isConnected.returns(false);
+      it('logs failed initialization due to inactive Pulse client', async () => {
+        pulseClient.isConnected.returns(false);
         await expect(scheduler.initialize()).to.eventually.be.rejectedWith(
           InactiveClientError,
-          `AgendaCommandScheduler: can't be initialized since underlying client with id '${agendaClientId}' is inactive`
+          `PulseCommandScheduler: can't be initialized since underlying client with id '${pulseClientId}' is inactive`
         );
       });
 
-      it('throws InactiveClientError when Agenda client is inactive on initialization', async () => {
-        agendaClient.isConnected.returns(false);
+      it('throws InactiveClientError when Pulse client is inactive on initialization', async () => {
+        pulseClient.isConnected.returns(false);
         await expect(scheduler.initialize()).to.eventually.be.rejectedWith(
           InactiveClientError
         );
         expect(log.error).to.be.calledWithMatch(
-          new Log(`inactive Agenda client`)
+          new Log(`inactive Pulse client`)
             .on(scheduler)
             .in(scheduler.initialize)
         );
@@ -199,10 +222,14 @@ describe(`AgendaCommandScheduler`, () => {
   });
 
   describe('managing state', () => {
+    beforeEach(() => {
+      pulseInstance._definitions[jobName] = { name: jobName };
+    });
+
     it('starts scheduling(processing scheduled jobs)', async () => {
       await scheduler.initialize();
       await scheduler.startScheduling();
-      expect(scheduler.isInState(AgendaCommandScheduler.STATES.active)).to.be
+      expect(scheduler.isInState(PulseCommandScheduler.STATES.active)).to.be
         .true;
     });
 
@@ -210,12 +237,16 @@ describe(`AgendaCommandScheduler`, () => {
       await scheduler.initialize();
       await scheduler.startScheduling();
       await scheduler.stopScheduling();
-      expect(scheduler.isInState(AgendaCommandScheduler.STATES.stopped)).to.be
+      expect(scheduler.isInState(PulseCommandScheduler.STATES.stopped)).to.be
         .true;
     });
   });
 
   describe('scheduling command', () => {
+    beforeEach(() => {
+      pulseInstance._definitions[jobName] = { name: jobName };
+    });
+
     it('logs scheduling command', async () => {
       await scheduler.initialize();
       await scheduler.schedule(scheduleCommand);
@@ -233,23 +264,34 @@ describe(`AgendaCommandScheduler`, () => {
         const expectedSerializedData = {
           id: assignmentId.toString(),
           command: serializedCommand,
-          commandType: 'AgendaCommandScheduler.MyCommand',
+          commandType: 'PulseCommandScheduler.MyCommand',
           assignerId: assignerId.toString(),
           assignerType: 'MyEventSourceable',
         };
 
+        const mockJob = {
+          save: sinon.stub().resolves(),
+        };
+        pulseInstance.schedule.resolves(mockJob);
+
         await scheduler.initialize();
         await scheduler.schedule(scheduleCommand);
 
-        expect(agendaInstance.schedule).to.be.calledOnce;
-        expect(agendaInstance.schedule).to.be.calledWith(
+        expect(pulseInstance.schedule).to.be.calledOnce;
+        expect(pulseInstance.schedule).to.be.calledWith(
           deliverAt,
           jobName,
           expectedSerializedData
         );
+        expect(mockJob.save).to.be.calledOnce;
       });
 
       it('logs successfully scheduled command', async () => {
+        const mockJob = {
+          save: sinon.stub().resolves(),
+        };
+        pulseInstance.schedule.resolves(mockJob);
+
         await scheduler.initialize();
         await scheduler.schedule(scheduleCommand);
 
@@ -265,7 +307,7 @@ describe(`AgendaCommandScheduler`, () => {
     context('failed', () => {
       it(`throws error when scheduled command can't be scheduled`, async () => {
         const error = new Error('my-error');
-        agendaInstance.schedule.rejects(error);
+        pulseInstance.schedule.rejects(error);
 
         await scheduler.initialize();
         await expect(
@@ -276,9 +318,9 @@ describe(`AgendaCommandScheduler`, () => {
         );
       });
 
-      it(`logs thrown error when Agenda can't schedule command`, async () => {
+      it(`logs thrown error when Pulse can't schedule command`, async () => {
         const error = new Error('my-error');
-        agendaInstance.schedule.rejects(error);
+        pulseInstance.schedule.rejects(error);
 
         await scheduler.initialize();
         await expect(
@@ -297,6 +339,10 @@ describe(`AgendaCommandScheduler`, () => {
   });
 
   describe('unscheduling command', () => {
+    beforeEach(() => {
+      pulseInstance._definitions[jobName] = { name: jobName };
+    });
+
     it('logs unscheduling command', async () => {
       await scheduler.initialize();
       await scheduler.unschedule(unscheduleCommand);
@@ -311,7 +357,7 @@ describe(`AgendaCommandScheduler`, () => {
 
     context('successful', () => {
       it(`unschedules command`, async () => {
-        agendaInstance.cancel.resolves(1);
+        pulseInstance.cancel.resolves(1);
 
         await scheduler.initialize();
         const isSuccessful = await scheduler.unschedule(unscheduleCommand);
@@ -323,12 +369,12 @@ describe(`AgendaCommandScheduler`, () => {
           'data.assignerId': assignerId.toString(),
           'data.assignerType': assignerType,
         };
-        expect(agendaInstance.cancel).to.be.calledOnce;
-        expect(agendaInstance.cancel).to.be.calledWith(expectedMongoQuery);
+        expect(pulseInstance.cancel).to.be.calledOnce;
+        expect(pulseInstance.cancel).to.be.calledWith(expectedMongoQuery);
       });
 
       it('logs successful cancellation of scheduled command', async () => {
-        agendaInstance.cancel.resolves(1);
+        pulseInstance.cancel.resolves(1);
 
         await scheduler.initialize();
         await scheduler.unschedule(unscheduleCommand);
@@ -341,8 +387,8 @@ describe(`AgendaCommandScheduler`, () => {
         );
       });
 
-      it('does not throw error if Agenda client resolves removed job count as 0', async () => {
-        agendaInstance.cancel.resolves(0);
+      it('does not throw error if Pulse client resolves removed job count as 0', async () => {
+        pulseInstance.cancel.resolves(0);
 
         await scheduler.initialize();
         const isSuccessful = await scheduler.unschedule(unscheduleCommand);
@@ -351,9 +397,9 @@ describe(`AgendaCommandScheduler`, () => {
     });
 
     context('failed', () => {
-      it('throws CommandUnschedulingError when Agenda client throws error', async () => {
+      it('throws CommandUnschedulingError when Pulse client throws error', async () => {
         const error = new Error('my-error');
-        agendaInstance.cancel.rejects(error);
+        pulseInstance.cancel.rejects(error);
 
         await scheduler.initialize();
         await expect(
@@ -364,9 +410,9 @@ describe(`AgendaCommandScheduler`, () => {
         );
       });
 
-      it('logs thrown error upon  Agenda client canceling the job', async () => {
+      it('logs thrown error upon Pulse client canceling the job', async () => {
         const error = new Error('my-error');
-        agendaInstance.cancel.rejects(error);
+        pulseInstance.cancel.rejects(error);
 
         await scheduler.initialize();
         await expect(
@@ -392,7 +438,7 @@ describe(`AgendaCommandScheduler`, () => {
         command: serializedCommand,
       };
 
-      const job = stubInterface<Agenda.Job>();
+      const job = stubInterface<Job>();
       job.attrs.data = serializedData;
 
       await scheduler.handleScheduledCommand(job);
@@ -408,12 +454,12 @@ describe(`AgendaCommandScheduler`, () => {
       const serializedData = {
         id: assignmentId.toString(),
         command: serializedCommand,
-        commandType: 'AgendaCommandScheduler.MyCommand',
+        commandType: 'PulseCommandScheduler.MyCommand',
         assignerId: assignerId.toString(),
         assignerType,
       };
 
-      const job = stubInterface<Agenda.Job>();
+      const job = stubInterface<Job>();
       job.attrs.data = serializedData;
 
       await scheduler.handleScheduledCommand(job);
@@ -421,16 +467,16 @@ describe(`AgendaCommandScheduler`, () => {
       expect(commandBus.send).to.be.calledWithExactly(command);
     });
 
-    it(`logs sended command through command bus upon scheduled time`, async () => {
+    it(`logs sent command through command bus upon scheduled time`, async () => {
       const serializedData = {
         id: assignmentId.toString(),
         command: serializedCommand,
-        commandType: 'AgendaCommandScheduler.MyCommand',
+        commandType: 'PulseCommandScheduler.MyCommand',
         assignerId: assignerId.toString(),
         assignerType,
       };
 
-      const job = stubInterface<Agenda.Job>();
+      const job = stubInterface<Job>();
       job.attrs.data = serializedData;
 
       await scheduler.handleScheduledCommand(job);
@@ -446,12 +492,12 @@ describe(`AgendaCommandScheduler`, () => {
       const serializedData = {
         id: assignmentId.toString(),
         command: serializedCommand,
-        commandType: 'AgendaCommandScheduler.MyCommand',
+        commandType: 'PulseCommandScheduler.MyCommand',
         assignerId: assignerId.toString(),
         assignerType,
       };
 
-      const job = stubInterface<Agenda.Job>();
+      const job = stubInterface<Job>();
       job.attrs.data = serializedData;
 
       const error = new Error('my-error');
@@ -468,12 +514,12 @@ describe(`AgendaCommandScheduler`, () => {
       const serializedData = {
         id: assignmentId.toString(),
         command: serializedCommand,
-        commandType: 'AgendaCommandScheduler.MyCommand',
+        commandType: 'PulseCommandScheduler.MyCommand',
         assignerId: assignerId.toString(),
         assignerType,
       };
 
-      const job = stubInterface<Agenda.Job>();
+      const job = stubInterface<Job>();
       job.attrs.data = serializedData;
 
       const error = new Error('my-error');
@@ -540,7 +586,7 @@ describe(`AgendaCommandScheduler`, () => {
   describe('resolving', () => {
     it('returns scheduled job if job is found on queue', async () => {
       const returnedJob = sinon.stub();
-      agendaInstance.jobs.returns([returnedJob]);
+      pulseInstance.jobs.returns([returnedJob]);
 
       const transformedJob = sinon.stub();
       jobTransformer.transform.returns(transformedJob);
@@ -561,8 +607,8 @@ describe(`AgendaCommandScheduler`, () => {
       };
       const expectedMongoSort = { data: -1 };
       const expectedMongoLimit = 1;
-      expect(agendaInstance.jobs).to.be.calledOnce;
-      expect(agendaInstance.jobs).to.be.calledWith(
+      expect(pulseInstance.jobs).to.be.calledOnce;
+      expect(pulseInstance.jobs).to.be.calledWith(
         expectedMongoQuery,
         expectedMongoSort,
         expectedMongoLimit
@@ -572,7 +618,7 @@ describe(`AgendaCommandScheduler`, () => {
 
     it('returns scheduled job with omitted optional assignmentId argument', async () => {
       const returnedJob = sinon.stub();
-      agendaInstance.jobs.returns([returnedJob]);
+      pulseInstance.jobs.returns([returnedJob]);
 
       const transformedJob = sinon.stub();
       jobTransformer.transform.returns(transformedJob);
@@ -591,8 +637,8 @@ describe(`AgendaCommandScheduler`, () => {
       };
       const expectedMongoSort = { data: -1 };
       const expectedMongoLimit = 1;
-      expect(agendaInstance.jobs).to.be.calledOnce;
-      expect(agendaInstance.jobs).to.be.calledWith(
+      expect(pulseInstance.jobs).to.be.calledOnce;
+      expect(pulseInstance.jobs).to.be.calledWith(
         expectedMongoQuery,
         expectedMongoSort,
         expectedMongoLimit
@@ -601,7 +647,7 @@ describe(`AgendaCommandScheduler`, () => {
     });
 
     it(`returns undefined if job can't be found on queue`, async () => {
-      agendaInstance.jobs.returns([]);
+      pulseInstance.jobs.returns([]);
 
       const foundJob = await scheduler.getJob(
         MyCommand.getTypeName(),
@@ -611,7 +657,7 @@ describe(`AgendaCommandScheduler`, () => {
       );
       expect(foundJob).to.be.equal(undefined);
 
-      expect(agendaInstance.jobs).to.be.calledOnce;
+      expect(pulseInstance.jobs).to.be.calledOnce;
       expect(jobTransformer.transform).to.not.be.called;
     });
   });
@@ -620,8 +666,13 @@ describe(`AgendaCommandScheduler`, () => {
     describe('getInterval', () => {
       it('returns interval in which jobs are processed', () => {
         const interval = 50;
-        agendaClient.getInterval.returns(interval);
+        pulseClient.getInterval.returns(interval);
         expect(scheduler.getInterval()).to.be.equal(interval);
+      });
+
+      it('returns default interval of 1 when client interval is undefined', () => {
+        pulseClient.getInterval.returns(undefined);
+        expect(scheduler.getInterval()).to.be.equal(1);
       });
     });
   });
