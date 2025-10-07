@@ -41,52 +41,38 @@ jobs:
 
       - name: 🐳 Start MongoDB Replica Set
         run: |
-          echo "Starting MongoDB (auth + replica set)..."
-          docker run -d \
+          # Start MongoDB with replica set and authentication
+          docker run --rm -d \
             -p 27017:27017 \
             --name mongodb-rs \
             -e MONGO_INITDB_ROOT_USERNAME=admin \
             -e MONGO_INITDB_ROOT_PASSWORD=password \
-            -e MONGO_INITDB_DATABASE=admin \
             mongo:6.0 \
-            --replSet rs0 --bind_ip_all --auth
+            mongod --replSet rs0 --bind_ip_all
 
+          # Wait for MongoDB to start
           echo "Waiting for MongoDB to start..."
-          for i in {1..10}; do
-            if docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval "db.runCommand({ ping: 1 })" &>/dev/null; then
-              echo "✅ MongoDB is up!"
-              break
-            fi
-            echo "Waiting for MongoDB... ($i/10)"
-            sleep 3
-          done
+          sleep 5
 
+          # Initialize replica set using Docker bridge gateway IP
           echo "Initializing replica set..."
-          docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval '
-            rs.initiate({
-              _id: "rs0",
-              members: [{ _id: 0, host: "localhost:27017" }]
-            });
-          '
+          docker run --rm mongo:6.0 \
+            mongosh --host 172.17.0.1 \
+            -u admin -p password \
+            --authenticationDatabase admin \
+            --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
 
-          echo "Waiting for replica set to become PRIMARY..."
-          sleep 10
+          # Wait for replica set to be ready
+          echo "Waiting for replica set to be ready..."
+          sleep 5
 
-          echo "Creating eveble database user..."
-          docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval '
-            use eveble;
-            db.createUser({
-              user: "admin",
-              pwd: "password",
-              roles: [
-                { role: "readWrite", db: "eveble" },
-                { role: "dbAdmin", db: "eveble" }
-              ]
-            });
-          '
-
+          # Verify replica set status
           echo "Replica set status:"
-          docker exec mongodb-rs mongosh -u admin -p password --authenticationDatabase admin --eval 'rs.status()'
+          docker run --rm mongo:6.0 \
+            mongosh --host 172.17.0.1 \
+            -u admin -p password \
+            --authenticationDatabase admin \
+            --eval 'rs.status()'
 
       - name: ⤵️ Checkout
         uses: actions/checkout@v3
@@ -116,7 +102,7 @@ jobs:
       - name: ✅ Test
         run: yarn test
         env:
-          MONGO_URI: mongodb://admin:password@172.17.0.1:27017/eveble?replicaSet=rs0&authSource=admin&directConnection=true
+          MONGO_URI: mongodb://root:password@localhost:27017/?replicaSet=rs0&authSource=admin
 
       - name: 🗝️ Build
         run: yarn build
