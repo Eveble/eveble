@@ -386,3 +386,4 @@ export {
   EntityProperties,
   TranslationProperties,
 } from './types/shared-types';
+export { LanguageCode } from './types/generated-types';
