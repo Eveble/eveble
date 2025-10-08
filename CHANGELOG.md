@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/Eveble/eveble/compare/v4.1.0...v4.2.0) (2025-10-08)
+
+
+### Features
+
+* add shared types ([6ebd822](https://github.com/Eveble/eveble/commit/6ebd82249b30e14da2b73697fdbb1c469bcb1126))
+
 # [4.1.0](https://github.com/Eveble/eveble/compare/v4.0.0...v4.1.0) (2025-10-08)
 
 
