@@ -20,7 +20,7 @@ import { Container, injectable, inject, postConstruct } from 'inversify';
 export { inject as Inject, injectable as Injectable, postConstruct as PostConstruct, inject, injectable, postConstruct } from 'inversify';
 import { diff } from 'deep-diff';
 import { ReflectParams } from 'reflect-params';
-import { inspect } from 'util';
+import util, { inspect } from 'util';
 import hasAnsi from 'has-ansi';
 import abbreviate from 'abbreviate';
 
@@ -939,6 +939,24 @@ InvalidInitializingMessageError = __decorate([
     Type('InvalidInitializingMessageError')({ kind: 19, name: "InvalidInitializingMessageError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "esTypeName", modifiers: 0, type: { kind: 2 } }, { name: "expected", modifiers: 0, type: { kind: 2 } }, { name: "got", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: EventSourceableError, arguments: [] } }),
     __metadata("design:paramtypes", [String, String, String])
 ], InvalidInitializingMessageError);
+let EmptyStringError = class EmptyStringError extends ValueObjectError {
+    constructor(typeName) {
+        super(`${typeName}: can't be an empty string`);
+    }
+};
+EmptyStringError = __decorate([
+    Type('EmptyStringError')({ kind: 19, name: "EmptyStringError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "typeName", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ValueObjectError, arguments: [] } }),
+    __metadata("design:paramtypes", [String])
+], EmptyStringError);
+let UnimplementedError = class UnimplementedError extends ValueObjectError {
+    constructor() {
+        super(`Not implemented`);
+    }
+};
+UnimplementedError = __decorate([
+    Type('UnimplementedError')({ kind: 19, name: "UnimplementedError", properties: {}, constructors: [{ modifiers: 0, parameters: [] }], extends: { kind: 18, type: ValueObjectError, arguments: [] } }),
+    __metadata("design:paramtypes", [])
+], UnimplementedError);
 
 const TYPE_KEY = '_type';
 const HANDLERS = 'eveble:handlers';
@@ -968,6 +986,7 @@ const LITERAL_KEYS = {
     COMMANDS_KEY,
     EVENTS_KEY,
 };
+const NON_ENUMERABLE_VALUE_KEY = '__value__';
 
 class List extends Array {
     constructor(source, listKey, serializableType, serializables) {
@@ -2390,7 +2409,7 @@ LogTransportConfig = __decorate([
                     isWholeLineColored: true,
                     includeStackTrace: true,
                     isAbbreviatingSources: false,
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "level": { kind: 999, modifiers: 0 }, "logColors": { kind: 999, modifiers: 0 }, "partsColors": { kind: 999, modifiers: 0 }, "messages": { kind: 999, modifiers: 0 }, "parts": { kind: 999, modifiers: 0 }, "flags": { kind: 999, modifiers: 0 }, "timestampFormat": { kind: 999, modifiers: 0 }, "abbreviationLength": { kind: 999, modifiers: 0 }, "inspectDepth": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "level": { kind: 999, modifiers: 0 }, "logColors": { kind: 999, modifiers: 0 }, "partsColors": { kind: 999, modifiers: 0 }, "messages": { kind: 999, modifiers: 0 }, "parts": { kind: 999, modifiers: 0 }, "flags": { kind: 999, modifiers: 0 }, "timestampFormat": { kind: 999, modifiers: 0 }, "abbreviationLength": { kind: 999, modifiers: 0 }, "inspectDepth": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7311": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7312": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], LogTransportConfig);
 
@@ -2430,7 +2449,7 @@ LoggingConfig = __decorate([
                     console: new LogTransportConfig({
                         level: getenv.string('LOGGING_LEVEL', 'info'),
                     }),
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: LogTransportConfig, arguments: [] }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "levels": { kind: 999, modifiers: 0 }, "transports": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: LogTransportConfig, arguments: [] }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "levels": { kind: 999, modifiers: 0 }, "transports": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7311": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7312": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], LoggingConfig);
 
@@ -2442,7 +2461,7 @@ let EvebleConfig = class EvebleConfig extends Config {
     }
 };
 EvebleConfig = __decorate([
-    Type()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "CommitStore": { kind: 999, modifiers: 0 }, "Snapshotter": { kind: 999, modifiers: 0 }, "CommandScheduler": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "CommitStore": { kind: 999, modifiers: 0 }, "Snapshotter": { kind: 999, modifiers: 0 }, "CommandScheduler": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7311": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7312": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], EvebleConfig);
 
@@ -2495,7 +2514,7 @@ AppConfig = AppConfig_1 = __decorate([
                             processEvery: 180000,
                         },
                     },
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Pulse": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "appId": { kind: 999, modifiers: 0 }, "workerId": { kind: 999, modifiers: 0 }, "logging": { kind: 999, modifiers: 0 }, "conversion": { kind: 999, modifiers: 0 }, "validation": { kind: 999, modifiers: 0 }, "description": { kind: 999, modifiers: 0 }, "eveble": { kind: 999, modifiers: 0 }, "clients": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@6177": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@6179": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Pulse": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "appId": { kind: 999, modifiers: 0 }, "workerId": { kind: 999, modifiers: 0 }, "logging": { kind: 999, modifiers: 0 }, "conversion": { kind: 999, modifiers: 0 }, "validation": { kind: 999, modifiers: 0 }, "description": { kind: 999, modifiers: 0 }, "eveble": { kind: 999, modifiers: 0 }, "clients": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@6243": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@6245": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], AppConfig);
 
@@ -5655,7 +5674,7 @@ let MongoDBCollectionConfig = class MongoDBCollectionConfig extends Config {
     }
 };
 MongoDBCollectionConfig = __decorate([
-    Type()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2, modifiers: 1 }, "indexes": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "indexes": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2, modifiers: 1 }, "indexes": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "indexes": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7311": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7312": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBCollectionConfig);
 let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends Config {
@@ -5665,7 +5684,7 @@ let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends Config {
     }
 };
 MongoDBDatabaseConfig = __decorate([
-    Type()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2, modifiers: 1 }, "collections": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "collections": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7245": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7246": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
+    Type()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2, modifiers: 1 }, "collections": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "collections": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7311": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7312": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBDatabaseConfig);
 class MongoDBClient extends Client {
@@ -6701,7 +6720,7 @@ let CommitMongoDBStorage = class CommitMongoDBStorage {
         }
         return undefined;
     }
-    isSuccessfulInsert(output, expectedNumber) {
+    isSuccessfulInsert(output, _expectedNumber) {
         return output.acknowledged && output.insertedId !== null;
     }
     isSuccessfulUpdate(output, expectedNumber) {
@@ -7724,4 +7743,501 @@ function loggerLoader(injector, level, consoleTransportConfig = new LogTransport
     return logger;
 }
 
-export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, can as Can, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingTrait, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, delegate as Delegate, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableTrait, ElementAlreadyExistsError, ElementNotFoundError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingTrait, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, Guid, handle as Handle, HandlerExistError, HandlerNotFoundError, HandlingError, HandlingTrait, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableTrait, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, initial as Initial, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NotVersionableError, OneToManyHandlingTrait, OneToOneHandlingTrait, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, PulseClient, PulseCommandScheduler, PulseCommandSchedulerModule, PulseScheduledJobTransformer, RFC5424LoggingTrait, route as Route, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableTrait, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, StateError, StatefulAssertion, StatefulTrait, StatusError, StatusfulAssertion, StatusfulTrait, StorageNotFoundError, StringifingConverter, Struct, subscribe as Subscribe, TransportExistsError, TypeTrait, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UpdatingCommitError, UpdatingSnapshotError, ValueObject, ValueObjectError, version as Version, VersionableError, VersionableTrait, can, convertObjectToCollection, createEJSON, debugInversifyMetadata, delegate, getAllClassProperties, getInjectedParameterIndices, getInjectedPropertyDetails, getInjectedPropertyNames, getInversifyMetadata, getMetadataSummary, getPostConstructMethodNames, getPreDestroyMethodNames, getPropertiesToValidate, handle, hasPostConstruct, hasPreDestroy, initial, isEventSourceableType, isInjectableClass, isPlainRecord, isPropertyInjected, isRecord, isTyped, loadENV, loggerLoader, route, subscribe, toPlainObject, version };
+let UnconvertibleStandardError = class UnconvertibleStandardError extends ValueObjectError {
+    constructor(standardId) {
+        super({ message: `Standard does not support conversion`, standardId });
+    }
+};
+UnconvertibleStandardError = __decorate([
+    Type('UnconvertibleStandardError')({ kind: 19, name: "UnconvertibleStandardError", properties: { "standardId": { kind: 2, modifiers: 1 } }, constructors: [{ modifiers: 0, parameters: [{ name: "standardId", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ValueObjectError, arguments: [] } }),
+    __metadata("design:paramtypes", [String])
+], UnconvertibleStandardError);
+class Standard {
+    constructor(id, isConvertible = false, codes) {
+        this.id = id;
+        this.isConvertible = isConvertible;
+        this.codes = codes;
+    }
+    getId() {
+        return this.id;
+    }
+    isValid(code) {
+        return this.isIn(code);
+    }
+    isIn(code) {
+        if (this.codes === undefined) {
+            throw new UnimplementedError();
+        }
+        return this.codes.includes(code);
+    }
+    convert(code, _identifiedStandard) {
+        if (!this.isConvertible) {
+            throw new UnconvertibleStandardError(this.id);
+        }
+        return code;
+    }
+    getCodes() {
+        return this.codes || [];
+    }
+}
+
+const ValidableTrait = trait((base) => class extends base {
+    static setValidator(validator) {
+        this.prototype.overrideHook('onValidation', 'validation', validator);
+    }
+    static getValidator() {
+        return this.prototype.getHook('onValidation', 'validation');
+    }
+    static removeValidator() {
+        this.prototype.removeHook('onValidation', 'validation');
+    }
+    static hasValidator() {
+        return this.prototype.hasHook('onValidation', 'validation');
+    }
+});
+
+class ValueString extends derive(EjsonableTrait, HookableTrait, ValidableTrait, String) {
+    constructor(value) {
+        super(value);
+        this.onValidation(value);
+        Object.defineProperty(this, NON_ENUMERABLE_VALUE_KEY, {
+            value,
+            enumerable: false,
+        });
+    }
+    equals(other) {
+        return (other !== null &&
+            other.constructor === this.constructor &&
+            this.valueOf() === other.valueOf());
+    }
+    [util.inspect.custom]() {
+        return `[${this.constructor.name}: '${this[NON_ENUMERABLE_VALUE_KEY]}']`;
+    }
+    toString() {
+        return this[NON_ENUMERABLE_VALUE_KEY];
+    }
+    valueOf() {
+        return this[NON_ENUMERABLE_VALUE_KEY];
+    }
+    toPlainObject() {
+        return this.valueOf();
+    }
+    anchor() {
+        return this.anchor();
+    }
+    big() {
+        return this.big();
+    }
+    blink() {
+        return this.blink();
+    }
+    bold() {
+        return this.bold();
+    }
+    fixed() {
+        return this.fixed();
+    }
+    fontcolor(color) {
+        return this.fontcolor(color);
+    }
+    fontsize(size) {
+        return this.fontsize(size);
+    }
+    italics() {
+        return this.italics();
+    }
+    link(url) {
+        return this.link(url);
+    }
+    small() {
+        return this.small();
+    }
+    strike() {
+        return this.strike();
+    }
+    sub() {
+        return this.sub();
+    }
+    sup() {
+        return this.sup();
+    }
+    onValidation(value, isStrict = true) {
+        if (!kernel.isValidating()) {
+            return true;
+        }
+        try {
+            kernel.validator.validate(value, String, isStrict);
+        }
+        catch (error) {
+            const { message } = error;
+            const typeName = this.getTypeName();
+            throw new error.constructor(`${typeName}: ${message}`);
+        }
+        const hooks = this.getHooks('onValidation');
+        for (const hook of Object.values(hooks)) {
+            hook.bind(this)(value);
+        }
+        return true;
+    }
+    static from(value) {
+        return new this(value);
+    }
+}
+ValueString.transformer = function () {
+    const Self = this;
+    return {
+        to: (instance) => {
+            if (instance === undefined) {
+                return undefined;
+            }
+            if (Array.isArray(instance)) {
+                return instance.map((item) => item.valueOf());
+            }
+            return instance.valueOf();
+        },
+        from: (value) => {
+            if (Array.isArray(value)) {
+                return value.map((item) => new Self(item));
+            }
+            return new Self(value);
+        },
+    };
+};
+
+class ValueNumber extends derive(HookableTrait, Number) {
+    constructor(value) {
+        super(value);
+        this.onValidation(value);
+        Object.defineProperties(this, {
+            [NON_ENUMERABLE_VALUE_KEY]: {
+                value,
+                enumerable: false,
+            },
+            registerHook: {
+                enumerable: false,
+            },
+            overrideHook: {
+                enumerable: false,
+            },
+            getHook: {
+                enumerable: false,
+            },
+            getHookOrThrow: {
+                enumerable: false,
+            },
+            getHooks: {
+                enumerable: false,
+            },
+            getActions: {
+                enumerable: false,
+            },
+            hasHook: {
+                enumerable: false,
+            },
+            hasAction: {
+                enumerable: false,
+            },
+            removeHook: {
+                enumerable: false,
+            },
+        });
+    }
+    toString() {
+        return `${this[NON_ENUMERABLE_VALUE_KEY]}`;
+    }
+    valueOf() {
+        return this[NON_ENUMERABLE_VALUE_KEY];
+    }
+    toPlainObject() {
+        return this.valueOf();
+    }
+    equals(other) {
+        return (other !== null &&
+            other.constructor === this.constructor &&
+            this.valueOf() === other.valueOf());
+    }
+    [util.inspect.custom]() {
+        return `[${this.constructor.name}: ${this}]`;
+    }
+    typeName() {
+        return this.getTypeName();
+    }
+    static typeName() {
+        return this.getTypeName();
+    }
+    getTypeName() {
+        return getTypeName(this);
+    }
+    static toString() {
+        return this.getTypeName();
+    }
+    static getTypeName() {
+        return getTypeName(this);
+    }
+    toJSONValue() {
+        var _a;
+        return (_a = kernel.serializer) === null || _a === void 0 ? void 0 : _a.toJSONValue(this);
+    }
+    static from(value) {
+        return new this(value);
+    }
+    onValidation(value, isStrict = true) {
+        if (!kernel.isValidating()) {
+            return true;
+        }
+        try {
+            kernel.validator.validate(value, Number, isStrict);
+        }
+        catch (error) {
+            const { message } = error;
+            const typeName = this.getTypeName();
+            throw new error.constructor(`${typeName}: ${message}`);
+        }
+        const hooks = this.getHooks('onValidation');
+        for (const hook of Object.values(hooks)) {
+            hook.bind(this)(value);
+        }
+        return true;
+    }
+    static setValidator(validator) {
+        this.prototype.overrideHook('onValidation', 'validation', validator);
+    }
+    static getValidator() {
+        return this.prototype.getHook('onValidation', 'validation');
+    }
+    static removeValidator() {
+        this.prototype.removeHook('onValidation', 'validation');
+    }
+    static hasValidator() {
+        return this.prototype.hasHook('onValidation', 'validation');
+    }
+}
+ValueNumber.transformer = function () {
+    const Self = this;
+    return {
+        to: (instance) => {
+            if (instance === undefined) {
+                return undefined;
+            }
+            if (Array.isArray(instance)) {
+                return instance.map((item) => item.valueOf());
+            }
+            return instance.valueOf();
+        },
+        from: (value) => {
+            if (Array.isArray(value)) {
+                return value.map((item) => new Self(item));
+            }
+            return new Self(value);
+        },
+    };
+};
+
+let StandardError = class StandardError extends ValueObjectError {
+};
+StandardError = __decorate([
+    Type('Eveble.StandardError')({ kind: 19, name: "StandardError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "propsOrMessage", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 2 }, { kind: 15, name: "__type", properties: {} }] } }] }], extends: { kind: 18, type: ValueObjectError, arguments: [] } })
+], StandardError);
+let UnsupportedStandardError = class UnsupportedStandardError extends ValueObjectError {
+    constructor(standardId) {
+        super({ message: `Standard is not supported`, standardId });
+    }
+};
+UnsupportedStandardError = __decorate([
+    Type('Eveble.UnsupportedStandardError')({ kind: 19, name: "UnsupportedStandardError", properties: { "standardId": { kind: 2, modifiers: 1 } }, constructors: [{ modifiers: 0, parameters: [{ name: "standardId", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: ValueObjectError, arguments: [] } }),
+    __metadata("design:paramtypes", [String])
+], UnsupportedStandardError);
+let StandardExistError = class StandardExistError extends StandardError {
+    constructor(typeName, id) {
+        super(`${typeName}: standard with id '${id}' already exists`);
+    }
+};
+StandardExistError = __decorate([
+    Type('Eveble.StandardExistError')({ kind: 19, name: "StandardExistError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "typeName", modifiers: 0, type: { kind: 2 } }, { name: "id", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: StandardError, arguments: [] } }),
+    __metadata("design:paramtypes", [String, String])
+], StandardExistError);
+let NotApplicableError = class NotApplicableError extends StandardError {
+    constructor(typeName, id) {
+        super(`${typeName}: standard with id '${id}' is not applicable`);
+    }
+};
+NotApplicableError = __decorate([
+    Type('Eveble.NotApplicableError')({ kind: 19, name: "NotApplicableError", properties: {}, constructors: [{ modifiers: 0, parameters: [{ name: "typeName", modifiers: 0, type: { kind: 2 } }, { name: "id", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: StandardError, arguments: [] } }),
+    __metadata("design:paramtypes", [String, String])
+], NotApplicableError);
+let UnavailableConversionError = class UnavailableConversionError extends StandardError {
+    constructor(from, to) {
+        super({ message: `Conversion is not available`, from, to });
+    }
+};
+UnavailableConversionError = __decorate([
+    Type('Eveble.UnavailableConversionError')({ kind: 19, name: "UnavailableConversionError", properties: { "from": { kind: 2, modifiers: 1 }, "to": { kind: 2, modifiers: 1 } }, constructors: [{ modifiers: 0, parameters: [{ name: "from", modifiers: 0, type: { kind: 2 } }, { name: "to", modifiers: 0, type: { kind: 2 } }] }], extends: { kind: 18, type: StandardError, arguments: [] } }),
+    __metadata("design:paramtypes", [String, String])
+], UnavailableConversionError);
+const StandardizedTrait = trait((base) => class extends base {
+    static registerStandard(standard, shouldOverride = false) {
+        if (this.standards === undefined) {
+            this.standards = new Map();
+        }
+        if (this.hasStandard(standard.getId()) && !shouldOverride) {
+            throw new StandardExistError(this.getTypeName(), standard.getId());
+        }
+        this.standards.set(standard.getId(), standard);
+    }
+    static overrideStandard(standard) {
+        this.registerStandard(standard, true);
+    }
+    static hasStandard(standardId) {
+        var _a;
+        if (this.standards === undefined)
+            return false;
+        return (_a = this.standards) === null || _a === void 0 ? void 0 : _a.has(standardId);
+    }
+    static removeStandard(standardId) {
+        var _a;
+        (_a = this.standards) === null || _a === void 0 ? void 0 : _a.delete(standardId);
+    }
+    static getStandards() {
+        var _a;
+        if (this.standards !== undefined) {
+            return Array.from((_a = this.standards) === null || _a === void 0 ? void 0 : _a.values());
+        }
+        return [];
+    }
+    static getStandard(standardId) {
+        if (this.standards === undefined)
+            return undefined;
+        return this.standards.get(standardId);
+    }
+    static getCodes(standardId) {
+        var _a;
+        if (!this.hasStandard(standardId)) {
+            throw new UnsupportedStandardError(standardId);
+        }
+        const standard = (_a = this.standards) === null || _a === void 0 ? void 0 : _a.get(standardId);
+        return standard.getCodes();
+    }
+    static identifyStandard(code) {
+        if (this.standards === undefined)
+            return undefined;
+        for (const standard of this.standards.values()) {
+            if (standard.isValid(code))
+                return standard;
+        }
+        return undefined;
+    }
+    static isInStandard(code, standardId) {
+        if (!this.hasStandard(standardId)) {
+            throw new UnsupportedStandardError(standardId);
+        }
+        const standard = this.getStandard(standardId);
+        return standard.isIn(code);
+    }
+    static convert(code, otherStandardId) {
+        if (!this.hasStandard(otherStandardId)) {
+            throw new UnsupportedStandardError(otherStandardId);
+        }
+        const identifiedStandard = this.identifyStandard(code);
+        if ((identifiedStandard === null || identifiedStandard === void 0 ? void 0 : identifiedStandard.getId()) === otherStandardId)
+            return code;
+        const standard = this.getStandard(otherStandardId);
+        if (standard.isConvertible === true) {
+            return standard.convert(code, identifiedStandard);
+        }
+        return undefined;
+    }
+});
+
+class InvalidGeneratorIdError extends ExtendableError {
+    constructor(got) {
+        super(`Expected id argument to be string, got ${got}`);
+    }
+}
+class GeneratorExistsError extends ExtendableError {
+    constructor(id) {
+        super(`Generator with id '${id}' would be overridden. To override existing mapping use <MyGenerator.prototype.overrideGenerator>`);
+    }
+}
+class GeneratorNotFoundError extends ExtendableError {
+    constructor(id) {
+        super(`Generator with id '${id}' was not found`);
+    }
+}
+const GeneratorTrait = () => trait((base) => class extends base {
+    constructor(generators = new Map()) {
+        super();
+        this.generators = generators;
+    }
+    registerGenerator(id, generator, shouldOverride = false) {
+        if (typeof id !== 'string') {
+            throw new InvalidGeneratorIdError(kernel.describer.describe(id));
+        }
+        if (this.hasGenerator(id) && !shouldOverride) {
+            throw new GeneratorExistsError(id);
+        }
+        this.generators.set(id, generator);
+    }
+    overrideGenerator(id, generator) {
+        this.registerGenerator(id, generator, true);
+    }
+    getGenerator(id) {
+        return this.generators.get(id);
+    }
+    hasGenerator(id) {
+        return this.generators.has(id);
+    }
+    removeGenerator(id) {
+        this.generators.delete(id);
+    }
+    getGenerators() {
+        return this.generators;
+    }
+});
+
+class InvalidValidatorIdError extends ExtendableError {
+    constructor(got) {
+        super(`Expected id argument to be string, got ${got}`);
+    }
+}
+class ValidatorExistsError extends ExtendableError {
+    constructor(id) {
+        super(`Validator with id '${id}' would be overridden. To override existing mapping use <MyValidator.prototype.overrideValidator>`);
+    }
+}
+class ValidatorNotFoundError extends ExtendableError {
+    constructor(id) {
+        super(`Validator with id '${id}' was not found`);
+    }
+}
+const ValidatorTrait = () => trait((base) => class extends base {
+    constructor(validators = new Map()) {
+        super();
+        this.validators = validators;
+    }
+    registerValidator(id, validator, shouldOverride = false) {
+        if (typeof id !== 'string') {
+            throw new InvalidValidatorIdError(kernel.describer.describe(id));
+        }
+        if (this.hasValidator(id) && !shouldOverride) {
+            throw new ValidatorExistsError(id);
+        }
+        this.validators.set(id, validator);
+    }
+    overrideValidator(id, validator) {
+        this.registerValidator(id, validator, true);
+    }
+    getValidator(id) {
+        return this.validators.get(id);
+    }
+    hasValidator(id) {
+        return this.validators.has(id);
+    }
+    removeValidator(id) {
+        this.validators.delete(id);
+    }
+    getValidators() {
+        return this.validators;
+    }
+});
+
+export { AbilityAssertion, AddingCommitFailedError, AddingSnapshotError, Aggregate, App, AppConfig, AppError, AppMissingError, Asserter, Assertion, AssertionApiAlreadyExistsError, AssertionError, Assignment, BINDINGS, BaseApp, BoundedContext, can as Can, CannotRouteMessageError, Client, ClientError, Command, CommandBus, CommandHandlingTrait, CommandSchedulingError, CommandSchedulingService, CommandUnschedulingError, Commit, CommitConcurrencyError, CommitMongoDBObserver, CommitMongoDBStorage, CommitPublisher, CommitReceiver, CommitSerializer, CommitStore, Config, ConsoleTransport, DEFAULTS, delegate as Delegate, DetailedLogFormatter, DomainError, DomainException, EJSONSerializerAdapter, BINDINGS as EVEBLE_BINDINGS, EjsonableTrait, ElementAlreadyExistsError, ElementNotFoundError, EmptyStringError, Entity, EntityError, Eveble, EvebleConfig, Event, EventBus, EventHandlingTrait, EventIdMismatchError, EventSourceable, EventSourceableError, EventSourceableRepository, EventsNotFoundError, GeneratorExistsError, GeneratorNotFoundError, GeneratorTrait, Guid, handle as Handle, HandlerExistError, HandlerNotFoundError, HandlingError, HandlingTrait, History, HookAlreadyExistsError, HookError, HookNotFoundError, HookableTrait, IdentifiableAlreadyExistsError, InactiveClientError, InfrastructureError, initial as Initial, InitializingMessageAlreadyExistsError, Injector, InjectorError, InjectorMissingError, InvalidAppConfigError, InvalidConfigError, InvalidControllerError, InvalidEnvironmentError, InvalidEventError, InvalidEventSourceableError, InvalidGeneratorIdError, InvalidHandlerError, InvalidHookActionError, InvalidHookIdError, InvalidInitializingMessageError, InvalidLegacyTransformerError, InvalidListError, InvalidMessageableType, InvalidModuleError, InvalidSchemaVersionError, InvalidStateError, InvalidStateTransitionError, InvalidStatusError, InvalidStatusTransitionError, InvalidTransportIdError, InvalidValidatorIdError, LITERAL_KEYS, LOGGING_LEVELS, LegacyTransformerAlreadyExistsError, LegacyTransformerNotFoundError, List, ListError, Log, LogMetadata, LogTransport, LogTransportConfig, Logger, LoggingConfig, LoggingError, METADATA_KEYS, Message, MissingEventSourceableError, MissingInitializingMessageError, Module, ModuleError, MongoDBClient, MongoDBCommitStorageModule, MongoDBSnapshotStorageModule, NON_ENUMERABLE_VALUE_KEY, NotApplicableError, NotVersionableError, OneToManyHandlingTrait, OneToOneHandlingTrait, Process, Projection, ProjectionAlreadyRebuildingError, ProjectionNotRebuildingError, ProjectionRebuilder, ProjectionRebuildingError, PulseClient, PulseCommandScheduler, PulseCommandSchedulerModule, PulseScheduledJobTransformer, RFC5424LoggingTrait, route as Route, Router, RouterError, SPECIFICATIONS, SavedStateNotFoundError, ScheduleCommand, ScheduledJob, SchedulerError, Serializable, SerializableError, SerializableTrait, SerializationError, Service, SimpleLogFormatter, SnapshotMongoDBStorage, SnapshotSerializer, Snapshotter, Standard, StandardError, StandardExistError, StandardizedTrait, StateError, StatefulAssertion, StatefulTrait, StatusError, StatusfulAssertion, StatusfulTrait, StorageNotFoundError, StringifingConverter, Struct, subscribe as Subscribe, TransportExistsError, TypeTrait, UnavailableConversionError, UndefinedActionError, UndefinedSnapshotterError, UndefinedSnapshotterFrequencyError, UndefinedStatesError, UndefinedStatusesError, UnhandleableTypeError, UnparsableValueError, UnresolvableIdentifierFromMessageError, UnscheduleCommand, UnsupportedExecutionTypeError, UnsupportedStandardError, UpdatingCommitError, UpdatingSnapshotError, ValidableTrait, ValidatorExistsError, ValidatorNotFoundError, ValidatorTrait, ValueNumber, ValueObject, ValueObjectError, ValueString, version as Version, VersionableError, VersionableTrait, can, convertObjectToCollection, createEJSON, debugInversifyMetadata, delegate, getAllClassProperties, getInjectedParameterIndices, getInjectedPropertyDetails, getInjectedPropertyNames, getInversifyMetadata, getMetadataSummary, getPostConstructMethodNames, getPreDestroyMethodNames, getPropertiesToValidate, handle, hasPostConstruct, hasPreDestroy, initial, isEventSourceableType, isInjectableClass, isPlainRecord, isPropertyInjected, isRecord, isTyped, loadENV, loggerLoader, route, subscribe, toPlainObject, version };

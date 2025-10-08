@@ -26,3 +26,4 @@ export declare const LITERAL_KEYS: {
     COMMANDS_KEY: symbol;
     EVENTS_KEY: symbol;
 };
+export declare const NON_ENUMERABLE_VALUE_KEY = "__value__";

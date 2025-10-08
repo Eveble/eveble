@@ -19,7 +19,7 @@ export declare class CommitMongoDBStorage implements types.CommitStorage {
     protected findCommits(query?: Filter<any>, options?: FindOptions<any>): Promise<Record<string, any>[]>;
     protected updateOne(filter?: Filter<any>, update?: UpdateFilter<any>): Promise<boolean>;
     findOneAndUpdate(filter?: Filter<any>, update?: UpdateFilter<any>, options?: FindOneAndUpdateOptions): Promise<types.Commit | undefined>;
-    protected isSuccessfulInsert(output: InsertOneResult<any>, expectedNumber: number): boolean;
+    protected isSuccessfulInsert(output: InsertOneResult<any>, _expectedNumber: number): boolean;
     protected isSuccessfulUpdate(output: UpdateResult | ModifyResult<any>, expectedNumber: number): boolean;
     protected getExpectedVersionOnStorage(commit: types.Commit): number;
 }

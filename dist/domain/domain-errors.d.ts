@@ -59,3 +59,9 @@ export declare class EventIdMismatchError extends EventSourceableError {
 export declare class InvalidInitializingMessageError extends EventSourceableError {
     constructor(esTypeName: string, expected: string, got: string);
 }
+export declare class EmptyStringError extends ValueObjectError {
+    constructor(typeName: string);
+}
+export declare class UnimplementedError extends ValueObjectError {
+    constructor();
+}
