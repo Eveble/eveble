@@ -2427,7 +2427,7 @@ exports.LogTransportConfig = __decorate([
                     isWholeLineColored: true,
                     includeStackTrace: true,
                     isAbbreviatingSources: false,
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "level": { kind: 999, modifiers: 0 }, "logColors": { kind: 999, modifiers: 0 }, "partsColors": { kind: 999, modifiers: 0 }, "messages": { kind: 999, modifiers: 0 }, "parts": { kind: 999, modifiers: 0 }, "flags": { kind: 999, modifiers: 0 }, "timestampFormat": { kind: 999, modifiers: 0 }, "abbreviationLength": { kind: 999, modifiers: 0 }, "inspectDepth": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7332": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7333": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isTimestamped": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isLabeled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showTarget": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "showMethod": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isWholeLineColored": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "includeStackTrace": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "isAbbreviatingSources": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] }, "timestampFormat": { kind: 17, initializer: () => 'HH:mm:ss', modifiers: 1, types: [{ kind: 12 }, { kind: 2 }] }, "abbreviationLength": { kind: 17, initializer: () => 15, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] }, "inspectDepth": { kind: 17, initializer: () => 0, modifiers: 1, types: [{ kind: 12 }, { kind: 3 }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "level": { kind: 999, modifiers: 0 }, "logColors": { kind: 999, modifiers: 0 }, "partsColors": { kind: 999, modifiers: 0 }, "messages": { kind: 999, modifiers: 0 }, "parts": { kind: 999, modifiers: 0 }, "flags": { kind: 999, modifiers: 0 }, "timestampFormat": { kind: 999, modifiers: 0 }, "abbreviationLength": { kind: 999, modifiers: 0 }, "inspectDepth": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7335": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7336": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], exports.LogTransportConfig);
 
@@ -2467,7 +2467,7 @@ exports.LoggingConfig = __decorate([
                     console: new exports.LogTransportConfig({
                         level: getenv.string('LOGGING_LEVEL', 'info'),
                     }),
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: exports.LogTransportConfig, arguments: [] }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "levels": { kind: 999, modifiers: 0 }, "transports": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7332": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7333": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "console": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 18, type: exports.LogTransportConfig, arguments: [] }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "isEnabled": { kind: 999, modifiers: 0 }, "levels": { kind: 999, modifiers: 0 }, "transports": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7335": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7336": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], exports.LoggingConfig);
 
@@ -2479,7 +2479,7 @@ exports.EvebleConfig = class EvebleConfig extends exports.Config {
     }
 };
 exports.EvebleConfig = __decorate([
-    core.Type()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "CommitStore": { kind: 999, modifiers: 0 }, "Snapshotter": { kind: 999, modifiers: 0 }, "CommandScheduler": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7332": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7333": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
+    core.Type()({ kind: 19, name: "EvebleConfig", properties: { "CommitStore": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "timeout": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "Snapshotter": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] }, "frequency": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 3 }] } } }] }, "CommandScheduler": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "isEnabled": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 4 }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "CommitStore": { kind: 999, modifiers: 0 }, "Snapshotter": { kind: 999, modifiers: 0 }, "CommandScheduler": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7335": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7336": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], exports.EvebleConfig);
 
@@ -2532,7 +2532,7 @@ exports.AppConfig = AppConfig_1 = __decorate([
                             processEvery: 180000,
                         },
                     },
-                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Pulse": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "appId": { kind: 999, modifiers: 0 }, "workerId": { kind: 999, modifiers: 0 }, "logging": { kind: 999, modifiers: 0 }, "conversion": { kind: 999, modifiers: 0 }, "validation": { kind: 999, modifiers: 0 }, "description": { kind: 999, modifiers: 0 }, "eveble": { kind: 999, modifiers: 0 }, "clients": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@6264": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@6266": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
+                }), modifiers: 1, types: [{ kind: 12 }, { kind: 15, properties: { "MongoDB": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommitStore": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "Snapshotter": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] }, "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] }, "Pulse": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, properties: { "CommandScheduler": { kind: 17, modifiers: 0, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: {} }] } } }] } } }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 17, types: [{ kind: 12 }, { kind: 15, name: "__type", properties: { "appId": { kind: 999, modifiers: 0 }, "workerId": { kind: 999, modifiers: 0 }, "logging": { kind: 999, modifiers: 0 }, "conversion": { kind: 999, modifiers: 0 }, "validation": { kind: 999, modifiers: 0 }, "description": { kind: 999, modifiers: 0 }, "eveble": { kind: 999, modifiers: 0 }, "clients": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@6267": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@6269": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } }] } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], exports.AppConfig);
 
@@ -5692,7 +5692,7 @@ let MongoDBCollectionConfig = class MongoDBCollectionConfig extends exports.Conf
     }
 };
 MongoDBCollectionConfig = __decorate([
-    core.Type()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2, modifiers: 1 }, "indexes": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "indexes": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7332": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7333": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
+    core.Type()({ kind: 19, name: "MongoDBCollectionConfig", properties: { "name": { kind: 2, modifiers: 1 }, "indexes": { kind: 17, modifiers: 1, types: [{ kind: 12 }, { kind: 18, type: Array, arguments: [{ kind: 1 }] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "indexes": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7335": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7336": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBCollectionConfig);
 let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends exports.Config {
@@ -5702,7 +5702,7 @@ let MongoDBDatabaseConfig = class MongoDBDatabaseConfig extends exports.Config {
     }
 };
 MongoDBDatabaseConfig = __decorate([
-    core.Type()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2, modifiers: 1 }, "collections": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "collections": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7332": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7333": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
+    core.Type()({ kind: 19, name: "MongoDBDatabaseConfig", properties: { "name": { kind: 2, modifiers: 1 }, "collections": { kind: 18, modifiers: 1, type: Array, arguments: [{ kind: 18, type: MongoDBCollectionConfig, arguments: [] }] } }, constructors: [{ modifiers: 0, parameters: [{ name: "props", modifiers: 0, type: { kind: 15, name: "__type", properties: { "name": { kind: 999, modifiers: 0 }, "collections": { kind: 999, modifiers: 0 }, "isConfigurable": { kind: 999, modifiers: 0 }, "getPropTypes": { kind: 999, modifiers: 0 }, "has": { kind: 999, modifiers: 0 }, "get": { kind: 999, modifiers: 0 }, "getExact": { kind: 999, modifiers: 0 }, "getDefault": { kind: 999, modifiers: 0 }, "hasDefault": { kind: 999, modifiers: 0 }, "set": { kind: 999, modifiers: 0 }, "assign": { kind: 999, modifiers: 0 }, "include": { kind: 999, modifiers: 0 }, "merge": { kind: 999, modifiers: 0 }, "__@CONFIG_INCLUDED_KEY@7335": { kind: 999, modifiers: 0 }, "__@CONFIG_MERGED_KEY@7336": { kind: 999, modifiers: 0 }, "schemaVersion": { kind: 999, modifiers: 0 }, "in": { kind: 999, modifiers: 0 }, "typeName": { kind: 999, modifiers: 0 }, "getTypeName": { kind: 999, modifiers: 0 }, "toString": { kind: 999, modifiers: 0 }, "toJSONValue": { kind: 999, modifiers: 0 }, "transformLegacyProps": { kind: 999, modifiers: 0 }, "getCurrentSchemaVersion": { kind: 999, modifiers: 0 }, "isLegacySchemaVersion": { kind: 999, modifiers: 0 }, "calculateNextSchemaVersion": { kind: 999, modifiers: 0 }, "registerLegacyTransformer": { kind: 999, modifiers: 0 }, "overrideLegacyTransformer": { kind: 999, modifiers: 0 }, "hasLegacyTransformer": { kind: 999, modifiers: 0 }, "getLegacyTransformers": { kind: 999, modifiers: 0 }, "getLegacyTransformer": { kind: 999, modifiers: 0 }, "getSchemaVersion": { kind: 999, modifiers: 0 }, "getPropertyInitializers": { kind: 999, modifiers: 0 }, "getInstanceInitializers": { kind: 999, modifiers: 0 }, "getParentInitializers": { kind: 999, modifiers: 0 }, "toPlainObject": { kind: 999, modifiers: 0 }, "validateProps": { kind: 999, modifiers: 0 }, "equals": { kind: 999, modifiers: 0 }, "hasSameValues": { kind: 999, modifiers: 0 }, "registerHook": { kind: 999, modifiers: 0 }, "overrideHook": { kind: 999, modifiers: 0 }, "getHook": { kind: 999, modifiers: 0 }, "getHookOrThrow": { kind: 999, modifiers: 0 }, "getHooks": { kind: 999, modifiers: 0 }, "getActions": { kind: 999, modifiers: 0 }, "hasHook": { kind: 999, modifiers: 0 }, "hasAction": { kind: 999, modifiers: 0 }, "removeHook": { kind: 999, modifiers: 0 } } } }] }], extends: { kind: 18, type: exports.Config, arguments: [] } }),
     __metadata("design:paramtypes", [Object])
 ], MongoDBDatabaseConfig);
 class MongoDBClient extends Client {
@@ -8257,6 +8257,167 @@ const ValidatorTrait = () => core$1.trait((base) => class extends base {
         return this.validators;
     }
 });
+
+exports.LanguageCode = void 0;
+(function (LanguageCode) {
+    LanguageCode["af"] = "af";
+    LanguageCode["ak"] = "ak";
+    LanguageCode["sq"] = "sq";
+    LanguageCode["am"] = "am";
+    LanguageCode["ar"] = "ar";
+    LanguageCode["hy"] = "hy";
+    LanguageCode["as"] = "as";
+    LanguageCode["az"] = "az";
+    LanguageCode["bm"] = "bm";
+    LanguageCode["bn"] = "bn";
+    LanguageCode["eu"] = "eu";
+    LanguageCode["be"] = "be";
+    LanguageCode["bs"] = "bs";
+    LanguageCode["br"] = "br";
+    LanguageCode["bg"] = "bg";
+    LanguageCode["my"] = "my";
+    LanguageCode["ca"] = "ca";
+    LanguageCode["ce"] = "ce";
+    LanguageCode["zh"] = "zh";
+    LanguageCode["zh_Hans"] = "zh_Hans";
+    LanguageCode["zh_Hant"] = "zh_Hant";
+    LanguageCode["cu"] = "cu";
+    LanguageCode["kw"] = "kw";
+    LanguageCode["co"] = "co";
+    LanguageCode["hr"] = "hr";
+    LanguageCode["cs"] = "cs";
+    LanguageCode["da"] = "da";
+    LanguageCode["nl"] = "nl";
+    LanguageCode["nl_BE"] = "nl_BE";
+    LanguageCode["dz"] = "dz";
+    LanguageCode["en"] = "en";
+    LanguageCode["en_AU"] = "en_AU";
+    LanguageCode["en_CA"] = "en_CA";
+    LanguageCode["en_GB"] = "en_GB";
+    LanguageCode["en_US"] = "en_US";
+    LanguageCode["eo"] = "eo";
+    LanguageCode["et"] = "et";
+    LanguageCode["ee"] = "ee";
+    LanguageCode["fo"] = "fo";
+    LanguageCode["fi"] = "fi";
+    LanguageCode["fr"] = "fr";
+    LanguageCode["fr_CA"] = "fr_CA";
+    LanguageCode["fr_CH"] = "fr_CH";
+    LanguageCode["ff"] = "ff";
+    LanguageCode["gl"] = "gl";
+    LanguageCode["lg"] = "lg";
+    LanguageCode["ka"] = "ka";
+    LanguageCode["de"] = "de";
+    LanguageCode["de_AT"] = "de_AT";
+    LanguageCode["de_CH"] = "de_CH";
+    LanguageCode["el"] = "el";
+    LanguageCode["gu"] = "gu";
+    LanguageCode["ht"] = "ht";
+    LanguageCode["ha"] = "ha";
+    LanguageCode["he"] = "he";
+    LanguageCode["hi"] = "hi";
+    LanguageCode["hu"] = "hu";
+    LanguageCode["is"] = "is";
+    LanguageCode["ig"] = "ig";
+    LanguageCode["id"] = "id";
+    LanguageCode["ia"] = "ia";
+    LanguageCode["ga"] = "ga";
+    LanguageCode["it"] = "it";
+    LanguageCode["ja"] = "ja";
+    LanguageCode["jv"] = "jv";
+    LanguageCode["kl"] = "kl";
+    LanguageCode["kn"] = "kn";
+    LanguageCode["ks"] = "ks";
+    LanguageCode["kk"] = "kk";
+    LanguageCode["km"] = "km";
+    LanguageCode["ki"] = "ki";
+    LanguageCode["rw"] = "rw";
+    LanguageCode["ko"] = "ko";
+    LanguageCode["ku"] = "ku";
+    LanguageCode["ky"] = "ky";
+    LanguageCode["lo"] = "lo";
+    LanguageCode["la"] = "la";
+    LanguageCode["lv"] = "lv";
+    LanguageCode["ln"] = "ln";
+    LanguageCode["lt"] = "lt";
+    LanguageCode["lu"] = "lu";
+    LanguageCode["lb"] = "lb";
+    LanguageCode["mk"] = "mk";
+    LanguageCode["mg"] = "mg";
+    LanguageCode["ms"] = "ms";
+    LanguageCode["ml"] = "ml";
+    LanguageCode["mt"] = "mt";
+    LanguageCode["gv"] = "gv";
+    LanguageCode["mi"] = "mi";
+    LanguageCode["mr"] = "mr";
+    LanguageCode["mn"] = "mn";
+    LanguageCode["ne"] = "ne";
+    LanguageCode["nd"] = "nd";
+    LanguageCode["se"] = "se";
+    LanguageCode["nb"] = "nb";
+    LanguageCode["nn"] = "nn";
+    LanguageCode["ny"] = "ny";
+    LanguageCode["or"] = "or";
+    LanguageCode["om"] = "om";
+    LanguageCode["os"] = "os";
+    LanguageCode["ps"] = "ps";
+    LanguageCode["fa"] = "fa";
+    LanguageCode["fa_AF"] = "fa_AF";
+    LanguageCode["pl"] = "pl";
+    LanguageCode["pt"] = "pt";
+    LanguageCode["pt_BR"] = "pt_BR";
+    LanguageCode["pt_PT"] = "pt_PT";
+    LanguageCode["pa"] = "pa";
+    LanguageCode["qu"] = "qu";
+    LanguageCode["ro"] = "ro";
+    LanguageCode["ro_MD"] = "ro_MD";
+    LanguageCode["rm"] = "rm";
+    LanguageCode["rn"] = "rn";
+    LanguageCode["ru"] = "ru";
+    LanguageCode["sm"] = "sm";
+    LanguageCode["sg"] = "sg";
+    LanguageCode["sa"] = "sa";
+    LanguageCode["gd"] = "gd";
+    LanguageCode["sr"] = "sr";
+    LanguageCode["sn"] = "sn";
+    LanguageCode["ii"] = "ii";
+    LanguageCode["sd"] = "sd";
+    LanguageCode["si"] = "si";
+    LanguageCode["sk"] = "sk";
+    LanguageCode["sl"] = "sl";
+    LanguageCode["so"] = "so";
+    LanguageCode["st"] = "st";
+    LanguageCode["es"] = "es";
+    LanguageCode["es_ES"] = "es_ES";
+    LanguageCode["es_MX"] = "es_MX";
+    LanguageCode["su"] = "su";
+    LanguageCode["sw"] = "sw";
+    LanguageCode["sw_CD"] = "sw_CD";
+    LanguageCode["sv"] = "sv";
+    LanguageCode["tg"] = "tg";
+    LanguageCode["ta"] = "ta";
+    LanguageCode["tt"] = "tt";
+    LanguageCode["te"] = "te";
+    LanguageCode["th"] = "th";
+    LanguageCode["bo"] = "bo";
+    LanguageCode["ti"] = "ti";
+    LanguageCode["to"] = "to";
+    LanguageCode["tr"] = "tr";
+    LanguageCode["tk"] = "tk";
+    LanguageCode["uk"] = "uk";
+    LanguageCode["ur"] = "ur";
+    LanguageCode["ug"] = "ug";
+    LanguageCode["uz"] = "uz";
+    LanguageCode["vi"] = "vi";
+    LanguageCode["vo"] = "vo";
+    LanguageCode["cy"] = "cy";
+    LanguageCode["fy"] = "fy";
+    LanguageCode["wo"] = "wo";
+    LanguageCode["xh"] = "xh";
+    LanguageCode["yi"] = "yi";
+    LanguageCode["yo"] = "yo";
+    LanguageCode["zu"] = "zu";
+})(exports.LanguageCode || (exports.LanguageCode = {}));
 
 Object.defineProperty(exports, 'EvebleType', {
   enumerable: true,

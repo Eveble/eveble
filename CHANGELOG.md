@@ -1,3 +1,10 @@
+# [4.3.0](https://github.com/Eveble/eveble/compare/v4.2.0...v4.3.0) (2025-10-08)
+
+
+### Features
+
+* add LanguageCode type ([551e1c5](https://github.com/Eveble/eveble/commit/551e1c593677183bc045447812adfb723393ddba))
+
 # [4.2.0](https://github.com/Eveble/eveble/compare/v4.1.0...v4.2.0) (2025-10-08)
 
 

@@ -127,3 +127,4 @@ export { InvalidGeneratorIdError, GeneratorExistsError, GeneratorNotFoundError, 
 export { InvalidValidatorIdError, ValidatorExistsError, ValidatorNotFoundError, } from './domain/type-helpers/traits/validator.trait';
 export { EmptyStringError } from './domain/domain-errors';
 export { DeepPartial, UnwrappedArray, ID, ValueOf, AnyFn, Properties, PropType, ClassProperties, EntityProperties, TranslationProperties, } from './types/shared-types';
+export { LanguageCode } from './types/generated-types';
