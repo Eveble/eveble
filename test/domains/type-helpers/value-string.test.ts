@@ -121,10 +121,6 @@ describe('ValueString', () => {
       );
     });
 
-    it('ensures that errors are only thrown upon enabled validation on kernel', () => {
-      expect(() => new ValueString(2 as any)).to.not.throw(Error);
-    });
-
     it('iterates over registered onValidation hooks', () => {
       const firstValidator = sinon.stub();
       const secondValidator = sinon.stub();

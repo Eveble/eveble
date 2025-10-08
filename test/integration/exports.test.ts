@@ -111,7 +111,10 @@ import { LoggingConfig } from '../../src/configs/logging-config';
 import { LogTransportConfig } from '../../src/configs/log-transport-config';
 // Constants
 import { BINDINGS } from '../../src/constants/bindings';
-import { LITERAL_KEYS } from '../../src/constants/literal-keys';
+import {
+  LITERAL_KEYS,
+  NON_ENUMERABLE_VALUE_KEY,
+} from '../../src/constants/literal-keys';
 import { DEFAULTS, LOGGING_LEVELS } from '../../src/constants/defaults';
 import { METADATA_KEYS } from '../../src/constants/metadata-keys';
 import { SPECIFICATIONS } from '../../src/constants/specifications';
@@ -345,6 +348,7 @@ import {
   StandardExistError,
   NotApplicableError,
   UnavailableConversionError,
+  StandardizedTrait,
 } from '../../src/domain/type-helpers/traits/standardized.trait';
 
 /*
