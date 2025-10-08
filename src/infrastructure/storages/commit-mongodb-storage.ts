@@ -413,7 +413,7 @@ export class CommitMongoDBStorage implements types.CommitStorage {
    */
   protected isSuccessfulInsert(
     output: InsertOneResult<any>,
-    expectedNumber: number
+    _expectedNumber: number
   ): boolean {
     return output.acknowledged && output.insertedId !== null;
   }
