@@ -174,6 +174,7 @@ import {
   InvalidEventError,
   EventIdMismatchError,
   InvalidInitializingMessageError,
+  EmptyStringError,
 } from '../../src/domain/domain-errors';
 import { DomainException } from '../../src/domain/domain-exception';
 import { Entity } from '../../src/domain/entity';
@@ -317,6 +318,39 @@ import {
   getPropertiesToValidate,
   isPropertyInjected,
 } from '../../src/utils/inversify';
+// Type Helpers - Constants
+import { NON_ENUMERABLE_VALUE_KEY } from '../../src/constants/literal-keys';
+
+// Type Helpers - Components
+import { Standard } from '../../src/domain/type-helpers/standard';
+import { ValueString } from '../../src/domain/type-helpers/value-string';
+import { ValueNumber } from '../../src/domain/type-helpers/value-number';
+
+// Type Helpers - Traits
+import { StandardizedTrait } from '../../src/domain/type-helpers/traits/standardized.trait';
+import { ValidableTrait } from '../../src/domain/type-helpers/traits/validable.trait';
+import {
+  GeneratorTrait,
+  InvalidGeneratorIdError,
+  GeneratorExistsError,
+  GeneratorNotFoundError,
+} from '../../src/domain/type-helpers/traits/generator.trait';
+import {
+  ValidatorTrait,
+  InvalidValidatorIdError,
+  ValidatorExistsError,
+  ValidatorNotFoundError,
+} from '../../src/domain/type-helpers/traits/validator.trait';
+
+// Type Helpers - Errors
+import {
+  StandardError,
+  UnsupportedStandardError,
+  StandardExistError,
+  NotApplicableError,
+  UnavailableConversionError,
+} from '../../src/domain/type-helpers/traits/standardized.trait';
+
 /*
 EXPORTED
 */
@@ -647,6 +681,33 @@ import {
   Type,
   EvebleType,
   Serializable,
+  /*
+  TYPE HELPERS
+  */
+  // Constants
+  NON_ENUMERABLE_VALUE_KEY as NON_ENUMERABLE_VALUE_KEY_EXPORTED,
+  // Components
+  Standard as StandardExported,
+  ValueString as ValueStringExported,
+  ValueNumber as ValueNumberExported,
+  // Traits
+  StandardizedTrait as StandardizedTraitExported,
+  ValidableTrait as ValidableTraitExported,
+  GeneratorTrait as GeneratorTraitExported,
+  ValidatorTrait as ValidatorTraitExported,
+  // Errors
+  StandardError as StandardErrorExported,
+  UnsupportedStandardError as UnsupportedStandardErrorExported,
+  StandardExistError as StandardExistErrorExported,
+  NotApplicableError as NotApplicableErrorExported,
+  UnavailableConversionError as UnavailableConversionErrorExported,
+  InvalidGeneratorIdError as InvalidGeneratorIdErrorExported,
+  GeneratorExistsError as GeneratorExistsErrorExported,
+  GeneratorNotFoundError as GeneratorNotFoundErrorExported,
+  InvalidValidatorIdError as InvalidValidatorIdErrorExported,
+  ValidatorExistsError as ValidatorExistsErrorExported,
+  ValidatorNotFoundError as ValidatorNotFoundErrorExported,
+  EmptyStringError as EmptyStringErrorExported,
 } from '../../src/index';
 
 describe(`exports`, () => {
@@ -1700,6 +1761,109 @@ describe(`exports`, () => {
     });
     it('inject', () => {
       expect(injectExported).to.be.equal(inject);
+    });
+  });
+
+  describe('type helpers', () => {
+    describe('constants', () => {
+      it('NON_ENUMERABLE_VALUE_KEY', () => {
+        expect(NON_ENUMERABLE_VALUE_KEY_EXPORTED).to.be.equal(
+          NON_ENUMERABLE_VALUE_KEY
+        );
+      });
+    });
+
+    describe('components', () => {
+      it('Standard', () => {
+        expect(StandardExported).to.be.equal(Standard);
+      });
+      it('ValueString', () => {
+        expect(ValueStringExported).to.be.equal(ValueString);
+      });
+      it('ValueNumber', () => {
+        expect(ValueNumberExported).to.be.equal(ValueNumber);
+      });
+    });
+
+    describe('traits', () => {
+      it('StandardizedTrait', () => {
+        expect(StandardizedTraitExported).to.be.equal(StandardizedTrait);
+      });
+      it('ValidableTrait', () => {
+        expect(ValidableTraitExported).to.be.equal(ValidableTrait);
+      });
+      it('GeneratorTrait', () => {
+        expect(GeneratorTraitExported).to.be.equal(GeneratorTrait);
+      });
+      it('ValidatorTrait', () => {
+        expect(ValidatorTraitExported).to.be.equal(ValidatorTrait);
+      });
+    });
+
+    describe('errors', () => {
+      describe('StandardizedTrait errors', () => {
+        it('StandardError', () => {
+          expect(StandardErrorExported).to.be.equal(StandardError);
+        });
+        it('UnsupportedStandardError', () => {
+          expect(UnsupportedStandardErrorExported).to.be.equal(
+            UnsupportedStandardError
+          );
+        });
+        it('StandardExistError', () => {
+          expect(StandardExistErrorExported).to.be.equal(StandardExistError);
+        });
+        it('NotApplicableError', () => {
+          expect(NotApplicableErrorExported).to.be.equal(NotApplicableError);
+        });
+        it('UnavailableConversionError', () => {
+          expect(UnavailableConversionErrorExported).to.be.equal(
+            UnavailableConversionError
+          );
+        });
+      });
+
+      describe('GeneratorTrait errors', () => {
+        it('InvalidGeneratorIdError', () => {
+          expect(InvalidGeneratorIdErrorExported).to.be.equal(
+            InvalidGeneratorIdError
+          );
+        });
+        it('GeneratorExistsError', () => {
+          expect(GeneratorExistsErrorExported).to.be.equal(
+            GeneratorExistsError
+          );
+        });
+        it('GeneratorNotFoundError', () => {
+          expect(GeneratorNotFoundErrorExported).to.be.equal(
+            GeneratorNotFoundError
+          );
+        });
+      });
+
+      describe('ValidatorTrait errors', () => {
+        it('InvalidValidatorIdError', () => {
+          expect(InvalidValidatorIdErrorExported).to.be.equal(
+            InvalidValidatorIdError
+          );
+        });
+        it('ValidatorExistsError', () => {
+          expect(ValidatorExistsErrorExported).to.be.equal(
+            ValidatorExistsError
+          );
+        });
+        it('ValidatorNotFoundError', () => {
+          expect(ValidatorNotFoundErrorExported).to.be.equal(
+            ValidatorNotFoundError
+          );
+        });
+      });
+
+      describe('domain errors', () => {
+        it('EmptyStringError', () => {
+          expect(EmptyStringErrorExported).to.be.equal(EmptyStringError);
+        });
+      });
     });
   });
 });

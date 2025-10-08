@@ -136,3 +136,19 @@ export class InvalidInitializingMessageError extends EventSourceableError {
     );
   }
 }
+/*
+SHARED ERRORS
+*/
+@Type('EmptyStringError')
+export class EmptyStringError extends ValueObjectError {
+  constructor(typeName: string) {
+    super(`${typeName}: can't be an empty string`);
+  }
+}
+
+@Type('UnimplementedError')
+export class UnimplementedError extends ValueObjectError {
+  constructor() {
+    super(`Not implemented`);
+  }
+}

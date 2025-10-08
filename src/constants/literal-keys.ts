@@ -45,3 +45,4 @@ export const LITERAL_KEYS = {
   COMMANDS_KEY,
   EVENTS_KEY,
 };
+export const NON_ENUMERABLE_VALUE_KEY = '__value__';
