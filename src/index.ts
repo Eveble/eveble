@@ -373,3 +373,16 @@ export {
   ValidatorNotFoundError,
 } from './domain/type-helpers/traits/validator.trait';
 export { EmptyStringError } from './domain/domain-errors';
+// Types
+export {
+  DeepPartial,
+  UnwrappedArray,
+  ID,
+  ValueOf,
+  AnyFn,
+  Properties,
+  PropType,
+  ClassProperties,
+  EntityProperties,
+  TranslationProperties,
+} from './types/shared-types';
