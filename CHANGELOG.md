@@ -1,3 +1,11 @@
+## [4.3.1](https://github.com/Eveble/eveble/compare/v4.3.0...v4.3.1) (2025-10-09)
+
+
+### Bug Fixes
+
+* bind Pulse library on injector ([e5d26cb](https://github.com/Eveble/eveble/commit/e5d26cb2f9fc96d861f27e5189b77fb4d3cafc3a))
+* ensure that Pulse is not bound before initialization ([ea29fc1](https://github.com/Eveble/eveble/commit/ea29fc12fac526d183356026a7e6ef42b4f7bdac))
+
 # [4.3.0](https://github.com/Eveble/eveble/compare/v4.2.0...v4.3.0) (2025-10-08)
 
 

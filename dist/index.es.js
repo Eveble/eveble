@@ -6315,6 +6315,11 @@ class PulseCommandSchedulerModule extends Module {
     }
     async initializeTopLevelDependencies() {
         var _a;
+        if (this.injector.isBound(BINDINGS.Pulse.library) === false) {
+            this.injector
+                .bind(BINDINGS.Pulse.library)
+                .toConstantValue(Pulse);
+        }
         this.injector
             .bind(BINDINGS.Pulse.jobTransformer)
             .to(PulseScheduledJobTransformer)
