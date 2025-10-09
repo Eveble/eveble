@@ -29,7 +29,8 @@
     "suppressImplicitAnyIndexErrors": false,
     "target": "es2018",
     "useDefineForClassFields": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/**/*.ts"

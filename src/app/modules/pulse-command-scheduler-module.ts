@@ -1,6 +1,6 @@
 import getenv from 'getenv';
 import { Collection } from 'mongodb';
-import { Pulse } from '@pulsecron/pulse';
+import Pulse from '@pulsecron/pulse';
 import { PulseClient } from '../clients/pulse-client';
 import { MongoDBClient } from '../clients/mongodb-client';
 import { Module } from '../../core/module';
@@ -64,8 +64,14 @@ export class PulseCommandSchedulerModule extends Module {
   async initializeTopLevelDependencies(): Promise<void> {
     if (this.injector.isBound(BINDINGS.Pulse.library) === false) {
       this.injector
-        .bind<typeof Pulse>(BINDINGS.Pulse.library)
+        .rebindSync<typeof Pulse>(BINDINGS.Pulse.library)
         .toConstantValue(Pulse);
+
+      this.log?.debug(
+        new Log(`bound 'BINDINGS.Pulse.library' to constant value`)
+          .on(this)
+          .in(this.initializeTopLevelDependencies)
+      );
     }
     this.injector
       .bind<types.PulseJobTransformer>(BINDINGS.Pulse.jobTransformer)

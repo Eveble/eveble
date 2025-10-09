@@ -1,4 +1,4 @@
-import { Pulse, Job } from '@pulsecron/pulse';
+import { Pulse, Job, PulseConfig } from '@pulsecron/pulse';
 import { inject } from 'inversify';
 import { Client } from '../client';
 import { types } from '../../types';
@@ -12,7 +12,7 @@ export class PulseClient extends Client implements types.Client {
   protected log: types.Logger;
 
   @inject(BINDINGS.Pulse.library)
-  protected Pulse: any;
+  protected Pulse: typeof Pulse;
 
   @inject(BINDINGS.MongoDB.clients.CommandScheduler)
   public readonly mongoClient: MongoDBClient;
@@ -25,7 +25,7 @@ export class PulseClient extends Client implements types.Client {
 
   public readonly collectionName: string;
 
-  public readonly options?: Record<string, any>;
+  public readonly options?: PulseConfig;
 
   protected _library?: Pulse;
 
@@ -44,9 +44,15 @@ export class PulseClient extends Client implements types.Client {
     );
     try {
       const database = this.mongoClient.getDatabase(this.databaseName);
-      this._library = new this.Pulse({
+      // Fix issue with constructor not being properly mapped between ESM and CJS
+      // so it breaks the code when trying to instantiate Pulse on other
+      // module using Eveble
+      const PulseConstructor = (this.Pulse as any)?.Pulse
+        ? (this.Pulse as any).Pulse
+        : this.Pulse;
+
+      this._library = new PulseConstructor({
         mongo: database,
-        collection: this.collectionName,
         ...this.options,
       });
 
