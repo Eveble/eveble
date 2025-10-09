@@ -1,6 +1,6 @@
 import getenv from 'getenv';
 import { Collection } from 'mongodb';
-import Pulse from '@pulsecron/pulse';
+import { Pulse } from '@pulsecron/pulse';
 import { PulseClient } from '../clients/pulse-client';
 import { MongoDBClient } from '../clients/mongodb-client';
 import { Module } from '../../core/module';
