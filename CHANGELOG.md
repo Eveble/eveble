@@ -1,3 +1,10 @@
+## [4.3.2](https://github.com/Eveble/eveble/compare/v4.3.1...v4.3.2) (2025-10-09)
+
+
+### Bug Fixes
+
+* Pulse import ([1d17460](https://github.com/Eveble/eveble/commit/1d1746050c03be1b2b3004a6bf858c9a418c4ce9))
+
 ## [4.3.1](https://github.com/Eveble/eveble/compare/v4.3.0...v4.3.1) (2025-10-09)
 
 

@@ -6336,7 +6336,7 @@ class PulseCommandSchedulerModule extends Module {
         if (this.injector.isBound(BINDINGS.Pulse.library) === false) {
             this.injector
                 .bind(BINDINGS.Pulse.library)
-                .toConstantValue(Pulse);
+                .toConstantValue(Pulse.Pulse);
         }
         this.injector
             .bind(BINDINGS.Pulse.jobTransformer)

@@ -12,7 +12,7 @@ import getenv from 'getenv';
 import decache from 'decache';
 import dotenv from 'dotenv-extended';
 import { v4 } from 'uuid';
-import Pulse from '@pulsecron/pulse';
+import Pulse$1, { Pulse } from '@pulsecron/pulse';
 import { Collection as Collection$1, MongoClient } from 'mongodb';
 import * as winston from 'winston';
 import chalk from 'chalk';
@@ -7156,7 +7156,7 @@ class App extends BaseApp {
             .on(this)
             .in(this.initializeExternalDependencies));
         const components = {
-            'Pulse.library': Pulse,
+            'Pulse.library': Pulse$1,
             'MongoDB.library': MongoClient,
         };
         for (const [id, component] of Object.entries(components)) {
