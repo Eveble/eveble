@@ -146,7 +146,6 @@ describe(`PulseClient`, () => {
         expect(Pulse).to.be.calledWithNew;
         expect(Pulse).to.be.calledWith({
           mongo: db,
-          collection: props.collectionName,
           ...props.options,
         });
         expect(pulseInstance.start).to.not.be.called;
