@@ -12,7 +12,7 @@ import getenv from 'getenv';
 import decache from 'decache';
 import dotenv from 'dotenv-extended';
 import { v4 } from 'uuid';
-import Pulse$1, { Pulse } from '@pulsecron/pulse';
+import Pulse from '@pulsecron/pulse';
 import { Collection as Collection$1, MongoClient } from 'mongodb';
 import * as winston from 'winston';
 import chalk from 'chalk';
@@ -5859,6 +5859,7 @@ __decorate([
 
 class PulseClient extends Client {
     async initialize() {
+        var _a;
         this.log.debug(new Log(`initializing client '${this.getId()}'`)
             .on(this)
             .in(this.initialize)
@@ -5867,9 +5868,11 @@ class PulseClient extends Client {
             .with('collectionName', this.collectionName));
         try {
             const database = this.mongoClient.getDatabase(this.databaseName);
-            this._library = new this.Pulse({
+            const PulseConstructor = ((_a = this.Pulse) === null || _a === void 0 ? void 0 : _a.Pulse)
+                ? this.Pulse.Pulse
+                : this.Pulse;
+            this._library = new PulseConstructor({
                 mongo: database,
-                collection: this.collectionName,
                 ...this.options,
             });
             await this.initializeEventHandlers();
@@ -6314,17 +6317,20 @@ class PulseCommandSchedulerModule extends Module {
         await ((_a = this.pulseClient) === null || _a === void 0 ? void 0 : _a.disconnect());
     }
     async initializeTopLevelDependencies() {
-        var _a;
+        var _a, _b;
         if (this.injector.isBound(BINDINGS.Pulse.library) === false) {
             this.injector
-                .bind(BINDINGS.Pulse.library)
+                .rebindSync(BINDINGS.Pulse.library)
                 .toConstantValue(Pulse);
+            (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'BINDINGS.Pulse.library' to constant value`)
+                .on(this)
+                .in(this.initializeTopLevelDependencies));
         }
         this.injector
             .bind(BINDINGS.Pulse.jobTransformer)
             .to(PulseScheduledJobTransformer)
             .inSingletonScope();
-        (_a = this.log) === null || _a === void 0 ? void 0 : _a.debug(new Log(`bound 'Pulse.ScheduledJobTransformer' in singleton scope`)
+        (_b = this.log) === null || _b === void 0 ? void 0 : _b.debug(new Log(`bound 'Pulse.ScheduledJobTransformer' in singleton scope`)
             .on(this)
             .in(this.initializeTopLevelDependencies));
     }
@@ -7156,7 +7162,7 @@ class App extends BaseApp {
             .on(this)
             .in(this.initializeExternalDependencies));
         const components = {
-            'Pulse.library': Pulse$1,
+            'Pulse.library': Pulse,
             'MongoDB.library': MongoClient,
         };
         for (const [id, component] of Object.entries(components)) {

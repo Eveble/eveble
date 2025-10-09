@@ -1,17 +1,17 @@
-import { Pulse } from '@pulsecron/pulse';
+import { Pulse, PulseConfig } from '@pulsecron/pulse';
 import { Client } from '../client';
 import { types } from '../../types';
 import { MongoDBClient } from './mongodb-client';
 import { Guid } from '../../domain/value-objects/guid';
 export declare class PulseClient extends Client implements types.Client {
     protected log: types.Logger;
-    protected Pulse: any;
+    protected Pulse: typeof Pulse;
     readonly mongoClient: MongoDBClient;
     id: string | Guid;
     state: types.State;
     readonly databaseName: string;
     readonly collectionName: string;
-    readonly options?: Record<string, any>;
+    readonly options?: PulseConfig;
     protected _library?: Pulse;
     initialize(): Promise<void>;
     get library(): Pulse;

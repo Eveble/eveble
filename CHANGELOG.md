@@ -1,3 +1,10 @@
+## [4.3.3](https://github.com/Eveble/eveble/compare/v4.3.2...v4.3.3) (2025-10-09)
+
+
+### Bug Fixes
+
+* Pulse client construction ([551b6cf](https://github.com/Eveble/eveble/commit/551b6cf3dc4c771fc5d2cf4a0d363bf15e6ed4ce))
+
 ## [4.3.2](https://github.com/Eveble/eveble/compare/v4.3.1...v4.3.2) (2025-10-09)
 
 
