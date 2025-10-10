@@ -6773,6 +6773,8 @@ let CommitMongoDBObserver = CommitMongoDBObserver_1 = class CommitMongoDBObserve
         const workerId = this.config
             .get('workerId')
             .toString();
+        const handledEventTypes = commitPublisher.getHandledEventTypes();
+        const handledCommandTypes = commitPublisher.getHandledCommandTypes();
         const pipeline = [
             {
                 $match: {
@@ -6780,12 +6782,12 @@ let CommitMongoDBObserver = CommitMongoDBObserver_1 = class CommitMongoDBObserve
                     $or: [
                         {
                             'fullDocument.eventTypes': {
-                                $in: commitPublisher.getHandledEventTypes(),
+                                $in: handledEventTypes,
                             },
                         },
                         {
                             'fullDocument.commandTypes': {
-                                $in: commitPublisher.getHandledCommandTypes(),
+                                $in: handledCommandTypes,
                             },
                         },
                     ],
@@ -6800,7 +6802,17 @@ let CommitMongoDBObserver = CommitMongoDBObserver_1 = class CommitMongoDBObserve
             const serializedCommit = change.fullDocument;
             if (!serializedCommit)
                 return;
-            const lockedCommit = await this.storage.lockCommit(serializedCommit.id, appId, workerId, {});
+            const registeredQuery = {
+                $or: [
+                    { eventTypes: { $in: handledEventTypes } },
+                    { commandTypes: { $in: handledCommandTypes } },
+                ],
+            };
+            const notReceivedYetQuery = { 'receivers.appId': { $nin: [appId] } };
+            const registeredAndNotReceivedYetFilter = {
+                $and: [registeredQuery, notReceivedYetQuery],
+            };
+            const lockedCommit = await this.storage.lockCommit(serializedCommit.id, appId, workerId, registeredAndNotReceivedYetFilter);
             if (lockedCommit !== undefined) {
                 await commitPublisher.publishChanges(lockedCommit);
             }

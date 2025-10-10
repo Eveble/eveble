@@ -1,3 +1,10 @@
+## [4.3.4](https://github.com/Eveble/eveble/compare/v4.3.3...v4.3.4) (2025-10-10)
+
+
+### Bug Fixes
+
+* **observer:** prevent duplicate event publishing by applying correct MongoDB lock filter ([a1c0357](https://github.com/Eveble/eveble/commit/a1c03574eb657a39f83cbbc6dab07998aaea435a))
+
 ## [4.3.3](https://github.com/Eveble/eveble/compare/v4.3.2...v4.3.3) (2025-10-09)
 
 
