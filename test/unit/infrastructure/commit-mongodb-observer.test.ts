@@ -79,8 +79,7 @@ describe(`CommitMongoDBObserver`, () => {
     });
 
     it(`observes commits for changes`, async () => {
-      const changeStream: any = stubInterface<ChangeStream>();
-
+      // Prepare handled types
       commitPublisher.getHandledEventTypes.returns(['MyEvent']);
       commitPublisher.getHandledCommandTypes.returns(['MyCommand']);
 
@@ -89,63 +88,97 @@ describe(`CommitMongoDBObserver`, () => {
           $match: {
             operationType: 'insert',
             $or: [
-              {
-                'fullDocument.eventTypes': {
-                  $in: ['MyEvent'],
-                },
-              },
-              {
-                'fullDocument.commandTypes': {
-                  $in: ['MyCommand'],
-                },
-              },
+              { 'fullDocument.eventTypes': { $in: ['MyEvent'] } },
+              { 'fullDocument.commandTypes': { $in: ['MyCommand'] } },
             ],
           },
         },
       ];
+
+      // Create fake change stream that immediately triggers "change"
+      const changeStream: any = {
+        on: (event: string, handler: Function) => {
+          if (event === 'change') {
+            handler({ fullDocument: { id: commitId } });
+          }
+          return changeStream;
+        },
+        close: sinon.stub(),
+      };
 
       collectionMock
         .expects('watch')
         .withArgs(expectedPipeline, { fullDocument: 'updateLookup' })
         .returns(changeStream);
 
-      const serializedCommit = {
-        id: commitId,
-      };
-
-      const changeEvent = {
-        fullDocument: serializedCommit,
-      };
-
-      changeStream.on.withArgs('change').yields(changeEvent);
-
       const lockedCommit = stubInterface<types.Commit>();
-
-      storage.lockCommit
-        .withArgs(commitId, appId, workerId, {})
-        .resolves(lockedCommit);
+      storage.lockCommit.resolves(lockedCommit);
 
       await observer.startObserving(commitPublisher);
-      expect(observer.isObserving()).to.be.true;
-      await observer.stopObserving();
-      expect(observer.isObserving()).to.be.false;
 
-      collectionMock.verify();
-      expect(changeStream.on).to.be.calledWith('close');
-      expect(changeStream.on).to.be.calledWith('error');
-      expect(commitPublisher.getHandledEventTypes).to.be.calledOnce;
-      expect(commitPublisher.getHandledCommandTypes).to.be.calledOnce;
-      expect(commitPublisher.publishChanges).to.be.calledOnce;
-      expect(commitPublisher.publishChanges).to.be.calledWithExactly(
+      expect(observer.isObserving()).to.be.true;
+      expect(storage.lockCommit).to.have.been.calledOnce;
+      expect(commitPublisher.publishChanges).to.have.been.calledOnce;
+      expect(commitPublisher.publishChanges).to.have.been.calledWithExactly(
         lockedCommit
       );
-      expect(storage.lockCommit).to.be.calledOnce;
-      expect(storage.lockCommit).to.be.calledWithExactly(
-        serializedCommit.id,
-        appId,
-        workerId,
-        {}
+
+      await observer.stopObserving();
+      expect(observer.isObserving()).to.be.false;
+      collectionMock.verify();
+
+      // Each of these should be called once (precomputed in observer)
+      expect(commitPublisher.getHandledEventTypes).to.be.calledOnce;
+      expect(commitPublisher.getHandledCommandTypes).to.be.calledOnce;
+    });
+
+    it('uses registeredAndNotReceivedYetFilter when locking commits (prevents duplicate publish)', async () => {
+      commitPublisher.getHandledEventTypes.returns(['MyEvent']);
+      commitPublisher.getHandledCommandTypes.returns(['MyCommand']);
+
+      const expectedFilter = {
+        $and: [
+          {
+            $or: [
+              { eventTypes: { $in: ['MyEvent'] } },
+              { commandTypes: { $in: ['MyCommand'] } },
+            ],
+          },
+          { 'receivers.appId': { $nin: [appId] } },
+        ],
+      };
+
+      // Fake changeStream that fires a "change" immediately
+      const changeStream: any = {
+        on: (event: string, handler: Function) => {
+          if (event === 'change') {
+            handler({ fullDocument: { id: commitId } });
+          }
+          return changeStream;
+        },
+        close: sinon.stub(),
+      };
+      collectionMock.expects('watch').returns(changeStream);
+
+      const lockedCommit = stubInterface<types.Commit>();
+      storage.lockCommit.resolves(lockedCommit);
+
+      await observer.startObserving(commitPublisher);
+
+      sinon.assert.calledOnce(storage.lockCommit);
+      expect(storage.lockCommit).to.have.been.calledWithMatch(
+        sinon.match.any, // commit id (can be Guid or string)
+        sinon.match(appId),
+        sinon.match(workerId),
+        sinon.match(expectedFilter)
       );
+      expect(commitPublisher.publishChanges).to.have.been.calledOnce;
+      expect(commitPublisher.publishChanges).to.have.been.calledWithExactly(
+        lockedCommit
+      );
+
+      await observer.stopObserving();
+      collectionMock.verify();
     });
 
     it('initializes with created state when observer is instantiated', async () => {

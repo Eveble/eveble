@@ -50,6 +50,9 @@ export class CommitMongoDBObserver extends derive(StatefulTrait) {
       .get<string | types.Stringifiable>('workerId')
       .toString();
 
+    const handledEventTypes = commitPublisher.getHandledEventTypes();
+    const handledCommandTypes = commitPublisher.getHandledCommandTypes();
+
     const pipeline = [
       {
         $match: {
@@ -57,12 +60,12 @@ export class CommitMongoDBObserver extends derive(StatefulTrait) {
           $or: [
             {
               'fullDocument.eventTypes': {
-                $in: commitPublisher.getHandledEventTypes(),
+                $in: handledEventTypes,
               },
             },
             {
               'fullDocument.commandTypes': {
-                $in: commitPublisher.getHandledCommandTypes(),
+                $in: handledCommandTypes,
               },
             },
           ],
@@ -79,17 +82,27 @@ export class CommitMongoDBObserver extends derive(StatefulTrait) {
       const serializedCommit = change.fullDocument;
       if (!serializedCommit) return;
 
+      const registeredQuery = {
+        $or: [
+          { eventTypes: { $in: handledEventTypes } },
+          { commandTypes: { $in: handledCommandTypes } },
+        ],
+      };
+      const notReceivedYetQuery = { 'receivers.appId': { $nin: [appId] } };
+      const registeredAndNotReceivedYetFilter = {
+        $and: [registeredQuery, notReceivedYetQuery],
+      };
+
       const lockedCommit = await this.storage.lockCommit(
         serializedCommit.id,
         appId,
         workerId,
-        {} // locking query logic can stay similar
+        registeredAndNotReceivedYetFilter
       );
       if (lockedCommit !== undefined) {
         await commitPublisher.publishChanges(lockedCommit);
       }
     });
-
     await this.initializeEventHandlers();
   }
 
