@@ -1,15 +1,21 @@
+import { LanguageCode } from './generated-dtypes';
+
 /**
  * A recursive implementation of the `Partial<T>` type.
  * Source: {@link https://stackoverflow.com/a/49936686/772859}
  */
 export type DeepPartial<T> = {
-  [P in keyof T]?:
-    | null
-    | (T[P] extends Array<infer U>
-        ? Array<DeepPartial<U>>
-        : T[P] extends ReadonlyArray<infer U>
-        ? ReadonlyArray<DeepPartial<U>>
-        : DeepPartial<T[P]>);
+  [P in keyof T]?: T[P] extends LanguageCode
+    ? LanguageCode // Explicitly allow LanguageCode
+    : T[P] extends (...args: any[]) => any
+    ? T[P]
+    : T[P] extends Array<infer U>
+    ? Array<DeepPartial<U>>
+    : T[P] extends ReadonlyArray<infer U>
+    ? ReadonlyArray<DeepPartial<U>>
+    : T[P] extends object
+    ? DeepPartial<T[P]>
+    : T[P];
 };
 
 /**
