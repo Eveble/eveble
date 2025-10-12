@@ -1,3 +1,13 @@
+## [4.3.5](https://github.com/Eveble/eveble/compare/v4.3.4...v4.3.5) (2025-10-12)
+
+
+### Bug Fixes
+
+* add missing export type ([c41abbe](https://github.com/Eveble/eveble/commit/c41abbe7557aad12e129cc24627e71481c3e9bdd))
+* how the "f" this got here? ([b2db750](https://github.com/Eveble/eveble/commit/b2db75014d34e3674b361c2f877aed45cb0f757e))
+* typo ([84b75e5](https://github.com/Eveble/eveble/commit/84b75e556a0a8cb97b188dd6001d48057b22bd3d))
+* update DeepPartial to not hang code ([3ee2d0b](https://github.com/Eveble/eveble/commit/3ee2d0b020126e1f89ce0df0efd7672aae60ed03))
+
 ## [4.3.4](https://github.com/Eveble/eveble/compare/v4.3.3...v4.3.4) (2025-10-10)
 
 

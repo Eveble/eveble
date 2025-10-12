@@ -126,5 +126,5 @@ export { StandardError, UnsupportedStandardError, StandardExistError, NotApplica
 export { InvalidGeneratorIdError, GeneratorExistsError, GeneratorNotFoundError, } from './domain/type-helpers/traits/generator.trait';
 export { InvalidValidatorIdError, ValidatorExistsError, ValidatorNotFoundError, } from './domain/type-helpers/traits/validator.trait';
 export { EmptyStringError } from './domain/domain-errors';
-export { DeepPartial, UnwrappedArray, ID, ValueOf, AnyFn, Properties, PropType, ClassProperties, EntityProperties, TranslationProperties, } from './types/shared-types';
+export { DeepPartial, UnwrappedArray, ID, ValueOf, AnyFn, Properties, PropType, ClassProperties, EntityProperties, TranslationProperties, ClassType, } from './types/shared-types';
 export { LanguageCode } from './types/generated-types';

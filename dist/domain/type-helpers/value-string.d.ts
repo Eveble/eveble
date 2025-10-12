@@ -83,19 +83,6 @@ export declare class ValueString extends ValueString_base {
     toString(): string;
     valueOf(): string;
     toPlainObject(): string;
-    anchor(): string;
-    big(): string;
-    blink(): string;
-    bold(): string;
-    fixed(): string;
-    fontcolor(color: string): string;
-    fontsize(size: number | string): string;
-    italics(): string;
-    link(url: string): string;
-    small(): string;
-    strike(): string;
-    sub(): string;
-    sup(): string;
     protected onValidation(value: string, isStrict?: boolean): boolean;
     static from(value: string): any;
     static transformer: () => {
