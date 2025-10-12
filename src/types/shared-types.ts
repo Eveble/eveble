@@ -1,4 +1,4 @@
-import { LanguageCode } from './generated-dtypes';
+import { LanguageCode } from './generated-types';
 
 /**
  * A recursive implementation of the `Partial<T>` type.
@@ -21,7 +21,7 @@ export type DeepPartial<T> = {
 /**
  * A type representing the type rather than instance of a class.
  */
-export interface Type<T> extends Function {
+export interface ClassType<T> extends Function {
   // tslint:disable-next-line:callable-types
   new (...args: any[]): T;
 }
@@ -37,7 +37,7 @@ export type DeepRequired<
 > = T extends object
   ? {
       [P in keyof T]-?: NonNullable<T[P]> extends NonNullable<
-        U | Function | Type<any>
+        U | Function | ClassType<any>
       >
         ? NonNullable<T[P]>
         : DeepRequired<NonNullable<T[P]>, U>;
