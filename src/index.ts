@@ -385,5 +385,6 @@ export {
   ClassProperties,
   EntityProperties,
   TranslationProperties,
+  ClassType,
 } from './types/shared-types';
 export { LanguageCode } from './types/generated-types';
