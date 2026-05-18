@@ -40,7 +40,10 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 import { types } from '../../../src/types';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
-import { setupSchedulerMongo } from '../../utilities/setups/scheduler-mongo.util';
+import {
+  setupSchedulerMongo,
+  getCachedDatabaseName,
+} from '../../utilities/setups/scheduler-mongo.util';
 import { Asserter } from '../../../src/domain/asserter';
 import { StatefulAssertion } from '../../../src/domain/assertions/stateful-assertion';
 import { StatusfulAssertion } from '../../../src/domain/assertions/statusful-assertion';
@@ -48,10 +51,7 @@ import { AbilityAssertion } from '../../../src/domain/assertions/ability-asserti
 
 import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
-import {
-  getDatabaseName,
-  getCollectionName,
-} from '../../utilities/setups/mongo-env.util';
+import { getCollectionName } from '../../utilities/setups/mongo-env.util';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
@@ -109,7 +109,7 @@ describe(`Command scheduling with Pulse`, () => {
 
     clients.pulse = new PulseClient({
       id: new Guid(),
-      databaseName: getDatabaseName('scheduler'),
+      databaseName: getCachedDatabaseName('scheduler')!,
       collectionName: getCollectionName('scheduler'),
       options: {
         processEvery: '1 seconds',
