@@ -21,6 +21,16 @@ export class MongoDBCommitStorageModule extends Module {
    * @async
    */
   protected async onInitialize(): Promise<void> {
+    if (this.injector.isBound(BINDINGS.CommitStorage)) {
+      this.log?.debug(
+        new Log(
+          `CommitStorage already bound: skipping MongoDB commit storage initialization`
+        )
+          .on(this)
+          .in(this.onInitialize)
+      );
+      return;
+    }
     await this.initializeClientForCommitStorage();
     await this.initializeCommitSerializer();
     await this.initializeCommitStorage();

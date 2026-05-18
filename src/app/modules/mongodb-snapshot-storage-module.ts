@@ -16,6 +16,16 @@ export class MongoDBSnapshotStorageModule extends Module {
    * @async
    */
   protected async onInitialize(): Promise<void> {
+    if (this.injector.isBound(BINDINGS.SnapshotStorage)) {
+      this.log?.debug(
+        new Log(
+          `SnapshotStorage already bound: skipping MongoDB snapshot storage initialization`
+        )
+          .on(this)
+          .in(this.onInitialize)
+      );
+      return;
+    }
     await this.initializeSnapshotSerializer();
     await this.initializeClientForSnapshotter();
     await this.initializeSnapshotter();

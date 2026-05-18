@@ -12,6 +12,11 @@ import { BINDINGS } from '../constants/bindings';
 import { PulseCommandSchedulerModule } from './modules/pulse-command-scheduler-module';
 import { MongoDBSnapshotStorageModule } from './modules/mongodb-snapshot-storage-module';
 import { MongoDBCommitStorageModule } from './modules/mongodb-commit-storage-module';
+import { InMemoryModule } from './modules/in-memory-module';
+import { InMemoryCommitStorage } from '../infrastructure/storages/commit-memory-storage';
+import { InMemorySnapshotStorage } from '../infrastructure/storages/snapshot-memory-storage';
+import { InMemoryCommitObserver } from '../infrastructure/storages/commit-memory-observer';
+import { InMemoryCommandScheduler } from '../infrastructure/schedulers/in-memory-command-scheduler';
 import { StorageNotFoundError } from '../infrastructure/infrastructure-errors';
 import { loadENV } from '../utils/helpers';
 
@@ -263,24 +268,52 @@ export class App extends BaseApp {
       new Log(`initializing schedulers`).on(this).in(this.initializeSchedulers)
     );
 
-    if (
-      this.isCommandScheduling() &&
-      !this.injector.isBound(BINDINGS.CommandScheduler)
-    ) {
-      const client = getenv.string('EVEBLE_COMMAND_SCHEDULER_CLIENT');
-      switch (client) {
-        case 'pulse':
-          this.modules.unshift(new PulseCommandSchedulerModule());
-          this.log?.debug(
-            new Log(
-              `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
-            )
-              .on(this)
-              .in(this.initializeSchedulers)
-          );
-          break;
-        default:
-          throw new StorageNotFoundError('CommandScheduler', client);
+    if (this.isCommandScheduling()) {
+      const hasInMemoryScheduler = this.modules.some(
+        (m) => m instanceof InMemoryModule
+      );
+      if (hasInMemoryScheduler) {
+        this.log?.debug(
+          new Log(
+            `CommandScheduler: InMemoryModule detected, binding in-memory scheduler`
+          )
+            .on(this)
+            .in(this.initializeSchedulers)
+        );
+        if (!this.injector.isBound(BINDINGS.CommandScheduler)) {
+          this.injector
+            .bind<types.CommandScheduler>(BINDINGS.CommandScheduler)
+            .to(InMemoryCommandScheduler)
+            .inSingletonScope();
+        }
+        return;
+      }
+
+      if (!this.injector.isBound(BINDINGS.CommandScheduler)) {
+        const client = getenv.string('EVEBLE_COMMAND_SCHEDULER_CLIENT');
+        switch (client) {
+          case 'pulse':
+            this.modules.unshift(new PulseCommandSchedulerModule());
+            this.log?.debug(
+              new Log(
+                `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
+              )
+                .on(this)
+                .in(this.initializeSchedulers)
+            );
+            break;
+          case 'inmemory':
+            this.log?.debug(
+              new Log(
+                `CommandScheduler: using in-memory scheduler (no Pulse required)`
+              )
+                .on(this)
+                .in(this.initializeSchedulers)
+            );
+            break;
+          default:
+            throw new StorageNotFoundError('CommandScheduler', client);
+        }
       }
     }
   }
@@ -294,6 +327,36 @@ export class App extends BaseApp {
       new Log(`initializing storages`).on(this).in(this.initializeStorages)
     );
 
+    const hasInMemoryModule = this.modules.some(
+      (m) => m instanceof InMemoryModule
+    );
+    if (hasInMemoryModule) {
+      this.log?.debug(
+        new Log(`InMemoryModule detected: binding in-memory storages`)
+          .on(this)
+          .in(this.initializeStorages)
+      );
+      if (!this.injector.isBound(BINDINGS.CommitStorage)) {
+        this.injector
+          .bind<types.CommitStorage>(BINDINGS.CommitStorage)
+          .to(InMemoryCommitStorage)
+          .inSingletonScope();
+      }
+      if (!this.injector.isBound(BINDINGS.SnapshotStorage)) {
+        this.injector
+          .bind<types.SnapshotStorage>(BINDINGS.SnapshotStorage)
+          .to(InMemorySnapshotStorage)
+          .inSingletonScope();
+      }
+      if (!this.injector.isBound(BINDINGS.CommitObserver)) {
+        this.injector
+          .bind<types.CommitObserver>(BINDINGS.CommitObserver)
+          .to(InMemoryCommitObserver)
+          .inSingletonScope();
+      }
+      return;
+    }
+
     if (
       !this.injector.isBound(BINDINGS.SnapshotStorage) &&
       this.isSnapshotting()
@@ -305,6 +368,15 @@ export class App extends BaseApp {
           this.log?.debug(
             new Log(
               `added 'SnapshotStorage' as 'MongoDBSnapshotStorageModule' to application modules`
+            )
+              .on(this)
+              .in(this.initializeStorages)
+          );
+          break;
+        case 'inmemory':
+          this.log?.debug(
+            new Log(
+              `SnapshotStorage: using in-memory storage (no MongoDB required)`
             )
               .on(this)
               .in(this.initializeStorages)
@@ -323,6 +395,15 @@ export class App extends BaseApp {
           this.log?.debug(
             new Log(
               `added 'CommitStorage' as 'MongoDBCommitStorageModule' to application modules`
+            )
+              .on(this)
+              .in(this.initializeStorages)
+          );
+          break;
+        case 'inmemory':
+          this.log?.debug(
+            new Log(
+              `CommitStorage: using in-memory storage (no MongoDB required)`
             )
               .on(this)
               .in(this.initializeStorages)

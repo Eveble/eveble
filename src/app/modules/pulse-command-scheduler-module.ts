@@ -20,6 +20,16 @@ export class PulseCommandSchedulerModule extends Module {
    * @async
    */
   protected async beforeInitialize(): Promise<void> {
+    if (this.injector.isBound(BINDINGS.CommandScheduler)) {
+      this.log?.debug(
+        new Log(
+          `CommandScheduler already bound: skipping Pulse scheduler initialization`
+        )
+          .on(this)
+          .in(this.beforeInitialize)
+      );
+      return;
+    }
     await this.initializeTopLevelDependencies();
     await this.initializeMongoDBClientForCommandScheduler();
     await this.initializePulseClientForCommandScheduler();

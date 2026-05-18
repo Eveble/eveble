@@ -19,6 +19,7 @@ export { Eveble } from './app/eveble';
 export { PulseCommandSchedulerModule } from './app/modules/pulse-command-scheduler-module';
 export { MongoDBCommitStorageModule } from './app/modules/mongodb-commit-storage-module';
 export { MongoDBSnapshotStorageModule } from './app/modules/mongodb-snapshot-storage-module';
+export { InMemoryModule } from './app/modules/in-memory-module';
 // Components
 export { Command, Assignment } from './components/command';
 export { Config } from './components/config';
@@ -128,6 +129,10 @@ export { SnapshotSerializer } from './infrastructure/serializers/snapshot-serial
 export { CommitMongoDBObserver } from './infrastructure/storages/commit-mongodb-observer';
 export { CommitMongoDBStorage } from './infrastructure/storages/commit-mongodb-storage';
 export { SnapshotMongoDBStorage } from './infrastructure/storages/snapshot-mongodb-storage';
+export { InMemoryCommitStorage } from './infrastructure/storages/commit-memory-storage';
+export { InMemorySnapshotStorage } from './infrastructure/storages/snapshot-memory-storage';
+export { InMemoryCommitObserver } from './infrastructure/storages/commit-memory-observer';
+export { InMemoryCommandScheduler } from './infrastructure/schedulers/in-memory-command-scheduler';
 export { Commit, CommitReceiver } from './infrastructure/structs/commit';
 export { ScheduledJob } from './infrastructure/structs/scheduled-job';
 export { PulseScheduledJobTransformer } from './infrastructure/transformers/pulse-scheduled-job-transformer';
