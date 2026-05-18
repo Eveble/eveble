@@ -318,15 +318,15 @@ describe('BaseApp', () => {
       });
       await app.initialize();
 
-      expect(app.beforeInitialize).toHaveBeenCalled(); expect(
+      expect(app.beforeInitialize).toHaveBeenCalledBefore(
         app.onInitialize as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
-      expect(app.onInitialize).toHaveBeenCalled(); expect(
+      );
+      expect(app.onInitialize).toHaveBeenCalledBefore(
         app.afterInitialize as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
-      expect(app.afterInitialize).toHaveBeenCalled(); expect(
+      );
+      expect(app.afterInitialize).toHaveBeenCalledAfter(
         app.onInitialize as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      );
     });
 
     describe('on configuration', () => {
@@ -624,7 +624,7 @@ describe('BaseApp', () => {
       expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
         new Log(`initialize`).on(app).in('initialize')
       ));
-      expect(log.debug).toHaveBeenCalled(); expect(module.initialize as any).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(log.debug).toHaveBeenCalledBefore(module.initialize as any);
     });
 
     it(`shows simple start log`, async () => {
@@ -644,7 +644,7 @@ describe('BaseApp', () => {
 
       await app.initialize();
       expect(consoleTransport.info).toHaveBeenCalledWith(expect.objectContaining(new Log('start')));
-      expect(consoleTransport.info).toHaveBeenCalled(); expect(log.debug).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(consoleTransport.info).toHaveBeenCalledBefore(log.debug);
     });
 
     it(`starts logging if logging is enabled on application configuration`, async () => {
@@ -727,7 +727,7 @@ describe('BaseApp', () => {
       expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
         new Log(`shutdown`).on(app).in('shutdown')
       ));
-      expect(log.debug).toHaveBeenCalled(); expect(app.afterShutdown as any).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(log.debug).toHaveBeenCalledBefore(app.afterShutdown as any);
     });
 
     it('stops logging after shutdown', async () => {
@@ -766,7 +766,7 @@ describe('BaseApp', () => {
         new Log(`shutdown`).on(app).in('shutdown')
       ));
       expect(consoleTransport.info).toHaveBeenCalledWith(expect.objectContaining(new Log(`exit`)));
-      expect(consoleTransport.info).toHaveBeenCalled(); expect(log.debug).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(log.debug).toHaveBeenCalled();
     });
   });
 

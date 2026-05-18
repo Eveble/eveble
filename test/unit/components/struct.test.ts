@@ -231,7 +231,7 @@ describe('Struct', () => {
       expect(() => new Car({ model: 'A5' })).not.toThrow(Error);
       expect(Car.prototype.validateProps).toHaveBeenCalledTimes(1);
       expect(validatorFn).toHaveBeenCalledTimes(1);
-      expect(Car.prototype.validateProps).toHaveBeenCalled(); expect(validatorFn).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(Car.prototype.validateProps).toHaveBeenCalledBefore(validatorFn);
     });
   });
 });

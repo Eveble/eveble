@@ -416,8 +416,8 @@ describe('OneToManyHandlingTrait', () => {
         expect(secondSpy).toHaveBeenCalledWith(event);
         expect(thirdSpy).toHaveBeenCalledTimes(1);
         expect(thirdSpy).toHaveBeenCalledWith(event);
-        expect(firstSpy).toHaveBeenCalled(); expect(secondSpy).toHaveBeenCalled(); /* TODO: verify call order */;
-        expect(secondSpy).toHaveBeenCalled(); expect(thirdSpy).toHaveBeenCalled(); /* TODO: verify call order */;
+        expect(firstSpy).toHaveBeenCalledBefore(secondSpy);
+        expect(secondSpy).toHaveBeenCalledBefore(thirdSpy);
       });
     });
 
@@ -459,7 +459,7 @@ describe('OneToManyHandlingTrait', () => {
 
         expect(secondSpy).toHaveBeenCalledTimes(1);
         expect(secondSpy).toHaveBeenCalledWith(event);
-        expect(secondSpy).toHaveBeenCalled(); expect(firstSpy).toHaveBeenCalled(); /* TODO: verify call order */;
+        expect(secondSpy).toHaveBeenCalledBefore(firstSpy);
       });
 
       it(`handles message type with concurrent handler execution in settled mode(multiple requests can be completed, regardless of their success or failure)`, async () => {
@@ -494,7 +494,7 @@ describe('OneToManyHandlingTrait', () => {
 
         expect(secondSpy).toHaveBeenCalledTimes(1);
         expect(secondSpy).toHaveBeenCalledWith(event);
-        expect(secondSpy).toHaveBeenCalled(); /* TODO: verify call order */;
+        expect(secondSpy).toHaveBeenCalled();
       });
     });
   });

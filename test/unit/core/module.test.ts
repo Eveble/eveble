@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
 
@@ -100,7 +108,7 @@ describe('Module', () => {
     logger = mock<types.Logger>();
     injector = mock<types.Injector>();
 
-    generateId = vi.spyOn(AppConfig, "generateId");
+    generateId = vi.spyOn(AppConfig, 'generateId');
     generatedId = 'my-app-id';
     generateId.mockReturnValue(generatedId);
 
@@ -234,13 +242,17 @@ describe('Module', () => {
 
       await module.initialize(app, injector);
       expect(module.log).toBe(logger);
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`initializing`)
-          .on(module)
-          .in(module.initialize)
-          .with('arguments', [app, injector])
-      ));
-      expect(logger.debug).toHaveBeenCalled(); expect(submodule.initialize as any).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`initializing`)
+            .on(module)
+            .in(module.initialize)
+            .with('arguments', [app, injector])
+        )
+      );
+      expect(logger.debug).toHaveBeenCalledBefore(
+        submodule.initialize as any
+      );
     });
 
     describe('merging with application configuration', () => {
@@ -484,9 +496,11 @@ describe('Module', () => {
 
       await module.initialize(app, injector);
       expect(module.beforeInitialize).toHaveBeenCalledTimes(1);
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`beforeInitialize`).on(module).in('runBeforeInitializeHooks')
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`beforeInitialize`).on(module).in('runBeforeInitializeHooks')
+        )
+      );
     });
 
     it('invokes the onInitialize method on itself', async () => {
@@ -495,9 +509,11 @@ describe('Module', () => {
 
       await module.initialize(app, injector);
       expect(module.onInitialize).toHaveBeenCalledTimes(1);
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`onInitialize`).on(module).in('runOnInitializeHooks')
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`onInitialize`).on(module).in('runOnInitializeHooks')
+        )
+      );
     });
 
     it('invokes the afterInitialize method on itself', async () => {
@@ -505,9 +521,11 @@ describe('Module', () => {
       module.afterInitialize = vi.fn();
       await module.initialize(app, injector);
       expect(module.afterInitialize).toHaveBeenCalledTimes(1);
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`afterInitialize`).on(module).in('runAfterInitializeHooks')
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`afterInitialize`).on(module).in('runAfterInitializeHooks')
+        )
+      );
     });
 
     it('ensures that order of: before, on, after for initialization hooks is correct', async () => {
@@ -517,15 +535,15 @@ describe('Module', () => {
       module.afterInitialize = vi.fn();
 
       await module.initialize(app, injector);
-      expect(module.beforeInitialize).toHaveBeenCalled(); expect(
+      expect(module.beforeInitialize).toHaveBeenCalledBefore(
         module.onInitialize as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
-      expect(module.onInitialize).toHaveBeenCalled(); expect(
+      );
+      expect(module.onInitialize).toHaveBeenCalledBefore(
         module.afterInitialize as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
-      expect(module.afterInitialize).toHaveBeenCalled(); expect(
+      );
+      expect(module.afterInitialize).toHaveBeenCalledAfter(
         module.onInitialize as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      );
     });
 
     it('injects dependencies into the module at initialization stage', async () => {
@@ -575,7 +593,9 @@ describe('Module', () => {
       await module.initialize(app, injector);
       await module.start();
       expect(module.isInState(Module.STATES.running)).toBe(true);
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(new Log(`start`).on(module)));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`start`).on(module))
+      );
     });
 
     it('invokes start action on sub modules', async () => {
@@ -584,8 +604,8 @@ describe('Module', () => {
       // Can't create stubbed instance like in `initializes submodule of module` example
       // do to sinon limitation resolved around spy & how 'invokeAction' is
       // running in conjunction with 'invokeActionOnDependentModules'
-      const startSpy1 = vi.spyOn(submodule1, "start");
-      const startSpy2 = vi.spyOn(submodule2, "start");
+      const startSpy1 = vi.spyOn(submodule1, 'start');
+      const startSpy2 = vi.spyOn(submodule2, 'start');
       const module = new MyModule({
         modules: [submodule1, submodule2],
       });
@@ -621,27 +641,23 @@ describe('Module', () => {
       await module.initialize(app, injector);
       await module.start();
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`beforeStart`).on(module)
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`beforeStart`).on(module))
+      );
       expect(MyModule.prototype.beforeStart).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeStart).toHaveBeenCalled(); expect(
-        MyModule.prototype.onStart as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.beforeStart).toHaveBeenCalledBefore(MyModule.prototype.onStart as any);
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(new Log(`onStart`).on(module)));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`onStart`).on(module))
+      );
       expect(MyModule.prototype.onStart).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onStart).toHaveBeenCalled(); expect(
-        MyModule.prototype.afterStart as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.onStart).toHaveBeenCalledBefore(MyModule.prototype.afterStart as any);
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`afterStart`).on(module)
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`afterStart`).on(module))
+      );
       expect(MyModule.prototype.afterStart).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterStart).toHaveBeenCalled(); expect(
-        MyModule.prototype.onStart as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.afterStart).toHaveBeenCalledAfter(MyModule.prototype.onStart as any);
     });
   });
 
@@ -668,8 +684,8 @@ describe('Module', () => {
       // Can't create stubbed instance like in `initializes submodule of module` example
       // do to sinon limitation resolved around spy & how 'invokeAction' is running in conjunction
       // with invokeActionOnDependentModules
-      const stopSpy1 = vi.spyOn(submodule1, "stop");
-      const stopSpy2 = vi.spyOn(submodule2, "stop");
+      const stopSpy1 = vi.spyOn(submodule1, 'stop');
+      const stopSpy2 = vi.spyOn(submodule2, 'stop');
 
       const module = new MyModule({
         modules: [submodule1, submodule2],
@@ -696,26 +712,22 @@ describe('Module', () => {
       await module.initialize(app, injector);
       await module.stop();
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`beforeStop`).on(module)
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`beforeStop`).on(module))
+      );
       expect(MyModule.prototype.beforeStop).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeStop).toHaveBeenCalled(); expect(
-        MyModule.prototype.onStop as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.beforeStop).toHaveBeenCalledBefore(MyModule.prototype.onStop as any);
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(new Log(`onStop`).on(module)));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`onStop`).on(module))
+      );
       expect(MyModule.prototype.onStop).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onStop).toHaveBeenCalled(); expect(
-        MyModule.prototype.afterStop as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`afterStop`).on(module)
-      ));
+      expect(MyModule.prototype.onStop).toHaveBeenCalledBefore(MyModule.prototype.afterStop as any);
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`afterStop`).on(module))
+      );
       expect(MyModule.prototype.afterStop).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterStop).toHaveBeenCalled(); expect(
-        MyModule.prototype.onStop as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.afterStop).toHaveBeenCalledAfter(MyModule.prototype.onStop as any);
     });
   });
 
@@ -749,8 +761,8 @@ describe('Module', () => {
       // Can't create stubbed instance like in `initializes submodule of module` example
       // do to sinon limitation resolved around spy & how 'invokeAction' is running in conjunction
       // with _invokeActionOnDependentModules
-      const shutdownSpy1 = vi.spyOn(submodule1, "shutdown");
-      const shutdownSpy2 = vi.spyOn(submodule2, "shutdown");
+      const shutdownSpy1 = vi.spyOn(submodule1, 'shutdown');
+      const shutdownSpy2 = vi.spyOn(submodule2, 'shutdown');
 
       const module = new MyModule({
         modules: [submodule1, submodule2],
@@ -774,7 +786,7 @@ describe('Module', () => {
 
     it('ensures that module is stopped before shutdown', async () => {
       const module = new MyModule();
-      const stopSpy = vi.spyOn(module, "stop");
+      const stopSpy = vi.spyOn(module, 'stop');
       await module.initialize(app, injector);
       await module.start();
       await module.shutdown();
@@ -787,28 +799,22 @@ describe('Module', () => {
       await module.initialize(app, injector);
       await module.shutdown();
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`beforeShutdown`).on(module)
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`beforeShutdown`).on(module))
+      );
       expect(MyModule.prototype.beforeShutdown).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeShutdown).toHaveBeenCalled(); expect(
-        MyModule.prototype.onShutdown as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.beforeShutdown).toHaveBeenCalledBefore(MyModule.prototype.onShutdown as any);
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`onShutdown`).on(module)
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`onShutdown`).on(module))
+      );
       expect(MyModule.prototype.onShutdown).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onShutdown).toHaveBeenCalled(); expect(
-        MyModule.prototype.afterShutdown as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`afterShutdown`).on(module)
-      ));
+      expect(MyModule.prototype.onShutdown).toHaveBeenCalledBefore(MyModule.prototype.afterShutdown as any);
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`afterShutdown`).on(module))
+      );
       expect(MyModule.prototype.afterShutdown).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterShutdown).toHaveBeenCalled(); expect(
-        MyModule.prototype.onShutdown as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.afterShutdown).toHaveBeenCalledAfter(MyModule.prototype.onShutdown as any);
     });
   });
 
@@ -871,26 +877,22 @@ describe('Module', () => {
       expect(MyModule.prototype.onReset).toHaveBeenCalledTimes(1);
       expect(MyModule.prototype.afterReset).toHaveBeenCalledTimes(1);
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`beforeReset`).on(module)
-      ));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`beforeReset`).on(module))
+      );
       expect(MyModule.prototype.beforeReset).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeReset).toHaveBeenCalled(); expect(
-        MyModule.prototype.onReset as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.beforeReset).toHaveBeenCalledBefore(MyModule.prototype.onReset as any);
 
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(new Log(`onReset`).on(module)));
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`onReset`).on(module))
+      );
       expect(MyModule.prototype.onReset).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onReset).toHaveBeenCalled(); expect(
-        MyModule.prototype.afterReset as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
-      expect(logger.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`afterReset`).on(module)
-      ));
+      expect(MyModule.prototype.onReset).toHaveBeenCalledBefore(MyModule.prototype.afterReset as any);
+      expect(logger.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`afterReset`).on(module))
+      );
       expect(MyModule.prototype.afterReset).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterReset).toHaveBeenCalled(); expect(
-        MyModule.prototype.onReset as any
-      ).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(MyModule.prototype.afterReset).toHaveBeenCalledAfter(MyModule.prototype.onReset as any);
     });
 
     it('invokes reset action on sub modules', async () => {
@@ -899,8 +901,8 @@ describe('Module', () => {
       // Can't create stubbed instance like in `initializes submodule of module` example
       // do to sinon limitation resolved around spy & how 'invokeAction' is running in conjunction
       // with _invokeActionOnDependentModules
-      const resetSpy1 = vi.spyOn(submodule1, "reset");
-      const resetSpy2 = vi.spyOn(submodule2, "reset");
+      const resetSpy1 = vi.spyOn(submodule1, 'reset');
+      const resetSpy2 = vi.spyOn(submodule2, 'reset');
 
       const module = new MyModule({
         modules: [submodule1, submodule2],
@@ -912,13 +914,13 @@ describe('Module', () => {
     });
 
     it(`restarts already running module to running state`, async () => {
-      const stop = vi.spyOn(MyModule.prototype, "stop");
+      const stop = vi.spyOn(MyModule.prototype, 'stop');
       const module = new MyModule();
       await module.initialize(app, injector);
       await module.start();
       expect(module.isInState(Module.STATES.running)).toBe(true);
 
-      const start = vi.spyOn(MyModule.prototype, "start");
+      const start = vi.spyOn(MyModule.prototype, 'start');
       await module.reset();
       expect(start).toHaveBeenCalledTimes(1);
       expect(stop).toHaveBeenCalledTimes(1);
@@ -943,4 +945,3 @@ describe('Module', () => {
     });
   });
 });
-

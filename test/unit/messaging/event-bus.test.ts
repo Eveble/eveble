@@ -128,7 +128,7 @@ describe('EventBus', () => {
       expect(firstSpy).toHaveBeenCalledWith(event);
       expect(secondHandler).toHaveBeenCalledTimes(1);
       expect(secondHandler).toHaveBeenCalledWith(event);
-      expect(secondHandler).toHaveBeenCalled(); expect(firstSpy).toHaveBeenCalled(); /* TODO: verify call order */;
+      expect(secondHandler).toHaveBeenCalledBefore(firstSpy);
     });
 
     it('has more expressive api for handling event - publish', async () => {

@@ -288,10 +288,8 @@ describe(`Injector`, () => {
     expect(logger.transport).toBeInstanceOf(Transport);
     expect(initialize).toHaveBeenCalledTimes(1);
     expect(initialize).toHaveBeenCalledWith('transport');
-    expect(before).toHaveBeenCalled();
-    expect(after).toHaveBeenCalled(); /* TODO: verify call order */
-    expect(after).toHaveBeenCalled();
-    expect(before).toHaveBeenCalled(); /* TODO: verify call order */
+    expect(before).toHaveBeenCalledBefore(after);
+    expect(after).toHaveBeenCalledAfter(before);
   });
 
   it('ensures that synchronous post construct method is executed even if there value is not dependent on other dependencies', () => {

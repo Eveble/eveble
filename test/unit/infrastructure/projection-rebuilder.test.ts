@@ -216,9 +216,7 @@ describe(`ProjectionRebuilder`, () => {
         await rebuilder.rebuild([projection]);
 
         expect(projection.enterRebuildMode).toHaveBeenCalledTimes(1);
-        expect(projection.enterRebuildMode).toHaveBeenCalled(); expect(
-          projection.beforeRebuild
-        ).toHaveBeenCalled(); /* TODO: verify call order */;
+        expect(projection.enterRebuildMode).toHaveBeenCalledBefore(projection.beforeRebuild);
       });
 
       it('runs projection beforeRebuild hook for preparations before rebuilding', async () => {
@@ -227,9 +225,7 @@ describe(`ProjectionRebuilder`, () => {
         await rebuilder.rebuild([projection]);
 
         expect(projection.beforeRebuild).toHaveBeenCalledTimes(1);
-        expect(projection.beforeRebuild).toHaveBeenCalled(); expect(
-          commitStore.getAllEvents
-        ).toHaveBeenCalled(); /* TODO: verify call order */;
+        expect(projection.beforeRebuild).toHaveBeenCalledBefore(commitStore.getAllEvents);
       });
 
       it('handles events from commit store on projection(rebuilding)', async () => {
@@ -259,7 +255,7 @@ describe(`ProjectionRebuilder`, () => {
         await rebuilder.rebuild(projections);
 
         for (const projection of projections) {
-          expect(projection.commit).toHaveBeenCalled(); expect(projection.MyEvent).toHaveBeenCalled(); /* TODO: verify call order */;
+          expect(projection.commit).toHaveBeenCalledAfter(projection.MyEvent);
           expect(projection.commit).toHaveBeenCalledTimes(1);
         }
       });
@@ -270,9 +266,7 @@ describe(`ProjectionRebuilder`, () => {
 
         for (const projection of projections) {
           expect(projection.exitRebuildMode).toHaveBeenCalledTimes(1);
-          expect(projection.exitRebuildMode).toHaveBeenCalled(); expect(
-            projection.commit
-          ).toHaveBeenCalled(); /* TODO: verify call order */;
+          expect(projection.exitRebuildMode).toHaveBeenCalledAfter(projection.commit);
         }
       });
     });
