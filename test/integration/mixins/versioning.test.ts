@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it, beforeEach } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { types } from '../../../src/types';
 import { Serializable } from '../../../src/components/serializable';
@@ -105,39 +106,39 @@ describe(`Versioning`, () => {
       };
     });
 
-    context('v0', () => {
+    describe('v0', () => {
       it('does not transform properties that matches current schema version', () => {
         const customer = new CustomerV0(propsV0);
-        expect(customer).to.be.instanceof(CustomerV0);
-        expect(customer).to.be.eql(propsV0);
+        expect(customer).toBeInstanceOf(CustomerV0);
+        expect(customer).toEqual(propsV0);
       });
     });
 
-    context('v1', () => {
+    describe('v1', () => {
       it('transform properties that are 1 version behind current schema version', () => {
         const customer = new CustomerV1(propsV0);
-        expect(customer).to.be.instanceof(CustomerV1);
-        expect(customer).to.be.eql(propsV1);
+        expect(customer).toBeInstanceOf(CustomerV1);
+        expect(customer).toEqual(propsV1);
       });
 
       it('does not transform properties that matches current schema version', () => {
         const customer = new CustomerV1(propsV1);
-        expect(customer).to.be.instanceof(CustomerV1);
-        expect(customer).to.be.eql(propsV1);
+        expect(customer).toBeInstanceOf(CustomerV1);
+        expect(customer).toEqual(propsV1);
       });
     });
 
-    context('v2', () => {
+    describe('v2', () => {
       it('transform properties that are 2 version behind current schema version', () => {
         const customer = new CustomerV2(propsV1);
-        expect(customer).to.be.instanceof(CustomerV2);
-        expect(customer).to.be.eql(propsV2);
+        expect(customer).toBeInstanceOf(CustomerV2);
+        expect(customer).toEqual(propsV2);
       });
 
       it('does not transform properties that matches current schema version', () => {
         const customer = new CustomerV2(propsV2);
-        expect(customer).to.be.instanceof(CustomerV2);
-        expect(customer).to.be.eql(propsV2);
+        expect(customer).toBeInstanceOf(CustomerV2);
+        expect(customer).toEqual(propsV2);
       });
     });
   });
@@ -168,15 +169,16 @@ describe(`Versioning`, () => {
       const propsV0 = {
         key: 'initial-string',
       };
-      expect(new Parent(propsV0)).to.be.eql({
+      expect(new Parent(propsV0)).toEqual({
         key: 'parent-version-1',
         schemaVersion: 1,
       });
 
-      expect(new Child(propsV0)).to.be.eql({
+      expect(new Child(propsV0)).toEqual({
         key: 'child-version-1',
         schemaVersion: 1,
       });
     });
   });
 });
+

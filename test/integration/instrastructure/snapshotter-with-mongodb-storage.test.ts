@@ -1,8 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, afterEach, beforeAll, afterAll } from 'vitest';
+
 import { Collection } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import { Type, kernel } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
@@ -15,9 +15,6 @@ import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
   @Type('SnapshotterWithMongoDBStorage.MyEventSourceable')
@@ -40,8 +37,8 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -50,11 +47,11 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(10);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(10);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -88,7 +85,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
     }
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     setupDefaultConfiguration();
     await setupSnapshotterMongo(injector, clients, collections);
@@ -100,7 +97,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
     await collections.snapshotter.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.snapshotter.disconnect();
   });
 
@@ -117,7 +114,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshot).to.be.undefined;
+      expect(foundSnapshot).toBeUndefined();
     });
 
     it(`saves the current state of event sourceable to storage`, async () => {
@@ -132,8 +129,8 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshot).to.be.instanceof(MyEventSourceable);
-      expect(foundSnapshot).to.be.eql(eventSourceable);
+      expect(foundSnapshot).toBeInstanceOf(MyEventSourceable);
+      expect(foundSnapshot).toEqual(eventSourceable);
     });
 
     it(`updates existing event sourceable snapshot on storage`, async () => {
@@ -148,7 +145,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshotV5).to.be.eql(eventSourceable);
+      expect(foundSnapshotV5).toEqual(eventSourceable);
 
       eventSourceable.version = 21;
       await snapshotter.makeSnapshotOf(eventSourceable);
@@ -156,7 +153,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshotV10).to.be.eql(eventSourceable);
+      expect(foundSnapshotV10).toEqual(eventSourceable);
     });
 
     it(`does not update existing event sourceable snapshot when not enough versions have passed`, async () => {
@@ -171,7 +168,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshotV5).to.be.eql(eventSourceable);
+      expect(foundSnapshotV5).toEqual(eventSourceable);
 
       eventSourceable.version = 12;
       await snapshotter.makeSnapshotOf(eventSourceable);
@@ -179,7 +176,7 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshotStillOnV11).to.be.eql(
+      expect(foundSnapshotStillOnV11).toEqual(
         Object.assign(eventSourceable, { version: 11 })
       );
     });
@@ -198,8 +195,8 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshot).to.be.instanceof(MyEventSourceable);
-      expect(foundSnapshot).to.be.eql(eventSourceable);
+      expect(foundSnapshot).toBeInstanceOf(MyEventSourceable);
+      expect(foundSnapshot).toEqual(eventSourceable);
     });
 
     it(`returns undefined if event sourceable snapshot cannot be found on storage`, async () => {
@@ -208,7 +205,8 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
         MyEventSourceable,
         id
       );
-      expect(foundSnapshot).to.be.undefined;
+      expect(foundSnapshot).toBeUndefined();
     });
   });
 });
+

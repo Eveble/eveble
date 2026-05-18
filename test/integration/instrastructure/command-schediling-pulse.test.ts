@@ -1,10 +1,18 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+
 import { Pulse } from '@pulsecron/pulse';
 import delay from 'delay';
 import { Collection } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import { Type, kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
@@ -53,9 +61,6 @@ import { EventBus } from '../../../src/messaging/event-bus';
 import { CommandSchedulingService } from '../../../src/infrastructure/command-scheduling-service';
 import { createEJSON } from '../../../src/utils/helpers';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`Command scheduling with Pulse`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
@@ -91,8 +96,8 @@ describe(`Command scheduling with Pulse`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -122,12 +127,12 @@ describe(`Command scheduling with Pulse`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -240,7 +245,7 @@ describe(`Command scheduling with Pulse`, () => {
     await commandScheduler.initialize();
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
 
     await setupCommitStoreMongo(injector, clients, collections);
@@ -269,10 +274,10 @@ describe(`Command scheduling with Pulse`, () => {
   beforeEach(() => {
     setupDefaultConfiguration();
 
-    const scheduler = stubInterface<types.CommandScheduler>();
+    const scheduler = mock<types.CommandScheduler>();
 
-    scheduler.schedule.resolves();
-    scheduler.unschedule.resolves(true);
+    scheduler.schedule.mockResolvedValue();
+    scheduler.unschedule.mockResolvedValue(true);
   });
 
   afterEach(async () => {
@@ -281,7 +286,7 @@ describe(`Command scheduling with Pulse`, () => {
     await collections.scheduler.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await (clients.pulse as PulseClient).stop();
     await clients.pulse.disconnect();
 
@@ -301,16 +306,16 @@ describe(`Command scheduling with Pulse`, () => {
     taskListId: Guid,
     taskId: Guid
   ): void {
-    expect(job).to.be.instanceof(ScheduledJob);
-    expect(job.id).to.be.a('string');
-    expect(job.name).to.be.equal('send scheduled command');
-    expect(job.isInState(ScheduledJob.STATES.enqueued)).to.be.true;
-    expect(job.priority).to.be.equal(0);
-    expect(job.nextRunAt).to.be.instanceof(Date);
-    expect(job.data.commandType).to.be.equal('ExpireTask');
-    expect(job.data.assignerId).to.be.equal(taskListId.toString());
-    expect(job.data.assignerType).to.be.equal('TaskList');
-    expect(job.data.id).to.be.equal(taskId.toString());
+    expect(job).toBeInstanceOf(ScheduledJob);
+    expect(job.id).toBeTypeOf('string');
+    expect(job.name).toBe('send scheduled command');
+    expect(job.isInState(ScheduledJob.STATES.enqueued)).toBe(true);
+    expect(job.priority).toBe(0);
+    expect(job.nextRunAt).toBeInstanceOf(Date);
+    expect(job.data.commandType).toBe('ExpireTask');
+    expect(job.data.assignerId).toBe(taskListId.toString());
+    expect(job.data.assignerType).toBe('TaskList');
+    expect(job.data.id).toBe(taskId.toString());
   };
 
   const assertJobIsCompleted = function (
@@ -318,17 +323,17 @@ describe(`Command scheduling with Pulse`, () => {
     taskListId: Guid,
     taskId: Guid
   ): void {
-    expect(job).to.be.instanceof(ScheduledJob);
-    expect(job.id).to.be.a('string');
-    expect(job.name).to.be.equal('send scheduled command');
-    expect(job.isInState(ScheduledJob.STATES.completed)).to.be.true;
-    expect(job.priority).to.be.equal(0);
-    expect(job.nextRunAt).to.be.instanceof(Date);
-    expect(job.completedAt).to.be.instanceof(Date);
-    expect(job.data.commandType).to.be.equal('ExpireTask');
-    expect(job.data.assignerId).to.be.equal(taskListId.toString());
-    expect(job.data.assignerType).to.be.equal('TaskList');
-    expect(job.data.id).to.be.equal(taskId.toString());
+    expect(job).toBeInstanceOf(ScheduledJob);
+    expect(job.id).toBeTypeOf('string');
+    expect(job.name).toBe('send scheduled command');
+    expect(job.isInState(ScheduledJob.STATES.completed)).toBe(true);
+    expect(job.priority).toBe(0);
+    expect(job.nextRunAt).toBeInstanceOf(Date);
+    expect(job.completedAt).toBeInstanceOf(Date);
+    expect(job.data.commandType).toBe('ExpireTask');
+    expect(job.data.assignerId).toBe(taskListId.toString());
+    expect(job.data.assignerType).toBe('TaskList');
+    expect(job.data.id).toBe(taskId.toString());
   };
 
   const assertJobIsFailed = function (
@@ -336,17 +341,17 @@ describe(`Command scheduling with Pulse`, () => {
     taskListId: Guid,
     taskId: Guid
   ): void {
-    expect(job).to.be.instanceof(ScheduledJob);
-    expect(job.id).to.be.a('string');
-    expect(job.name).to.be.equal('send scheduled command');
-    expect(job.isInState(ScheduledJob.STATES.failed)).to.be.true;
-    expect(job.priority).to.be.equal(0);
-    expect(job.nextRunAt).to.be.instanceof(Date);
-    expect(job.failedAt).to.be.instanceof(Date);
-    expect(job.data.commandType).to.be.equal('ExpireTask');
-    expect(job.data.assignerId).to.be.equal(taskListId.toString());
-    expect(job.data.assignerType).to.be.equal('TaskList');
-    expect(job.data.id).to.be.equal(taskId.toString());
+    expect(job).toBeInstanceOf(ScheduledJob);
+    expect(job.id).toBeTypeOf('string');
+    expect(job.name).toBe('send scheduled command');
+    expect(job.isInState(ScheduledJob.STATES.failed)).toBe(true);
+    expect(job.priority).toBe(0);
+    expect(job.nextRunAt).toBeInstanceOf(Date);
+    expect(job.failedAt).toBeInstanceOf(Date);
+    expect(job.data.commandType).toBe('ExpireTask');
+    expect(job.data.assignerId).toBe(taskListId.toString());
+    expect(job.data.assignerType).toBe('TaskList');
+    expect(job.data.id).toBe(taskId.toString());
   };
 
   /*
@@ -354,7 +359,7 @@ describe(`Command scheduling with Pulse`, () => {
   */
   describe(`scheduling command`, () => {
     it('queues scheduling command that is deliverable in future', async () => {
-      config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+      config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
       const taskListId = new Guid();
       const taskId = new Guid();
@@ -388,13 +393,13 @@ describe(`Command scheduling with Pulse`, () => {
         taskListId
       )) as TaskList;
       const foundTask = foundTaskList.in<Task>('tasks').findById(taskId);
-      expect(foundTask.isInState(Task.STATES.expired)).to.be.false;
+      expect(foundTask.isInState(Task.STATES.expired)).toBe(false);
 
       assertJobIsEnqueued(scheduledJob, taskListId, taskId);
     });
 
     it('queues scheduling command that is deliverable and executes command with handler', async () => {
-      config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+      config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
       const taskListId = new Guid();
       const taskId = new Guid();
@@ -436,13 +441,13 @@ describe(`Command scheduling with Pulse`, () => {
         taskListId
       )) as TaskList;
       const foundTask = foundTaskList.in<Task>('tasks').findById(taskId);
-      expect(foundTask.isInState(Task.STATES.expired)).to.be.true;
+      expect(foundTask.isInState(Task.STATES.expired)).toBe(true);
       assertJobIsEnqueued(scheduledJobEnqueued, taskListId, taskId);
       assertJobIsCompleted(scheduledJobCompleted, taskListId, taskId);
     });
 
     it('flags scheduled job as failed if scheduled command was delivered but command handler did throw error', async () => {
-      config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+      config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
       const taskListId = new Guid();
       const taskId = new Guid();
@@ -477,7 +482,7 @@ describe(`Command scheduling with Pulse`, () => {
         taskListId
       )) as TaskList;
       const foundTask = foundTaskList.in<Task>('tasks').findById(taskId);
-      expect(foundTask.isInState(Task.STATES.expired)).to.be.false;
+      expect(foundTask.isInState(Task.STATES.expired)).toBe(false);
 
       assertJobIsFailed(scheduledJob, taskListId, taskId);
     });
@@ -485,7 +490,7 @@ describe(`Command scheduling with Pulse`, () => {
 
   describe('unscheduling commands', () => {
     it('unschedules queued command', async () => {
-      config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+      config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
       const taskListId = new Guid();
       const taskId = new Guid();
@@ -519,14 +524,14 @@ describe(`Command scheduling with Pulse`, () => {
         'TaskList',
         taskId
       );
-      expect(scheduledJob).to.be.undefined;
+      expect(scheduledJob).toBeUndefined();
 
       const foundTaskList = (await repository.find(
         TaskList,
         taskListId
       )) as TaskList;
       const foundTask = foundTaskList.in<Task>('tasks').findById(taskId);
-      expect(foundTask.isInState(Task.STATES.expired)).to.be.false;
+      expect(foundTask.isInState(Task.STATES.expired)).toBe(false);
     });
   });
 
@@ -558,13 +563,6 @@ describe(`Command scheduling with Pulse`, () => {
         command,
       });
 
-      const databaseName = getDatabaseName('scheduler');
-      const collectionName = getCollectionName('scheduler');
-      const collection = (clients.scheduler as any).getCollection(
-        databaseName,
-        collectionName
-      );
-
       await commandScheduler.schedule(scheduleCommand);
       await commandScheduler.schedule(scheduleCommand);
       await commandScheduler.schedule(scheduleCommand);
@@ -572,16 +570,16 @@ describe(`Command scheduling with Pulse`, () => {
       // Give Pulse time to persist jobs
       await delay(50);
 
-      const beforeUnschedule = await collection.find({}).toArray();
+      const scheduledJobs = await collections.scheduler.find({}).toArray();
 
-      expect(beforeUnschedule).to.be.instanceof(Array);
-      expect(beforeUnschedule).to.have.length(3);
+      expect(scheduledJobs).toBeInstanceOf(Array);
+      expect(scheduledJobs).toHaveLength(3);
 
       await commandScheduler.unscheduleAll();
 
-      const afterUnschedule = await collection.find({}).toArray();
-      expect(afterUnschedule).to.be.instanceof(Array);
-      expect(afterUnschedule).to.have.length(0);
+      const remainingJobs = await collections.scheduler.find({}).toArray();
+      expect(remainingJobs).toBeInstanceOf(Array);
+      expect(remainingJobs).toHaveLength(0);
     });
   });
 });

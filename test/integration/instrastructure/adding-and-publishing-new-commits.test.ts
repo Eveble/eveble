@@ -1,9 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
+
 import delay from 'delay';
-import { stubInterface } from 'ts-sinon';
+
 import { Collection } from 'mongodb';
 import { Type, kernel } from '@eveble/core';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
@@ -27,9 +26,6 @@ import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`Adding and publishing new commits`, () => {
   @Type('AddingAndPublishingNewCommits.MyCommand')
@@ -56,8 +52,8 @@ describe(`Adding and publishing new commits`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -65,9 +61,9 @@ describe(`Adding and publishing new commits`, () => {
   };
 
   const setupDefaultConfiguration = function (): void {
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -118,7 +114,7 @@ describe(`Adding and publishing new commits`, () => {
     }
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     setupDefaultConfiguration();
@@ -136,7 +132,7 @@ describe(`Adding and publishing new commits`, () => {
     await collections.commitStore.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
   });
 
@@ -185,32 +181,32 @@ describe(`Adding and publishing new commits`, () => {
     });
 
     it(`publishes externally added commits in the current app if there is a registered handler`, async () => {
-      const commandHandler = sinon.stub();
+      const commandHandler = vi.fn();
       commandBus.registerHandler(MyCommand, commandHandler);
-      const eventHandler = sinon.stub();
+      const eventHandler = vi.fn();
       eventBus.registerHandler(MyEvent, eventHandler);
 
       await commitStore.save(commit);
 
-      expect(eventHandler).to.be.calledWith(event);
-      expect(commandHandler).to.be.calledWith(command);
+      expect(eventHandler).toHaveBeenCalledWith(event);
+      expect(commandHandler).toHaveBeenCalledWith(command);
 
       const foundCommitAfterPublishing = (await commitStore.findById(
         commit.id
       )) as Commit;
-      expect(foundCommitAfterPublishing).to.be.instanceof(Commit);
+      expect(foundCommitAfterPublishing).toBeInstanceOf(Commit);
       const receivers = foundCommitAfterPublishing.receivers;
-      expect(receivers[0].appId).to.be.equal(appId);
-      expect(receivers[0].workerId).to.be.equal(workerId);
-      expect(receivers[0].state).to.be.equal('published');
-      expect(receivers[0].publishedAt).to.be.instanceof(Date);
+      expect(receivers[0].appId).toBe(appId);
+      expect(receivers[0].workerId).toBe(workerId);
+      expect(receivers[0].state).toBe('published');
+      expect(receivers[0].publishedAt).toBeInstanceOf(Date);
     });
 
     it(`fails the processing attempt if timeout is reached`, async () => {
       const timeout = 5;
-      config.get.withArgs('eveble.commitStore.timeout').returns(timeout);
+      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
 
-      const commandHandlerSpy = sinon.stub();
+      const commandHandlerSpy = vi.fn();
       const commandHandler = async (cmd: Command<{}>): Promise<void> => {
         await delay(timeout + 5);
         commandHandlerSpy(cmd);
@@ -222,17 +218,17 @@ describe(`Adding and publishing new commits`, () => {
       const foundCommitAfterTimeout = (await commitStore.findById(
         commit.id
       )) as Commit;
-      expect(foundCommitAfterTimeout).to.be.instanceof(Commit);
+      expect(foundCommitAfterTimeout).toBeInstanceOf(Commit);
       const receivers = foundCommitAfterTimeout.receivers;
-      expect(receivers[0].appId).to.be.equal(appId);
-      expect(receivers[0].workerId).to.be.equal(workerId);
-      expect(receivers[0].state).to.be.equal('timeouted');
-      expect(receivers[0].failedAt).to.be.instanceof(Date);
-      expect(receivers[0].publishedAt).to.be.undefined;
+      expect(receivers[0].appId).toBe(appId);
+      expect(receivers[0].workerId).toBe(workerId);
+      expect(receivers[0].state).toBe('timeouted');
+      expect(receivers[0].failedAt).toBeInstanceOf(Date);
+      expect(receivers[0].publishedAt).toBeUndefined();
     });
 
     it(`handles error by flagging commit as failed and clearing the timeout`, async () => {
-      config.get.withArgs('eveble.commitStore.timeout').returns(60);
+      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
       const error = new Error('my-error');
 
       const commandHandler = async function (): Promise<void> {
@@ -247,28 +243,28 @@ describe(`Adding and publishing new commits`, () => {
       const foundCommitAfterFail = (await commitStore.findById(
         commit.id
       )) as Commit;
-      expect(foundCommitAfterFail).to.be.instanceof(Commit);
+      expect(foundCommitAfterFail).toBeInstanceOf(Commit);
       const receivers = foundCommitAfterFail.receivers;
-      expect(receivers[0].appId).to.be.equal(appId);
-      expect(receivers[0].workerId).to.be.equal(workerId);
-      expect(receivers[0].state).to.be.equal('failed');
-      expect(receivers[0].failedAt).to.be.instanceof(Date);
-      expect(receivers[0].publishedAt).to.be.undefined;
+      expect(receivers[0].appId).toBe(appId);
+      expect(receivers[0].workerId).toBe(workerId);
+      expect(receivers[0].state).toBe('failed');
+      expect(receivers[0].failedAt).toBeInstanceOf(Date);
+      expect(receivers[0].publishedAt).toBeUndefined();
     });
 
     it(`does not process commands that can't be handled`, async () => {
-      const send = sinon.spy(commandBus, 'send');
+      const send = vi.spyOn(commandBus, "send");
       await commitStore.save(commit);
-      expect(send).to.not.be.called;
+      expect(send).not.toHaveBeenCalled;
     });
 
     it(`avoids potential race condition between commit being flagged as timeouted and published`, async () => {
       const timeout = 5;
-      config.get.withArgs('eveble.commitStore.timeout').returns(timeout);
+      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
 
-      const flagCommitAsPublished = sinon.spy(storage, 'flagCommitAsPublished');
+      const flagCommitAsPublished = vi.spyOn(storage, "flagCommitAsPublished");
 
-      const commandHandlerSpy = sinon.stub();
+      const commandHandlerSpy = vi.fn();
       const commandHandler = async (cmd: Command<{}>): Promise<void> => {
         await delay(timeout + 5);
         commandHandlerSpy(cmd);
@@ -280,14 +276,15 @@ describe(`Adding and publishing new commits`, () => {
       const foundCommitAfterTimeout = (await commitStore.findById(
         commit.id
       )) as Commit;
-      expect(foundCommitAfterTimeout).to.be.instanceof(Commit);
+      expect(foundCommitAfterTimeout).toBeInstanceOf(Commit);
       const receivers = foundCommitAfterTimeout.receivers;
-      expect(receivers[0].appId).to.be.equal(appId);
-      expect(receivers[0].workerId).to.be.equal(workerId);
-      expect(receivers[0].state).to.be.equal('timeouted');
-      expect(receivers[0].failedAt).to.be.instanceof(Date);
-      expect(receivers[0].publishedAt).to.be.undefined;
-      expect(flagCommitAsPublished).to.not.be.called;
+      expect(receivers[0].appId).toBe(appId);
+      expect(receivers[0].workerId).toBe(workerId);
+      expect(receivers[0].state).toBe('timeouted');
+      expect(receivers[0].failedAt).toBeInstanceOf(Date);
+      expect(receivers[0].publishedAt).toBeUndefined();
+      expect(flagCommitAsPublished).not.toHaveBeenCalled;
     });
   });
 });
+

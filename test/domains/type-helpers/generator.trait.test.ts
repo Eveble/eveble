@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import { derive } from '@traits-ts/core';
 import {
   GeneratorExistsError,
@@ -20,7 +21,7 @@ describe(`GeneratorTrait`, () => {
           undefined as any as string,
           generator
         )
-      ).to.throw(
+      ).toThrow(
         InvalidGeneratorIdError,
         `Expected id argument to be string, got undefined`
       );
@@ -30,7 +31,7 @@ describe(`GeneratorTrait`, () => {
       const id = 'my-generator';
       const instance = new SoundGenerator();
       instance.registerGenerator(id, generator);
-      expect(() => instance.registerGenerator(id, generator)).to.throw(
+      expect(() => instance.registerGenerator(id, generator)).toThrow(
         GeneratorExistsError,
         `Generator with id 'my-generator' would be overridden. To override existing mapping use <MyGenerator.prototype.overrideGenerator>`
       );
@@ -41,8 +42,8 @@ describe(`GeneratorTrait`, () => {
 
       const instance = new SoundGenerator();
       instance.registerGenerator(id, generator);
-      expect(instance.getGenerator(id)).to.equal(generator);
-      expect(instance.hasGenerator(id)).to.be.true;
+      expect(instance.getGenerator(id)).toBe(generator);
+      expect(instance.hasGenerator(id)).toBe(true);
     });
 
     it('allows to override generator', () => {
@@ -55,8 +56,8 @@ describe(`GeneratorTrait`, () => {
       instance.registerGenerator(id, generator);
       expect(() => {
         instance.overrideGenerator(id, otherGenerator);
-      }).to.not.throw(Error);
-      expect(instance.getGenerator(id)).to.equal(otherGenerator);
+      }).not.toThrow(Error);
+      expect(instance.getGenerator(id)).toBe(otherGenerator);
     });
 
     it('returns generator by id', () => {
@@ -69,9 +70,9 @@ describe(`GeneratorTrait`, () => {
       const instance = new SoundGenerator();
       instance.registerGenerator('burp', burpGenerator);
       instance.registerGenerator('plop', plopGenerator);
-      expect(instance.getGenerator('burp')).to.equal(burpGenerator);
-      expect(instance.getGenerator('plop')).to.equal(plopGenerator);
-      expect(instance.getGenerator('non-existing-generator')).to.be.undefined;
+      expect(instance.getGenerator('burp')).toBe(burpGenerator);
+      expect(instance.getGenerator('plop')).toBe(plopGenerator);
+      expect(instance.getGenerator('non-existing-generator')).toBeUndefined();
     });
 
     it('removes generator', () => {
@@ -80,8 +81,8 @@ describe(`GeneratorTrait`, () => {
       const instance = new SoundGenerator();
       instance.registerGenerator(id, generator);
       instance.removeGenerator(id);
-      expect(instance.getGenerator(id)).to.be.undefined;
-      expect(instance.hasGenerator(id)).to.be.false;
+      expect(instance.getGenerator(id)).toBeUndefined();
+      expect(instance.hasGenerator(id)).toBe(false);
     });
   });
 
@@ -90,13 +91,13 @@ describe(`GeneratorTrait`, () => {
       const id = 'my-generator';
       const instance = new SoundGenerator();
       instance.registerGenerator(id, generator);
-      expect(instance.hasGenerator(id)).to.be.true;
+      expect(instance.hasGenerator(id)).toBe(true);
     });
 
     it(`returns false generator is not registered on instance`, () => {
       const id = 'my-generator';
       const instance = new SoundGenerator();
-      expect(instance.hasGenerator(id)).to.be.false;
+      expect(instance.hasGenerator(id)).toBe(false);
     });
   });
 
@@ -116,7 +117,8 @@ describe(`GeneratorTrait`, () => {
       const instance = new SoundGenerator();
       instance.registerGenerator('burp', burpGenerator);
       instance.registerGenerator('plop', plopGenerator);
-      expect(instance.getGenerators()).to.be.eql(generators);
+      expect(instance.getGenerators()).toEqual(generators);
     });
   });
 });
+

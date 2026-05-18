@@ -1,10 +1,9 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import chaiAsPromised from 'chai-as-promised';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import { Collection } from 'mongodb';
 import { type Job, DefineOptions } from '@pulsecron/pulse';
-import sinon from 'sinon';
+
 import { Type } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
 import { types } from '../../../src/types';
@@ -21,9 +20,6 @@ import { BINDINGS } from '../../../src/constants/bindings';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
 import { PulseCommandScheduler } from '../../../src/infrastructure/schedulers/pulse-command-scheduler';
 import { PulseClient } from '../../../src/app/clients/pulse-client';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`PulseCommandScheduler`, () => {
   @Type('PulseCommandScheduler.MyCommand', { isRegistrable: false })
@@ -91,28 +87,28 @@ describe(`PulseCommandScheduler`, () => {
   )}},"targetId":{"$type":"Guid","$value":{"id":"${targetId.toString()}"}},"name":"Foo"}}`;
 
   beforeEach(() => {
-    log = stubInterface<types.Logger>();
-    commandBus = stubInterface<types.CommandBus>();
-    pulseClient = stubInterface<PulseClient>();
-    serializer = stubInterface<types.Serializer>();
-    collection = stubInterface<Collection>();
-    jobTransformer = stubInterface<types.PulseJobTransformer>();
+    log = mock<types.Logger>();
+    commandBus = mock<types.CommandBus>();
+    pulseClient = mock<PulseClient>();
+    serializer = mock<types.Serializer>();
+    collection = mock<Collection>();
+    jobTransformer = mock<types.PulseJobTransformer>();
     pulseInstance = {
-      define: sinon.stub(),
-      schedule: sinon.stub(),
-      cancel: sinon.stub(),
-      jobs: sinon.stub(),
-      start: sinon.stub(),
-      stop: sinon.stub(),
+      define: vi.fn(),
+      schedule: vi.fn(),
+      cancel: vi.fn(),
+      jobs: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
       _definitions: {},
     };
 
     pulseClient.library = pulseInstance;
-    pulseClient.isConnected.returns(true);
-    pulseClient.getId.returns(pulseClientId);
+    pulseClient.isConnected.mockReturnValue(true);
+    pulseClient.getId.mockReturnValue(pulseClientId);
 
-    serializer.stringify.withArgs(command).returns(serializedCommand);
-    serializer.parse.withArgs(serializedCommand).returns(command);
+    serializer.stringify.calledWith(command).mockReturnValue(serializedCommand);
+    serializer.parse.calledWith(serializedCommand).mockReturnValue(command);
 
     injector = new Injector();
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -139,18 +135,18 @@ describe(`PulseCommandScheduler`, () => {
   describe(`construction`, () => {
     it(`takes jobName as a string and assigns it`, () => {
       const instance = new PulseCommandScheduler(jobName);
-      expect(instance.jobName).to.be.equal(jobName);
+      expect(instance.jobName).toBe(jobName);
     });
 
     it(`takes jobName and options as an object and assigns them`, () => {
       const instance = new PulseCommandScheduler(jobName, options);
-      expect(instance.jobName).to.be.equal(jobName);
-      expect(instance.options).to.be.equal(options);
+      expect(instance.jobName).toBe(jobName);
+      expect(instance.options).toBe(options);
     });
   });
 
   describe('initialization', () => {
-    context('successful', () => {
+    describe('successful', () => {
       beforeEach(() => {
         pulseInstance._definitions[jobName] = { name: jobName };
       });
@@ -158,30 +154,30 @@ describe(`PulseCommandScheduler`, () => {
       it(`defines pulse job for scheduled command upon initialization`, async () => {
         await scheduler.initialize();
 
-        expect(pulseInstance.define).to.be.calledOnce;
-        const calledArgs = pulseInstance.define.args[0];
-        expect(calledArgs[0]).to.be.equal(jobName);
-        expect(calledArgs[1]).to.be.instanceof(Function);
-        expect(calledArgs[2]).to.be.equal(options);
+        expect(pulseInstance.define).toHaveBeenCalledTimes(1);
+        const calledArgs = pulseInstance.define.mock.calls[0];
+        expect(calledArgs[0]).toBe(jobName);
+        expect(calledArgs[1]).toBeInstanceOf(Function);
+        expect(calledArgs[2]).toBe(options);
       });
 
       it('ensures that scheduled command job handler is bound to instance of scheduler', async () => {
-        const handleSSchduledCommandStub = sinon.stub();
+        const handleSSchduledCommandStub = vi.fn();
         scheduler.handleScheduledCommand = handleSSchduledCommandStub;
         await scheduler.initialize();
 
-        expect(pulseInstance.define).to.be.calledOnce;
-        const calledArgs = pulseInstance.define.args[0];
+        expect(pulseInstance.define).toHaveBeenCalledTimes(1);
+        const calledArgs = pulseInstance.define.mock.calls[0];
         const boundHandler = calledArgs[1];
         await boundHandler();
 
-        expect(handleSSchduledCommandStub).to.be.calledOnce;
+        expect(handleSSchduledCommandStub).toHaveBeenCalledTimes(1);
       });
 
       it('logs successful scheduler initialization', async () => {
         await scheduler.initialize();
 
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(
             `defined new Pulse job '${jobName}' for client with id '${pulseClientId}'`
           )
@@ -193,30 +189,30 @@ describe(`PulseCommandScheduler`, () => {
       it('starts processing jobs after initialization', async () => {
         await scheduler.initialize();
 
-        expect(pulseClient.startProcessing).to.be.calledOnce;
-        expect(pulseClient.startProcessing).to.be.calledWith(jobName);
+        expect(pulseClient.startProcessing).toHaveBeenCalledTimes(1);
+        expect(pulseClient.startProcessing).toHaveBeenCalledWith(jobName);
       });
     });
 
-    context('failed', () => {
+    describe('failed', () => {
       it('logs failed initialization due to inactive Pulse client', async () => {
-        pulseClient.isConnected.returns(false);
-        await expect(scheduler.initialize()).to.eventually.be.rejectedWith(
+        pulseClient.isConnected.mockReturnValue(false);
+        await expect(scheduler.initialize()).rejects.toThrow(
           InactiveClientError,
           `PulseCommandScheduler: can't be initialized since underlying client with id '${pulseClientId}' is inactive`
         );
       });
 
       it('throws InactiveClientError when Pulse client is inactive on initialization', async () => {
-        pulseClient.isConnected.returns(false);
-        await expect(scheduler.initialize()).to.eventually.be.rejectedWith(
+        pulseClient.isConnected.mockReturnValue(false);
+        await expect(scheduler.initialize()).rejects.toThrow(
           InactiveClientError
         );
-        expect(log.error).to.be.calledWithMatch(
+        expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
           new Log(`inactive Pulse client`)
             .on(scheduler)
             .in(scheduler.initialize)
-        );
+        ));
       });
     });
   });
@@ -251,7 +247,7 @@ describe(`PulseCommandScheduler`, () => {
       await scheduler.initialize();
       await scheduler.schedule(scheduleCommand);
 
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`scheduling command '${assignmentId}'`)
           .on(scheduler)
           .in(scheduler.schedule)
@@ -259,7 +255,7 @@ describe(`PulseCommandScheduler`, () => {
       );
     });
 
-    context('successful', () => {
+    describe('successful', () => {
       it(`schedules command`, async () => {
         const expectedSerializedData = {
           id: assignmentId.toString(),
@@ -270,32 +266,32 @@ describe(`PulseCommandScheduler`, () => {
         };
 
         const mockJob = {
-          save: sinon.stub().resolves(),
+          save: vi.fn().mockResolvedValue(),
         };
-        pulseInstance.schedule.resolves(mockJob);
+        pulseInstance.schedule.mockResolvedValue(mockJob);
 
         await scheduler.initialize();
         await scheduler.schedule(scheduleCommand);
 
-        expect(pulseInstance.schedule).to.be.calledOnce;
-        expect(pulseInstance.schedule).to.be.calledWith(
+        expect(pulseInstance.schedule).toHaveBeenCalledTimes(1);
+        expect(pulseInstance.schedule).toHaveBeenCalledWith(
           deliverAt,
           jobName,
           expectedSerializedData
         );
-        expect(mockJob.save).to.be.calledOnce;
+        expect(mockJob.save).toHaveBeenCalledTimes(1);
       });
 
       it('logs successfully scheduled command', async () => {
         const mockJob = {
-          save: sinon.stub().resolves(),
+          save: vi.fn().mockResolvedValue(),
         };
-        pulseInstance.schedule.resolves(mockJob);
+        pulseInstance.schedule.mockResolvedValue(mockJob);
 
         await scheduler.initialize();
         await scheduler.schedule(scheduleCommand);
 
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`scheduled command '${assignmentId}'`)
             .on(scheduler)
             .in(scheduler.schedule)
@@ -304,15 +300,15 @@ describe(`PulseCommandScheduler`, () => {
       });
     });
 
-    context('failed', () => {
+    describe('failed', () => {
       it(`throws error when scheduled command can't be scheduled`, async () => {
         const error = new Error('my-error');
-        pulseInstance.schedule.rejects(error);
+        pulseInstance.schedule.mockRejectedValue(error);
 
         await scheduler.initialize();
         await expect(
           scheduler.schedule(scheduleCommand)
-        ).to.be.eventually.rejectedWith(
+        ).rejects.toThrow(
           CommandSchedulingError,
           `${jobName}: cannot schedule command '${assignmentId}' that was scheduled by '${assignerType}@${assignerId}' do to error '${error}'`
         );
@@ -320,13 +316,13 @@ describe(`PulseCommandScheduler`, () => {
 
       it(`logs thrown error when Pulse can't schedule command`, async () => {
         const error = new Error('my-error');
-        pulseInstance.schedule.rejects(error);
+        pulseInstance.schedule.mockRejectedValue(error);
 
         await scheduler.initialize();
         await expect(
           scheduler.schedule(scheduleCommand)
-        ).to.be.eventually.rejectedWith(CommandSchedulingError);
-        expect(log.error).to.be.calledWithExactly(
+        ).rejects.toThrow(CommandSchedulingError);
+        expect(log.error).toHaveBeenCalledWith(
           new Log(
             `failed scheduling command '${assignmentId}' do to error: ${error}`
           )
@@ -347,7 +343,7 @@ describe(`PulseCommandScheduler`, () => {
       await scheduler.initialize();
       await scheduler.unschedule(unscheduleCommand);
 
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`unscheduling command '${assignmentId}'`)
           .on(scheduler)
           .in(scheduler.unschedule)
@@ -355,13 +351,13 @@ describe(`PulseCommandScheduler`, () => {
       );
     });
 
-    context('successful', () => {
+    describe('successful', () => {
       it(`unschedules command`, async () => {
-        pulseInstance.cancel.resolves(1);
+        pulseInstance.cancel.mockResolvedValue(1);
 
         await scheduler.initialize();
         const isSuccessful = await scheduler.unschedule(unscheduleCommand);
-        expect(isSuccessful).to.be.true;
+        expect(isSuccessful).toBe(true);
 
         const expectedMongoQuery = {
           'data.id': assignmentId.toString(),
@@ -369,17 +365,17 @@ describe(`PulseCommandScheduler`, () => {
           'data.assignerId': assignerId.toString(),
           'data.assignerType': assignerType,
         };
-        expect(pulseInstance.cancel).to.be.calledOnce;
-        expect(pulseInstance.cancel).to.be.calledWith(expectedMongoQuery);
+        expect(pulseInstance.cancel).toHaveBeenCalledTimes(1);
+        expect(pulseInstance.cancel).toHaveBeenCalledWith(expectedMongoQuery);
       });
 
       it('logs successful cancellation of scheduled command', async () => {
-        pulseInstance.cancel.resolves(1);
+        pulseInstance.cancel.mockResolvedValue(1);
 
         await scheduler.initialize();
         await scheduler.unschedule(unscheduleCommand);
 
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`unscheduled command '${assignmentId}'`)
             .on(scheduler)
             .in(scheduler.unschedule)
@@ -388,23 +384,23 @@ describe(`PulseCommandScheduler`, () => {
       });
 
       it('does not throw error if Pulse client resolves removed job count as 0', async () => {
-        pulseInstance.cancel.resolves(0);
+        pulseInstance.cancel.mockResolvedValue(0);
 
         await scheduler.initialize();
         const isSuccessful = await scheduler.unschedule(unscheduleCommand);
-        expect(isSuccessful).to.be.false;
+        expect(isSuccessful).toBe(false);
       });
     });
 
-    context('failed', () => {
+    describe('failed', () => {
       it('throws CommandUnschedulingError when Pulse client throws error', async () => {
         const error = new Error('my-error');
-        pulseInstance.cancel.rejects(error);
+        pulseInstance.cancel.mockRejectedValue(error);
 
         await scheduler.initialize();
         await expect(
           scheduler.unschedule(unscheduleCommand)
-        ).to.be.eventually.rejectedWith(
+        ).rejects.toThrow(
           CommandUnschedulingError,
           `${jobName}: cannot cancel command '${assignmentId}' that was scheduled by '${assignerType}@${assignerId}' do to error '${error}'`
         );
@@ -412,14 +408,14 @@ describe(`PulseCommandScheduler`, () => {
 
       it('logs thrown error upon Pulse client canceling the job', async () => {
         const error = new Error('my-error');
-        pulseInstance.cancel.rejects(error);
+        pulseInstance.cancel.mockRejectedValue(error);
 
         await scheduler.initialize();
         await expect(
           scheduler.unschedule(unscheduleCommand)
-        ).to.be.eventually.rejectedWith(CommandUnschedulingError);
+        ).rejects.toThrow(CommandUnschedulingError);
 
-        expect(log.error).to.be.calledWithExactly(
+        expect(log.error).toHaveBeenCalledWith(
           new Log(
             `failed unscheduling command '${assignmentId}' do to error: ${error}`
           )
@@ -438,16 +434,16 @@ describe(`PulseCommandScheduler`, () => {
         command: serializedCommand,
       };
 
-      const job = stubInterface<Job>();
+      const job = mock<Job>();
       job.attrs.data = serializedData;
 
       await scheduler.handleScheduledCommand(job);
-      expect(log.debug).to.be.calledWithMatch(
+      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
         new Log(`handling scheduled command '${assignmentId}'`)
           .on(scheduler)
           .in(scheduler.handleScheduledCommand)
           .with('command', command)
-      );
+      ));
     });
 
     it(`sends command through command bus upon scheduled time`, async () => {
@@ -459,12 +455,12 @@ describe(`PulseCommandScheduler`, () => {
         assignerType,
       };
 
-      const job = stubInterface<Job>();
+      const job = mock<Job>();
       job.attrs.data = serializedData;
 
       await scheduler.handleScheduledCommand(job);
-      expect(commandBus.send).to.be.calledOnce;
-      expect(commandBus.send).to.be.calledWithExactly(command);
+      expect(commandBus.send).toHaveBeenCalledTimes(1);
+      expect(commandBus.send).toHaveBeenCalledWith(command);
     });
 
     it(`logs sent command through command bus upon scheduled time`, async () => {
@@ -476,11 +472,11 @@ describe(`PulseCommandScheduler`, () => {
         assignerType,
       };
 
-      const job = stubInterface<Job>();
+      const job = mock<Job>();
       job.attrs.data = serializedData;
 
       await scheduler.handleScheduledCommand(job);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`handled scheduled command '${assignmentId}'`)
           .on(scheduler)
           .in(scheduler.handleScheduledCommand)
@@ -497,17 +493,17 @@ describe(`PulseCommandScheduler`, () => {
         assignerType,
       };
 
-      const job = stubInterface<Job>();
+      const job = mock<Job>();
       job.attrs.data = serializedData;
 
       const error = new Error('my-error');
-      commandBus.send.rejects(error);
+      commandBus.send.mockRejectedValue(error);
 
       await scheduler.handleScheduledCommand(job);
-      expect(job.fail).to.be.calledOnce;
-      expect(job.fail).to.be.calledWithExactly(error);
-      expect(job.save).to.be.calledOnce;
-      expect(job.save).to.be.calledWithExactly();
+      expect(job.fail).toHaveBeenCalledTimes(1);
+      expect(job.fail).toHaveBeenCalledWith(error);
+      expect(job.save).toHaveBeenCalledTimes(1);
+      expect(job.save).toHaveBeenCalledWith();
     });
 
     it('logs failed handling of job upon thrown error', async () => {
@@ -519,14 +515,14 @@ describe(`PulseCommandScheduler`, () => {
         assignerType,
       };
 
-      const job = stubInterface<Job>();
+      const job = mock<Job>();
       job.attrs.data = serializedData;
 
       const error = new Error('my-error');
-      commandBus.send.rejects(error);
+      commandBus.send.mockRejectedValue(error);
 
       await scheduler.handleScheduledCommand(job);
-      expect(log.error).to.be.calledWithExactly(
+      expect(log.error).toHaveBeenCalledWith(
         new Log(
           `failed handling of scheduled command '${assignmentId}' do to error: ${error}`
         )
@@ -541,8 +537,8 @@ describe(`PulseCommandScheduler`, () => {
     it('successfully cancels all scheduled commands', async () => {
       await scheduler.unscheduleAll();
 
-      expect(collection.deleteMany).to.be.calledOnce;
-      expect(collection.deleteMany).to.be.calledWith({
+      expect(collection.deleteMany).toHaveBeenCalledTimes(1);
+      expect(collection.deleteMany).toHaveBeenCalledWith({
         name: jobName,
       });
     });
@@ -550,7 +546,7 @@ describe(`PulseCommandScheduler`, () => {
     it('logs successful cancellation of all scheduled commands', async () => {
       await scheduler.unscheduleAll();
 
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`successfully unscheduled all jobs from '${jobName}'`)
           .on(scheduler)
           .in(scheduler.unscheduleAll)
@@ -559,21 +555,21 @@ describe(`PulseCommandScheduler`, () => {
 
     it('throws error upon unsuccessful cancellation of all jobs', async () => {
       const error = new Error('my-error');
-      collection.deleteMany.rejects(error);
+      collection.deleteMany.mockRejectedValue(error);
 
-      await expect(scheduler.unscheduleAll()).to.eventually.be.rejectedWith(
+      await expect(scheduler.unscheduleAll()).rejects.toThrow(
         error
       );
     });
 
     it('logs unsuccessful cancellation of all jobs', async () => {
       const error = new Error('my-error');
-      collection.deleteMany.rejects(error);
+      collection.deleteMany.mockRejectedValue(error);
 
-      await expect(scheduler.unscheduleAll()).to.eventually.be.rejectedWith(
+      await expect(scheduler.unscheduleAll()).rejects.toThrow(
         error
       );
-      expect(log.error).to.be.calledWithExactly(
+      expect(log.error).toHaveBeenCalledWith(
         new Log(
           `failed unscheduling all jobs from '${jobName}' do to error: ${error}`
         )
@@ -585,11 +581,11 @@ describe(`PulseCommandScheduler`, () => {
 
   describe('resolving', () => {
     it('returns scheduled job if job is found on queue', async () => {
-      const returnedJob = sinon.stub();
-      pulseInstance.jobs.returns([returnedJob]);
+      const returnedJob = vi.fn();
+      pulseInstance.jobs.mockReturnValue([returnedJob]);
 
-      const transformedJob = sinon.stub();
-      jobTransformer.transform.returns(transformedJob);
+      const transformedJob = vi.fn();
+      jobTransformer.transform.mockReturnValue(transformedJob);
 
       const foundJob = await scheduler.getJob(
         MyCommand.getTypeName(),
@@ -597,7 +593,7 @@ describe(`PulseCommandScheduler`, () => {
         assignerType,
         assignmentId
       );
-      expect(foundJob).to.be.equal(transformedJob);
+      expect(foundJob).toBe(transformedJob);
 
       const expectedMongoQuery = {
         'data.commandType': MyCommand.getTypeName(),
@@ -607,28 +603,28 @@ describe(`PulseCommandScheduler`, () => {
       };
       const expectedMongoSort = { data: -1 };
       const expectedMongoLimit = 1;
-      expect(pulseInstance.jobs).to.be.calledOnce;
-      expect(pulseInstance.jobs).to.be.calledWith(
+      expect(pulseInstance.jobs).toHaveBeenCalledTimes(1);
+      expect(pulseInstance.jobs).toHaveBeenCalledWith(
         expectedMongoQuery,
         expectedMongoSort,
         expectedMongoLimit
       );
-      expect(jobTransformer.transform).to.be.calledWith(returnedJob);
+      expect(jobTransformer.transform).toHaveBeenCalledWith(returnedJob);
     });
 
     it('returns scheduled job with omitted optional assignmentId argument', async () => {
-      const returnedJob = sinon.stub();
-      pulseInstance.jobs.returns([returnedJob]);
+      const returnedJob = vi.fn();
+      pulseInstance.jobs.mockReturnValue([returnedJob]);
 
-      const transformedJob = sinon.stub();
-      jobTransformer.transform.returns(transformedJob);
+      const transformedJob = vi.fn();
+      jobTransformer.transform.mockReturnValue(transformedJob);
 
       const foundJob = await scheduler.getJob(
         MyCommand.getTypeName(),
         assignerId,
         assignerType
       );
-      expect(foundJob).to.be.equal(transformedJob);
+      expect(foundJob).toBe(transformedJob);
 
       const expectedMongoQuery = {
         'data.commandType': MyCommand.getTypeName(),
@@ -637,17 +633,17 @@ describe(`PulseCommandScheduler`, () => {
       };
       const expectedMongoSort = { data: -1 };
       const expectedMongoLimit = 1;
-      expect(pulseInstance.jobs).to.be.calledOnce;
-      expect(pulseInstance.jobs).to.be.calledWith(
+      expect(pulseInstance.jobs).toHaveBeenCalledTimes(1);
+      expect(pulseInstance.jobs).toHaveBeenCalledWith(
         expectedMongoQuery,
         expectedMongoSort,
         expectedMongoLimit
       );
-      expect(jobTransformer.transform).to.be.calledWith(returnedJob);
+      expect(jobTransformer.transform).toHaveBeenCalledWith(returnedJob);
     });
 
     it(`returns undefined if job can't be found on queue`, async () => {
-      pulseInstance.jobs.returns([]);
+      pulseInstance.jobs.mockReturnValue([]);
 
       const foundJob = await scheduler.getJob(
         MyCommand.getTypeName(),
@@ -655,10 +651,10 @@ describe(`PulseCommandScheduler`, () => {
         assignerType,
         assignmentId
       );
-      expect(foundJob).to.be.equal(undefined);
+      expect(foundJob).toBe(undefined);
 
-      expect(pulseInstance.jobs).to.be.calledOnce;
-      expect(jobTransformer.transform).to.not.be.called;
+      expect(pulseInstance.jobs).toHaveBeenCalledTimes(1);
+      expect(jobTransformer.transform).not.toHaveBeenCalled();
     });
   });
 
@@ -666,14 +662,15 @@ describe(`PulseCommandScheduler`, () => {
     describe('getInterval', () => {
       it('returns interval in which jobs are processed', () => {
         const interval = 50;
-        pulseClient.getInterval.returns(interval);
-        expect(scheduler.getInterval()).to.be.equal(interval);
+        pulseClient.getInterval.mockReturnValue(interval);
+        expect(scheduler.getInterval()).toBe(interval);
       });
 
       it('returns default interval of 1 when client interval is undefined', () => {
-        pulseClient.getInterval.returns(undefined);
-        expect(scheduler.getInterval()).to.be.equal(1);
+        pulseClient.getInterval.mockReturnValue(undefined);
+        expect(scheduler.getInterval()).toBe(1);
       });
     });
   });
 });
+

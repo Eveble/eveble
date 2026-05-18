@@ -1,14 +1,11 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, vi } from 'vitest';
+
 import { derive } from '@traits-ts/core';
 import {
   StatusfulTrait,
   UndefinedStatusesError,
   InvalidStatusError,
 } from '../../../src/traits/statusful.trait';
-
-chai.use(sinonChai);
 
 describe(`StatusfulTrait`, () => {
   class MyClass extends derive(StatusfulTrait) {
@@ -24,7 +21,7 @@ describe(`StatusfulTrait`, () => {
   describe('getters', () => {
     it('returns all available statuses', () => {
       const instance = new MyClass();
-      expect(instance.getSelectableStatuses()).to.be.eql({
+      expect(instance.getSelectableStatuses()).toEqual({
         pendingPayment: 'pendingPayment',
         paid: 'paid',
         refunded: 'refunded',
@@ -36,14 +33,14 @@ describe(`StatusfulTrait`, () => {
     it(`allows to set status on instance `, () => {
       const instance = new MyClass();
       instance.setStatus(MyClass.STATUSES.pendingPayment);
-      expect(instance.getStatus()).to.be.equal(MyClass.STATUSES.pendingPayment);
+      expect(instance.getStatus()).toBe(MyClass.STATUSES.pendingPayment);
       instance.setStatus(MyClass.STATUSES.paid);
-      expect(instance.getStatus()).to.be.equal(MyClass.STATUSES.paid);
+      expect(instance.getStatus()).toBe(MyClass.STATUSES.paid);
     });
 
     it(`throws UndefinedStatusesError on instance with undefined statuses`, () => {
       const instance = new MyClassWithoutPredefinedStatuses();
-      expect(() => instance.setStatus('my-status')).to.throw(
+      expect(() => instance.setStatus('my-status')).toThrow(
         UndefinedStatusesError,
         `MyClassWithoutPredefinedStatuses: statuses are not defined. Please define statuses as class(MyClass.STATUSES) property or define your getter as MyClass.prototype.getAvailableStatuses`
       );
@@ -51,31 +48,30 @@ describe(`StatusfulTrait`, () => {
   });
 
   describe('evaluation', () => {
-    context('single status expectation', () => {
+    describe('single status expectation', () => {
       it(`returns true if instance is in expected status`, () => {
         const instance = new MyClass();
         instance.setStatus(MyClass.STATUSES.pendingPayment);
-        expect(instance.isInStatus(MyClass.STATUSES.pendingPayment)).to.be.true;
+        expect(instance.isInStatus(MyClass.STATUSES.pendingPayment)).toBe(true);
       });
 
       it(`returns false if instance is not in expected status`, () => {
         const instance = new MyClass();
-        expect(instance.isInStatus(MyClass.STATUSES.paid)).to.be.false;
+        expect(instance.isInStatus(MyClass.STATUSES.paid)).toBe(false);
       });
 
       it(`allows to pass array to isInStatus as fallback`, () => {
         const instance = new MyClass();
-        instance.isInOneOfStatuses = sinon.spy(instance.isInOneOfStatuses);
+        instance.isInOneOfStatuses = vi.fn();
 
         instance.isInStatus(['pendingPayment']);
-        expect(instance.isInOneOfStatuses).to.be.calledOnce;
-        expect(instance.isInOneOfStatuses).to.be.calledWithExactly([
-          'pendingPayment',
-        ]);
+        expect(instance.isInOneOfStatuses).toHaveBeenCalledTimes(1);
+        expect(instance.isInOneOfStatuses).toHaveBeenCalledWith([
+          'pendingPayment', ]);
       });
     });
 
-    context('one of statuses expectation', () => {
+    describe('one of statuses expectation', () => {
       it(`returns true if instance is one of expected status`, () => {
         const instance = new MyClass();
         instance.setStatus(MyClass.STATUSES.paid);
@@ -84,8 +80,8 @@ describe(`StatusfulTrait`, () => {
             MyClass.STATUSES.paid,
             MyClass.STATUSES.refunded,
           ])
-        ).to.be.true;
-        expect(instance.isInOneOfStatuses(MyClass.STATUSES.paid)).to.be.true;
+        ).toBe(true);
+        expect(instance.isInOneOfStatuses(MyClass.STATUSES.paid)).toBe(true);
       });
 
       it(`returns false if instance is not in one of expected status`, () => {
@@ -95,16 +91,16 @@ describe(`StatusfulTrait`, () => {
             MyClass.STATUSES.paid,
             MyClass.STATUSES.refunded,
           ])
-        ).to.be.false;
-        expect(instance.isInOneOfStatuses(MyClass.STATUSES.paid)).to.be.false;
+        ).toBe(false);
+        expect(instance.isInOneOfStatuses(MyClass.STATUSES.paid)).toBe(false);
       });
     });
 
-    context('evaluating if status is not nil', () => {
+    describe('evaluating if status is not nil', () => {
       it(`returns true if instance has status assigned(is not nil)`, () => {
         const instance = new MyClass();
         instance.setStatus(MyClass.STATUSES.paid);
-        expect(instance.hasStatus()).to.be.true;
+        expect(instance.hasStatus()).toBe(true);
       });
 
       it(`returns false if instance has no status assigned(is nil)`, () => {
@@ -113,7 +109,7 @@ describe(`StatusfulTrait`, () => {
         Object.defineProperty(instance, 'status', {
           value: undefined,
         });
-        expect(instance.hasStatus()).to.be.false;
+        expect(instance.hasStatus()).toBe(false);
       });
     });
   });
@@ -123,7 +119,7 @@ describe(`StatusfulTrait`, () => {
       const instance = new MyClass();
       instance.setStatus(MyClass.STATUSES.pendingPayment);
 
-      expect(() => instance.validateStatus(MyClass.STATUSES.paid)).to.throw(
+      expect(() => instance.validateStatus(MyClass.STATUSES.paid)).toThrow(
         InvalidStatusError,
         `MyClass: expected current status of 'pendingPayment' to be in one of statuses: 'paid'`
       );
@@ -138,7 +134,7 @@ describe(`StatusfulTrait`, () => {
           MyClass.STATUSES.paid,
           MyClass.STATUSES.refunded,
         ])
-      ).to.throw(
+      ).toThrow(
         InvalidStatusError,
         `MyClass: expected current status of 'pendingPayment' to be in one of statuses: 'paid, refunded'`
       );
@@ -155,7 +151,8 @@ describe(`StatusfulTrait`, () => {
           [MyClass.STATUSES.paid, MyClass.STATUSES.refunded],
           error
         )
-      ).to.throw(MyError);
+      ).toThrow(MyError);
     });
   });
 });
+

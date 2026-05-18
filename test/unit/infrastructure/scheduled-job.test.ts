@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it, beforeAll } from 'vitest';
+
 import { ValidationError } from 'typend';
 import { ScheduledJob } from '../../../src/infrastructure/structs/scheduled-job';
 import { Struct } from '../../../src/components/struct';
@@ -6,12 +7,12 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 
 describe(`ScheduledJob`, () => {
   let now: any;
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   it(`extends Struct`, () => {
-    expect(ScheduledJob.prototype).to.be.instanceof(Struct);
+    expect(ScheduledJob.prototype).toBeInstanceOf(Struct);
   });
 
   describe(`construction`, () => {
@@ -23,10 +24,10 @@ describe(`ScheduledJob`, () => {
         priority: 'lowest',
       };
       const scheduledJob = new ScheduledJob(props);
-      expect(scheduledJob.id).to.be.equal(props.id);
-      expect(scheduledJob.name).to.be.equal('my-name');
-      expect(scheduledJob.data).to.be.eql({});
-      expect(scheduledJob.priority).to.be.equal('lowest');
+      expect(scheduledJob.id).toBe(props.id);
+      expect(scheduledJob.name).toBe('my-name');
+      expect(scheduledJob.data).toEqual({});
+      expect(scheduledJob.priority).toBe('lowest');
     });
 
     it('allows to set required property id as a string', () => {
@@ -37,7 +38,7 @@ describe(`ScheduledJob`, () => {
         priority: 'lowest',
       };
       const scheduledJob = new ScheduledJob(props);
-      expect(scheduledJob.id).to.be.a('string');
+      expect(scheduledJob.id).toBeTypeOf('string');
     });
 
     it('allows to set required: priority to on of allowed String values', () => {
@@ -50,27 +51,27 @@ describe(`ScheduledJob`, () => {
         ...props,
         priority: 'lowest',
       });
-      expect(lowestPriorityJob.priority).to.be.equal('lowest');
+      expect(lowestPriorityJob.priority).toBe('lowest');
       const lowPriorityJob = new ScheduledJob({
         ...props,
         priority: 'low',
       });
-      expect(lowPriorityJob.priority).to.be.equal('low');
+      expect(lowPriorityJob.priority).toBe('low');
       const normalPriorityJob = new ScheduledJob({
         ...props,
         priority: 'normal',
       });
-      expect(normalPriorityJob.priority).to.be.equal('normal');
+      expect(normalPriorityJob.priority).toBe('normal');
       const highPriorityJob = new ScheduledJob({
         ...props,
         priority: 'high',
       });
-      expect(highPriorityJob.priority).to.be.equal('high');
+      expect(highPriorityJob.priority).toBe('high');
       const highestPriorityJob = new ScheduledJob({
         ...props,
         priority: 'highest',
       });
-      expect(highestPriorityJob.priority).to.be.equal('highest');
+      expect(highestPriorityJob.priority).toBe('highest');
     });
 
     it('allows to set required: priority as numeric value', () => {
@@ -81,7 +82,7 @@ describe(`ScheduledJob`, () => {
         priority: 0,
       };
       const scheduledJob = new ScheduledJob(props);
-      expect(scheduledJob.priority).to.be.a('number');
+      expect(scheduledJob.priority).toBeTypeOf('number');
     });
 
     it('takes optional properties: nextRunAt, completedAt, lockedAt, lastRunAt, failedAt as Dates', () => {
@@ -97,16 +98,16 @@ describe(`ScheduledJob`, () => {
         failedAt: now,
       };
       const scheduledJob = new ScheduledJob(props);
-      expect(scheduledJob.nextRunAt).to.be.instanceof(Date);
-      expect(scheduledJob.nextRunAt).to.be.equal(now);
-      expect(scheduledJob.completedAt).to.be.instanceof(Date);
-      expect(scheduledJob.completedAt).to.equal(now);
-      expect(scheduledJob.lockedAt).to.be.instanceof(Date);
-      expect(scheduledJob.lockedAt).to.be.equal(now);
-      expect(scheduledJob.lastRunAt).to.be.instanceof(Date);
-      expect(scheduledJob.lastRunAt).to.be.equal(now);
-      expect(scheduledJob.failedAt).to.be.instanceof(Date);
-      expect(scheduledJob.failedAt).to.be.equal(now);
+      expect(scheduledJob.nextRunAt).toBeInstanceOf(Date);
+      expect(scheduledJob.nextRunAt).toBe(now);
+      expect(scheduledJob.completedAt).toBeInstanceOf(Date);
+      expect(scheduledJob.completedAt).toBe(now);
+      expect(scheduledJob.lockedAt).toBeInstanceOf(Date);
+      expect(scheduledJob.lockedAt).toBe(now);
+      expect(scheduledJob.lastRunAt).toBeInstanceOf(Date);
+      expect(scheduledJob.lastRunAt).toBe(now);
+      expect(scheduledJob.failedAt).toBeInstanceOf(Date);
+      expect(scheduledJob.failedAt).toBe(now);
     });
   });
 
@@ -123,9 +124,9 @@ describe(`ScheduledJob`, () => {
         ...props,
         state: ScheduledJob.STATES.enqueued,
       });
-      expect(scheduledJob.getState()).to.be.equal(ScheduledJob.STATES.enqueued);
+      expect(scheduledJob.getState()).toBe(ScheduledJob.STATES.enqueued);
       scheduledJob.setState(ScheduledJob.STATES.started);
-      expect(scheduledJob.getState()).to.be.equal(ScheduledJob.STATES.started);
+      expect(scheduledJob.getState()).toBe(ScheduledJob.STATES.started);
     });
 
     it(`returns true if scheduled job is in state`, () => {
@@ -133,7 +134,7 @@ describe(`ScheduledJob`, () => {
         ...props,
         state: ScheduledJob.STATES.enqueued,
       });
-      expect(scheduledJob.isInState(ScheduledJob.STATES.enqueued)).to.be.true;
+      expect(scheduledJob.isInState(ScheduledJob.STATES.enqueued)).toBe(true);
     });
 
     it(`returns false if scheduled job is not in state`, () => {
@@ -141,7 +142,7 @@ describe(`ScheduledJob`, () => {
         ...props,
         state: ScheduledJob.STATES.enqueued,
       });
-      expect(scheduledJob.isInState(ScheduledJob.STATES.started)).to.be.false;
+      expect(scheduledJob.isInState(ScheduledJob.STATES.started)).toBe(false);
     });
 
     it(`returns true if scheduled job has state`, () => {
@@ -149,18 +150,18 @@ describe(`ScheduledJob`, () => {
         ...props,
         state: ScheduledJob.STATES.enqueued,
       });
-      expect(scheduledJob.hasState()).to.be.true;
+      expect(scheduledJob.hasState()).toBe(true);
     });
 
     it(`returns false if scheduled job has no assigned state`, () => {
       const scheduledJob = new ScheduledJob({
         ...props,
       });
-      expect(scheduledJob.hasState()).to.be.false;
+      expect(scheduledJob.hasState()).toBe(false);
     });
 
     it('allows only available states to be set', () => {
-      expect(ScheduledJob.STATES).to.be.eql({
+      expect(ScheduledJob.STATES).toEqual({
         enqueued: 'enqueued',
         started: 'started',
         locked: 'locked',
@@ -173,7 +174,7 @@ describe(`ScheduledJob`, () => {
     it('throws ValidationError if state is not in one of allowed values on creation', () => {
       expect(() => {
         new ScheduledJob({ ...props, state: 'notValidState' });
-      }).to.throw(
+      }).toThrow(
         ValidationError,
         `Expected String("notValidState") to be one of: String("enqueued"), String("started"), String("locked"), String("failed"), String("completed"), String("removed")`
       );
@@ -186,10 +187,11 @@ describe(`ScheduledJob`, () => {
       });
       expect(() => {
         scheduledJob.setState('notValidState');
-      }).to.throw(
+      }).toThrow(
         ValidationError,
         `Expected String("notValidState") to be one of: String("enqueued"), String("started"), String("locked"), String("failed"), String("completed"), String("removed")`
       );
     });
   });
 });
+

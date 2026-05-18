@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import { postConstruct, injectable, inject } from 'inversify';
 // Typend
 import {
@@ -464,7 +465,6 @@ import {
   LogTransportConfig as LogTransportConfigExported,
   // Constants
   BINDINGS as BINDINGSExported,
-  // eslint-disable-next-line camelcase
   EVEBLE_BINDINGS as EVEBLE_BINDINGSExported,
   DEFAULTS as DEFAULTSExported,
   LOGGING_LEVELS as LOGGING_LEVELS_EXPORTED,
@@ -717,192 +717,192 @@ describe(`exports`, () => {
   describe('Typend', () => {
     describe('errors', () => {
       it('ValidationError', () => {
-        expect(ValidationErrorExported).to.be.equal(ValidationError);
+        expect(ValidationErrorExported).toBe(ValidationError);
       });
       it('InvalidDefinitionError', () => {
-        expect(InvalidDefinitionErrorExported).to.be.equal(
+        expect(InvalidDefinitionErrorExported).toBe(
           InvalidDefinitionError
         );
       });
       it('InvalidTypeError', () => {
-        expect(InvalidTypeErrorExported).to.be.equal(InvalidTypeError);
+        expect(InvalidTypeErrorExported).toBe(InvalidTypeError);
       });
       it('InvalidValueError', () => {
-        expect(InvalidValueErrorExported).to.be.equal(InvalidValueError);
+        expect(InvalidValueErrorExported).toBe(InvalidValueError);
       });
       it('UnequalValueError', () => {
-        expect(UnequalValueErrorExported).to.be.equal(UnequalValueError);
+        expect(UnequalValueErrorExported).toBe(UnequalValueError);
       });
       it('UnmatchedTypeError', () => {
-        expect(UnmatchedTypeErrorExported).to.be.equal(UnmatchedTypeError);
+        expect(UnmatchedTypeErrorExported).toBe(UnmatchedTypeError);
       });
       it('NotAMemberError', () => {
-        expect(NotAMemberErrorExported).to.be.equal(NotAMemberError);
+        expect(NotAMemberErrorExported).toBe(NotAMemberError);
       });
       it('UnexpectedKeyError', () => {
-        expect(UnexpectedKeyErrorExported).to.be.equal(UnexpectedKeyError);
+        expect(UnexpectedKeyErrorExported).toBe(UnexpectedKeyError);
       });
       it('UnknownError', () => {
-        expect(UnknownErrorExported).to.be.equal(UnknownError);
+        expect(UnknownErrorExported).toBe(UnknownError);
       });
       it('TypeDescriberExistsError', () => {
-        expect(TypeDescriberExistsErrorExported).to.be.equal(
+        expect(TypeDescriberExistsErrorExported).toBe(
           TypeDescriberExistsError
         );
       });
       it('TypeDescriberNotFoundError', () => {
-        expect(TypeDescriberNotFoundErrorExported).to.be.equal(
+        expect(TypeDescriberNotFoundErrorExported).toBe(
           TypeDescriberNotFoundError
         );
       });
       it('PatternValidatorExistError', () => {
-        expect(PatternValidatorExistErrorExported).to.be.equal(
+        expect(PatternValidatorExistErrorExported).toBe(
           PatternValidatorExistError
         );
       });
       it('PatternValidatorNotFoundError', () => {
-        expect(PatternValidatorNotFoundErrorExported).to.be.equal(
+        expect(PatternValidatorNotFoundErrorExported).toBe(
           PatternValidatorNotFoundError
         );
       });
       it('UndefinableClassError', () => {
-        expect(UndefinableClassErrorExported).to.be.equal(
+        expect(UndefinableClassErrorExported).toBe(
           UndefinableClassError
         );
       });
       it('TypeConverterExists', () => {
-        expect(TypeConverterExistsExported).to.be.equal(TypeConverterExists);
+        expect(TypeConverterExistsExported).toBe(TypeConverterExists);
       });
     });
     describe('utilities', () => {
       it('PropsOf', () => {
-        expect(PropsOfExported).to.be.equal(PropsOf);
+        expect(PropsOfExported).toBe(PropsOf);
       });
       it('TypeOf', () => {
-        expect(TypeOfExported).to.be.equal(TypeOf);
+        expect(TypeOfExported).toBe(TypeOf);
       });
     });
     describe('annotations', () => {
       it('Internal', () => {
-        expect(InternalExported).to.be.equal(Internal);
+        expect(InternalExported).toBe(Internal);
       });
       it('Validable', () => {
-        expect(ValidableExported).to.be.equal(Validable);
+        expect(ValidableExported).toBe(Validable);
       });
     });
     describe('end-api', () => {
       it('typend', () => {
-        expect(typendExported).to.be.equal(typend);
+        expect(typendExported).toBe(typend);
       });
       it('validator', () => {
-        expect(validatorExported).to.be.equal(validator);
+        expect(validatorExported).toBe(validator);
       });
       it('describer', () => {
-        expect(describerExported).to.be.equal(describer);
+        expect(describerExported).toBe(describer);
       });
       it('converter', () => {
-        expect(converterExported).to.be.equal(converter);
+        expect(converterExported).toBe(converter);
       });
       it('validate', () => {
-        expect(validateExported).to.be.equal(validate);
+        expect(validateExported).toBe(validate);
       });
       it('isValid', () => {
-        expect(isValidExported).to.be.equal(isValid);
+        expect(isValidExported).toBe(isValid);
       });
       it('isInstanceOf', () => {
-        expect(isInstanceOfExported).to.be.equal(isInstanceOf);
+        expect(isInstanceOfExported).toBe(isInstanceOf);
       });
       it('check', () => {
-        expect(checkExported).to.be.equal(check);
+        expect(checkExported).toBe(check);
       });
       it('is', () => {
-        expect(isExported).to.be.equal(is);
+        expect(isExported).toBe(is);
       });
       it('instanceOf', () => {
-        expect(instanceOfExported).to.be.equal(instanceOf);
+        expect(instanceOfExported).toBe(instanceOf);
       });
       it('convert', () => {
-        expect(convertExported).to.be.equal(convert);
+        expect(convertExported).toBe(convert);
       });
       it('reflect', () => {
-        expect(reflectExported).to.be.equal(reflect);
+        expect(reflectExported).toBe(reflect);
       });
     });
     describe('patterns', () => {
       it('any', () => {
-        expect(anyExported).to.be.equal(any);
+        expect(anyExported).toBe(any);
       });
       it('iof', () => {
-        expect(iofExported).to.be.equal(iof);
+        expect(iofExported).toBe(iof);
       });
       it('collection', () => {
-        expect(collectionExported).to.be.equal(collection);
+        expect(collectionExported).toBe(collection);
       });
       it('collectionIncluding', () => {
-        expect(collectionIncludingExported).to.be.equal(collectionIncluding);
+        expect(collectionIncludingExported).toBe(collectionIncluding);
       });
       it('collectionWithin', () => {
-        expect(collectionWithinExported).to.be.equal(collectionWithin);
+        expect(collectionWithinExported).toBe(collectionWithin);
       });
       it('eq', () => {
-        expect(eqExported).to.be.equal(eq);
+        expect(eqExported).toBe(eq);
       });
       it('integer', () => {
-        expect(integerExported).to.be.equal(integer);
+        expect(integerExported).toBe(integer);
       });
       it('list', () => {
-        expect(listExported).to.be.equal(list);
+        expect(listExported).toBe(list);
       });
       it('maybe', () => {
-        expect(maybeExported).to.be.equal(maybe);
+        expect(maybeExported).toBe(maybe);
       });
       it('never', () => {
-        expect(neverExported).to.be.equal(never);
+        expect(neverExported).toBe(never);
       });
       it('oneOf', () => {
-        expect(oneOfExported).to.be.equal(oneOf);
+        expect(oneOfExported).toBe(oneOf);
       });
       it('optional', () => {
-        expect(optionalExported).to.be.equal(optional);
+        expect(optionalExported).toBe(optional);
       });
       it('tuple', () => {
-        expect(tupleExported).to.be.equal(tuple);
+        expect(tupleExported).toBe(tuple);
       });
       it('unknown', () => {
-        expect(unknownExported).to.be.equal(unknown);
+        expect(unknownExported).toBe(unknown);
       });
       it('unrecognized', () => {
-        expect(unrecognizedExported).to.be.equal(unrecognized);
+        expect(unrecognizedExported).toBe(unrecognized);
       });
       it('voided', () => {
-        expect(voidedExported).to.be.equal(voided);
+        expect(voidedExported).toBe(voided);
       });
       it('where', () => {
-        expect(whereExported).to.be.equal(where);
+        expect(whereExported).toBe(where);
       });
       it('PropTypes', () => {
-        expect(PropTypesExported).to.be.equal(PropTypes);
+        expect(PropTypesExported).toBe(PropTypes);
       });
       // Utilities
       it('propsOf', () => {
-        expect(propsOfExported).to.be.equal(propsOf);
+        expect(propsOfExported).toBe(propsOf);
       });
       it('typeOf', () => {
-        expect(typeOfExported).to.be.equal(typeOf);
+        expect(typeOfExported).toBe(typeOf);
       });
     });
     describe('primitive types', () => {
       it('string', () => {
-        expect(stringExported).to.be.equal(string);
+        expect(stringExported).toBe(string);
       });
       it('number', () => {
-        expect(numberExported).to.be.equal(number);
+        expect(numberExported).toBe(number);
       });
       it('boolean', () => {
-        expect(booleanExported).to.be.equal(boolean);
+        expect(booleanExported).toBe(boolean);
       });
       it('symbol', () => {
-        expect(symbolExported).to.be.equal(symbol);
+        expect(symbolExported).toBe(symbol);
       });
     });
   });
@@ -913,258 +913,258 @@ describe(`exports`, () => {
   describe('Eveble', () => {
     describe('annotations', () => {
       it('delegate', () => {
-        expect(delegateExported).to.be.equal(delegate);
+        expect(delegateExported).toBe(delegate);
       });
       it('Delegate', () => {
-        expect(DelegateExported).to.be.equal(Delegate);
+        expect(DelegateExported).toBe(Delegate);
       });
       it('handle', () => {
-        expect(handleExported).to.be.equal(handle);
+        expect(handleExported).toBe(handle);
       });
       it('Handle', () => {
-        expect(HandleExported).to.be.equal(Handle);
+        expect(HandleExported).toBe(Handle);
       });
       it('initial', () => {
-        expect(initialExported).to.be.equal(initial);
+        expect(initialExported).toBe(initial);
       });
       it('Initial', () => {
-        expect(InitialExported).to.be.equal(Initial);
+        expect(InitialExported).toBe(Initial);
       });
       it('route', () => {
-        expect(routeExported).to.be.equal(route);
+        expect(routeExported).toBe(route);
       });
       it('Route', () => {
-        expect(RouteExported).to.be.equal(Route);
+        expect(RouteExported).toBe(Route);
       });
       it('subscribe', () => {
-        expect(subscribeExported).to.be.equal(subscribe);
+        expect(subscribeExported).toBe(subscribe);
       });
       it('Subscribe', () => {
-        expect(SubscribeExported).to.be.equal(Subscribe);
+        expect(SubscribeExported).toBe(Subscribe);
       });
       it('version', () => {
-        expect(versionExported).to.be.equal(version);
+        expect(versionExported).toBe(version);
       });
       it('Version', () => {
-        expect(VersionExported).to.be.equal(Version);
+        expect(VersionExported).toBe(Version);
       });
     });
     describe('annotations', () => {
       it('can', () => {
-        expect(canExported).to.be.equal(can);
+        expect(canExported).toBe(can);
       });
       it('Can', () => {
-        expect(CanExported).to.be.equal(Can);
+        expect(CanExported).toBe(Can);
       });
     });
     describe('app', () => {
       it('App', () => {
-        expect(AppExported).to.be.equal(App);
+        expect(AppExported).toBe(App);
       });
       it('Eveble', () => {
-        expect(EvebleExported).to.be.equal(Eveble);
+        expect(EvebleExported).toBe(Eveble);
       });
       it('PulseCommandSchedulerModule', () => {
-        expect(PulseCommandSchedulerModuleExported).to.be.equal(
+        expect(PulseCommandSchedulerModuleExported).toBe(
           PulseCommandSchedulerModule
         );
       });
       it('MongoDBCommitStorageModule', () => {
-        expect(MongoDBCommitStorageModuleExported).to.be.equal(
+        expect(MongoDBCommitStorageModuleExported).toBe(
           MongoDBCommitStorageModule
         );
       });
       it('MongoDBSnapshotStorageModule', () => {
-        expect(MongoDBSnapshotStorageModuleExported).to.be.equal(
+        expect(MongoDBSnapshotStorageModuleExported).toBe(
           MongoDBSnapshotStorageModule
         );
       });
     });
     describe('components', () => {
       it('Command', () => {
-        expect(CommandExported).to.be.equal(Command);
+        expect(CommandExported).toBe(Command);
       });
       it('Assignment', () => {
-        expect(AssignmentExported).to.be.equal(Assignment);
+        expect(AssignmentExported).toBe(Assignment);
       });
       it('Config', () => {
-        expect(ConfigExported).to.be.equal(Config);
+        expect(ConfigExported).toBe(Config);
       });
       it('Event', () => {
-        expect(EventExported).to.be.equal(Event);
+        expect(EventExported).toBe(Event);
       });
       it('ExtendableError', () => {
-        expect(ExtendableErrorExported).to.be.equal(ExtendableError);
+        expect(ExtendableErrorExported).toBe(ExtendableError);
       });
       it('Log', () => {
-        expect(LogExported).to.be.equal(Log);
+        expect(LogExported).toBe(Log);
       });
       it('LogMetadata', () => {
-        expect(LogMetadataExported).to.be.equal(LogMetadata);
+        expect(LogMetadataExported).toBe(LogMetadata);
       });
       it('Message', () => {
-        expect(MessageExported).to.be.equal(Message);
+        expect(MessageExported).toBe(Message);
       });
       it('SerializableError', () => {
-        expect(SerializableErrorExported).to.be.equal(SerializableError);
+        expect(SerializableErrorExported).toBe(SerializableError);
       });
       it('Serializable', () => {
-        expect(SerializableExported).to.be.equal(Serializable);
+        expect(SerializableExported).toBe(Serializable);
       });
       it('Struct', () => {
-        expect(StructExported).to.be.equal(Struct);
+        expect(StructExported).toBe(Struct);
       });
     });
     describe('configs', () => {
       it('AppConfig', () => {
-        expect(AppConfigExported).to.be.equal(AppConfig);
+        expect(AppConfigExported).toBe(AppConfig);
       });
       it('EvebleConfig', () => {
-        expect(EvebleConfigExported).to.be.equal(EvebleConfig);
+        expect(EvebleConfigExported).toBe(EvebleConfig);
       });
       it('LoggingConfig', () => {
-        expect(LoggingConfigExported).to.be.equal(LoggingConfig);
+        expect(LoggingConfigExported).toBe(LoggingConfig);
       });
       it('LogTransportConfig', () => {
-        expect(LogTransportConfigExported).to.be.equal(LogTransportConfig);
+        expect(LogTransportConfigExported).toBe(LogTransportConfig);
       });
     });
     describe('constants', () => {
       it('BINDINGS', () => {
-        expect(BINDINGSExported).to.be.equal(BINDINGS);
+        expect(BINDINGSExported).toBe(BINDINGS);
       });
       it('EVEBLE_BINDINGS', () => {
-        expect(EVEBLE_BINDINGSExported).to.be.equal(BINDINGS);
+        expect(EVEBLE_BINDINGSExported).toBe(BINDINGS);
       });
       it('DEFAULTS', () => {
-        expect(DEFAULTSExported).to.be.equal(DEFAULTS);
+        expect(DEFAULTSExported).toBe(DEFAULTS);
       });
       it('LOGGING_LEVELS', () => {
-        expect(LOGGING_LEVELS_EXPORTED).to.be.equal(LOGGING_LEVELS);
+        expect(LOGGING_LEVELS_EXPORTED).toBe(LOGGING_LEVELS);
       });
       it('LITERAL_KEYS', () => {
-        expect(LITERAL_KEYS_EXPORTED).to.be.equal(LITERAL_KEYS);
+        expect(LITERAL_KEYS_EXPORTED).toBe(LITERAL_KEYS);
       });
       it('METADATA_KEYS', () => {
-        expect(METADATA_KEYS_EXPORTED).to.be.equal(METADATA_KEYS);
+        expect(METADATA_KEYS_EXPORTED).toBe(METADATA_KEYS);
       });
       it('SPECIFICATIONS', () => {
-        expect(SPECIFICATIONSExported).to.be.equal(SPECIFICATIONS);
+        expect(SPECIFICATIONSExported).toBe(SPECIFICATIONS);
       });
     });
     describe('core', () => {
       it('StringifingConverter', () => {
-        expect(StringifingConverterExported).to.be.equal(StringifingConverter);
+        expect(StringifingConverterExported).toBe(StringifingConverter);
       });
       it('DetailedLogFormatter', () => {
-        expect(DetailedLogFormatterExported).to.be.equal(DetailedLogFormatter);
+        expect(DetailedLogFormatterExported).toBe(DetailedLogFormatter);
       });
       it('SimpleLogFormatter', () => {
-        expect(SimpleLogFormatterExported).to.be.equal(SimpleLogFormatter);
+        expect(SimpleLogFormatterExported).toBe(SimpleLogFormatter);
       });
       it('ConsoleTransport', () => {
-        expect(ConsoleTransportExported).to.be.equal(ConsoleTransport);
+        expect(ConsoleTransportExported).toBe(ConsoleTransport);
       });
       it('BaseApp', () => {
-        expect(BaseAppExported).to.be.equal(BaseApp);
+        expect(BaseAppExported).toBe(BaseApp);
       });
       it('Injector', () => {
-        expect(InjectorExported).to.be.equal(Injector);
+        expect(InjectorExported).toBe(Injector);
       });
       it('Kernel', () => {
-        expect(KernelExported).to.be.equal(Kernel);
+        expect(KernelExported).toBe(Kernel);
       });
       it('kernel', () => {
-        expect(kernelExported).to.be.equal(kernel);
+        expect(kernelExported).toBe(kernel);
       });
       it('Library', () => {
-        expect(LibraryExported).to.be.equal(Library);
+        expect(LibraryExported).toBe(Library);
       });
       it('LogTransport', () => {
-        expect(LogTransportExported).to.be.equal(LogTransport);
+        expect(LogTransportExported).toBe(LogTransport);
       });
       it('Logger', () => {
-        expect(LoggerExported).to.be.equal(Logger);
+        expect(LoggerExported).toBe(Logger);
       });
       it('Module', () => {
-        expect(ModuleExported).to.be.equal(Module);
+        expect(ModuleExported).toBe(Module);
       });
       describe('errors', () => {
         it('InjectorError', () => {
-          expect(InjectorErrorExported).to.be.equal(InjectorError);
+          expect(InjectorErrorExported).toBe(InjectorError);
         });
         it('InvalidEventSourceableError', () => {
-          expect(InvalidEventSourceableErrorExported).to.be.equal(
+          expect(InvalidEventSourceableErrorExported).toBe(
             InvalidEventSourceableError
           );
         });
         it('KernelError', () => {
-          expect(KernelErrorExported).to.be.equal(KernelError);
+          expect(KernelErrorExported).toBe(KernelError);
         });
         it('UnavailableSerializerError', () => {
-          expect(UnavailableSerializerErrorExported).to.be.equal(
+          expect(UnavailableSerializerErrorExported).toBe(
             UnavailableSerializerError
           );
         });
         it('UnavailableAsserterError', () => {
-          expect(UnavailableAsserterErrorExported).to.be.equal(
+          expect(UnavailableAsserterErrorExported).toBe(
             UnavailableAsserterError
           );
         });
         it('TypeError', () => {
-          expect(TypeErrorExported).to.be.equal(TypeError);
+          expect(TypeErrorExported).toBe(TypeError);
         });
         it('TypeExistsError', () => {
-          expect(TypeExistsErrorExported).to.be.equal(TypeExistsError);
+          expect(TypeExistsErrorExported).toBe(TypeExistsError);
         });
         it('TypeNotFoundError', () => {
-          expect(TypeNotFoundErrorExported).to.be.equal(TypeNotFoundError);
+          expect(TypeNotFoundErrorExported).toBe(TypeNotFoundError);
         });
         it('UnregistrableTypeError', () => {
-          expect(UnregistrableTypeErrorExported).to.be.equal(
+          expect(UnregistrableTypeErrorExported).toBe(
             UnregistrableTypeError
           );
         });
         it('ModuleError', () => {
-          expect(ModuleErrorExported).to.be.equal(ModuleError);
+          expect(ModuleErrorExported).toBe(ModuleError);
         });
         it('AppMissingError', () => {
-          expect(AppMissingErrorExported).to.be.equal(AppMissingError);
+          expect(AppMissingErrorExported).toBe(AppMissingError);
         });
         it('InjectorMissingError', () => {
-          expect(InjectorMissingErrorExported).to.be.equal(
+          expect(InjectorMissingErrorExported).toBe(
             InjectorMissingError
           );
         });
         it('InvalidModuleError', () => {
-          expect(InvalidModuleErrorExported).to.be.equal(InvalidModuleError);
+          expect(InvalidModuleErrorExported).toBe(InvalidModuleError);
         });
         it('InvalidConfigError', () => {
-          expect(InvalidConfigErrorExported).to.be.equal(InvalidConfigError);
+          expect(InvalidConfigErrorExported).toBe(InvalidConfigError);
         });
         it('InvalidEnvironmentError', () => {
-          expect(InvalidEnvironmentErrorExported).to.be.equal(
+          expect(InvalidEnvironmentErrorExported).toBe(
             InvalidEnvironmentError
           );
         });
         it('AppError', () => {
-          expect(AppErrorExported).to.be.equal(AppError);
+          expect(AppErrorExported).toBe(AppError);
         });
         it('InvalidAppConfigError', () => {
-          expect(InvalidAppConfigErrorExported).to.be.equal(
+          expect(InvalidAppConfigErrorExported).toBe(
             InvalidAppConfigError
           );
         });
         it('LoggingError', () => {
-          expect(LoggingErrorExported).to.be.equal(LoggingError);
+          expect(LoggingErrorExported).toBe(LoggingError);
         });
         it('InvalidTransportIdError', () => {
-          expect(InvalidTransportIdErrorExported).to.be.equal(
+          expect(InvalidTransportIdErrorExported).toBe(
             InvalidTransportIdError
           );
         });
         it('TransportExistsError', () => {
-          expect(TransportExistsErrorExported).to.be.equal(
+          expect(TransportExistsErrorExported).toBe(
             TransportExistsError
           );
         });
@@ -1173,130 +1173,130 @@ describe(`exports`, () => {
   });
   describe('decorators', () => {
     it('Type', () => {
-      expect(TypeExported).to.be.equal(Type);
+      expect(TypeExported).toBe(Type);
     });
     it('EvebleType', () => {
-      expect(EvebleTypeExported).to.be.equal(EvebleType);
+      expect(EvebleTypeExported).toBe(EvebleType);
     });
   });
   describe('domain', () => {
     it('AbilityAssertion', () => {
-      expect(AbilityAssertionExported).to.be.equal(AbilityAssertion);
+      expect(AbilityAssertionExported).toBe(AbilityAssertion);
     });
     it('StatefulAssertion', () => {
-      expect(StatefulAssertionExported).to.be.equal(StatefulAssertion);
+      expect(StatefulAssertionExported).toBe(StatefulAssertion);
     });
     it('InvalidStateTransitionError', () => {
-      expect(InvalidStateTransitionErrorExported).to.be.equal(
+      expect(InvalidStateTransitionErrorExported).toBe(
         InvalidStateTransitionError
       );
     });
     it('StatusfulAssertion', () => {
-      expect(StatusfulAssertionExported).to.be.equal(StatusfulAssertion);
+      expect(StatusfulAssertionExported).toBe(StatusfulAssertion);
     });
     it('InvalidStatusTransitionError', () => {
-      expect(InvalidStatusTransitionErrorExported).to.be.equal(
+      expect(InvalidStatusTransitionErrorExported).toBe(
         InvalidStatusTransitionError
       );
     });
     it('Guid', () => {
-      expect(GuidExported).to.be.equal(Guid);
+      expect(GuidExported).toBe(Guid);
     });
     it('Aggregate', () => {
-      expect(AggregateExported).to.be.equal(Aggregate);
+      expect(AggregateExported).toBe(Aggregate);
     });
     it('Asserter', () => {
-      expect(AsserterExported).to.be.equal(Asserter);
+      expect(AsserterExported).toBe(Asserter);
     });
     it('AssertionApiAlreadyExistsError', () => {
-      expect(AssertionApiAlreadyExistsErrorExported).to.be.equal(
+      expect(AssertionApiAlreadyExistsErrorExported).toBe(
         AssertionApiAlreadyExistsError
       );
     });
     it('Assertion', () => {
-      expect(AssertionExported).to.be.equal(Assertion);
+      expect(AssertionExported).toBe(Assertion);
     });
     it('BoundedContext', () => {
-      expect(BoundedContextExported).to.be.equal(BoundedContext);
+      expect(BoundedContextExported).toBe(BoundedContext);
     });
     it('DomainError', () => {
-      expect(DomainErrorExported).to.be.equal(DomainError);
+      expect(DomainErrorExported).toBe(DomainError);
     });
     it('DomainException', () => {
-      expect(DomainExceptionExported).to.be.equal(DomainException);
+      expect(DomainExceptionExported).toBe(DomainException);
     });
     it('Entity', () => {
-      expect(EntityExported).to.be.equal(Entity);
+      expect(EntityExported).toBe(Entity);
     });
     it('EventSourceable', () => {
-      expect(EventSourceableExported).to.be.equal(EventSourceable);
+      expect(EventSourceableExported).toBe(EventSourceable);
     });
     it('History', () => {
-      expect(HistoryExported).to.be.equal(History);
+      expect(HistoryExported).toBe(History);
     });
     it('List', () => {
-      expect(ListExported).to.be.equal(List);
+      expect(ListExported).toBe(List);
     });
     it('ScheduleCommand', () => {
-      expect(ScheduleCommandExported).to.be.equal(ScheduleCommand);
+      expect(ScheduleCommandExported).toBe(ScheduleCommand);
     });
     it('UnscheduleCommand', () => {
-      expect(UnscheduleCommandExported).to.be.equal(UnscheduleCommand);
+      expect(UnscheduleCommandExported).toBe(UnscheduleCommand);
     });
     it('Process', () => {
-      expect(ProcessExported).to.be.equal(Process);
+      expect(ProcessExported).toBe(Process);
     });
     it('ValueObject', () => {
-      expect(ValueObjectExported).to.be.equal(ValueObject);
+      expect(ValueObjectExported).toBe(ValueObject);
     });
     describe('errors', () => {
       it('AssertionError', () => {
-        expect(AssertionErrorExported).to.be.equal(AssertionError);
+        expect(AssertionErrorExported).toBe(AssertionError);
       });
       it('UndefinedActionError', () => {
-        expect(UndefinedActionErrorExported).to.be.equal(UndefinedActionError);
+        expect(UndefinedActionErrorExported).toBe(UndefinedActionError);
       });
       it('ListError', () => {
-        expect(ListErrorExported).to.be.equal(ListError);
+        expect(ListErrorExported).toBe(ListError);
       });
       it('IdentifiableAlreadyExistsError', () => {
-        expect(IdentifiableAlreadyExistsErrorExported).to.be.equal(
+        expect(IdentifiableAlreadyExistsErrorExported).toBe(
           IdentifiableAlreadyExistsError
         );
       });
       it('ElementAlreadyExistsError', () => {
-        expect(ElementAlreadyExistsErrorExported).to.be.equal(
+        expect(ElementAlreadyExistsErrorExported).toBe(
           ElementAlreadyExistsError
         );
       });
       it('ElementNotFoundError', () => {
-        expect(ElementNotFoundErrorExported).to.be.equal(ElementNotFoundError);
+        expect(ElementNotFoundErrorExported).toBe(ElementNotFoundError);
       });
       it('InvalidListError', () => {
-        expect(InvalidListErrorExported).to.be.equal(InvalidListError);
+        expect(InvalidListErrorExported).toBe(InvalidListError);
       });
       it('ValueObjectError', () => {
-        expect(ValueObjectErrorExported).to.be.equal(ValueObjectError);
+        expect(ValueObjectErrorExported).toBe(ValueObjectError);
       });
       it('EntityError', () => {
-        expect(EntityErrorExported).to.be.equal(EntityError);
+        expect(EntityErrorExported).toBe(EntityError);
       });
       it('SavedStateNotFoundError', () => {
-        expect(SavedStateNotFoundErrorExported).to.be.equal(
+        expect(SavedStateNotFoundErrorExported).toBe(
           SavedStateNotFoundError
         );
       });
       it('EventSourceableError', () => {
-        expect(EventSourceableErrorExported).to.be.equal(EventSourceableError);
+        expect(EventSourceableErrorExported).toBe(EventSourceableError);
       });
       it('InvalidEventError', () => {
-        expect(InvalidEventErrorExported).to.be.equal(InvalidEventError);
+        expect(InvalidEventErrorExported).toBe(InvalidEventError);
       });
       it('EventIdMismatchError', () => {
-        expect(EventIdMismatchErrorExported).to.be.equal(EventIdMismatchError);
+        expect(EventIdMismatchErrorExported).toBe(EventIdMismatchError);
       });
       it('InvalidInitializingMessageError', () => {
-        expect(InvalidInitializingMessageErrorExported).to.be.equal(
+        expect(InvalidInitializingMessageErrorExported).toBe(
           InvalidInitializingMessageError
         );
       });
@@ -1304,174 +1304,174 @@ describe(`exports`, () => {
   });
   describe('infrastructure', () => {
     it('PulseClient', () => {
-      expect(PulseClientExported).to.be.equal(PulseClient);
+      expect(PulseClientExported).toBe(PulseClient);
     });
     it('MongoDBClient', () => {
-      expect(MongoDBClientExported).to.be.equal(MongoDBClient);
+      expect(MongoDBClientExported).toBe(MongoDBClient);
     });
     it('PulseCommandScheduler', () => {
-      expect(PulseCommandSchedulerExported).to.be.equal(PulseCommandScheduler);
+      expect(PulseCommandSchedulerExported).toBe(PulseCommandScheduler);
     });
     it('CommitSerializer', () => {
-      expect(CommitSerializerExported).to.be.equal(CommitSerializer);
+      expect(CommitSerializerExported).toBe(CommitSerializer);
     });
     it('SnapshotSerializer', () => {
-      expect(SnapshotSerializerExported).to.be.equal(SnapshotSerializer);
+      expect(SnapshotSerializerExported).toBe(SnapshotSerializer);
     });
     it('CommitMongoDBObserver', () => {
-      expect(CommitMongoDBObserverExported).to.be.equal(CommitMongoDBObserver);
+      expect(CommitMongoDBObserverExported).toBe(CommitMongoDBObserver);
     });
     it('CommitMongoDBStorage', () => {
-      expect(CommitMongoDBStorageExported).to.be.equal(CommitMongoDBStorage);
+      expect(CommitMongoDBStorageExported).toBe(CommitMongoDBStorage);
     });
     it('SnapshotMongoDBStorage', () => {
-      expect(SnapshotMongoDBStorageExported).to.be.equal(
+      expect(SnapshotMongoDBStorageExported).toBe(
         SnapshotMongoDBStorage
       );
     });
     it('Commit', () => {
-      expect(CommitExported).to.be.equal(Commit);
+      expect(CommitExported).toBe(Commit);
     });
     it('CommitReceiver', () => {
-      expect(CommitReceiverExported).to.be.equal(CommitReceiver);
+      expect(CommitReceiverExported).toBe(CommitReceiver);
     });
     it('ScheduledJob', () => {
-      expect(ScheduledJobExported).to.be.equal(ScheduledJob);
+      expect(ScheduledJobExported).toBe(ScheduledJob);
     });
     it('PulseScheduledJobTransformer', () => {
-      expect(PulseScheduledJobTransformerExported).to.be.equal(
+      expect(PulseScheduledJobTransformerExported).toBe(
         PulseScheduledJobTransformer
       );
     });
     it('Client', () => {
-      expect(ClientExported).to.be.equal(Client);
+      expect(ClientExported).toBe(Client);
     });
     it('CommandSchedulingService', () => {
-      expect(CommandSchedulingServiceExported).to.be.equal(
+      expect(CommandSchedulingServiceExported).toBe(
         CommandSchedulingService
       );
     });
     it('CommitPublisher', () => {
-      expect(CommitPublisherExported).to.be.equal(CommitPublisher);
+      expect(CommitPublisherExported).toBe(CommitPublisher);
     });
     it('CommitStore', () => {
-      expect(CommitStoreExported).to.be.equal(CommitStore);
+      expect(CommitStoreExported).toBe(CommitStore);
     });
     it('EventSourceableRepository', () => {
-      expect(EventSourceableRepositoryExported).to.be.equal(
+      expect(EventSourceableRepositoryExported).toBe(
         EventSourceableRepository
       );
     });
     it('ProjectionRebuilder', () => {
-      expect(ProjectionRebuilderExported).to.be.equal(ProjectionRebuilder);
+      expect(ProjectionRebuilderExported).toBe(ProjectionRebuilder);
     });
     it('Projection', () => {
-      expect(ProjectionExported).to.be.equal(Projection);
+      expect(ProjectionExported).toBe(Projection);
     });
     it('Router', () => {
-      expect(RouterExported).to.be.equal(Router);
+      expect(RouterExported).toBe(Router);
     });
     it('Service', () => {
-      expect(ServiceExported).to.be.equal(Service);
+      expect(ServiceExported).toBe(Service);
     });
     it('Snapshotter', () => {
-      expect(SnapshotterExported).to.be.equal(Snapshotter);
+      expect(SnapshotterExported).toBe(Snapshotter);
     });
     describe('errors', () => {
       it('InfrastructureError', () => {
-        expect(InfrastructureErrorExported).to.be.equal(InfrastructureError);
+        expect(InfrastructureErrorExported).toBe(InfrastructureError);
       });
       it('CommitConcurrencyError', () => {
-        expect(CommitConcurrencyErrorExported).to.be.equal(
+        expect(CommitConcurrencyErrorExported).toBe(
           CommitConcurrencyError
         );
       });
       it('EventsNotFoundError', () => {
-        expect(EventsNotFoundErrorExported).to.be.equal(EventsNotFoundError);
+        expect(EventsNotFoundErrorExported).toBe(EventsNotFoundError);
       });
       it('AddingCommitFailedError', () => {
-        expect(AddingCommitFailedErrorExported).to.be.equal(
+        expect(AddingCommitFailedErrorExported).toBe(
           AddingCommitFailedError
         );
       });
       it('UpdatingCommitError', () => {
-        expect(UpdatingCommitErrorExported).to.be.equal(UpdatingCommitError);
+        expect(UpdatingCommitErrorExported).toBe(UpdatingCommitError);
       });
       it('AddingSnapshotError', () => {
-        expect(AddingSnapshotErrorExported).to.be.equal(AddingSnapshotError);
+        expect(AddingSnapshotErrorExported).toBe(AddingSnapshotError);
       });
       it('UpdatingSnapshotError', () => {
-        expect(UpdatingSnapshotErrorExported).to.be.equal(
+        expect(UpdatingSnapshotErrorExported).toBe(
           UpdatingSnapshotError
         );
       });
       it('StorageNotFoundError', () => {
-        expect(StorageNotFoundErrorExported).to.be.equal(StorageNotFoundError);
+        expect(StorageNotFoundErrorExported).toBe(StorageNotFoundError);
       });
       it('RouterError', () => {
-        expect(RouterErrorExported).to.be.equal(RouterError);
+        expect(RouterErrorExported).toBe(RouterError);
       });
       it('MissingEventSourceableError', () => {
-        expect(MissingEventSourceableErrorExported).to.be.equal(
+        expect(MissingEventSourceableErrorExported).toBe(
           MissingEventSourceableError
         );
       });
       it('MissingInitializingMessageError', () => {
-        expect(MissingInitializingMessageErrorExported).to.be.equal(
+        expect(MissingInitializingMessageErrorExported).toBe(
           MissingInitializingMessageError
         );
       });
       it('CannotRouteMessageError', () => {
-        expect(CannotRouteMessageErrorExported).to.be.equal(
+        expect(CannotRouteMessageErrorExported).toBe(
           CannotRouteMessageError
         );
       });
       it('UnresolvableIdentifierFromMessageError', () => {
-        expect(UnresolvableIdentifierFromMessageErrorExported).to.be.equal(
+        expect(UnresolvableIdentifierFromMessageErrorExported).toBe(
           UnresolvableIdentifierFromMessageError
         );
       });
       it('UndefinedSnapshotterFrequencyError', () => {
-        expect(UndefinedSnapshotterFrequencyErrorExported).to.be.equal(
+        expect(UndefinedSnapshotterFrequencyErrorExported).toBe(
           UndefinedSnapshotterFrequencyError
         );
       });
       it('UndefinedSnapshotterError', () => {
-        expect(UndefinedSnapshotterErrorExported).to.be.equal(
+        expect(UndefinedSnapshotterErrorExported).toBe(
           UndefinedSnapshotterError
         );
       });
       it('ProjectionRebuildingError', () => {
-        expect(ProjectionRebuildingErrorExported).to.be.equal(
+        expect(ProjectionRebuildingErrorExported).toBe(
           ProjectionRebuildingError
         );
       });
       it('ProjectionAlreadyRebuildingError', () => {
-        expect(ProjectionAlreadyRebuildingErrorExported).to.be.equal(
+        expect(ProjectionAlreadyRebuildingErrorExported).toBe(
           ProjectionAlreadyRebuildingError
         );
       });
       it('ProjectionNotRebuildingError', () => {
-        expect(ProjectionNotRebuildingErrorExported).to.be.equal(
+        expect(ProjectionNotRebuildingErrorExported).toBe(
           ProjectionNotRebuildingError
         );
       });
       it('ClientError', () => {
-        expect(ClientErrorExported).to.be.equal(ClientError);
+        expect(ClientErrorExported).toBe(ClientError);
       });
       it('InactiveClientError', () => {
-        expect(InactiveClientErrorExported).to.be.equal(InactiveClientError);
+        expect(InactiveClientErrorExported).toBe(InactiveClientError);
       });
       it('SchedulerError', () => {
-        expect(SchedulerErrorExported).to.be.equal(SchedulerError);
+        expect(SchedulerErrorExported).toBe(SchedulerError);
       });
       it('CommandSchedulingError', () => {
-        expect(CommandSchedulingErrorExported).to.be.equal(
+        expect(CommandSchedulingErrorExported).toBe(
           CommandSchedulingError
         );
       });
       it('CommandUnschedulingError', () => {
-        expect(CommandUnschedulingErrorExported).to.be.equal(
+        expect(CommandUnschedulingErrorExported).toBe(
           CommandUnschedulingError
         );
       });
@@ -1479,295 +1479,295 @@ describe(`exports`, () => {
   });
   describe('messaging', () => {
     it('EJSONSerializerAdapter', () => {
-      expect(EJSONSerializerAdapterExported).to.be.equal(
+      expect(EJSONSerializerAdapterExported).toBe(
         EJSONSerializerAdapter
       );
     });
     it('CommandBus', () => {
-      expect(CommandBusExported).to.be.equal(CommandBus);
+      expect(CommandBusExported).toBe(CommandBus);
     });
     it('EventBus', () => {
-      expect(EventBusExported).to.be.equal(EventBus);
+      expect(EventBusExported).toBe(EventBus);
     });
     describe('errors', () => {
       it('HandlingError', () => {
-        expect(HandlingErrorExported).to.be.equal(HandlingError);
+        expect(HandlingErrorExported).toBe(HandlingError);
       });
       it('UnhandleableTypeError', () => {
-        expect(UnhandleableTypeErrorExported).to.be.equal(
+        expect(UnhandleableTypeErrorExported).toBe(
           UnhandleableTypeError
         );
       });
       it('InvalidControllerError', () => {
-        expect(InvalidControllerErrorExported).to.be.equal(
+        expect(InvalidControllerErrorExported).toBe(
           InvalidControllerError
         );
       });
       it('InvalidHandlerError', () => {
-        expect(InvalidHandlerErrorExported).to.be.equal(InvalidHandlerError);
+        expect(InvalidHandlerErrorExported).toBe(InvalidHandlerError);
       });
       it('HandlerExistError', () => {
-        expect(HandlerExistErrorExported).to.be.equal(HandlerExistError);
+        expect(HandlerExistErrorExported).toBe(HandlerExistError);
       });
       it('HandlerNotFoundError', () => {
-        expect(HandlerNotFoundErrorExported).to.be.equal(HandlerNotFoundError);
+        expect(HandlerNotFoundErrorExported).toBe(HandlerNotFoundError);
       });
       it('UnsupportedExecutionTypeError', () => {
-        expect(UnsupportedExecutionTypeErrorExported).to.be.equal(
+        expect(UnsupportedExecutionTypeErrorExported).toBe(
           UnsupportedExecutionTypeError
         );
       });
       it('InvalidMessageableType', () => {
-        expect(InvalidMessageableTypeExported).to.be.equal(
+        expect(InvalidMessageableTypeExported).toBe(
           InvalidMessageableType
         );
       });
       it('InitializingMessageAlreadyExistsError', () => {
-        expect(InitializingMessageAlreadyExistsErrorExported).to.be.equal(
+        expect(InitializingMessageAlreadyExistsErrorExported).toBe(
           InitializingMessageAlreadyExistsError
         );
       });
       it('SerializationError', () => {
-        expect(SerializationErrorExported).to.be.equal(SerializationError);
+        expect(SerializationErrorExported).toBe(SerializationError);
       });
       it('UnparsableValueError', () => {
-        expect(UnparsableValueErrorExported).to.be.equal(UnparsableValueError);
+        expect(UnparsableValueErrorExported).toBe(UnparsableValueError);
       });
     });
   });
   describe('traits', () => {
     it('CommandHandlingTrait', () => {
-      expect(CommandHandlingTraitExported).to.be.equal(CommandHandlingTrait);
+      expect(CommandHandlingTraitExported).toBe(CommandHandlingTrait);
     });
     it('TypeTrait', () => {
-      expect(TypeTraitExported).to.be.equal(TypeTrait);
+      expect(TypeTraitExported).toBe(TypeTrait);
     });
     it('EjsonableTrait', () => {
-      expect(EjsonableTraitExported).to.be.equal(EjsonableTrait);
+      expect(EjsonableTraitExported).toBe(EjsonableTrait);
     });
     it('EventHandlingTrait', () => {
-      expect(EventHandlingTraitExported).to.be.equal(EventHandlingTrait);
+      expect(EventHandlingTraitExported).toBe(EventHandlingTrait);
     });
     it('HandlingTrait', () => {
-      expect(HandlingTraitExported).to.be.equal(HandlingTrait);
+      expect(HandlingTraitExported).toBe(HandlingTrait);
     });
 
     it('OneToManyHandlingTrait', () => {
-      expect(OneToManyHandlingTraitExported).to.be.equal(
+      expect(OneToManyHandlingTraitExported).toBe(
         OneToManyHandlingTrait
       );
     });
     it('OneToOneHandlingTrait', () => {
-      expect(OneToOneHandlingTraitExported).to.be.equal(OneToOneHandlingTrait);
+      expect(OneToOneHandlingTraitExported).toBe(OneToOneHandlingTrait);
     });
     it('RFC5424LoggingTrait', () => {
-      expect(RFC5424LoggingTraitExported).to.be.equal(RFC5424LoggingTrait);
+      expect(RFC5424LoggingTraitExported).toBe(RFC5424LoggingTrait);
     });
     it('SerializableTrait', () => {
-      expect(SerializableTraitExported).to.be.equal(SerializableTrait);
+      expect(SerializableTraitExported).toBe(SerializableTrait);
     });
 
     describe('HookableTrait', () => {
       it('HookableTrait', () => {
-        expect(HookableTraitExported).to.be.equal(HookableTrait);
+        expect(HookableTraitExported).toBe(HookableTrait);
       });
       it('HookError', () => {
-        expect(HookErrorExported).to.be.equal(HookError);
+        expect(HookErrorExported).toBe(HookError);
       });
       it('InvalidHookActionError', () => {
-        expect(InvalidHookActionErrorExported).to.be.equal(
+        expect(InvalidHookActionErrorExported).toBe(
           InvalidHookActionError
         );
       });
       it('InvalidHookIdError', () => {
-        expect(InvalidHookIdErrorExported).to.be.equal(InvalidHookIdError);
+        expect(InvalidHookIdErrorExported).toBe(InvalidHookIdError);
       });
       it('HookAlreadyExistsError', () => {
-        expect(HookAlreadyExistsErrorExported).to.be.equal(
+        expect(HookAlreadyExistsErrorExported).toBe(
           HookAlreadyExistsError
         );
       });
       it('HookNotFoundError', () => {
-        expect(HookNotFoundErrorExported).to.be.equal(HookNotFoundError);
+        expect(HookNotFoundErrorExported).toBe(HookNotFoundError);
       });
     });
     describe('StatefulTrait', () => {
       it('StatefulTrait', () => {
-        expect(StatefulTraitExported).to.be.equal(StatefulTrait);
+        expect(StatefulTraitExported).toBe(StatefulTrait);
       });
       it('StateError', () => {
-        expect(StateErrorExported).to.be.equal(StateError);
+        expect(StateErrorExported).toBe(StateError);
       });
       it('UndefinedStatesError', () => {
-        expect(UndefinedStatesErrorExported).to.be.equal(UndefinedStatesError);
+        expect(UndefinedStatesErrorExported).toBe(UndefinedStatesError);
       });
       it('InvalidStateError', () => {
-        expect(InvalidStateErrorExported).to.be.equal(InvalidStateError);
+        expect(InvalidStateErrorExported).toBe(InvalidStateError);
       });
     });
     describe('StatusfulTrait', () => {
       it('StatusfulTrait', () => {
-        expect(StatusfulTraitExported).to.be.equal(StatusfulTrait);
+        expect(StatusfulTraitExported).toBe(StatusfulTrait);
       });
       it('StatusError', () => {
-        expect(StatusErrorExported).to.be.equal(StatusError);
+        expect(StatusErrorExported).toBe(StatusError);
       });
       it('UndefinedStatusesError', () => {
-        expect(UndefinedStatusesErrorExported).to.be.equal(
+        expect(UndefinedStatusesErrorExported).toBe(
           UndefinedStatusesError
         );
       });
       it('InvalidStatusError', () => {
-        expect(InvalidStatusErrorExported).to.be.equal(InvalidStatusError);
+        expect(InvalidStatusErrorExported).toBe(InvalidStatusError);
       });
     });
     describe('VersionablMixin', () => {
       it('VersionableTrait', () => {
-        expect(VersionableTraitExported).to.be.equal(VersionableTrait);
+        expect(VersionableTraitExported).toBe(VersionableTrait);
       });
       it('VersionableError', () => {
-        expect(VersionableErrorExported).to.be.equal(VersionableError);
+        expect(VersionableErrorExported).toBe(VersionableError);
       });
       it('InvalidSchemaVersionError', () => {
-        expect(InvalidSchemaVersionErrorExported).to.be.equal(
+        expect(InvalidSchemaVersionErrorExported).toBe(
           InvalidSchemaVersionError
         );
       });
       it('LegacyTransformerAlreadyExistsError', () => {
-        expect(LegacyTransformerAlreadyExistsErrorExported).to.be.equal(
+        expect(LegacyTransformerAlreadyExistsErrorExported).toBe(
           LegacyTransformerAlreadyExistsError
         );
       });
       it('LegacyTransformerNotFoundError', () => {
-        expect(LegacyTransformerNotFoundErrorExported).to.be.equal(
+        expect(LegacyTransformerNotFoundErrorExported).toBe(
           LegacyTransformerNotFoundError
         );
       });
       it('InvalidLegacyTransformerError', () => {
-        expect(InvalidLegacyTransformerErrorExported).to.be.equal(
+        expect(InvalidLegacyTransformerErrorExported).toBe(
           InvalidLegacyTransformerError
         );
       });
       it('NotVersionableError', () => {
-        expect(NotVersionableErrorExported).to.be.equal(NotVersionableError);
+        expect(NotVersionableErrorExported).toBe(NotVersionableError);
       });
     });
   });
   describe('helpers', () => {
     it('isTyped', () => {
-      expect(isTypedExported).to.be.equal(isTyped);
+      expect(isTypedExported).toBe(isTyped);
     });
     it('isSerializable', () => {
-      expect(isSerializableExported).to.be.equal(isSerializable);
+      expect(isSerializableExported).toBe(isSerializable);
     });
     it('isRecord', () => {
-      expect(isRecordExported).to.be.equal(isRecord);
+      expect(isRecordExported).toBe(isRecord);
     });
     it('isPlainRecord', () => {
-      expect(isPlainRecordExported).to.be.equal(isPlainRecord);
+      expect(isPlainRecordExported).toBe(isPlainRecord);
     });
     it('toPlainObject', () => {
-      expect(toPlainObjectExported).to.be.equal(toPlainObject);
+      expect(toPlainObjectExported).toBe(toPlainObject);
     });
     it('convertObjectToCollection', () => {
-      expect(convertObjectToCollectionExported).to.be.equal(
+      expect(convertObjectToCollectionExported).toBe(
         convertObjectToCollection
       );
     });
     it('resolveSerializableFromPropType', () => {
-      expect(resolveSerializableFromPropTypeExported).to.be.equal(
+      expect(resolveSerializableFromPropTypeExported).toBe(
         resolveSerializableFromPropType
       );
     });
     it('createEJSON', () => {
-      expect(createEJSONExported).to.be.equal(createEJSON);
+      expect(createEJSONExported).toBe(createEJSON);
     });
     it('isEventSourceableType', () => {
-      expect(isEventSourceableTypeExported).to.be.equal(isEventSourceableType);
+      expect(isEventSourceableTypeExported).toBe(isEventSourceableType);
     });
     it('loadENV', () => {
-      expect(loadENVExported).to.be.equal(loadENV);
+      expect(loadENVExported).toBe(loadENV);
     });
     it('loggerLoader', () => {
-      expect(loggerLoaderExported).to.be.equal(loggerLoader);
+      expect(loggerLoaderExported).toBe(loggerLoader);
     });
   });
 
   describe('inversify', () => {
     it('getInversifyMetadata', () => {
-      expect(getInversifyMetadataExported).to.be.equal(getInversifyMetadata);
+      expect(getInversifyMetadataExported).toBe(getInversifyMetadata);
     });
     it('isInjectableClass', () => {
-      expect(isInjectableClassExported).to.be.equal(isInjectableClass);
+      expect(isInjectableClassExported).toBe(isInjectableClass);
     });
     it('getInjectedPropertyNames', () => {
-      expect(getInjectedPropertyNamesExported).to.be.equal(
+      expect(getInjectedPropertyNamesExported).toBe(
         getInjectedPropertyNames
       );
     });
     it('getInjectedParameterIndices', () => {
-      expect(getInjectedParameterIndicesExported).to.be.equal(
+      expect(getInjectedParameterIndicesExported).toBe(
         getInjectedParameterIndices
       );
     });
     it('getInjectedPropertyDetails', () => {
-      expect(getInjectedPropertyDetailsExported).to.be.equal(
+      expect(getInjectedPropertyDetailsExported).toBe(
         getInjectedPropertyDetails
       );
     });
     it('hasPostConstruct', () => {
-      expect(hasPostConstructExported).to.be.equal(hasPostConstruct);
+      expect(hasPostConstructExported).toBe(hasPostConstruct);
     });
     it('getPostConstructMethodNames', () => {
-      expect(getPostConstructMethodNamesExported).to.be.equal(
+      expect(getPostConstructMethodNamesExported).toBe(
         getPostConstructMethodNames
       );
     });
     it('hasPreDestroy', () => {
-      expect(hasPreDestroyExported).to.be.equal(hasPreDestroy);
+      expect(hasPreDestroyExported).toBe(hasPreDestroy);
     });
     it('getPreDestroyMethodNames', () => {
-      expect(getPreDestroyMethodNamesExported).to.be.equal(
+      expect(getPreDestroyMethodNamesExported).toBe(
         getPreDestroyMethodNames
       );
     });
     it('getMetadataSummary', () => {
-      expect(getMetadataSummaryExported).to.be.equal(getMetadataSummary);
+      expect(getMetadataSummaryExported).toBe(getMetadataSummary);
     });
     it('debugInversifyMetadata', () => {
-      expect(debugInversifyMetadataExported).to.be.equal(
+      expect(debugInversifyMetadataExported).toBe(
         debugInversifyMetadata
       );
     });
     it('getAllClassProperties', () => {
-      expect(getAllClassPropertiesExported).to.be.equal(getAllClassProperties);
+      expect(getAllClassPropertiesExported).toBe(getAllClassProperties);
     });
     it('getPropertiesToValidate', () => {
-      expect(getPropertiesToValidateExported).to.be.equal(
+      expect(getPropertiesToValidateExported).toBe(
         getPropertiesToValidate
       );
     });
     it('isPropertyInjected', () => {
-      expect(isPropertyInjectedExported).to.be.equal(isPropertyInjected);
+      expect(isPropertyInjectedExported).toBe(isPropertyInjected);
     });
   });
 
   describe('external', () => {
     it('postConstruct', () => {
-      expect(postConstructExported).to.be.equal(postConstruct);
+      expect(postConstructExported).toBe(postConstruct);
     });
     it('injectable', () => {
-      expect(injectableExported).to.be.equal(injectable);
+      expect(injectableExported).toBe(injectable);
     });
     it('inject', () => {
-      expect(injectExported).to.be.equal(inject);
+      expect(injectExported).toBe(inject);
     });
   });
 
   describe('type helpers', () => {
     describe('constants', () => {
       it('NON_ENUMERABLE_VALUE_KEY', () => {
-        expect(NON_ENUMERABLE_VALUE_KEY_EXPORTED).to.be.equal(
+        expect(NON_ENUMERABLE_VALUE_KEY_EXPORTED).toBe(
           NON_ENUMERABLE_VALUE_KEY
         );
       });
@@ -1775,49 +1775,49 @@ describe(`exports`, () => {
 
     describe('components', () => {
       it('Standard', () => {
-        expect(StandardExported).to.be.equal(Standard);
+        expect(StandardExported).toBe(Standard);
       });
       it('ValueString', () => {
-        expect(ValueStringExported).to.be.equal(ValueString);
+        expect(ValueStringExported).toBe(ValueString);
       });
       it('ValueNumber', () => {
-        expect(ValueNumberExported).to.be.equal(ValueNumber);
+        expect(ValueNumberExported).toBe(ValueNumber);
       });
     });
 
     describe('traits', () => {
       it('StandardizedTrait', () => {
-        expect(StandardizedTraitExported).to.be.equal(StandardizedTrait);
+        expect(StandardizedTraitExported).toBe(StandardizedTrait);
       });
       it('ValidableTrait', () => {
-        expect(ValidableTraitExported).to.be.equal(ValidableTrait);
+        expect(ValidableTraitExported).toBe(ValidableTrait);
       });
       it('GeneratorTrait', () => {
-        expect(GeneratorTraitExported).to.be.equal(GeneratorTrait);
+        expect(GeneratorTraitExported).toBe(GeneratorTrait);
       });
       it('ValidatorTrait', () => {
-        expect(ValidatorTraitExported).to.be.equal(ValidatorTrait);
+        expect(ValidatorTraitExported).toBe(ValidatorTrait);
       });
     });
 
     describe('errors', () => {
       describe('StandardizedTrait errors', () => {
         it('StandardError', () => {
-          expect(StandardErrorExported).to.be.equal(StandardError);
+          expect(StandardErrorExported).toBe(StandardError);
         });
         it('UnsupportedStandardError', () => {
-          expect(UnsupportedStandardErrorExported).to.be.equal(
+          expect(UnsupportedStandardErrorExported).toBe(
             UnsupportedStandardError
           );
         });
         it('StandardExistError', () => {
-          expect(StandardExistErrorExported).to.be.equal(StandardExistError);
+          expect(StandardExistErrorExported).toBe(StandardExistError);
         });
         it('NotApplicableError', () => {
-          expect(NotApplicableErrorExported).to.be.equal(NotApplicableError);
+          expect(NotApplicableErrorExported).toBe(NotApplicableError);
         });
         it('UnavailableConversionError', () => {
-          expect(UnavailableConversionErrorExported).to.be.equal(
+          expect(UnavailableConversionErrorExported).toBe(
             UnavailableConversionError
           );
         });
@@ -1825,17 +1825,17 @@ describe(`exports`, () => {
 
       describe('GeneratorTrait errors', () => {
         it('InvalidGeneratorIdError', () => {
-          expect(InvalidGeneratorIdErrorExported).to.be.equal(
+          expect(InvalidGeneratorIdErrorExported).toBe(
             InvalidGeneratorIdError
           );
         });
         it('GeneratorExistsError', () => {
-          expect(GeneratorExistsErrorExported).to.be.equal(
+          expect(GeneratorExistsErrorExported).toBe(
             GeneratorExistsError
           );
         });
         it('GeneratorNotFoundError', () => {
-          expect(GeneratorNotFoundErrorExported).to.be.equal(
+          expect(GeneratorNotFoundErrorExported).toBe(
             GeneratorNotFoundError
           );
         });
@@ -1843,17 +1843,17 @@ describe(`exports`, () => {
 
       describe('ValidatorTrait errors', () => {
         it('InvalidValidatorIdError', () => {
-          expect(InvalidValidatorIdErrorExported).to.be.equal(
+          expect(InvalidValidatorIdErrorExported).toBe(
             InvalidValidatorIdError
           );
         });
         it('ValidatorExistsError', () => {
-          expect(ValidatorExistsErrorExported).to.be.equal(
+          expect(ValidatorExistsErrorExported).toBe(
             ValidatorExistsError
           );
         });
         it('ValidatorNotFoundError', () => {
-          expect(ValidatorNotFoundErrorExported).to.be.equal(
+          expect(ValidatorNotFoundErrorExported).toBe(
             ValidatorNotFoundError
           );
         });
@@ -1861,9 +1861,10 @@ describe(`exports`, () => {
 
       describe('domain errors', () => {
         it('EmptyStringError', () => {
-          expect(EmptyStringErrorExported).to.be.equal(EmptyStringError);
+          expect(EmptyStringErrorExported).toBe(EmptyStringError);
         });
       });
     });
   });
 });
+

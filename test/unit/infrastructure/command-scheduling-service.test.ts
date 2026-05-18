@@ -1,6 +1,6 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, beforeAll } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
 import { CommandSchedulingService } from '../../../src/infrastructure/command-scheduling-service';
@@ -11,8 +11,6 @@ import { ScheduleCommand } from '../../../src/domain/schedule-command';
 import { Service } from '../../../src/infrastructure/service';
 import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
 import { Guid } from '../../../src/domain/value-objects/guid';
-
-chai.use(sinonChai);
 
 describe(`CommandSchedulingService`, () => {
   @Type('CommandSchedulingService.MyCommand', { isRegistrable: false })
@@ -43,15 +41,15 @@ describe(`CommandSchedulingService`, () => {
     assignerType,
   });
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   beforeEach(() => {
     injector = new Injector();
-    commandBus = stubInterface<types.CommandBus>();
-    eventBus = stubInterface<types.EventBus>();
-    scheduler = stubInterface<types.CommandScheduler>();
+    commandBus = mock<types.CommandBus>();
+    eventBus = mock<types.EventBus>();
+    scheduler = mock<types.CommandScheduler>();
 
     injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
@@ -66,15 +64,15 @@ describe(`CommandSchedulingService`, () => {
   });
 
   it(`extends Service`, () => {
-    expect(CommandSchedulingService.prototype).to.be.instanceof(Service);
+    expect(CommandSchedulingService.prototype).toBeInstanceOf(Service);
   });
 
   it(`handles ScheduleCommand command`, () => {
-    expect(service.hasHandler(ScheduleCommand)).to.be.true;
+    expect(service.hasHandler(ScheduleCommand)).toBe(true);
   });
 
   it(`handles UnscheduleCommand command`, () => {
-    expect(service.hasHandler(UnscheduleCommand)).to.be.true;
+    expect(service.hasHandler(UnscheduleCommand)).toBe(true);
   });
 
   it(`schedules delayed command with command scheduler`, async () => {
@@ -98,9 +96,9 @@ describe(`CommandSchedulingService`, () => {
     });
 
     await service.handle(scheduleCommand);
-    expect(commandBus.send).to.be.not.called;
-    expect(scheduler.schedule).to.be.calledOnce;
-    expect(scheduler.schedule).to.be.calledWithExactly(scheduleCommand);
+    expect(commandBus.send).not.toHaveBeenCalled();
+    expect(scheduler.schedule).toHaveBeenCalledTimes(1);
+    expect(scheduler.schedule).toHaveBeenCalledWith(scheduleCommand);
   });
 
   it(`sends command immediately if command is deliverable`, async () => {
@@ -124,13 +122,14 @@ describe(`CommandSchedulingService`, () => {
     });
 
     await service.handle(scheduleCommand);
-    expect(commandBus.send).to.be.calledOnce;
-    expect(commandBus.send).to.be.calledWithExactly(scheduleCommand.command);
+    expect(commandBus.send).toHaveBeenCalledTimes(1);
+    expect(commandBus.send).toHaveBeenCalledWith(scheduleCommand.command);
   });
 
   it(`unschedules command from command scheduler`, async () => {
     await service.handle(unscheduleCommand);
-    expect(scheduler.unschedule).to.be.calledOnce;
-    expect(scheduler.unschedule).to.be.calledWithExactly(unscheduleCommand);
+    expect(scheduler.unschedule).toHaveBeenCalledTimes(1);
+    expect(scheduler.unschedule).toHaveBeenCalledWith(unscheduleCommand);
   });
 });
+

@@ -1,7 +1,6 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { derive, derived } from '@traits-ts/core';
 import { CommandHandlingTrait } from '../../../src/traits/command-handling.trait';
@@ -15,14 +14,12 @@ import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 
-chai.use(sinonChai);
-
 describe(`CommandHandlingTrait`, () => {
   let injector: types.Injector;
   let commandBus: any;
 
   beforeEach(() => {
-    commandBus = stubInterface<types.CommandBus>();
+    commandBus = mock<types.CommandBus>();
     injector = new Injector();
     injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
@@ -47,7 +44,7 @@ describe(`CommandHandlingTrait`, () => {
   it(`has OneToOneHandlingTrait in composition chain`, () => {
     class TestClass extends derive(CommandHandlingTrait) {}
 
-    expect(derived(TestClass.prototype, OneToOneHandlingTrait)).to.be.true;
+    expect(derived(TestClass.prototype, OneToOneHandlingTrait)).toBe(true);
   });
 
   describe('construction', () => {
@@ -55,7 +52,7 @@ describe(`CommandHandlingTrait`, () => {
       class MyController extends derive(CommandHandlingTrait) {}
 
       const controller = new MyController();
-      expect(controller.getHandledCommands()).to.be.eql([]);
+      expect(controller.getHandledCommands()).toEqual([]);
     });
   });
 
@@ -71,15 +68,15 @@ describe(`CommandHandlingTrait`, () => {
         }
       }
       const controller = new MyController();
-      controller.registerCommandHandler = sinon.stub();
+      controller.registerCommandHandler = vi.fn();
       injector.injectInto(controller);
 
-      expect(controller.registerCommandHandler).to.be.calledTwice;
-      expect(controller.registerCommandHandler).to.be.calledWithExactly(
+      expect(controller.registerCommandHandler).toHaveBeenCalledTimes(2);
+      expect(controller.registerCommandHandler).toHaveBeenCalledWith(
         MyCommand,
         controller.MyCommand
       );
-      expect(controller.registerCommandHandler).to.be.calledWithExactly(
+      expect(controller.registerCommandHandler).toHaveBeenCalledWith(
         MyOtherCommand,
         controller.MyOtherCommand
       );
@@ -92,19 +89,19 @@ describe(`CommandHandlingTrait`, () => {
         }
       }
       const controller = new MyController();
-      controller.registerHandler = sinon.stub();
+      controller.registerHandler = vi.fn();
       controller.initialize();
-      expect(controller.registerHandler).to.not.be.called;
+      expect(controller.registerHandler).not.toHaveBeenCalled;
     });
 
     it(`throws UnhandleableTypeError upon types not subclassing from Command defined as handlers`, () => {
       class MyController extends derive(CommandHandlingTrait) {
         handles(): Map<types.MessageType<any>, types.Handler> {
-          return new Map([[MyEvent, sinon.stub()]]);
+          return new Map([[MyEvent, vi.fn()]]);
         }
       }
       const controller = new MyController();
-      expect(() => controller.initialize()).to.throw(
+      expect(() => controller.initialize()).toThrow(
         UnhandleableTypeError,
         `MyController: type must be one of: [Command]; got MyEvent`
       );
@@ -116,54 +113,54 @@ describe(`CommandHandlingTrait`, () => {
       class MyController extends derive(CommandHandlingTrait) {}
       const controller = new MyController();
       expect(() => {
-        controller.registerCommandHandler(MyEvent as any, sinon.stub());
-      }).to.throw(
+        controller.registerCommandHandler(MyEvent as any, vi.fn());
+      }).toThrow(
         UnhandleableTypeError,
         'MyController: type must be one of: [Command]; got MyEvent'
       );
     });
 
     it(`registers command handler`, () => {
-      const handler = sinon.spy();
+      const handler = vi.fn();
       class MyController extends derive(CommandHandlingTrait) {}
       const controller = new MyController();
       injector.injectInto(controller);
-      controller.registerHandler = sinon.stub();
+      controller.registerHandler = vi.fn();
 
       controller.registerCommandHandler(MyCommand, handler);
-      expect(controller.registerHandler).to.be.calledOnce;
+      expect(controller.registerHandler).toHaveBeenCalledTimes(1);
     });
 
     it(`registers handler on instance with bound handler`, () => {
-      const handler = sinon.stub();
+      const handler = vi.fn();
       class MyController extends derive(CommandHandlingTrait) {}
       const controller = new MyController();
-      const registerHandler = sinon.stub(controller, 'registerHandler');
+      const registerHandler = vi.spyOn(controller, "registerHandler");
       injector.injectInto(controller);
 
       controller.registerCommandHandler(MyCommand, handler);
-      expect(registerHandler).to.be.calledOnce;
-      expect(registerHandler.args[0][0]).to.be.equal(MyCommand);
+      expect(registerHandler).toHaveBeenCalledTimes(1);
+      expect(registerHandler.mock.calls[0][0]).toBe(MyCommand);
       expect(
-        Object.create(handler.prototype) instanceof registerHandler.args[0][1]
-      ).to.be.true; // Compare bound function to handler function example
-      expect(registerHandler.args[0][2]).to.be.false; // Flag shouldOverride set by default to false
+        Object.create(handler.prototype) instanceof registerHandler.mock.calls[0][1]
+      ).toBe(true); // Compare bound function to handler function example
+      expect(registerHandler.mock.calls[0][2]).toBe(false); // Flag shouldOverride set by default to false
     });
 
     it(`registers handler on CommandBus with bound handler`, () => {
-      const handler = sinon.stub();
+      const handler = vi.fn();
       class MyController extends derive(CommandHandlingTrait) {}
       const controller = new MyController();
       injector.injectInto(controller);
 
       controller.registerCommandHandler(MyCommand, handler);
-      expect(commandBus.registerHandler).to.be.calledOnce;
-      expect(commandBus.registerHandler.args[0][0]).to.be.equal(MyCommand);
+      expect(commandBus.registerHandler).toHaveBeenCalledTimes(1);
+      expect(commandBus.registerHandler.mock.calls[0][0]).toBe(MyCommand);
       expect(
         Object.create(handler.prototype) instanceof
-          commandBus.registerHandler.args[0][1]
-      ).to.be.true; // Compare bound function to handler function example
-      expect(commandBus.registerHandler.args[0][2]).to.be.false; // Flag shouldOverride set by default to false
+          commandBus.registerHandler.mock.calls[0][1]
+      ).toBe(true); // Compare bound function to handler function example
+      expect(commandBus.registerHandler.mock.calls[0][2]).toBe(false); // Flag shouldOverride set by default to false
     });
 
     it(`ensures that context of registered handler on CommandBus is bound to instance`, () => {
@@ -180,7 +177,7 @@ describe(`CommandHandlingTrait`, () => {
         }
       }
       const controller = new MyController();
-      controller.dependency = sinon.stub();
+      controller.dependency = vi.fn();
       controller.commandBus = commandBus;
 
       controller.registerCommandHandler(MyCommand, controller.MyCommand);
@@ -189,8 +186,8 @@ describe(`CommandHandlingTrait`, () => {
         key: 'my-key',
       });
       commandBus.handlers.get(MyCommand)(commandInstance);
-      expect(controller.dependency).to.be.calledOnce;
-      expect(controller.dependency).to.be.calledWithExactly(commandInstance);
+      expect(controller.dependency).toHaveBeenCalledTimes(1);
+      expect(controller.dependency).toHaveBeenCalledWith(commandInstance);
     });
   });
 
@@ -205,12 +202,12 @@ describe(`CommandHandlingTrait`, () => {
         key: 'my-key',
       });
       await controller.send(commandInstance);
-      expect(commandBus.send).to.be.calledOnce;
-      expect(commandBus.send).to.be.calledWithExactly(commandInstance);
+      expect(commandBus.send).toHaveBeenCalledTimes(1);
+      expect(commandBus.send).toHaveBeenCalledWith(commandInstance);
     });
 
     it(`ensures that result is passed back from handler upon sending command`, async () => {
-      commandBus.send.returns('result');
+      commandBus.send.mockReturnValue('result');
 
       class MyController extends derive(CommandHandlingTrait) {}
       const controller = new MyController();
@@ -221,7 +218,8 @@ describe(`CommandHandlingTrait`, () => {
         key: 'my-key',
       });
       const result = await controller.send(commandInstance);
-      expect(result).to.be.equal('result');
+      expect(result).toBe('result');
     });
   });
 });
+

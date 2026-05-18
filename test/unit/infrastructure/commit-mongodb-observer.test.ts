@@ -1,19 +1,15 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+
 import getenv from 'getenv';
 import { MongoClient, Collection, ChangeStream } from 'mongodb';
-import sinon from 'sinon';
-import { stubInterface } from 'ts-sinon';
+
 import { types } from '../../../src/types';
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
 import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
 import { Guid } from '../../../src/domain/value-objects/guid';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`CommitMongoDBObserver`, () => {
   const now = new Date();
@@ -23,14 +19,13 @@ describe(`CommitMongoDBObserver`, () => {
   let mongoClient: MongoClient;
   let injector: Injector;
   let collection: Collection;
-  let collectionMock: any;
   let config: any;
   let log: any;
   let storage: any;
   let observer: CommitMongoDBObserver;
   let commitPublisher: any;
 
-  before(async () => {
+  beforeAll(async () => {
     const mongoUrl = getenv.string('EVEBLE_COMMITSTORE_MONGODB_URL');
     mongoClient = await MongoClient.connect(mongoUrl);
   });
@@ -41,14 +36,13 @@ describe(`CommitMongoDBObserver`, () => {
     const collectionName =
       getenv.string('EVEBLE_COMMITSTORE_MONGODB_COLLECTION') || 'commits';
     collection = mongoClient.db(dbName).collection(collectionName);
-    collectionMock = sinon.mock(collection);
 
     injector = new Injector();
     observer = new CommitMongoDBObserver();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
-    storage = stubInterface<types.CommitStorage>();
-    commitPublisher = stubInterface<types.CommitPublisher>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
+    storage = mock<types.CommitStorage>();
+    commitPublisher = mock<types.CommitPublisher>();
 
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
@@ -60,28 +54,28 @@ describe(`CommitMongoDBObserver`, () => {
       .toConstantValue(storage);
     injector.injectInto(observer);
 
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
   });
 
-  after(async () => {
+  afterAll(async () => {
     await mongoClient.close();
   });
 
   const commitId = new Guid().toString();
 
   describe('observing', () => {
-    before(() => {
-      clock = sinon.useFakeTimers(now.getTime());
+    beforeAll(() => {
+      clock = vi.useFakeTimers(now.getTime());
     });
-    after(() => {
-      clock.restore();
+    afterAll(() => {
+      vi.useRealTimers();
     });
 
     it(`observes commits for changes`, async () => {
       // Prepare handled types
-      commitPublisher.getHandledEventTypes.returns(['MyEvent']);
-      commitPublisher.getHandledCommandTypes.returns(['MyCommand']);
+      commitPublisher.getHandledEventTypes.mockReturnValue(['MyEvent']);
+      commitPublisher.getHandledCommandTypes.mockReturnValue(['MyCommand']);
 
       const expectedPipeline = [
         {
@@ -103,38 +97,35 @@ describe(`CommitMongoDBObserver`, () => {
           }
           return changeStream;
         },
-        close: sinon.stub(),
+        close: vi.fn(),
       };
 
-      collectionMock
-        .expects('watch')
-        .withArgs(expectedPipeline, { fullDocument: 'updateLookup' })
-        .returns(changeStream);
+      vi.spyOn(collection, 'watch').mockReturnValue(changeStream);
 
-      const lockedCommit = stubInterface<types.Commit>();
-      storage.lockCommit.resolves(lockedCommit);
+      const lockedCommit = mock<types.Commit>();
+      storage.lockCommit.mockResolvedValue(lockedCommit);
 
       await observer.startObserving(commitPublisher);
 
-      expect(observer.isObserving()).to.be.true;
-      expect(storage.lockCommit).to.have.been.calledOnce;
-      expect(commitPublisher.publishChanges).to.have.been.calledOnce;
-      expect(commitPublisher.publishChanges).to.have.been.calledWithExactly(
+      expect(observer.isObserving()).toBe(true);
+      expect(storage.lockCommit).toHaveBeenCalledTimes(1);
+      expect(commitPublisher.publishChanges).toHaveBeenCalledTimes(1);
+      expect(commitPublisher.publishChanges).toHaveBeenCalledWith(
         lockedCommit
       );
 
       await observer.stopObserving();
-      expect(observer.isObserving()).to.be.false;
-      collectionMock.verify();
+      expect(observer.isObserving()).toBe(false);
 
       // Each of these should be called once (precomputed in observer)
-      expect(commitPublisher.getHandledEventTypes).to.be.calledOnce;
-      expect(commitPublisher.getHandledCommandTypes).to.be.calledOnce;
+      expect(commitPublisher.getHandledEventTypes).toHaveBeenCalledTimes(1);
+      expect(commitPublisher.getHandledCommandTypes).toHaveBeenCalledTimes(1);
+      expect(collection.watch).toHaveBeenCalledWith(expectedPipeline, { fullDocument: 'updateLookup' });
     });
 
     it('uses registeredAndNotReceivedYetFilter when locking commits (prevents duplicate publish)', async () => {
-      commitPublisher.getHandledEventTypes.returns(['MyEvent']);
-      commitPublisher.getHandledCommandTypes.returns(['MyCommand']);
+      commitPublisher.getHandledEventTypes.mockReturnValue(['MyEvent']);
+      commitPublisher.getHandledCommandTypes.mockReturnValue(['MyCommand']);
 
       const expectedFilter = {
         $and: [
@@ -156,29 +147,27 @@ describe(`CommitMongoDBObserver`, () => {
           }
           return changeStream;
         },
-        close: sinon.stub(),
+        close: vi.fn(),
       };
-      collectionMock.expects('watch').returns(changeStream);
+      vi.spyOn(collection, 'watch').mockReturnValue(changeStream);
 
-      const lockedCommit = stubInterface<types.Commit>();
-      storage.lockCommit.resolves(lockedCommit);
+      const lockedCommit = mock<types.Commit>();
+      storage.lockCommit.mockResolvedValue(lockedCommit);
 
       await observer.startObserving(commitPublisher);
 
-      sinon.assert.calledOnce(storage.lockCommit);
-      expect(storage.lockCommit).to.have.been.calledWithMatch(
-        sinon.match.any, // commit id (can be Guid or string)
-        sinon.match(appId),
-        sinon.match(workerId),
-        sinon.match(expectedFilter)
+      expect(storage.lockCommit).toHaveBeenCalledWith(
+        expect.anything(), // commit id (can be Guid or string)
+        appId,
+        workerId,
+        expectedFilter
       );
-      expect(commitPublisher.publishChanges).to.have.been.calledOnce;
-      expect(commitPublisher.publishChanges).to.have.been.calledWithExactly(
+      expect(commitPublisher.publishChanges).toHaveBeenCalledTimes(1);
+      expect(commitPublisher.publishChanges).toHaveBeenCalledWith(
         lockedCommit
       );
 
       await observer.stopObserving();
-      collectionMock.verify();
     });
 
     it('initializes with created state when observer is instantiated', async () => {
@@ -187,8 +176,8 @@ describe(`CommitMongoDBObserver`, () => {
     });
 
     it('changes state to observing when observer starts observing commit changes', async () => {
-      const changeStream: any = stubInterface<ChangeStream>();
-      collectionMock.expects('watch').returns(changeStream);
+      const changeStream: any = mock<ChangeStream>();
+      vi.spyOn(collection, 'watch').mockReturnValue(changeStream);
 
       await observer.startObserving(commitPublisher);
       expect(observer.isInState(CommitMongoDBObserver.STATES.observing)).to.be
@@ -200,16 +189,16 @@ describe(`CommitMongoDBObserver`, () => {
       const changeStream = {
         on: (): void => undefined,
         close: (): void => undefined,
-        pause: sinon.stub().resolves(),
+        pause: vi.fn().mockResolvedValue(),
       };
 
-      collectionMock.expects('watch').returns(changeStream);
+      vi.spyOn(collection, 'watch').mockReturnValue(changeStream);
 
       await observer.startObserving(commitPublisher);
       await observer.pauseObserving();
       expect(observer.isInState(CommitMongoDBObserver.STATES.paused)).to.be
         .true;
-      expect(changeStream.pause).to.be.calledOnce;
+      expect(changeStream.pause).toHaveBeenCalledTimes(1);
 
       await observer.stopObserving();
     });
@@ -217,17 +206,17 @@ describe(`CommitMongoDBObserver`, () => {
     it('changes state to closed when observer stops observing commit changes', async () => {
       const changeStream = {
         on: (): void => undefined,
-        close: sinon.stub().resolves(),
+        close: vi.fn().mockResolvedValue(),
       };
 
-      collectionMock.expects('watch').returns(changeStream);
+      vi.spyOn(collection, 'watch').mockReturnValue(changeStream);
 
       await observer.startObserving(commitPublisher);
       await observer.stopObserving();
       expect(observer.isInState(CommitMongoDBObserver.STATES.closed)).to.be
         .true;
 
-      expect(changeStream.close).to.be.calledOnce;
+      expect(changeStream.close).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -243,12 +232,12 @@ describe(`CommitMongoDBObserver`, () => {
         },
       };
 
-      collectionMock.expects('watch').returns(changeStream);
+      vi.spyOn(collection, 'watch').mockReturnValue(changeStream);
     });
 
     it('registers event handlers for mongo events', async () => {
       await observer.startObserving(commitPublisher);
-      expect(Array.from(handlers.keys())).to.be.eql([
+      expect(Array.from(handlers.keys())).toEqual([
         'change',
         'close',
         'error',
@@ -261,9 +250,9 @@ describe(`CommitMongoDBObserver`, () => {
       await handler();
       expect(observer.isInState(CommitMongoDBObserver.STATES.closed)).to.be
         .true;
-      expect(log.debug).to.be.calledWithMatch(
+      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
         new Log(`closed observing commits`)
-      );
+      ));
     });
 
     it('changes state to failed on error event and logs error', async () => {
@@ -273,9 +262,9 @@ describe(`CommitMongoDBObserver`, () => {
       await handler(error);
       expect(observer.isInState(CommitMongoDBObserver.STATES.failed)).to.be
         .true;
-      expect(log.error).to.be.calledWithMatch(
+      expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
         new Log(`failed observing commits due to error: Error: my-error`)
-      );
+      ));
     });
   });
 });

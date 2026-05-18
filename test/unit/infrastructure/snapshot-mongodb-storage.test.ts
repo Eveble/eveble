@@ -1,10 +1,9 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+
 import getenv from 'getenv';
 import { MongoClient, Collection } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import { Type } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -17,9 +16,6 @@ import {
   UpdatingSnapshotError,
 } from '../../../src/infrastructure/infrastructure-errors';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`SnapshotMongoDBStorage`, () => {
   @Type('SnapshotMongoDBStorage.MyEventSourceable', { isRegistrable: false })
   class MyEventSourceable extends EventSourceable {
@@ -29,7 +25,6 @@ describe(`SnapshotMongoDBStorage`, () => {
   let mongoClient: MongoClient;
   let injector: Injector;
   let collection: Collection;
-  let collectionMock: any;
   let esSerializer: any;
   let storage: SnapshotMongoDBStorage;
   let eventSourceableId: string;
@@ -37,7 +32,7 @@ describe(`SnapshotMongoDBStorage`, () => {
   let snapshot: any;
   let snapshotedES: any;
 
-  before(async () => {
+  beforeAll(async () => {
     const mongoUrl = getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_URL');
     // Remove deprecated options for v6
     mongoClient = await MongoClient.connect(mongoUrl);
@@ -50,7 +45,7 @@ describe(`SnapshotMongoDBStorage`, () => {
   });
 
   beforeEach(() => {
-    snapshotedES = sinon.stub();
+    snapshotedES = vi.fn();
     snapshot = {
       id: 'my-id',
       snapshot: snapshotedES,
@@ -61,16 +56,15 @@ describe(`SnapshotMongoDBStorage`, () => {
     const collectionName =
       getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_COLLECTION') || 'snapshots';
     collection = mongoClient.db(dbName).collection(collectionName);
-    collectionMock = sinon.mock(collection);
 
     injector = new Injector();
     storage = new SnapshotMongoDBStorage();
-    esSerializer = stubInterface<types.SnapshotSerializer>();
+    esSerializer = mock<types.SnapshotSerializer>();
 
-    esSerializer.serialize.withArgs(eventSourceable).returns(snapshot);
+    esSerializer.serialize.calledWith(eventSourceable).mockReturnValue(snapshot);
     esSerializer.deserialize
-      .withArgs(MyEventSourceable, snapshotedES)
-      .returns(eventSourceable);
+      .calledWith(MyEventSourceable, snapshotedES)
+      .mockReturnValue(eventSourceable);
 
     injector
       .bind<types.SnapshotSerializer>(BINDINGS.SnapshotSerializer)
@@ -81,34 +75,34 @@ describe(`SnapshotMongoDBStorage`, () => {
     injector.injectInto(storage);
   });
 
-  after(async () => {
+  afterAll(async () => {
     await mongoClient.close();
   });
 
   it(`inserts snapshot to MongoDB collection`, async () => {
     const docId = 'mongo-id';
-    collectionMock.expects('insertOne').withArgs(snapshot).resolves({
+    vi.spyOn(collection, 'insertOne').mockResolvedValue({
       insertedId: docId,
       acknowledged: true,
     });
 
     const result = await storage.save(eventSourceable);
-    expect(result).to.be.equal(docId);
+    expect(result).toBe(docId);
 
-    collectionMock.verify();
+    expect(collection.insertOne).toHaveBeenCalledWith(snapshot);
   });
 
   it(`throws AddingSnapshotError on unsuccessful document insertion`, async () => {
-    collectionMock.expects('insertOne').withArgs(snapshot).resolves({
+    vi.spyOn(collection, 'insertOne').mockResolvedValue({
       acknowledged: false,
       insertedId: null,
     });
 
-    await expect(storage.save(eventSourceable)).to.eventually.be.rejectedWith(
+    await expect(storage.save(eventSourceable)).rejects.toThrow(
       AddingSnapshotError,
       `SnapshotMongoDBStorage: adding snapshot for event sourceable 'SnapshotMongoDBStorage.MyEventSourceable' with id '${eventSourceableId.toString()}' failed`
     );
-    collectionMock.verify();
+    expect(collection.insertOne).toHaveBeenCalledWith(snapshot);
   });
 
   it(`updates snapshot on MongoDB collection`, async () => {
@@ -121,14 +115,11 @@ describe(`SnapshotMongoDBStorage`, () => {
       },
     };
 
-    collectionMock
-      .expects('updateOne')
-      .withArgs(filter, update)
-      .resolves({ modifiedCount: 1, acknowledged: true });
+    vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 1, acknowledged: true });
 
     await storage.update(eventSourceable);
 
-    collectionMock.verify();
+    expect(collection.updateOne).toHaveBeenCalledWith(filter, update);
   });
 
   it(`throws UpdatingSnapshotError on failed snapshot update at MongoDB collection`, async () => {
@@ -141,17 +132,14 @@ describe(`SnapshotMongoDBStorage`, () => {
       },
     };
 
-    collectionMock
-      .expects('updateOne')
-      .withArgs(filter, update)
-      .resolves({ modifiedCount: 0, acknowledged: true });
+    vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 0, acknowledged: true });
 
-    await expect(storage.update(eventSourceable)).to.eventually.be.rejectedWith(
+    await expect(storage.update(eventSourceable)).rejects.toThrow(
       UpdatingSnapshotError,
       `SnapshotMongoDBStorage: updating snapshot for event sourceable 'SnapshotMongoDBStorage.MyEventSourceable' with id '${eventSourceableId.toString()}' failed`
     );
 
-    collectionMock.verify();
+    expect(collection.updateOne).toHaveBeenCalledWith(filter, update);
   });
 
   it(`returns deserialized event sourceable snapshot from MongoDB collection by event sourceable's id`, async () => {
@@ -159,16 +147,16 @@ describe(`SnapshotMongoDBStorage`, () => {
       _id: eventSourceableId,
     };
 
-    collectionMock.expects('findOne').withArgs(query).resolves(snapshot);
+    vi.spyOn(collection, 'findOne').mockResolvedValue(snapshot);
 
     const foundSnapshot = await storage.findById(
       MyEventSourceable,
       eventSourceableId
     );
-    expect(foundSnapshot).to.be.instanceOf(MyEventSourceable);
-    expect(foundSnapshot).to.be.eql(eventSourceable);
+    expect(foundSnapshot).toBeInstanceOf(MyEventSourceable);
+    expect(foundSnapshot).toEqual(eventSourceable);
 
-    collectionMock.verify();
+    expect(collection.findOne).toHaveBeenCalledWith(query);
   });
 
   it(`returns undefined if snapshot cannot be found on MongoDB collection`, async () => {
@@ -176,14 +164,14 @@ describe(`SnapshotMongoDBStorage`, () => {
       _id: eventSourceableId,
     };
 
-    collectionMock.expects('findOne').withArgs(query).resolves(null);
+    vi.spyOn(collection, 'findOne').mockResolvedValue(null);
 
     const foundSnapshot = await storage.findById(
       MyEventSourceable,
       eventSourceableId
     );
-    expect(foundSnapshot).to.be.equal(undefined);
+    expect(foundSnapshot).toBe(undefined);
 
-    collectionMock.verify();
+    expect(collection.findOne).toHaveBeenCalledWith(query);
   });
 });

@@ -1,7 +1,6 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+
 import { Collection } from 'mongodb';
 import { Type, kernel } from '@eveble/core';
 import { CommitStore } from '../../../src/infrastructure/commit-store';
@@ -24,9 +23,6 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
 import { createEJSON } from '../../../src/utils/helpers';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`CommitStore with MongoDB storage`, () => {
   @Type('CommitStoreWithMongoDBStorage.MyEventSourceable')
@@ -64,8 +60,8 @@ describe(`CommitStore with MongoDB storage`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -73,12 +69,12 @@ describe(`CommitStore with MongoDB storage`, () => {
   };
 
   const setupDefaultConfiguration = function (): void {
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
   };
 
   const setupEvebleDependencies = function (): void {
-    commitPublisher = stubInterface<types.CommitPublisher>();
+    commitPublisher = mock<types.CommitPublisher>();
 
     // Serializer
     injector.bind<any>(BINDINGS.EJSON).toConstantValue(createEJSON());
@@ -114,7 +110,7 @@ describe(`CommitStore with MongoDB storage`, () => {
     }
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     setupDefaultConfiguration();
@@ -130,7 +126,7 @@ describe(`CommitStore with MongoDB storage`, () => {
     await collections.commitStore.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
   });
 
@@ -153,37 +149,37 @@ describe(`CommitStore with MongoDB storage`, () => {
 
       const commit = await commitStore.createCommit(aggregate);
 
-      expect(commit).to.be.instanceof(Commit);
-      expect(commit.id).to.be.a('string'); // Generated from MongoDBStorage
-      expect(commit.sourceId).to.be.equal(id);
-      expect(commit.version).to.be.equal(1);
-      expect(commit.eventSourceableType).to.be.equal(
+      expect(commit).toBeInstanceOf(Commit);
+      expect(commit.id).toBeTypeOf('string'); // Generated from MongoDBStorage
+      expect(commit.sourceId).toBe(id);
+      expect(commit.version).toBe(1);
+      expect(commit.eventSourceableType).toBe(
         'CommitStoreWithMongoDBStorage.MyAggregate'
       );
 
-      expect(commit.events).to.be.instanceof(Array);
-      expect(commit.events[0]).to.be.instanceof(MyEvent);
-      expect(commit.events[0].sourceId).to.be.equal(id);
-      expect(commit.events[0].timestamp).to.be.instanceof(Date);
-      expect(commit.events[0].version).to.be.equal(1);
+      expect(commit.events).toBeInstanceOf(Array);
+      expect(commit.events[0]).toBeInstanceOf(MyEvent);
+      expect(commit.events[0].sourceId).toBe(id);
+      expect(commit.events[0].timestamp).toBeInstanceOf(Date);
+      expect(commit.events[0].version).toBe(1);
 
-      expect(commit.events[1]).to.be.instanceof(MyOtherEvent);
-      expect(commit.events[1].sourceId).to.be.equal(id);
-      expect(commit.events[1].timestamp).to.be.instanceof(Date);
-      expect(commit.events[1].version).to.be.equal(1);
+      expect(commit.events[1]).toBeInstanceOf(MyOtherEvent);
+      expect(commit.events[1].sourceId).toBe(id);
+      expect(commit.events[1].timestamp).toBeInstanceOf(Date);
+      expect(commit.events[1].version).toBe(1);
 
-      expect(commit.commands).to.be.instanceof(Array);
-      expect(commit.commands).to.be.eql([]);
+      expect(commit.commands).toBeInstanceOf(Array);
+      expect(commit.commands).toEqual([]);
 
-      expect(commit.insertedAt).to.be.instanceof(Date);
-      expect(commit.sentBy).to.be.equal(appId);
+      expect(commit.insertedAt).toBeInstanceOf(Date);
+      expect(commit.sentBy).toBe(appId);
 
-      expect(commit.receivers).to.be.instanceof(Array);
-      expect(commit.receivers[0]).to.be.instanceof(CommitReceiver);
-      expect(commit.receivers[0].state).to.be.equal('received');
-      expect(commit.receivers[0].appId).to.be.equal(appId);
-      expect(commit.receivers[0].workerId).to.be.equal(workerId);
-      expect(commit.receivers[0].receivedAt).to.be.instanceof(Date);
+      expect(commit.receivers).toBeInstanceOf(Array);
+      expect(commit.receivers[0]).toBeInstanceOf(CommitReceiver);
+      expect(commit.receivers[0].state).toBe('received');
+      expect(commit.receivers[0].appId).toBe(appId);
+      expect(commit.receivers[0].workerId).toBe(workerId);
+      expect(commit.receivers[0].receivedAt).toBeInstanceOf(Date);
     });
 
     it(`generates unique commit id on storage`, async () => {
@@ -192,8 +188,8 @@ describe(`CommitStore with MongoDB storage`, () => {
 
       const firstCommit = await commitStore.createCommit(firstAggregate);
       const secondCommit = await commitStore.createCommit(secondAggregate);
-      expect(firstCommit.id).to.be.a('string');
-      expect(secondCommit.id).to.be.a('string');
+      expect(firstCommit.id).toBeTypeOf('string');
+      expect(secondCommit.id).toBeTypeOf('string');
       expect(firstCommit.id).to.not.be.equal(secondCommit.id);
     });
 
@@ -225,37 +221,37 @@ describe(`CommitStore with MongoDB storage`, () => {
 
       const commit = await commitStore.createCommit(process);
 
-      expect(commit).to.be.instanceof(Commit);
-      expect(commit.id).to.be.a('string'); // Generated from MongoDBStorage
-      expect(commit.sourceId).to.be.equal(id);
-      expect(commit.version).to.be.equal(1);
-      expect(commit.eventSourceableType).to.be.equal(
+      expect(commit).toBeInstanceOf(Commit);
+      expect(commit.id).toBeTypeOf('string'); // Generated from MongoDBStorage
+      expect(commit.sourceId).toBe(id);
+      expect(commit.version).toBe(1);
+      expect(commit.eventSourceableType).toBe(
         'CommitStoreWithMongoDBStorage.MyProcess'
       );
 
-      expect(commit.events).to.be.instanceof(Array);
-      expect(commit.events[0]).to.be.instanceof(MyEvent);
-      expect(commit.events[0].sourceId).to.be.equal(id);
-      expect(commit.events[0].timestamp).to.be.instanceof(Date);
-      expect(commit.events[0].version).to.be.equal(1);
+      expect(commit.events).toBeInstanceOf(Array);
+      expect(commit.events[0]).toBeInstanceOf(MyEvent);
+      expect(commit.events[0].sourceId).toBe(id);
+      expect(commit.events[0].timestamp).toBeInstanceOf(Date);
+      expect(commit.events[0].version).toBe(1);
 
-      expect(commit.events[1]).to.be.instanceof(MyOtherEvent);
-      expect(commit.events[1].sourceId).to.be.equal(id);
-      expect(commit.events[1].timestamp).to.be.instanceof(Date);
-      expect(commit.events[1].version).to.be.equal(1);
+      expect(commit.events[1]).toBeInstanceOf(MyOtherEvent);
+      expect(commit.events[1].sourceId).toBe(id);
+      expect(commit.events[1].timestamp).toBeInstanceOf(Date);
+      expect(commit.events[1].version).toBe(1);
 
-      expect(commit.commands).to.be.instanceof(Array);
-      expect(commit.commands).to.be.eql([firstCommand, secondCommand]);
+      expect(commit.commands).toBeInstanceOf(Array);
+      expect(commit.commands).toEqual([firstCommand, secondCommand]);
 
-      expect(commit.insertedAt).to.be.instanceof(Date);
-      expect(commit.sentBy).to.be.equal(appId);
+      expect(commit.insertedAt).toBeInstanceOf(Date);
+      expect(commit.sentBy).toBe(appId);
 
-      expect(commit.receivers).to.be.instanceof(Array);
-      expect(commit.receivers[0]).to.be.instanceof(CommitReceiver);
-      expect(commit.receivers[0].state).to.be.equal('received');
-      expect(commit.receivers[0].appId).to.be.equal(appId);
-      expect(commit.receivers[0].workerId).to.be.equal(workerId);
-      expect(commit.receivers[0].receivedAt).to.be.instanceof(Date);
+      expect(commit.receivers).toBeInstanceOf(Array);
+      expect(commit.receivers[0]).toBeInstanceOf(CommitReceiver);
+      expect(commit.receivers[0].state).toBe('received');
+      expect(commit.receivers[0].appId).toBe(appId);
+      expect(commit.receivers[0].workerId).toBe(workerId);
+      expect(commit.receivers[0].receivedAt).toBeInstanceOf(Date);
     });
 
     it(`creates another commit for event sourceable`, async () => {
@@ -286,37 +282,37 @@ describe(`CommitStore with MongoDB storage`, () => {
       const fourthCommit = await commitStore.createCommit(eventSourceable);
       await commitStore.save(fourthCommit);
 
-      expect(fourthCommit).to.be.instanceof(Commit);
-      expect(fourthCommit.id).to.be.a('string'); // Generated from MongoDBStorage
-      expect(fourthCommit.sourceId).to.be.equal(id);
-      expect(fourthCommit.version).to.be.equal(4);
-      expect(fourthCommit.eventSourceableType).to.be.equal(
+      expect(fourthCommit).toBeInstanceOf(Commit);
+      expect(fourthCommit.id).toBeTypeOf('string'); // Generated from MongoDBStorage
+      expect(fourthCommit.sourceId).toBe(id);
+      expect(fourthCommit.version).toBe(4);
+      expect(fourthCommit.eventSourceableType).toBe(
         'CommitStoreWithMongoDBStorage.MyEventSourceable'
       );
 
-      expect(fourthCommit.events).to.be.instanceof(Array);
-      expect(fourthCommit.events[0]).to.be.instanceof(MyEvent);
-      expect(fourthCommit.events[0].sourceId).to.be.equal(id);
-      expect(fourthCommit.events[0].timestamp).to.be.instanceof(Date);
-      expect(fourthCommit.events[0].version).to.be.equal(4);
+      expect(fourthCommit.events).toBeInstanceOf(Array);
+      expect(fourthCommit.events[0]).toBeInstanceOf(MyEvent);
+      expect(fourthCommit.events[0].sourceId).toBe(id);
+      expect(fourthCommit.events[0].timestamp).toBeInstanceOf(Date);
+      expect(fourthCommit.events[0].version).toBe(4);
 
-      expect(fourthCommit.events[1]).to.be.instanceof(MyOtherEvent);
-      expect(fourthCommit.events[1].sourceId).to.be.equal(id);
-      expect(fourthCommit.events[1].timestamp).to.be.instanceof(Date);
-      expect(fourthCommit.events[1].version).to.be.equal(4);
+      expect(fourthCommit.events[1]).toBeInstanceOf(MyOtherEvent);
+      expect(fourthCommit.events[1].sourceId).toBe(id);
+      expect(fourthCommit.events[1].timestamp).toBeInstanceOf(Date);
+      expect(fourthCommit.events[1].version).toBe(4);
 
-      expect(fourthCommit.commands).to.be.instanceof(Array);
-      expect(fourthCommit.commands).to.be.eql([]);
+      expect(fourthCommit.commands).toBeInstanceOf(Array);
+      expect(fourthCommit.commands).toEqual([]);
 
-      expect(fourthCommit.insertedAt).to.be.instanceof(Date);
-      expect(fourthCommit.sentBy).to.be.equal(appId);
+      expect(fourthCommit.insertedAt).toBeInstanceOf(Date);
+      expect(fourthCommit.sentBy).toBe(appId);
 
-      expect(fourthCommit.receivers).to.be.instanceof(Array);
-      expect(fourthCommit.receivers[0]).to.be.instanceof(CommitReceiver);
-      expect(fourthCommit.receivers[0].state).to.be.equal('received');
-      expect(fourthCommit.receivers[0].appId).to.be.equal(appId);
-      expect(fourthCommit.receivers[0].workerId).to.be.equal(workerId);
-      expect(fourthCommit.receivers[0].receivedAt).to.be.instanceof(Date);
+      expect(fourthCommit.receivers).toBeInstanceOf(Array);
+      expect(fourthCommit.receivers[0]).toBeInstanceOf(CommitReceiver);
+      expect(fourthCommit.receivers[0].state).toBe('received');
+      expect(fourthCommit.receivers[0].appId).toBe(appId);
+      expect(fourthCommit.receivers[0].workerId).toBe(workerId);
+      expect(fourthCommit.receivers[0].receivedAt).toBeInstanceOf(Date);
     });
 
     it(`throws CommitConcurrencyError if the version in the store does not equal the expected version`, async () => {
@@ -328,7 +324,7 @@ describe(`CommitStore with MongoDB storage`, () => {
       aggregate.version = 20; // Should be at version 1
       await expect(
         commitStore.createCommit(aggregate)
-      ).to.eventually.be.rejectedWith(
+      ).rejects.toThrow(
         CommitConcurrencyError,
         `CommitStoreWithMongoDBStorage.MyAggregate: expected event sourceable with id of 'my-id' to be at version 20 but is at version 1`
       );
@@ -342,30 +338,30 @@ describe(`CommitStore with MongoDB storage`, () => {
       const commit = await commitStore.createCommit(aggregate);
 
       const commitId = await commitStore.save(commit);
-      expect(commitId).to.be.a('string');
+      expect(commitId).toBeTypeOf('string');
 
       const foundCommit = (await commitStore.findById(commitId)) as Commit;
 
-      expect(foundCommit).to.be.instanceof(Commit);
-      expect(foundCommit.id).to.be.a('string'); // Generated from MongoDBStorage
-      expect(foundCommit.sourceId).to.be.equal(id);
-      expect(foundCommit.version).to.be.equal(1);
+      expect(foundCommit).toBeInstanceOf(Commit);
+      expect(foundCommit.id).toBeTypeOf('string'); // Generated from MongoDBStorage
+      expect(foundCommit.sourceId).toBe(id);
+      expect(foundCommit.version).toBe(1);
 
-      expect(foundCommit.eventSourceableType).to.be.equal(
+      expect(foundCommit.eventSourceableType).toBe(
         'CommitStoreWithMongoDBStorage.MyAggregate'
       );
-      expect(foundCommit.events).to.be.eql([]);
-      expect(foundCommit.commands).to.be.eql([]);
+      expect(foundCommit.events).toEqual([]);
+      expect(foundCommit.commands).toEqual([]);
 
-      expect(foundCommit.insertedAt).to.be.instanceof(Date);
-      expect(foundCommit.sentBy).to.be.equal(appId);
+      expect(foundCommit.insertedAt).toBeInstanceOf(Date);
+      expect(foundCommit.sentBy).toBe(appId);
 
-      expect(foundCommit.receivers).to.be.instanceof(Array);
-      expect(foundCommit.receivers[0]).to.be.instanceof(CommitReceiver);
-      expect(foundCommit.receivers[0].state).to.be.equal('received');
-      expect(foundCommit.receivers[0].appId).to.be.equal(appId);
-      expect(foundCommit.receivers[0].workerId).to.be.equal(workerId);
-      expect(foundCommit.receivers[0].receivedAt).to.be.instanceof(Date);
+      expect(foundCommit.receivers).toBeInstanceOf(Array);
+      expect(foundCommit.receivers[0]).toBeInstanceOf(CommitReceiver);
+      expect(foundCommit.receivers[0].state).toBe('received');
+      expect(foundCommit.receivers[0].appId).toBe(appId);
+      expect(foundCommit.receivers[0].workerId).toBe(workerId);
+      expect(foundCommit.receivers[0].receivedAt).toBeInstanceOf(Date);
     });
 
     it(`rethrows any thrown error on storage`, async () => {
@@ -373,7 +369,7 @@ describe(`CommitStore with MongoDB storage`, () => {
 
       const commit = await commitStore.createCommit(aggregate);
       await commitStore.save(commit);
-      await expect(commitStore.save(commit)).to.eventually.be.rejectedWith(
+      await expect(commitStore.save(commit)).rejects.toThrow(
         CommitConcurrencyError,
         `CommitStoreWithMongoDBStorage.MyAggregate: expected event sourceable with id of 'my-id' to be at version 0 but is at version 1`
       );
@@ -388,14 +384,14 @@ describe(`CommitStore with MongoDB storage`, () => {
       await commitStore.save(commit);
 
       const foundCommit = await commitStore.findById(commit.id);
-      expect(foundCommit).to.be.instanceof(Commit);
-      expect(foundCommit).to.be.eql(commit);
+      expect(foundCommit).toBeInstanceOf(Commit);
+      expect(foundCommit).toEqual(commit);
     });
 
     it(`returns undefined if commit by id can't be found`, async () => {
       const commitId = new Guid().toString();
       const foundCommit = await commitStore.findById(commitId);
-      expect(foundCommit).to.be.equal(undefined);
+      expect(foundCommit).toBe(undefined);
     });
   });
 
@@ -426,7 +422,7 @@ describe(`CommitStore with MongoDB storage`, () => {
       const firstV1Event = new MyEvent({ ...firstEvent, version: 1 });
       const firstV2Event = new MyEvent({ ...firstEvent, version: 2 });
       const secondV2Event = new MyOtherEvent({ ...secondEvent, version: 2 });
-      expect(events).to.be.eql([firstV1Event, firstV2Event, secondV2Event]);
+      expect(events).toEqual([firstV1Event, firstV2Event, secondV2Event]);
     });
 
     it(`allows to pass version offset to skip events`, async () => {
@@ -454,15 +450,15 @@ describe(`CommitStore with MongoDB storage`, () => {
       const events = await commitStore.getEvents(aggregateId, 2);
       const firstV2Event = new MyEvent({ ...firstEvent, version: 2 });
       const secondV2Event = new MyOtherEvent({ ...secondEvent, version: 2 });
-      expect(events).to.be.eql([firstV2Event, secondV2Event]);
+      expect(events).toEqual([firstV2Event, secondV2Event]);
 
       const firstV1Event = new MyEvent({ ...firstEvent, version: 1 });
-      expect(events).to.not.include(firstV1Event);
+      expect(events).not.toContain(firstV1Event);
     });
 
     it(`returns empty array if commits for event sourceable can't be found`, async () => {
       const events = await commitStore.getEvents('my-id');
-      expect(events).to.be.eql([]);
+      expect(events).toEqual([]);
     });
 
     it(`returns all events from all available commits`, async () => {
@@ -491,12 +487,13 @@ describe(`CommitStore with MongoDB storage`, () => {
       const firstV1Event = new MyEvent({ ...firstEvent, version: 1 });
       const firstV2Event = new MyEvent({ ...firstEvent, version: 2 });
       const secondV2Event = new MyOtherEvent({ ...secondEvent, version: 2 });
-      expect(events).to.be.eql([firstV1Event, firstV2Event, secondV2Event]);
+      expect(events).toEqual([firstV1Event, firstV2Event, secondV2Event]);
     });
 
     it(`returns empty when no commits are available`, async () => {
       const allEvents = await commitStore.getAllEvents();
-      expect(allEvents).to.be.eql([]);
+      expect(allEvents).toEqual([]);
     });
   });
 });
+

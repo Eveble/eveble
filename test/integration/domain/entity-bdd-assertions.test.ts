@@ -1,6 +1,5 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import sinon from 'sinon';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+
 import { pull } from 'lodash';
 import { Type, kernel } from '@eveble/core';
 import {
@@ -18,8 +17,6 @@ import { ValueObject } from '../../../src/domain/value-object';
 import { types } from '../../../src/types';
 import { can } from '../../../src/decorators/can';
 
-chai.use(sinonChai);
-
 describe(`Entity BDD assertions`, () => {
   describe(`validating state assertion`, () => {
     @Type('MyEntity', { isRegistrable: false })
@@ -35,7 +32,7 @@ describe(`Entity BDD assertions`, () => {
 
     let asserter: Asserter;
 
-    before(() => {
+    beforeAll(() => {
       asserter = new Asserter();
       asserter.registerAssertion(new StatefulAssertion(asserter));
     });
@@ -48,16 +45,16 @@ describe(`Entity BDD assertions`, () => {
       kernel.setAsserter(undefined as any);
     });
 
-    context('single state validation', () => {
+    describe('single state validation', () => {
       describe('evaluating state', () => {
         it(`returns true if entity is in expected state`, () => {
           const entity = new MyEntity({
             id: 'my-id',
           });
           entity.setState(MyEntity.STATES.first);
-          expect(entity.isInState(MyEntity.STATES.first)).to.be.true;
+          expect(entity.isInState(MyEntity.STATES.first)).toBe(true);
           entity.setState(MyEntity.STATES.second);
-          expect(entity.isInState(MyEntity.STATES.second)).to.be.true;
+          expect(entity.isInState(MyEntity.STATES.second)).toBe(true);
         });
 
         it(`returns false if entity is not in expected state`, () => {
@@ -65,14 +62,14 @@ describe(`Entity BDD assertions`, () => {
             id: 'my-id',
           });
           entity.setState(MyEntity.STATES.first);
-          expect(entity.isInState(MyEntity.STATES.second)).to.be.false;
+          expect(entity.isInState(MyEntity.STATES.second)).toBe(false);
           entity.setState(MyEntity.STATES.second);
-          expect(entity.isInState(MyEntity.STATES.third)).to.be.false;
+          expect(entity.isInState(MyEntity.STATES.third)).toBe(false);
         });
       });
 
       describe('ensuring state correctness', () => {
-        context('positive ensurement', () => {
+        describe('positive ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is in expected state`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -82,7 +79,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-state')
                 .ensure.is.inState(MyEntity.STATES.first)
-            ).to.not.throw(InvalidStateTransitionError);
+            ).not.toThrow(InvalidStateTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is not in expected state`, () => {
@@ -94,7 +91,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-second-state')
                 .ensure.is.inState(MyEntity.STATES.second)
-            ).to.throw(
+            ).toThrow(
               InvalidStateTransitionError,
               `MyEntity: cannot 'ensure-is-in-second-state' when in 'first' state(expected states: 'second')`
             );
@@ -110,11 +107,11 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-second-state')
                 .ensure.is.inState(MyEntity.STATES.second, error)
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
 
-        context('negative ensurement', () => {
+        describe('negative ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is NOT in expected state`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -124,7 +121,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-state')
                 .ensure.is.not.inState(MyEntity.STATES.second)
-            ).to.not.throw(InvalidStateTransitionError);
+            ).not.toThrow(InvalidStateTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is in NOT expected state`, () => {
@@ -136,7 +133,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-state')
                 .ensure.is.not.inState(MyEntity.STATES.first)
-            ).to.throw(
+            ).toThrow(
               InvalidStateTransitionError,
               `MyEntity: cannot 'ensure-is-in-first-state' when in 'first' state(expected states: 'first')`
             );
@@ -152,13 +149,13 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-state')
                 .ensure.is.not.inState(MyEntity.STATES.first, error)
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
       });
     });
 
-    context('multiple states validation', () => {
+    describe('multiple states validation', () => {
       describe('evaluating state', () => {
         it(`returns true if entity is in one of expected states`, () => {
           const entity = new MyEntity({
@@ -170,7 +167,7 @@ describe(`Entity BDD assertions`, () => {
               MyEntity.STATES.first,
               MyEntity.STATES.second,
             ])
-          ).to.be.true;
+          ).toBe(true);
         });
 
         it(`returns false if entity is not in one of expected states`, () => {
@@ -183,12 +180,12 @@ describe(`Entity BDD assertions`, () => {
               MyEntity.STATES.second,
               MyEntity.STATES.third,
             ])
-          ).to.be.false;
+          ).toBe(false);
         });
       });
 
       describe('ensuring state correctness', () => {
-        context('positive ensurement', () => {
+        describe('positive ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is in one of expected states`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -201,7 +198,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATES.first,
                   MyEntity.STATES.second,
                 ])
-            ).to.not.throw(InvalidStateTransitionError);
+            ).not.toThrow(InvalidStateTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is not in one of expected states`, () => {
@@ -216,7 +213,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATES.second,
                   MyEntity.STATES.third,
                 ])
-            ).to.throw(
+            ).toThrow(
               InvalidStateTransitionError,
               `MyEntity: cannot 'ensure-is-in-second-or-third-state' when in 'first' state(expected states: 'second, third')`
             );
@@ -235,11 +232,11 @@ describe(`Entity BDD assertions`, () => {
                   [MyEntity.STATES.second, MyEntity.STATES.third],
                   error
                 )
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
 
-        context('negative ensurement', () => {
+        describe('negative ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is NOT in one of expected state`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -252,7 +249,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATES.second,
                   MyEntity.STATES.third,
                 ])
-            ).to.not.throw(InvalidStateTransitionError);
+            ).not.toThrow(InvalidStateTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is in one of NOT expected state`, () => {
@@ -267,7 +264,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATES.first,
                   MyEntity.STATES.second,
                 ])
-            ).to.throw(
+            ).toThrow(
               InvalidStateTransitionError,
               `MyEntity: cannot 'ensure-is-not-in-first-or-second-state' when in 'first' state(expected states: 'first, second')`
             );
@@ -286,7 +283,7 @@ describe(`Entity BDD assertions`, () => {
                   [MyEntity.STATES.first, MyEntity.STATES.second],
                   error
                 )
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
       });
@@ -309,7 +306,7 @@ describe(`Entity BDD assertions`, () => {
 
     let asserter: Asserter;
 
-    before(() => {
+    beforeAll(() => {
       asserter = new Asserter();
       asserter.registerAssertion(new StatusfulAssertion(asserter));
     });
@@ -320,16 +317,16 @@ describe(`Entity BDD assertions`, () => {
     afterEach(() => {
       kernel.setAsserter(undefined as any);
     });
-    context('single status validation', () => {
+    describe('single status validation', () => {
       describe('evaluating status', () => {
         it(`returns true if entity is in expected status`, () => {
           const entity = new MyEntity({
             id: 'my-id',
           });
           entity.setStatus(MyEntity.STATUSES.first);
-          expect(entity.isInStatus(MyEntity.STATUSES.first)).to.be.true;
+          expect(entity.isInStatus(MyEntity.STATUSES.first)).toBe(true);
           entity.setStatus(MyEntity.STATUSES.second);
-          expect(entity.isInStatus(MyEntity.STATUSES.second)).to.be.true;
+          expect(entity.isInStatus(MyEntity.STATUSES.second)).toBe(true);
         });
 
         it(`returns false if entity is not in expected status`, () => {
@@ -337,14 +334,14 @@ describe(`Entity BDD assertions`, () => {
             id: 'my-id',
           });
           entity.setStatus(MyEntity.STATUSES.first);
-          expect(entity.isInStatus(MyEntity.STATUSES.second)).to.be.false;
+          expect(entity.isInStatus(MyEntity.STATUSES.second)).toBe(false);
           entity.setStatus(MyEntity.STATUSES.second);
-          expect(entity.isInStatus(MyEntity.STATUSES.third)).to.be.false;
+          expect(entity.isInStatus(MyEntity.STATUSES.third)).toBe(false);
         });
       });
 
       describe('ensuring status correctness', () => {
-        context('positive ensurement', () => {
+        describe('positive ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is in expected status`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -354,7 +351,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-status')
                 .ensure.is.inStatus(MyEntity.STATUSES.first)
-            ).to.not.throw(InvalidStatusTransitionError);
+            ).not.toThrow(InvalidStatusTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is not in expected status`, () => {
@@ -366,7 +363,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-second-status')
                 .ensure.is.inStatus(MyEntity.STATUSES.second)
-            ).to.throw(
+            ).toThrow(
               InvalidStatusTransitionError,
               `MyEntity: cannot 'ensure-is-in-second-status' when in 'first' status(expected statuses: 'second')`
             );
@@ -382,11 +379,11 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-second-status')
                 .ensure.is.inStatus(MyEntity.STATUSES.second, error)
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
 
-        context('negative ensurement', () => {
+        describe('negative ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is NOT in expected status`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -396,7 +393,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-status')
                 .ensure.is.not.inStatus(MyEntity.STATUSES.second)
-            ).to.not.throw(InvalidStatusTransitionError);
+            ).not.toThrow(InvalidStatusTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is in NOT expected status`, () => {
@@ -408,7 +405,7 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-status')
                 .ensure.is.not.inStatus(MyEntity.STATUSES.first)
-            ).to.throw(
+            ).toThrow(
               InvalidStatusTransitionError,
               `MyEntity: cannot 'ensure-is-in-first-status' when in 'first' status(expected statuses: 'first')`
             );
@@ -424,13 +421,13 @@ describe(`Entity BDD assertions`, () => {
               entity
                 .on('ensure-is-in-first-status')
                 .ensure.is.not.inStatus(MyEntity.STATUSES.first, error)
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
       });
     });
 
-    context('multiple statuses validation', () => {
+    describe('multiple statuses validation', () => {
       describe('evaluating status', () => {
         it(`returns true if entity is in one of expected statuses`, () => {
           const entity = new MyEntity({
@@ -442,7 +439,7 @@ describe(`Entity BDD assertions`, () => {
               MyEntity.STATUSES.first,
               MyEntity.STATUSES.second,
             ])
-          ).to.be.true;
+          ).toBe(true);
         });
 
         it(`returns false if entity is not in one of expected statuses`, () => {
@@ -455,12 +452,12 @@ describe(`Entity BDD assertions`, () => {
               MyEntity.STATUSES.second,
               MyEntity.STATUSES.third,
             ])
-          ).to.be.false;
+          ).toBe(false);
         });
       });
 
       describe('ensuring status correctness', () => {
-        context('positive ensurement', () => {
+        describe('positive ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is in one of expected statuses`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -473,7 +470,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATUSES.first,
                   MyEntity.STATUSES.second,
                 ])
-            ).to.not.throw(InvalidStatusTransitionError);
+            ).not.toThrow(InvalidStatusTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is not in one of expected statuses`, () => {
@@ -488,7 +485,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATUSES.second,
                   MyEntity.STATUSES.third,
                 ])
-            ).to.throw(
+            ).toThrow(
               InvalidStatusTransitionError,
               `MyEntity: cannot 'ensure-is-in-second-or-third-status' when in 'first' status(expected statuses: 'second, third')`
             );
@@ -507,11 +504,11 @@ describe(`Entity BDD assertions`, () => {
                   [MyEntity.STATUSES.second, MyEntity.STATUSES.third],
                   error
                 )
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
 
-        context('negative ensurement', () => {
+        describe('negative ensurement', () => {
           it(`does not throw InvalidStateTransitionError if entity is NOT in one of expected status`, () => {
             const entity = new MyEntity({
               id: 'my-id',
@@ -524,7 +521,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATUSES.second,
                   MyEntity.STATUSES.third,
                 ])
-            ).to.not.throw(InvalidStatusTransitionError);
+            ).not.toThrow(InvalidStatusTransitionError);
           });
 
           it(`throws InvalidStateTransitionError if entity is in one of NOT expected status`, () => {
@@ -539,7 +536,7 @@ describe(`Entity BDD assertions`, () => {
                   MyEntity.STATUSES.first,
                   MyEntity.STATUSES.second,
                 ])
-            ).to.throw(
+            ).toThrow(
               InvalidStatusTransitionError,
               `MyEntity: cannot 'ensure-is-not-in-first-or-second-status' when in 'first' status(expected statuses: 'first, second')`
             );
@@ -558,7 +555,7 @@ describe(`Entity BDD assertions`, () => {
                   [MyEntity.STATUSES.first, MyEntity.STATUSES.second],
                   error
                 )
-            ).to.throw(error);
+            ).toThrow(error);
           });
         });
       });
@@ -566,7 +563,7 @@ describe(`Entity BDD assertions`, () => {
   });
 
   describe(`ability validating assertions`, () => {
-    const handler = sinon.stub();
+    const handler = vi.fn();
 
     @Type('MyEntity', { isRegistrable: false })
     class MyEntity extends Entity {
@@ -619,7 +616,7 @@ describe(`Entity BDD assertions`, () => {
 
     let asserter: Asserter;
 
-    before(() => {
+    beforeAll(() => {
       asserter = new Asserter();
       asserter.registerAssertion(new StatefulAssertion(asserter));
       asserter.registerAssertion(new AbilityAssertion(asserter));
@@ -635,7 +632,7 @@ describe(`Entity BDD assertions`, () => {
 
     it(`provides an api to assert that entity is able to change state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(() => entity.ensure.is.ableTo.start()).to.throw(
+      expect(() => entity.ensure.is.ableTo.start()).toThrow(
         InvalidStateTransitionError,
         `MyEntity: cannot 'start' when in 'created' state(expected states: 'accepted')`
       );
@@ -643,11 +640,11 @@ describe(`Entity BDD assertions`, () => {
 
     it(`ensures that state of entity is unchanged if error is not thrown upon validation`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(() => entity.ensure.is.ableTo.start()).to.throw(
+      expect(() => entity.ensure.is.ableTo.start()).toThrow(
         InvalidStateTransitionError,
         `MyEntity: cannot 'start' when in 'created' state(expected states: 'accepted')`
       );
-      expect(entity.isInState(MyEntity.STATES.created)).to.be.true;
+      expect(entity.isInState(MyEntity.STATES.created)).toBe(true);
     });
 
     it(`allows to pass all required arguments to invoked action(method)`, () => {
@@ -656,7 +653,7 @@ describe(`Entity BDD assertions`, () => {
       const declineReason = 'My reason';
 
       entity.ensure.is.ableTo.decline(declinedAt, declineReason);
-      expect(handler).to.be.calledWithExactly(declinedAt, declineReason);
+      expect(handler).toHaveBeenCalledWith(declinedAt, declineReason);
     });
 
     it(`allows to use 'ensure.is.ableTo' with serializable lists to ensure ability of manipulating list`, () => {
@@ -669,14 +666,14 @@ describe(`Entity BDD assertions`, () => {
         items: [],
       });
       const item = order.ensure.is.ableTo.in<Item>('items').create(itemProps);
-      expect(item).to.be.instanceof(Item);
-      expect(item).to.be.eql(itemProps);
-      expect(order.items).to.have.length(1);
+      expect(item).toBeInstanceOf(Item);
+      expect(item).toEqual(itemProps);
+      expect(order.items).toHaveLength(1);
     });
   });
 
   describe(`ability evaluation assertions`, () => {
-    const handler = sinon.stub();
+    const handler = vi.fn();
 
     @Type('MyEntity', {
       isRegistrable: false,
@@ -720,7 +717,7 @@ describe(`Entity BDD assertions`, () => {
 
     let asserter: Asserter;
 
-    before(() => {
+    beforeAll(() => {
       asserter = new Asserter();
       asserter.registerAssertion(new StatefulAssertion(asserter));
       asserter.registerAssertion(new AbilityAssertion(asserter));
@@ -736,37 +733,38 @@ describe(`Entity BDD assertions`, () => {
 
     it(`returns true if entity can change to selected state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(entity.can.complete()).to.be.true;
-      expect(entity.can.expire()).to.be.true;
+      expect(entity.can.complete()).toBe(true);
+      expect(entity.can.expire()).toBe(true);
     });
 
     it(`returns false if entity can't change to selected state`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       entity.complete();
-      expect(entity.can.complete()).to.be.false;
-      expect(entity.can.expire()).to.be.false;
+      expect(entity.can.complete()).toBe(false);
+      expect(entity.can.expire()).toBe(false);
     });
 
     it(`ensures that state of entity is unchanged if assertion returns true`, () => {
       const entity = new MyEntity({ id: 'my-id' });
-      expect(entity.can.complete()).to.be.true;
-      expect(entity.can.expire()).to.be.true;
-      expect(entity.isInState(MyEntity.STATES.created)).to.be.true;
+      expect(entity.can.complete()).toBe(true);
+      expect(entity.can.expire()).toBe(true);
+      expect(entity.isInState(MyEntity.STATES.created)).toBe(true);
     });
 
     it(`ensures that state of entity is unchanged if assertion returns false`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       entity.complete();
-      expect(entity.can.expire()).to.be.false;
-      expect(entity.isInState(MyEntity.STATES.completed)).to.be.true;
+      expect(entity.can.expire()).toBe(false);
+      expect(entity.isInState(MyEntity.STATES.completed)).toBe(true);
     });
 
     it(`returns true if entity can change to selected state with additional required arguments to invoked action(method)`, () => {
       const entity = new MyEntity({ id: 'my-id' });
       const declinedAt = new Date();
       const declineReason = 'My reason';
-      expect(entity.can.decline(declinedAt, declineReason)).to.be.true;
-      expect(handler).to.be.calledWithExactly(declinedAt, declineReason);
+      expect(entity.can.decline(declinedAt, declineReason)).toBe(true);
+      expect(handler).toHaveBeenCalledWith(declinedAt, declineReason);
     });
   });
 });
+

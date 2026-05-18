@@ -1,8 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+
 import { Collection, Filter } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import { Type, kernel } from '@eveble/core';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
 import { Command } from '../../../src/components/command';
@@ -20,9 +20,6 @@ import { Injector } from '../../../src/core/injector';
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
 import { createEJSON } from '../../../src/utils/helpers';
 import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson-serializer-adapter';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`CommitMongoDBStorage`, () => {
   @Type('IntegrationCommitMongoDBStorage.MyCommand')
@@ -157,8 +154,8 @@ describe(`CommitMongoDBStorage`, () => {
   */
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -192,7 +189,7 @@ describe(`CommitMongoDBStorage`, () => {
     }
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     setupEvebleDependencies();
@@ -211,7 +208,7 @@ describe(`CommitMongoDBStorage`, () => {
     await collections.commitStore.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
     kernel.setSerializer(undefined as any);
   });
@@ -221,7 +218,7 @@ describe(`CommitMongoDBStorage`, () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
 
       const result = await storage.save(commit);
-      expect(result).to.be.equal(commitId);
+      expect(result).toBe(commitId);
 
       const expectedCommit = generateSerializedCommit(
         commitId,
@@ -231,7 +228,7 @@ describe(`CommitMongoDBStorage`, () => {
       const foundCommit = await collections.commitStore.findOne({
         _id: commit.id,
       } as Filter<any>);
-      expect(foundCommit).to.be.eql(expectedCommit);
+      expect(foundCommit).toEqual(expectedCommit);
     });
 
     it(`throws commit concurrency exception on duplicated key error`, async () => {
@@ -239,7 +236,7 @@ describe(`CommitMongoDBStorage`, () => {
 
       await expect(
         storage.save(generateCommit(commitId, eventSourceableId, 1))
-      ).to.eventually.be.rejectedWith(
+      ).rejects.toThrow(
         CommitConcurrencyError,
         `IntegrationCommitMongoDBStorage.MyEventSourceable: expected event sourceable with id of '${eventSourceableId}' to be at version 0 but is at version 1`
       );
@@ -252,12 +249,12 @@ describe(`CommitMongoDBStorage`, () => {
       const lastCommitVersion = await storage.findLastVersionById(
         eventSourceableId
       );
-      expect(lastCommitVersion).to.be.equal(10);
+      expect(lastCommitVersion).toBe(10);
     });
 
     it(`returns undefined when commit cannot be found for event sourceable's`, async () => {
       const lastCommitVersion = await storage.findLastVersionById('my-id');
-      expect(lastCommitVersion).to.be.equal(undefined);
+      expect(lastCommitVersion).toBe(undefined);
     });
   });
 
@@ -266,15 +263,15 @@ describe(`CommitMongoDBStorage`, () => {
       await storage.save(generateCommit(commitId, eventSourceableId, 1));
 
       const foundCommit = await storage.findById(commitId);
-      expect(foundCommit).to.be.instanceof(Commit);
-      expect(foundCommit).to.be.eql(
+      expect(foundCommit).toBeInstanceOf(Commit);
+      expect(foundCommit).toEqual(
         generateCommit(commitId, eventSourceableId, 1)
       );
     });
 
     it(`returns undefined if commit by id can't be found`, async () => {
       const foundCommit = await storage.findById(commitId);
-      expect(foundCommit).to.be.equal(undefined);
+      expect(foundCommit).toBe(undefined);
     });
 
     it(`returns commits by event sourcealbe's id and version offset`, async () => {
@@ -285,7 +282,7 @@ describe(`CommitMongoDBStorage`, () => {
       await storage.save(generateCommit(secondCommitId, eventSourceableId, 11));
 
       const foundCommits = await storage.getCommits(eventSourceableId, 10);
-      expect(foundCommits).to.be.eql([
+      expect(foundCommits).toEqual([
         generateCommit(firstCommitId, eventSourceableId, 10),
         generateCommit(secondCommitId, eventSourceableId, 11),
       ]);
@@ -293,7 +290,7 @@ describe(`CommitMongoDBStorage`, () => {
 
     it(`returns empty array when no commits can be found for version offset`, async () => {
       const foundCommits = await storage.getCommits(eventSourceableId, 10);
-      expect(foundCommits).to.be.eql([]);
+      expect(foundCommits).toEqual([]);
     });
 
     it(`returns all commits for every event sourceable`, async () => {
@@ -309,7 +306,7 @@ describe(`CommitMongoDBStorage`, () => {
       );
 
       const foundCommit = await storage.getAllCommits();
-      expect(foundCommit).to.be.eql([
+      expect(foundCommit).toEqual([
         generateCommit(firstCommitId, eventSourceableId, 1),
         generateCommit(secondCommitId, eventSourceableId, 2),
         generateCommit(thirdCommitId, otherEventSourceableId, 5),
@@ -342,3 +339,4 @@ describe(`CommitMongoDBStorage`, () => {
     });
   });
 });
+

@@ -1,15 +1,11 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
 
-import sinon from 'sinon';
 import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { LogTransport } from '../../../src/core/log-transport';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Injector } from '../../../src/core/injector';
-
-chai.use(sinonChai);
 
 describe(`LoggingTransport`, () => {
   interface LoggingClient {
@@ -40,8 +36,8 @@ describe(`LoggingTransport`, () => {
   };
 
   beforeEach(() => {
-    logger = stubInterface<types.Logger>();
-    client = stubInterface<LoggingClient>();
+    logger = mock<types.Logger>();
+    client = mock<LoggingClient>();
     injector = new Injector();
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
   });
@@ -52,22 +48,22 @@ describe(`LoggingTransport`, () => {
     it('takes required level as a string and assigns it', () => {
       const level = 'my-level';
       const transport = new MyTransport(level);
-      expect(transport.level).to.be.equal(level);
+      expect(transport.level).toBe(level);
     });
 
     it('takes optional config as instance of LogTransportConfig and assings it', () => {
       const level = 'my-level';
       const config = new LogTransportConfig();
       const transport = new MyTransport(level, config);
-      expect(transport.level).to.be.equal(level);
-      expect(transport.config).to.be.equal(config);
+      expect(transport.level).toBe(level);
+      expect(transport.config).toBe(config);
     });
 
     it('annotates logger property for property injection', () => {
       const level = 'my-level';
       const transport = new MyTransport(level);
       injector.injectInto(transport);
-      expect(transport.logger).to.be.equal(logger);
+      expect(transport.logger).toBe(logger);
     });
   });
 
@@ -81,13 +77,13 @@ describe(`LoggingTransport`, () => {
       const transport = new MyTransport(level);
       injector.injectInto(transport);
 
-      expect(transport.logger).to.be.equal(logger);
-      expect((transport as any).first).to.be.instanceof(Function);
-      expect((transport as any).second).to.be.instanceof(Function);
+      expect(transport.logger).toBe(logger);
+      expect((transport as any).first).toBeInstanceOf(Function);
+      expect((transport as any).second).toBeInstanceOf(Function);
     });
 
     it('ensures that dynamically assigned methods are not overriding existing methods set prior to initialization', () => {
-      const spy = sinon.stub();
+      const spy = vi.fn();
       class MyOtherTransport extends LogTransport {
         info(): void {
           spy();
@@ -102,7 +98,7 @@ describe(`LoggingTransport`, () => {
       injector.injectInto(transport);
 
       transport.info();
-      expect(spy).to.be.calledOnce;
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -112,14 +108,14 @@ describe(`LoggingTransport`, () => {
       const level = 'debug';
       const transport = new MyTransport(level);
       injector.injectInto(transport);
-      expect(transport.isLoggable('emerg')).to.be.true;
-      expect(transport.isLoggable('alert')).to.be.true;
-      expect(transport.isLoggable('crit')).to.be.true;
-      expect(transport.isLoggable('error')).to.be.true;
-      expect(transport.isLoggable('warning')).to.be.true;
-      expect(transport.isLoggable('notice')).to.be.true;
-      expect(transport.isLoggable('info')).to.be.true;
-      expect(transport.isLoggable('debug')).to.be.true;
+      expect(transport.isLoggable('emerg')).toBe(true);
+      expect(transport.isLoggable('alert')).toBe(true);
+      expect(transport.isLoggable('crit')).toBe(true);
+      expect(transport.isLoggable('error')).toBe(true);
+      expect(transport.isLoggable('warning')).toBe(true);
+      expect(transport.isLoggable('notice')).toBe(true);
+      expect(transport.isLoggable('info')).toBe(true);
+      expect(transport.isLoggable('debug')).toBe(true);
     });
 
     it('returns false if expected logging level has higher priority', () => {
@@ -127,14 +123,14 @@ describe(`LoggingTransport`, () => {
       const level = 'emerg';
       const transport = new MyTransport(level);
       injector.injectInto(transport);
-      expect(transport.isLoggable('emerg')).to.be.true;
-      expect(transport.isLoggable('alert')).to.be.false;
-      expect(transport.isLoggable('crit')).to.be.false;
-      expect(transport.isLoggable('error')).to.be.false;
-      expect(transport.isLoggable('warning')).to.be.false;
-      expect(transport.isLoggable('notice')).to.be.false;
-      expect(transport.isLoggable('info')).to.be.false;
-      expect(transport.isLoggable('debug')).to.be.false;
+      expect(transport.isLoggable('emerg')).toBe(true);
+      expect(transport.isLoggable('alert')).toBe(false);
+      expect(transport.isLoggable('crit')).toBe(false);
+      expect(transport.isLoggable('error')).toBe(false);
+      expect(transport.isLoggable('warning')).toBe(false);
+      expect(transport.isLoggable('notice')).toBe(false);
+      expect(transport.isLoggable('info')).toBe(false);
+      expect(transport.isLoggable('debug')).toBe(false);
     });
   });
 
@@ -151,8 +147,8 @@ describe(`LoggingTransport`, () => {
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);
-      expect(client.debug).to.be.calledOnce;
-      expect(client.debug).to.be.calledWith(...args);
+      expect(client.debug).toHaveBeenCalledTimes(1);
+      expect(client.debug).toHaveBeenCalledWith(...args);
     });
 
     it(`skips logging entry on loggable level not matching transport's priority`, () => {
@@ -167,10 +163,11 @@ describe(`LoggingTransport`, () => {
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);
-      expect(client.debug).to.not.be.called;
+      expect(client.debug).not.toHaveBeenCalled;
       transport.log('emerg', 'my-message', 'first', 2, null, undefined);
-      expect(client.emerg).to.be.calledOnce;
-      expect(client.emerg).to.be.calledWith(...args);
+      expect(client.emerg).toHaveBeenCalledTimes(1);
+      expect(client.emerg).toHaveBeenCalledWith(...args);
     });
   });
 });
+

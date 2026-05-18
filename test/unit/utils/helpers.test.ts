@@ -1,6 +1,8 @@
-import { expect } from 'chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it } from 'vitest';
+
 import { Collection, PropTypes } from 'typend';
-import { stubInterface } from 'ts-sinon';
+
 import {
   Type,
   isSerializable,
@@ -70,18 +72,18 @@ describe('helpers', () => {
         equals(): void {}
       }
 
-      expect(isTyped(new MyDefinable())).to.be.true;
+      expect(isTyped(new MyDefinable())).toBe(true);
     });
 
     it('returns false for nil', () => {
-      expect(isTyped(null)).to.be.false;
-      expect(isTyped(undefined)).to.be.false;
+      expect(isTyped(null)).toBe(false);
+      expect(isTyped(undefined)).toBe(false);
     });
 
     it('returns true for Struct', () => {
       @Type('MyStruct', { isRegistrable: false })
       class MyStruct extends Struct {}
-      expect(isTyped(new MyStruct())).to.be.true;
+      expect(isTyped(new MyStruct())).toBe(true);
     });
 
     it('returns false for not defined(@Type) classes implementing Definable interface', () => {
@@ -97,12 +99,12 @@ describe('helpers', () => {
         equals(): void {}
       }
 
-      expect(isTyped(ValidButNotDefined)).to.be.false;
+      expect(isTyped(ValidButNotDefined)).toBe(false);
     });
 
     it('returns false for arguments not implementing Definable interface', () => {
       class InvalidDefinable {}
-      expect(isTyped(InvalidDefinable)).to.be.false;
+      expect(isTyped(InvalidDefinable)).toBe(false);
     });
   });
 
@@ -111,30 +113,30 @@ describe('helpers', () => {
       @Type('MySerialziable', { isRegistrable: false })
       class MySerializable extends SerializableStub {}
 
-      expect(isSerializable(new MySerializable())).to.be.true;
+      expect(isSerializable(new MySerializable())).toBe(true);
     });
 
     it('returns false for not defined(@Type) class instances that implementing Serializable interface', () => {
       class MySerializable extends SerializableStub {}
 
-      expect(isSerializable(new MySerializable())).to.be.false;
+      expect(isSerializable(new MySerializable())).toBe(false);
     });
 
     it('returns false for nil', () => {
-      expect(isSerializable(null)).to.be.false;
-      expect(isSerializable(undefined)).to.be.false;
+      expect(isSerializable(null)).toBe(false);
+      expect(isSerializable(undefined)).toBe(false);
     });
 
     it('returns false for other arguments', () => {
       class InvalidSerializable {}
-      expect(isSerializable(InvalidSerializable)).to.be.false;
+      expect(isSerializable(InvalidSerializable)).toBe(false);
     });
   });
 
   describe('isRecord', () => {
     it('returns true for plain objects', () => {
-      expect(isRecord({})).to.be.true;
-      expect(isRecord({ key: 'string' })).to.be.true;
+      expect(isRecord({})).toBe(true);
+      expect(isRecord({ key: 'string' })).toBe(true);
     });
 
     it('returns true for class instances', () => {
@@ -146,27 +148,27 @@ describe('helpers', () => {
         }
       }
 
-      expect(isRecord(new MyClass('my-string'))).to.be.true;
+      expect(isRecord(new MyClass('my-string'))).toBe(true);
     });
 
     it('returns true for Collection instances', () => {
-      expect(isRecord(new Collection())).to.be.true;
+      expect(isRecord(new Collection())).toBe(true);
     });
 
     it('returns false for other arguments', () => {
-      expect(isRecord('my-string')).to.be.false;
-      expect(isRecord(1234)).to.be.false;
+      expect(isRecord('my-string')).toBe(false);
+      expect(isRecord(1234)).toBe(false);
     });
   });
 
   describe('isPlainRecord', () => {
     it('returns true for plain objects', () => {
-      expect(isPlainRecord({})).to.be.true;
-      expect(isPlainRecord({ key: 'string' })).to.be.true;
+      expect(isPlainRecord({})).toBe(true);
+      expect(isPlainRecord({ key: 'string' })).toBe(true);
     });
 
     it('returns true for Collection instances', () => {
-      expect(isPlainRecord(new Collection())).to.be.true;
+      expect(isPlainRecord(new Collection())).toBe(true);
     });
 
     it('returns false for class instances', () => {
@@ -178,19 +180,19 @@ describe('helpers', () => {
         }
       }
 
-      expect(isPlainRecord(new MyClass('my-string'))).to.be.false;
+      expect(isPlainRecord(new MyClass('my-string'))).toBe(false);
     });
 
     it('returns false for other arguments', () => {
-      expect(isPlainRecord('my-string')).to.be.false;
-      expect(isPlainRecord(1234)).to.be.false;
+      expect(isPlainRecord('my-string')).toBe(false);
+      expect(isPlainRecord(1234)).toBe(false);
     });
   });
 
   describe('toPlainObject', () => {
     it('returns unchanged plain object without Definable values', () => {
       const obj = { key: 'my-string' };
-      expect(toPlainObject(obj)).to.be.eql(obj);
+      expect(toPlainObject(obj)).toEqual(obj);
     });
 
     it('returns converted plain object with Definable values', () => {
@@ -200,7 +202,7 @@ describe('helpers', () => {
         }
       }
       const obj = { key: 'my-string', definable: new MyDefinable() };
-      expect(toPlainObject(obj)).to.be.eql({
+      expect(toPlainObject(obj)).toEqual({
         key: 'my-string',
         definable: {
           nested: 'my-converted-definable-plain-object',
@@ -215,7 +217,7 @@ describe('helpers', () => {
             key: 'my-collection',
           })
         )
-      ).to.be.eql({
+      ).toEqual({
         key: 'my-collection',
       });
     });
@@ -229,19 +231,19 @@ describe('helpers', () => {
         },
       };
       const converted = convertObjectToCollection(obj);
-      expect(converted).to.be.eql({
+      expect(converted).toEqual({
         nested: new Collection({
           key: 'my-string',
         }),
       });
-      expect(converted.nested).to.be.instanceof(Collection);
+      expect(converted.nested).toBeInstanceOf(Collection);
     });
   });
 
   describe('resolveSerializableFromPropType', () => {
     it('resolves serializable type from root-level list', () => {
       const propType = PropTypes.arrayOf(SerializableStub);
-      expect(resolveSerializableFromPropType(propType)).to.be.equal(
+      expect(resolveSerializableFromPropType(propType)).toBe(
         SerializableStub
       );
     });
@@ -250,7 +252,7 @@ describe('helpers', () => {
       const propType = PropTypes.arrayOf(
         PropTypes.instanceOf(SerializableStub)
       );
-      expect(resolveSerializableFromPropType(propType)).to.be.equal(
+      expect(resolveSerializableFromPropType(propType)).toBe(
         SerializableStub
       );
     });
@@ -259,31 +261,31 @@ describe('helpers', () => {
       const propType = PropTypes.arrayOf(
         PropTypes.instanceOf(SerializableStub)
       ).isOptional;
-      expect(resolveSerializableFromPropType(propType)).to.be.equal(
+      expect(resolveSerializableFromPropType(propType)).toBe(
         SerializableStub
       );
     });
 
     it('returns undefined for non-list serializable types', () => {
       const propType = PropTypes.instanceOf(SerializableStub);
-      expect(resolveSerializableFromPropType(propType)).to.be.undefined;
+      expect(resolveSerializableFromPropType(propType)).toBeUndefined();
     });
 
     it('returns undefined for nil prop type', () => {
-      expect(resolveSerializableFromPropType(null)).to.be.undefined;
-      expect(resolveSerializableFromPropType(undefined)).to.be.undefined;
+      expect(resolveSerializableFromPropType(null)).toBeUndefined();
+      expect(resolveSerializableFromPropType(undefined)).toBeUndefined();
     });
   });
 
   describe('isEventSourceableType', () => {
     it('returns false for nil', () => {
-      expect(isEventSourceableType(null)).to.be.false;
-      expect(isEventSourceableType(undefined)).to.be.false;
+      expect(isEventSourceableType(null)).toBe(false);
+      expect(isEventSourceableType(undefined)).toBe(false);
     });
 
     it('returns true for value implementing EventSourceableType interface', () => {
-      const EventSourceableType = stubInterface<types.EventSourceableType>();
-      expect(isEventSourceableType(EventSourceableType)).to.be.true;
+      const EventSourceableType = mock<types.EventSourceableType>();
+      expect(isEventSourceableType(EventSourceableType)).toBe(true);
     });
 
     it('returns false for value not implementing EventSourceableType interface', () => {
@@ -292,7 +294,8 @@ describe('helpers', () => {
           return 'my-type-name';
         }
       }
-      expect(isEventSourceableType(MyInvalidEventSourceableType)).to.be.false;
+      expect(isEventSourceableType(MyInvalidEventSourceableType)).toBe(false);
     });
   });
 });
+

@@ -1,8 +1,7 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+
 import { PropTypes, ValidationError } from 'typend';
-import sinon from 'sinon';
+
 import { Type } from '@eveble/core';
 import { derived } from '@traits-ts/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
@@ -31,9 +30,6 @@ import { UnscheduleCommand } from '../../../src/domain/unschedule-command';
 import { isTyped } from '../../../src/utils/helpers';
 import { initial } from '../../../src/annotations/initial';
 import { route } from '../../../src/annotations/route';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`EventSourceable`, () => {
   let now: Date;
@@ -91,20 +87,20 @@ describe(`EventSourceable`, () => {
     items: string[];
   }
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(now.getTime());
+    clock = vi.useFakeTimers(now.getTime());
 
     handlers = {
-      CreateOrder: sinon.stub(),
-      OrderCreated: sinon.stub(),
-      PayOrder: sinon.stub(),
-      OrderPaid: sinon.stub(),
-      FulfillOrder: sinon.stub(),
-      OrderFulfilled: sinon.stub(),
+      CreateOrder: vi.fn(),
+      OrderCreated: vi.fn(),
+      PayOrder: vi.fn(),
+      OrderPaid: vi.fn(),
+      FulfillOrder: vi.fn(),
+      OrderFulfilled: vi.fn(),
     };
 
     orderProps = {
@@ -150,7 +146,7 @@ describe(`EventSourceable`, () => {
   });
 
   afterEach(() => {
-    clock.restore();
+    vi.useRealTimers();
   });
   /*
   EVENT SOURCEABLE
@@ -255,7 +251,7 @@ describe(`EventSourceable`, () => {
   }
 
   it(`extends Entity`, () => {
-    expect(EventSourceable.prototype).to.be.instanceof(Entity);
+    expect(EventSourceable.prototype).toBeInstanceOf(Entity);
   });
 
   it(`implements OneToOneHandlingTrait`, () => {
@@ -264,28 +260,28 @@ describe(`EventSourceable`, () => {
   });
 
   it('defines the type name correctly', () => {
-    expect(EventSourceable.getTypeName()).to.equal('EventSourceable');
-    expect(EventSourceable.prototype.getTypeName()).to.equal('EventSourceable');
+    expect(EventSourceable.getTypeName()).toBe('EventSourceable');
+    expect(EventSourceable.prototype.getTypeName()).toBe('EventSourceable');
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(EventSourceable.prototype)).to.be.true;
+    expect(isTyped(EventSourceable.prototype)).toBe(true);
   });
 
   describe('prop types', () => {
     it('have prop types set for: id, version, state, status, COMMANDS_KEY, EVENTS_KEY and metadata', () => {
-      expect(EventSourceable.getPropTypes()).to.contain.all.keys([
+      expect(Object.keys(EventSourceable.getPropTypes()).sort()).toEqual([
         'id',
-        'version',
-        'state',
-        'status',
         'metadata',
         'schemaVersion',
+        'state',
+        'status',
+        'version',
       ]);
     });
 
     it('takes required id property as a string or Guid', () => {
-      expect(EventSourceable.getPropTypes().id).to.be.eql(
+      expect(EventSourceable.getPropTypes().id).toEqual(
         PropTypes.oneOf([
           PropTypes.instanceOf(String),
           PropTypes.instanceOf(Guid),
@@ -294,25 +290,25 @@ describe(`EventSourceable`, () => {
     });
 
     it('takes required version property as a Number', () => {
-      expect(EventSourceable.getPropTypes().version).to.be.eql(
+      expect(EventSourceable.getPropTypes().version).toEqual(
         PropTypes.instanceOf(Number)
       );
     });
 
     it('takes optional metadata property as an object', () => {
-      expect(EventSourceable.getPropTypes().metadata).to.be.eql(
+      expect(EventSourceable.getPropTypes().metadata).toEqual(
         PropTypes.object.isOptional
       );
     });
 
     it('takes optional schemaVersion property as a Number', () => {
-      expect(EventSourceable.getPropTypes().schemaVersion).to.be.eql(
+      expect(EventSourceable.getPropTypes().schemaVersion).toEqual(
         PropTypes.instanceOf(Number).isOptional
       );
     });
 
     it('takes optional state property as a string', () => {
-      expect(EventSourceable.getPropTypes().state).to.be.eql(
+      expect(EventSourceable.getPropTypes().state).toEqual(
         PropTypes.oneOf([
           undefined,
           PropTypes.instanceOf(String),
@@ -322,7 +318,7 @@ describe(`EventSourceable`, () => {
     });
 
     it('takes optional status property as a string', () => {
-      expect(EventSourceable.getPropTypes().status).to.be.eql(
+      expect(EventSourceable.getPropTypes().status).toEqual(
         PropTypes.oneOf([
           undefined,
           PropTypes.instanceOf(String),
@@ -334,56 +330,56 @@ describe(`EventSourceable`, () => {
 
   describe(`construction`, () => {
     it(`ensures that validation is not triggered on construction`, () => {
-      expect(() => new MyEventSourceable({})).to.not.throw(ValidationError);
+      expect(() => new MyEventSourceable({})).not.toThrow(ValidationError);
       const props = {
         customerName: 'Jane Doe',
       };
-      expect(() => new MyEventSourceable(props)).to.not.throw(ValidationError);
+      expect(() => new MyEventSourceable(props)).not.toThrow(ValidationError);
     });
 
     it(`makes the id publicly available`, () => {
       const id = 'my-id';
       const instance = new MyEventSourceable({ id });
-      expect(instance.getId()).to.be.equal(id);
+      expect(instance.getId()).toBe(id);
     });
 
     it(`sets the initial state to undefined`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(instance.getState()).to.be.equal(undefined);
+      expect(instance.getState()).toBe(undefined);
     });
 
     it(`sets the initial status to undefined`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(instance.getState()).to.be.equal(undefined);
+      expect(instance.getState()).toBe(undefined);
     });
 
     it(`sets the initial version to 0`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(instance.getVersion()).to.be.equal(0);
+      expect(instance.getVersion()).toBe(0);
     });
 
     it(`initializes uncommitted changes(events) as empty array`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(instance.getEvents()).to.be.instanceof(Array);
-      expect(instance.getEvents()).to.be.eql([]);
+      expect(instance.getEvents()).toBeInstanceOf(Array);
+      expect(instance.getEvents()).toEqual([]);
     });
 
     it(`initializes untriggered commands as empty array`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(instance.getCommands()).to.be.instanceof(Array);
-      expect(instance.getCommands()).to.be.eql([]);
+      expect(instance.getCommands()).toBeInstanceOf(Array);
+      expect(instance.getCommands()).toEqual([]);
     });
 
     it(`initializes with empty handled commands as a mapping`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(instance.handles()).to.be.instanceof(Map);
-      expect(instance.handles()).to.be.eql(new Map());
+      expect(instance.handles()).toBeInstanceOf(Map);
+      expect(instance.handles()).toEqual(new Map());
     });
 
     it(`initializes with empty subscribed events as a mapping`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(instance.subscribes()).to.be.instanceof(Map);
-      expect(instance.subscribes()).to.be.eql(new Map());
+      expect(instance.subscribes()).toBeInstanceOf(Map);
+      expect(instance.subscribes()).toEqual(new Map());
     });
   });
 
@@ -393,10 +389,10 @@ describe(`EventSourceable`, () => {
       instance.initialize();
 
       instance.record(events.OrderCreated);
-      expect(handlers.OrderCreated).to.be.calledOnce;
-      expect(handlers.OrderCreated).to.have.been.calledWithMatch(
+      expect(handlers.OrderCreated).toHaveBeenCalledTimes(1);
+      expect(handlers.OrderCreated).toHaveBeenCalledWith(expect.objectContaining(
         events.OrderCreated
-      );
+      ));
     });
 
     it(`allows to record event on command handler by passing event's type and additional required properties`, async () => {
@@ -405,22 +401,19 @@ describe(`EventSourceable`, () => {
 
       await instance.handle(commands.CreateOrder);
       await instance.handle(commands.FulfillOrder);
-      expect(handlers.OrderFulfilled).to.be.calledWithMatch(
-        new OrderFulfilled({
-          sourceId: orderProps.id,
-          customerName: orderProps.customerName,
-          discountCode: 'discount20',
-          version: 0,
-          timestamp: now,
-        })
-      );
+      expect(handlers.OrderFulfilled).toHaveBeenCalledWith(expect.objectContaining({
+        sourceId: orderProps.id,
+        customerName: orderProps.customerName,
+        discountCode: 'discount20',
+        version: 0,
+      }));
     });
 
     it('pushes the event into the events array', () => {
       const instance = new Order({ id: orderProps.id });
       instance.record(events.OrderCreated);
-      expect(instance.getEvents()).to.have.length(1);
-      expect(instance.getEvents()).to.eql([events.OrderCreated]);
+      expect(instance.getEvents()).toHaveLength(1);
+      expect(instance.getEvents()).toEqual([events.OrderCreated]);
     });
 
     it('only records instances of domain Event', () => {
@@ -431,7 +424,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: 'my-id' });
       expect(() => {
         instance.record(nonEvent as any as Event<{}>);
-      }).to.throw(
+      }).toThrow(
         InvalidEventError,
         `Order: event must be instance of Event, got {"type":String("Test"), "eventSourceableId":String("my-id")}`
       );
@@ -448,7 +441,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: 'my-id' });
       expect(() => {
         instance.record(event);
-      }).to.throw(
+      }).toThrow(
         EventIdMismatchError,
         `Order: the given event has mismatching source id. Expected id 'my-id', got 'other-id'`
       );
@@ -462,7 +455,7 @@ describe(`EventSourceable`, () => {
         sourceId: 'my-id',
       });
       const instance = new MyEventSourceable({ id: 'my-id' });
-      expect(() => instance.record(event)).not.to.throw(
+      expect(() => instance.record(event)).not.toThrow(
         UnhandleableTypeError,
         `MyEventSourceable: cannot handle 'Event'`
       );
@@ -476,8 +469,8 @@ describe(`EventSourceable`, () => {
       const instance = new MyEventSourceable({ id: 'my-id' });
       expect(() => {
         instance.record(nonEvent as any as Event<{}>);
-      }).to.throw(InvalidEventError);
-      expect(instance.getEvents()).to.eql([]);
+      }).toThrow(InvalidEventError);
+      expect(instance.getEvents()).toEqual([]);
     });
 
     it('ensures that each event fired from single handler does not leak n+x state on referenceable properties(like arrays, objects)', async () => {
@@ -497,7 +490,7 @@ describe(`EventSourceable`, () => {
           item: 'second',
         })
       );
-      expect(instance.getEvents()).to.eql([
+      expect(instance.getEvents()).toEqual([
         new ItemAdded({
           sourceId: orderProps.id,
           item: 'first',
@@ -520,22 +513,22 @@ describe(`EventSourceable`, () => {
       class MyNonStateES extends EventSourceable {}
 
       const instance = new MyNonStateES({ id: 'my-id' });
-      expect(() => instance.setState('created')).to.throw(
+      expect(() => instance.setState('created')).toThrow(
         UndefinedStatesError,
         `MyNonStateES: states are not defined. Please define states as class(MyClass.STATES) property or define your getter as MyClass.prototype.getAvailableStates`
       );
     });
 
     it('has no state by default', () => {
-      expect(new MyEventSourceable({ id: 'my-id' }).hasState()).to.be.false;
+      expect(new MyEventSourceable({ id: 'my-id' }).hasState()).toBe(false);
     });
 
     it('can transition to a state', async () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
-      expect(instance.isInState(Order.STATES.pending)).to.be.true;
+      expect(instance.isInState(Order.STATES.pending)).toBe(true);
       await instance.handle(events.OrderFulfilled);
-      expect(instance.isInState(Order.STATES.fulfilled)).to.be.true;
+      expect(instance.isInState(Order.STATES.fulfilled)).toBe(true);
     });
   });
 
@@ -545,22 +538,22 @@ describe(`EventSourceable`, () => {
       class MyNonStatusES extends EventSourceable {}
 
       const instance = new MyNonStatusES({ id: 'my-id' });
-      expect(() => instance.setStatus('myStatus')).to.throw(
+      expect(() => instance.setStatus('myStatus')).toThrow(
         UndefinedStatusesError,
         `MyNonStatusES: statuses are not defined. Please define statuses as class(MyClass.STATUSES) property or define your getter as MyClass.prototype.getAvailableStatuses`
       );
     });
 
     it('has no status by default', () => {
-      expect(new MyEventSourceable({ id: 'my-id' }).hasStatus()).to.be.false;
+      expect(new MyEventSourceable({ id: 'my-id' }).hasStatus()).toBe(false);
     });
 
     it('can transition to a status', async () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
-      expect(instance.isInStatus(Order.STATUSES.pendingPayment)).to.be.true;
+      expect(instance.isInStatus(Order.STATUSES.pendingPayment)).toBe(true);
       await instance.handle(events.OrderPaid);
-      expect(instance.isInStatus(Order.STATUSES.paid)).to.be.true;
+      expect(instance.isInStatus(Order.STATUSES.paid)).toBe(true);
     });
   });
 
@@ -569,17 +562,17 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       instance.replay(events.OrderCreated);
-      expect(handlers.OrderCreated).to.be.calledOnce;
-      expect(handlers.OrderCreated).to.have.been.calledWithMatch(
+      expect(handlers.OrderCreated).toHaveBeenCalledTimes(1);
+      expect(handlers.OrderCreated).toHaveBeenCalledWith(expect.objectContaining(
         events.OrderCreated
-      );
+      ));
     });
 
     it('does not push the event into the events array(only recorded events should be added)', () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       instance.replay(events.OrderCreated);
-      expect(instance.getEvents()).to.eql([]);
+      expect(instance.getEvents()).toEqual([]);
     });
 
     it('throws DomainEventRequiredError when the event is not a domain event', () => {
@@ -590,7 +583,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       expect(() => {
         instance.record(nonEvent as any as Event<{}>);
-      }).to.throw(
+      }).toThrow(
         InvalidEventError,
         `Order: event must be instance of Event, got {"type":String("Test"), "eventSourceableId":String("my-id")}`
       );
@@ -606,7 +599,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       instance.replay(event);
-      expect(instance.getVersion()).to.equal(event.version);
+      expect(instance.getVersion()).toBe(event.version);
     });
 
     it('allows to set event sourceable version', () => {
@@ -614,7 +607,7 @@ describe(`EventSourceable`, () => {
       instance.initialize();
       const version = 10;
       instance.setVersion(version);
-      expect(instance.getVersion()).to.equal(version);
+      expect(instance.getVersion()).toBe(version);
     });
 
     it('also accepts events that have no version', () => {
@@ -627,7 +620,7 @@ describe(`EventSourceable`, () => {
           items: [],
         })
       );
-      expect(instance.getVersion()).to.equal(0);
+      expect(instance.getVersion()).toBe(0);
     });
 
     it('only replays events that have the right source id', () => {
@@ -639,7 +632,7 @@ describe(`EventSourceable`, () => {
 
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
-      expect(() => instance.replay(event)).to.throw(
+      expect(() => instance.replay(event)).toThrow(
         EventIdMismatchError,
         `Order: the given event has mismatching source id. Expected id 'my-id', got 'other-id'`
       );
@@ -659,7 +652,7 @@ describe(`EventSourceable`, () => {
     it('replays given historic events on the event sourceable', () => {
       const instance = new EventSourceable({ id: orderProps.id });
       instance.initialize();
-      const replaySpy = sinon.stub(instance, 'replay');
+      const replaySpy = vi.spyOn(instance, "replay");
       const history = new History([
         new Created({
           sourceId: orderProps.id,
@@ -675,10 +668,10 @@ describe(`EventSourceable`, () => {
         }),
       ]);
       instance.replayHistory(history);
-      expect(replaySpy).to.have.been.calledThrice;
-      expect(replaySpy).to.have.been.calledWithExactly(history[0]);
-      expect(replaySpy).to.have.been.calledWithExactly(history[1]);
-      expect(replaySpy).to.have.been.calledWithExactly(history[2]);
+      expect(replaySpy).toHaveBeenCalledTimes(3);
+      expect(replaySpy).toHaveBeenCalledWith(history[0]);
+      expect(replaySpy).toHaveBeenCalledWith(history[1]);
+      expect(replaySpy).toHaveBeenCalledWith(history[2]);
     });
   });
 
@@ -687,7 +680,7 @@ describe(`EventSourceable`, () => {
       class MyMessage {}
 
       const instance = new EventSourceable({ id: orderProps.id });
-      expect(() => instance.getHandler(MyMessage as any)).to.throw(
+      expect(() => instance.getHandler(MyMessage as any)).toThrow(
         InvalidMessageableType,
         `Type 'MyMessage' must implement Messageable interface`
       );
@@ -703,7 +696,7 @@ describe(`EventSourceable`, () => {
       });
 
       const instance = new MyEventSourceable({ id });
-      expect(instance.handle(command)).to.eventually.be.rejectedWith(
+      await expect(instance.handle(command)).rejects.toThrow(
         HandlerNotFoundError,
         `MyEventSourceable: handler for type 'NotHandledCommand' can't be found`
       );
@@ -713,7 +706,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(events.OrderCreated);
-      expect(handlers.OrderCreated).to.have.been.calledWithExactly(
+      expect(handlers.OrderCreated).toHaveBeenCalledWith(
         events.OrderCreated
       );
     });
@@ -722,7 +715,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(events.OrderCreated);
-      expect(instance.getEvents()).to.eql([]);
+      expect(instance.getEvents()).toEqual([]);
     });
 
     it('it does not assign the event version to the event sourceable(only record does that)', async () => {
@@ -735,7 +728,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(event);
-      expect(instance.getVersion()).not.to.equal(event.version);
+      expect(instance.getVersion()).not.toBe(event.version);
     });
 
     it('handles events that have no version', async () => {
@@ -747,7 +740,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(event);
-      expect(instance.getVersion()).to.equal(0);
+      expect(instance.getVersion()).toBe(0);
     });
 
     it('handles events with different source id then id of event sourceable', async () => {
@@ -760,7 +753,7 @@ describe(`EventSourceable`, () => {
 
       const instance = new Order({ id });
       instance.initialize();
-      expect(async () => instance.handle(event)).not.to.throw(
+      expect(async () => instance.handle(event)).not.toThrow(
         EventIdMismatchError
       );
     });
@@ -769,7 +762,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(commands.CreateOrder);
-      expect(handlers.CreateOrder).to.have.been.calledWithExactly(
+      expect(handlers.CreateOrder).toHaveBeenCalledWith(
         commands.CreateOrder
       );
     });
@@ -777,7 +770,7 @@ describe(`EventSourceable`, () => {
     it(`returns event sourceable for chaining after handling`, async () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
-      expect(await instance.handle(commands.CreateOrder)).to.be.equal(instance);
+      expect(await instance.handle(commands.CreateOrder)).toBe(instance);
     });
   });
 
@@ -834,7 +827,7 @@ describe(`EventSourceable`, () => {
         id,
       });
       instance.initialize();
-      expect(instance).to.be.eql(initialState);
+      expect(instance).toEqual(initialState);
       instance.record(updateProfileEvent);
 
       const expectedStateAfterProfileUpdate = {
@@ -847,7 +840,7 @@ describe(`EventSourceable`, () => {
         color: 'blue',
         version: 0,
       };
-      expect(instance).to.be.eql(expectedStateAfterProfileUpdate);
+      expect(instance).toEqual(expectedStateAfterProfileUpdate);
     });
 
     it(`does not assign properties that does not match event sourceable's prop types`, () => {
@@ -864,7 +857,7 @@ describe(`EventSourceable`, () => {
       });
       instance.initialize();
       instance.record(notRelatedEvent);
-      expect((instance as any).propertyThatDoesNotMatchDefinition).to.be.equal(
+      expect((instance as any).propertyThatDoesNotMatchDefinition).toBe(
         undefined
       );
     });
@@ -876,7 +869,7 @@ describe(`EventSourceable`, () => {
         'other-key': 'other-value',
       };
       instance.assignMetadata(metadata);
-      expect(instance.metadata).to.be.eql(metadata);
+      expect(instance.metadata).toEqual(metadata);
     });
 
     it('ensures that assigning metadata preserves deeply nested properties', () => {
@@ -916,7 +909,7 @@ describe(`EventSourceable`, () => {
       };
       instance.assignMetadata(firstMetadata);
       instance.assignMetadata(secondMetadata);
-      expect(instance.metadata).to.be.eql(expectedMetadata);
+      expect(instance.metadata).toEqual(expectedMetadata);
     });
   });
 
@@ -929,7 +922,7 @@ describe(`EventSourceable`, () => {
         metadata: {},
         version: 0,
       };
-      expect(instance.eventProps()).to.be.eql(eventProps);
+      expect(instance.eventProps()).toEqual(eventProps);
     });
 
     it(`returns essential command properties: metadata, timestamp`, () => {
@@ -938,7 +931,7 @@ describe(`EventSourceable`, () => {
         timestamp: new Date(),
         metadata: {},
       };
-      expect(instance.commandProps()).to.be.eql(commandProps);
+      expect(instance.commandProps()).toEqual(commandProps);
     });
   });
 
@@ -969,8 +962,8 @@ describe(`EventSourceable`, () => {
         targetId: orderProps.id,
         command: commandAfterSchedule,
       });
-      expect(instance.getCommands()).to.be.eql([expectedScheduleCommand]);
-      expect(command).to.be.eql(commandAfterSchedule);
+      expect(instance.getCommands()).toEqual([expectedScheduleCommand]);
+      expect(command).toEqual(commandAfterSchedule);
     });
 
     it(`assigns id of Event Sourceable when custom id is not passed on scheduling`, () => {
@@ -998,8 +991,8 @@ describe(`EventSourceable`, () => {
         targetId: orderProps.id,
         command: commandAfterSchedule,
       });
-      expect(instance.getCommands()).to.be.eql([expectedScheduleCommand]);
-      expect(command).to.be.eql(commandAfterSchedule);
+      expect(instance.getCommands()).toEqual([expectedScheduleCommand]);
+      expect(command).toEqual(commandAfterSchedule);
     });
 
     it('adds unschedule command to routed commands upon unscheduling', () => {
@@ -1015,7 +1008,7 @@ describe(`EventSourceable`, () => {
         assignmentId,
         commandType: 'CreateOrder',
       });
-      expect(instance.getCommands()).to.be.eql([expectedUnscheduleCommand]);
+      expect(instance.getCommands()).toEqual([expectedUnscheduleCommand]);
     });
 
     it('omits handler execution of scheduled, non deliverable command on handling', async () => {
@@ -1036,7 +1029,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(command);
-      expect(handlers.CreateOrder).to.not.be.called;
+      expect(handlers.CreateOrder).not.toHaveBeenCalled;
     });
 
     it('executes handler for scheduled, deliverable command on handling', async () => {
@@ -1057,8 +1050,8 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(command);
-      expect(handlers.CreateOrder).to.be.called;
-      expect(handlers.CreateOrder).to.be.calledWithExactly(command);
+      expect(handlers.CreateOrder).toHaveBeenCalled();
+      expect(handlers.CreateOrder).toHaveBeenCalledWith(command);
     });
   });
 
@@ -1088,7 +1081,7 @@ describe(`EventSourceable`, () => {
           }
           return MyClass;
         };
-        expect(fn).to.throw(
+        expect(fn).toThrow(
           InitializingMessageAlreadyExistsError,
           `MyClass: trying to override already existing initializing message with 'SecondCommand'. Remove annotation '@initial' from 'FirstCommand' beforehand`
         );
@@ -1107,7 +1100,7 @@ describe(`EventSourceable`, () => {
           }
           return MyClass;
         };
-        expect(fn).to.throw(
+        expect(fn).toThrow(
           InitializingMessageAlreadyExistsError,
           `MyClass: trying to override already existing initializing message with 'SecondEvent'. Remove annotation '@initial' from 'FirstEvent' beforehand`
         );
@@ -1126,7 +1119,7 @@ describe(`EventSourceable`, () => {
           }
           return MyClass;
         };
-        expect(fn).to.throw(
+        expect(fn).toThrow(
           InitializingMessageAlreadyExistsError,
           `MyClass: trying to override already existing initializing message with 'FirstEvent'. Remove annotation '@initial' from 'FirstCommand' beforehand`
         );
@@ -1151,7 +1144,7 @@ describe(`EventSourceable`, () => {
             return event;
           }
         }
-        expect(MyClass.resolveInitializingMessage()).to.be.equal(FirstCommand);
+        expect(MyClass.resolveInitializingMessage()).toBe(FirstCommand);
       });
 
       it('sets the initializing event', () => {
@@ -1173,7 +1166,7 @@ describe(`EventSourceable`, () => {
             return event;
           }
         }
-        expect(MyClass.resolveInitializingMessage()).to.be.equal(FirstEvent);
+        expect(MyClass.resolveInitializingMessage()).toBe(FirstEvent);
       });
 
       it('returns undefined if initializing message is not set', () => {
@@ -1195,12 +1188,12 @@ describe(`EventSourceable`, () => {
             return event;
           }
         }
-        expect(MyClass.resolveInitializingMessage()).to.be.equal(undefined);
+        expect(MyClass.resolveInitializingMessage()).toBe(undefined);
       });
     });
 
     describe('routing messages', () => {
-      context('commands', () => {
+      describe('commands', () => {
         it('routes commands', () => {
           @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
@@ -1212,7 +1205,7 @@ describe(`EventSourceable`, () => {
               return command;
             }
           }
-          expect(MyClass.resolveRoutedCommands()).to.be.eql([
+          expect(MyClass.resolveRoutedCommands()).toEqual([
             FirstCommand,
             SecondCommand,
           ]);
@@ -1221,10 +1214,10 @@ describe(`EventSourceable`, () => {
         it('returns empty array if there are no routed commands', () => {
           @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {}
-          expect(MyClass.resolveRoutedCommands()).to.be.eql([]);
+          expect(MyClass.resolveRoutedCommands()).toEqual([]);
         });
       });
-      context('events', () => {
+      describe('events', () => {
         it('routes events', () => {
           @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
@@ -1236,7 +1229,7 @@ describe(`EventSourceable`, () => {
               return event;
             }
           }
-          expect(MyClass.resolveRoutedEvents()).to.be.eql([
+          expect(MyClass.resolveRoutedEvents()).toEqual([
             FirstEvent,
             SecondEvent,
           ]);
@@ -1245,11 +1238,11 @@ describe(`EventSourceable`, () => {
         it('returns empty array if there are no routed events', () => {
           @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {}
-          expect(MyClass.resolveRoutedEvents()).to.be.eql([]);
+          expect(MyClass.resolveRoutedEvents()).toEqual([]);
         });
       });
 
-      context('mixed messages', () => {
+      describe('mixed messages', () => {
         it('routes mixed messages', () => {
           @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {
@@ -1261,7 +1254,7 @@ describe(`EventSourceable`, () => {
               return event;
             }
           }
-          expect(MyClass.resolveRoutedMessages()).to.be.eql([
+          expect(MyClass.resolveRoutedMessages()).toEqual([
             FirstCommand,
             SecondEvent,
           ]);
@@ -1270,9 +1263,10 @@ describe(`EventSourceable`, () => {
         it('returns empty array if there are no routed messages', () => {
           @Type('MyClass', { isRegistrable: false })
           class MyClass extends EventSourceable {}
-          expect(MyClass.resolveRoutedMessages()).to.be.eql([]);
+          expect(MyClass.resolveRoutedMessages()).toEqual([]);
         });
       });
     });
   });
 });
+

@@ -1,5 +1,6 @@
-import { expect } from 'chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach } from 'vitest';
+
 import { injectable } from 'inversify';
 import { Type } from '@eveble/core';
 import { derived } from '@traits-ts/core';
@@ -29,8 +30,8 @@ describe(`Service`, () => {
 
   beforeEach(() => {
     injector = new Injector();
-    commandBus = stubInterface<types.CommandBus>();
-    eventBus = stubInterface<types.EventBus>();
+    commandBus = mock<types.CommandBus>();
+    eventBus = mock<types.EventBus>();
 
     injector
       .bind<types.CommandBus>(BINDINGS.CommandBus)
@@ -39,11 +40,11 @@ describe(`Service`, () => {
   });
 
   it(`has CommandHandlingTrait mixin on prototype chain applied`, () => {
-    expect(derived(Service.prototype, CommandHandlingTrait)).to.be.true;
+    expect(derived(Service.prototype, CommandHandlingTrait)).toBe(true);
   });
 
   it(`has EventHandlingTrait mixin on prototype chain applied`, () => {
-    expect(derived(Service.prototype, EventHandlingTrait)).to.be.true;
+    expect(derived(Service.prototype, EventHandlingTrait)).toBe(true);
   });
 
   it('ensures that initializers from CommandHandlingTrait, EventHandlingTrait are invoked upon dependency injection', () => {
@@ -59,8 +60,8 @@ describe(`Service`, () => {
     const service = new MyService();
     injector.injectInto(service);
 
-    expect(service.hasHandler(MyCommand)).to.be.true;
-    expect(service.hasHandler(MyEvent)).to.be.true;
+    expect(service.hasHandler(MyCommand)).toBe(true);
+    expect(service.hasHandler(MyEvent)).toBe(true);
   });
 
   it('ensures that service can be resolved by Inversify in singleton scope', () => {
@@ -77,7 +78,8 @@ describe(`Service`, () => {
     injector.bind<types.Service>('MyService').to(MyService).inSingletonScope();
 
     injector.get('MyService');
-    expect(() => injector.get('MyService')).to.not.throw(Error);
-    expect(injector.get('MyService')).to.be.instanceof(MyService);
+    expect(() => injector.get('MyService')).not.toThrow(Error);
+    expect(injector.get('MyService')).toBeInstanceOf(MyService);
   });
 });
+

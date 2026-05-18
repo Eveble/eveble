@@ -23,13 +23,19 @@ export const getDatabaseName = function (targetName: string): string {
   let databaseName;
   switch (targetName) {
     case 'snapshotter':
-      databaseName = getenv.string('EVEBLE_SNAPSHOTTER_MONGODB_DBNAME');
+      databaseName = `${getenv.string(
+        'EVEBLE_SNAPSHOTTER_MONGODB_DBNAME'
+      )}${Date.now()}_${Math.random().toString(36).slice(2)}`;
       break;
     case 'commitStore':
-      databaseName = getenv.string('EVEBLE_COMMITSTORE_MONGODB_DBNAME');
+      databaseName = `${getenv.string(
+        'EVEBLE_COMMITSTORE_MONGODB_DBNAME'
+      )}${Date.now()}_${Math.random().toString(36).slice(2)}`;
       break;
     case 'scheduler':
-      databaseName = getenv.string('EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME');
+      databaseName = `${getenv.string(
+        'EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME'
+      )}${Date.now()}_${Math.random().toString(36).slice(2)}`;
       break;
     default:
       databaseName = 'eveble_testing';

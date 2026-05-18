@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import { Log, LogMetadata } from '../../../src/components/log-entry';
@@ -21,56 +22,56 @@ describe('Log', () => {
   describe('construction', () => {
     it('takes message as a string and assigns it', () => {
       const log = new Log(message);
-      expect(log.message).to.be.equal(message);
+      expect(log.message).toBe(message);
     });
 
     it('initializes with empty metadata map', () => {
       const log = new Log(message);
-      expect(log.metadata).to.be.instanceOf(Map);
-      expect(log.metadata).to.be.empty;
+      expect(log.metadata).toBeInstanceOf(Map);
+      expect(log.metadata).toHaveLength(0);
     });
 
     it('initializes with empty options object', () => {
       const log = new Log(message);
-      expect(log.options).to.be.instanceOf(Object);
-      expect(log.options).to.be.empty;
+      expect(log.options).toBeInstanceOf(Object);
+      expect(Object.keys(log.options)).toHaveLength(0);
     });
   });
 
   describe('conversion', () => {
     it('converts log message to string', () => {
-      expect(new Log(message).toString()).to.be.equal(message);
+      expect(new Log(message).toString()).toBe(message);
     });
   });
 
   describe('describing log', () => {
-    context('on', () => {
+    describe('on', () => {
       it(`sets target 'on' which log was done`, () => {
         const target = new MyClass();
         const log = new Log(message).on(target);
-        expect(log.getTarget()).to.be.equal(target);
+        expect(log.getTarget()).toBe(target);
       });
     });
 
-    context('in', () => {
+    describe('in', () => {
       it(`sets target's method function 'in' which log was done`, () => {
         const target = new MyClass();
         const log = new Log(message).on(target).in(target.myMethod);
-        expect(log.getTarget()).to.be.equal(target);
-        expect(log.method).to.be.equal(target.myMethod);
-        expect(log.methodName).to.be.equal('myMethod');
+        expect(log.getTarget()).toBe(target);
+        expect(log.method).toBe(target.myMethod);
+        expect(log.methodName).toBe('myMethod');
       });
 
       it(`sets target's method function name as a String 'in' which log was done`, () => {
         const target = new MyClass();
         const log = new Log(message).on(target).in('myMethod');
-        expect(log.getTarget()).to.be.equal(target);
-        expect(log.methodName).to.be.equal('myMethod');
-        expect(log.method).to.be.equal(target.myMethod);
+        expect(log.getTarget()).toBe(target);
+        expect(log.methodName).toBe('myMethod');
+        expect(log.method).toBe(target.myMethod);
       });
     });
 
-    context('with', () => {
+    describe('with', () => {
       it(`adds additional metadata 'with' is related to log`, () => {
         const result = {
           first: 'first',
@@ -81,9 +82,9 @@ describe('Log', () => {
           .on(target)
           .in(target.myMethod)
           .with('result', result, keys);
-        expect(log.hasMetadata('result')).to.be.true;
-        expect(log.getMetadata('result')).to.be.instanceof(LogMetadata);
-        expect(log.getMetadata('result')).to.be.eql(
+        expect(log.hasMetadata('result')).toBe(true);
+        expect(log.getMetadata('result')).toBeInstanceOf(LogMetadata);
+        expect(log.getMetadata('result')).toEqual(
           new LogMetadata('result', result, keys)
         );
       });
@@ -96,15 +97,15 @@ describe('Log', () => {
           .with('first', 'first-value')
           .with('second', 'second-value');
 
-        expect(log.hasMetadata('first')).to.be.true;
-        expect(log.getMetadata('first')).to.be.instanceof(LogMetadata);
-        expect(log.getMetadata('first')).to.be.eql(
+        expect(log.hasMetadata('first')).toBe(true);
+        expect(log.getMetadata('first')).toBeInstanceOf(LogMetadata);
+        expect(log.getMetadata('first')).toEqual(
           new LogMetadata('first', 'first-value')
         );
 
-        expect(log.hasMetadata('second')).to.be.true;
-        expect(log.getMetadata('second')).to.be.instanceof(LogMetadata);
-        expect(log.getMetadata('second')).to.be.eql(
+        expect(log.hasMetadata('second')).toBe(true);
+        expect(log.getMetadata('second')).toBeInstanceOf(LogMetadata);
+        expect(log.getMetadata('second')).toEqual(
           new LogMetadata('second', 'second-value')
         );
       });
@@ -115,21 +116,21 @@ describe('Log', () => {
           .on(target)
           .in(target.myMethod)
           .with('properties');
-        expect(log.hasMetadata('properties')).to.be.true;
-        expect(log.getMetadata('properties')).to.be.instanceof(LogMetadata);
-        expect(log.getMetadata('properties')).to.be.eql(
+        expect(log.hasMetadata('properties')).toBe(true);
+        expect(log.getMetadata('properties')).toBeInstanceOf(LogMetadata);
+        expect(log.getMetadata('properties')).toEqual(
           new LogMetadata('properties')
         );
       });
     });
 
-    context('format', () => {
+    describe('format', () => {
       it('allows to define additional formatting options', () => {
         const options = { isSimple: true };
         const target = new MyClass();
         const log = new Log(message).on(target).format(options);
 
-        expect(log.options).to.be.eql(options);
+        expect(log.options).toEqual(options);
       });
 
       it('ensures that formatting options can be chained', () => {
@@ -141,14 +142,14 @@ describe('Log', () => {
           .format(firstOptions)
           .format(secondOptions);
 
-        expect(log.options).to.be.eql({ ...firstOptions, ...secondOptions });
+        expect(log.options).toEqual({ ...firstOptions, ...secondOptions });
       });
     });
 
-    context('level', () => {
+    describe('level', () => {
       it('allows to set log entry level', () => {
         const log = new Log(message).setLevel('debug');
-        expect(log.level).to.be.equal('debug');
+        expect(log.level).toBe('debug');
       });
     });
   });
@@ -158,7 +159,7 @@ describe('Log', () => {
       it(`returns target type name as type name`, () => {
         const target = new MyClass();
         const log = new Log(message).on(target);
-        expect(log.typeName).to.be.equal('MyClass');
+        expect(log.typeName).toBe('MyClass');
       });
 
       it(`returns target name based on constructor name`, () => {
@@ -166,12 +167,12 @@ describe('Log', () => {
 
         const target = new MyOtherClass();
         const log = new Log(message).on(target);
-        expect(log.typeName).to.be.equal('MyOtherClass');
+        expect(log.typeName).toBe('MyOtherClass');
       });
 
       it(`returns empty string if target is not set`, () => {
         const log = new Log(message);
-        expect(log.typeName).to.be.equal('');
+        expect(log.typeName).toBe('');
       });
     });
 
@@ -179,12 +180,12 @@ describe('Log', () => {
       it(`returns method name based on function's name property`, () => {
         const target = new MyClass();
         const log = new Log(message).on(target).in('myMethod');
-        expect(log.methodName).to.be.equal('myMethod');
+        expect(log.methodName).toBe('myMethod');
       });
       it(`returns method name based on direct named function`, () => {
         const target = new MyClass();
         const log = new Log(message).on(target).in(target.myMethod);
-        expect(log.methodName).to.be.equal('myMethod');
+        expect(log.methodName).toBe('myMethod');
       });
     });
   });
@@ -194,14 +195,15 @@ describe('Log', () => {
       it('returns true if assigned method is static', () => {
         const target = new MyClass();
         const log = new Log(message).on(target).in(MyClass.myStaticMethod);
-        expect(log.methodName).to.be.equal('myStaticMethod');
-        expect(log.isStaticMethod()).to.be.true;
+        expect(log.methodName).toBe('myStaticMethod');
+        expect(log.isStaticMethod()).toBe(true);
       });
       it('returns false if assigned method is prototype(instance)', () => {
         const target = new MyClass();
         const log = new Log(message).on(target).in(target.myMethod);
-        expect(log.isStaticMethod()).to.be.false;
+        expect(log.isStaticMethod()).toBe(false);
       });
     });
   });
 });
+

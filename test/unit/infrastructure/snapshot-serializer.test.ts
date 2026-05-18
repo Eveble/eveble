@@ -1,14 +1,12 @@
-import { stubInterface } from 'ts-sinon';
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
-
-chai.use(sinonChai);
 
 describe(`SnapshotSerializer`, () => {
   @Type('MyEventSourceable', { isRegistrable: false })
@@ -21,7 +19,7 @@ describe(`SnapshotSerializer`, () => {
   let esSerializer: SnapshotSerializer;
 
   beforeEach(() => {
-    serializer = stubInterface<types.Serializer>();
+    serializer = mock<types.Serializer>();
 
     injector = new Injector();
     esSerializer = new SnapshotSerializer();
@@ -42,17 +40,17 @@ describe(`SnapshotSerializer`, () => {
       id: 'my-id',
       key: 'my-value',
     });
-    serializer.toData.withArgs(instance).returns(data);
-    serializer.stringify.withArgs(data).returns(serializedEs);
+    serializer.toData.calledWith(instance).mockReturnValue(data);
+    serializer.stringify.calledWith(data).mockReturnValue(serializedEs);
 
-    expect(esSerializer.serialize(instance)).to.be.eql({
+    expect(esSerializer.serialize(instance)).toEqual({
       _id: 'my-id',
       snapshot: serializedEs,
     });
-    expect(serializer.toData).to.be.calledOnce;
-    expect(serializer.toData).to.be.calledWithExactly(instance);
-    expect(serializer.stringify).to.be.calledOnce;
-    expect(serializer.stringify).to.be.calledWithExactly(data);
+    expect(serializer.toData).toHaveBeenCalledTimes(1);
+    expect(serializer.toData).toHaveBeenCalledWith(instance);
+    expect(serializer.stringify).toHaveBeenCalledTimes(1);
+    expect(serializer.stringify).toHaveBeenCalledWith(data);
   });
 
   it('deserializes serialized event sourceable', () => {
@@ -64,15 +62,16 @@ describe(`SnapshotSerializer`, () => {
     const instance = new MyEventSourceable({
       key: 'my-value',
     });
-    serializer.parse.withArgs(serializedEs).returns(data);
-    serializer.fromData.withArgs(data).returns(instance);
+    serializer.parse.calledWith(serializedEs).mockReturnValue(data);
+    serializer.fromData.calledWith(data).mockReturnValue(instance);
 
     expect(
       esSerializer.deserialize(MyEventSourceable, serializedEs)
-    ).to.be.equal(instance);
-    expect(serializer.parse).to.be.calledOnce;
-    expect(serializer.parse).to.be.calledWithExactly(serializedEs);
-    expect(serializer.fromData).to.be.calledOnce;
-    expect(serializer.fromData).to.be.calledWithExactly(data);
+    ).toBe(instance);
+    expect(serializer.parse).toHaveBeenCalledTimes(1);
+    expect(serializer.parse).toHaveBeenCalledWith(serializedEs);
+    expect(serializer.fromData).toHaveBeenCalledTimes(1);
+    expect(serializer.fromData).toHaveBeenCalledWith(data);
   });
 });
+

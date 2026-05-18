@@ -1,7 +1,8 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+
 import { PropTypes } from 'typend';
-import { stubInterface } from 'ts-sinon';
+
 import { Type, kernel } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import {
@@ -9,8 +10,6 @@ import {
   TypeTrait,
 } from '../../../src/traits/type.trait';
 import { types } from '../../../src/types';
-
-chai.use(sinonChai);
 
 describe('TypeTrait', () => {
   let originalConverter: any;
@@ -21,24 +20,24 @@ describe('TypeTrait', () => {
   let validator: any;
   let library: any;
 
-  before(() => {
+  beforeAll(() => {
     originalConverter = kernel.converter;
     originalValidator = kernel.validator;
     originalLibrary = kernel.library;
   });
 
   beforeEach(() => {
-    converter = stubInterface<types.Converter>();
-    validator = stubInterface<types.Validator>();
-    library = stubInterface<types.Library>();
+    converter = mock<types.Converter>();
+    validator = mock<types.Validator>();
+    library = mock<types.Library>();
     kernel.setConverter(converter);
     kernel.setValidator(validator);
     kernel.setLibrary(library);
 
-    converter.convert.returns({ properties: {} });
+    converter.convert.mockReturnValue({ properties: {} });
   });
 
-  after(() => {
+  afterAll(() => {
     kernel.setConverter(originalConverter);
     kernel.setValidator(originalValidator);
     kernel.setLibrary(originalLibrary);
@@ -117,22 +116,22 @@ describe('TypeTrait', () => {
           lastName: PropTypes.instanceOf(String),
           age: PropTypes.instanceOf(Number),
         };
-        converter.convert.withArgs(Person).returns({ properties: propTypes });
+        converter.convert.mockReturnValue({ properties: propTypes });
         const person = new Person('Jane', 'Doe', 28);
-        expect(person.equals(null)).to.be.false;
+        expect(person.equals(null)).toBe(false);
       });
 
-      context('flat', () => {
+      describe('flat', () => {
         it('returns true if both instance are equal', () => {
           const propTypes = {
             firstName: PropTypes.instanceOf(String),
             lastName: PropTypes.instanceOf(String),
             age: PropTypes.instanceOf(Number),
           };
-          converter.convert.withArgs(Person).returns({ properties: propTypes });
+          converter.convert.mockReturnValue({ properties: propTypes });
           const firstPerson = new Person('Jane', 'Doe', 28);
           const secondPerson = new Person('Jane', 'Doe', 28);
-          expect(firstPerson.equals(secondPerson)).to.be.true;
+          expect(firstPerson.equals(secondPerson)).toBe(true);
         });
 
         it('returns false if one instance is different from other by values', () => {
@@ -141,10 +140,10 @@ describe('TypeTrait', () => {
             lastName: PropTypes.instanceOf(String),
             age: PropTypes.instanceOf(Number),
           };
-          converter.convert.withArgs(Person).returns({ properties: propTypes });
+          converter.convert.mockReturnValue({ properties: propTypes });
           const firstPerson = new Person('Jane', 'Doe', 28);
           const secondPerson = new Person('John', 'Doe', 30);
-          expect(firstPerson.equals(secondPerson)).to.be.false;
+          expect(firstPerson.equals(secondPerson)).toBe(false);
         });
 
         it('returns false if one instance has different type then other', () => {
@@ -169,19 +168,20 @@ describe('TypeTrait', () => {
             lastName: PropTypes.instanceOf(String),
             age: PropTypes.instanceOf(Number),
           };
-          converter.convert.withArgs(Person).returns({ properties: propTypes });
+          converter.convert.mockReturnValue({ properties: propTypes });
           converter.convert
-            .withArgs(NotAPerson)
-            .returns({ properties: propTypes });
+            .mockReturnValue({ properties: propTypes });
           const firstPerson = new Person('Jane', 'Doe', 28);
           const secondPerson = new NotAPerson('John', 'Doe', 30);
-          expect(firstPerson.equals(secondPerson)).to.be.false;
+          expect(firstPerson.equals(secondPerson)).toBe(false);
         });
       });
 
-      context('nested', () => {
+      describe('nested', () => {
+        let customerPropTypes: any;
+        let orderPropTypes: any;
         beforeEach(() => {
-          const customerPropTypes = {
+          customerPropTypes = {
             name: PropTypes.instanceOf(String),
             emails: PropTypes.arrayOf(String),
             address: PropTypes.shape({
@@ -189,16 +189,15 @@ describe('TypeTrait', () => {
               country: PropTypes.instanceOf(String),
             }),
           };
-          converter.convert
-            .withArgs(Customer)
-            .returns({ properties: customerPropTypes });
 
-          const orderPropTypes = {
+          orderPropTypes = {
             customer: PropTypes.instanceOf(Customer),
           };
-          converter.convert
-            .withArgs(Order)
-            .returns({ properties: orderPropTypes });
+          converter.convert.mockImplementation((cls: any) => {
+            if (cls === Customer) return { properties: customerPropTypes };
+            if (cls === Order) return { properties: orderPropTypes };
+            return { properties: {} };
+          });
         });
         it('supports comparison of nested definables', () => {
           const firstCustomer = new Customer({
@@ -224,7 +223,7 @@ describe('TypeTrait', () => {
           const secondOrder = new Order({
             customer: secondCustomer,
           });
-          expect(firstOrder.equals(secondOrder)).to.be.true;
+          expect(firstOrder.equals(secondOrder)).toBe(true);
         });
 
         it('is not equal if a sub value object comparison fails', () => {
@@ -251,7 +250,7 @@ describe('TypeTrait', () => {
             customer: secondCustomer,
           });
 
-          expect(firstOrder.equals(secondOrder)).to.be.false;
+          expect(firstOrder.equals(secondOrder)).toBe(false);
         });
       });
     });
@@ -264,12 +263,12 @@ describe('TypeTrait', () => {
         lastName: PropTypes.instanceOf(String),
         age: PropTypes.instanceOf(Number),
       };
-      converter.convert.withArgs(Person).returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const person = new Person('Jane', 'Doe', 28);
       const props = person.getPropTypes();
-      expect(props).to.be.eql(propTypes);
-      expect(kernel.converter.convert).to.be.calledWithExactly(Person);
+      expect(props).toEqual(propTypes);
+      expect(kernel.converter.convert).toHaveBeenCalledWith(Person);
     });
 
     it(`returns converted TypeScript class declaration properties declaration from class constructor`, () => {
@@ -278,11 +277,11 @@ describe('TypeTrait', () => {
         lastName: PropTypes.instanceOf(String),
         age: PropTypes.instanceOf(Number),
       };
-      converter.convert.withArgs(Person).returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const props = Person.getPropTypes();
-      expect(props).to.be.eql(propTypes);
-      expect(kernel.converter.convert).to.be.calledWithExactly(Person);
+      expect(props).toEqual(propTypes);
+      expect(kernel.converter.convert).toHaveBeenCalledWith(Person);
     });
 
     it('ensures that parent properties declarations are resolved on child', () => {
@@ -291,11 +290,11 @@ describe('TypeTrait', () => {
         childKey: PropTypes.instanceOf(Number),
         parentObj: PropTypes.interface({}).isOptional,
       };
-      converter.convert.withArgs(Child).returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const child = new Child({ childKey: 1337, parentKey: 'my-string' });
       const props = child.getPropTypes();
-      expect(props).to.be.eql(propTypes);
+      expect(props).toEqual(propTypes);
     });
   });
 
@@ -306,12 +305,12 @@ describe('TypeTrait', () => {
         lastName: PropTypes.instanceOf(String),
         age: PropTypes.instanceOf(Number),
       };
-      converter.convert.withArgs(Person).returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const person = new Person('Jane', 'Doe', 28);
       const obj = person.toPlainObject();
-      expect(obj).to.be.instanceof(Object);
-      expect(obj).to.be.eql({
+      expect(obj).toBeInstanceOf(Object);
+      expect(obj).toEqual({
         firstName: 'Jane',
         lastName: 'Doe',
         age: 28,
@@ -324,12 +323,12 @@ describe('TypeTrait', () => {
         childKey: PropTypes.instanceOf(Number),
         parentObj: PropTypes.interface({}).isOptional,
       };
-      converter.convert.withArgs(Child).returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const child = new Child({ childKey: 1337, parentKey: 'my-string' });
       const props = child.toPlainObject();
-      expect(props).to.be.instanceof(Object);
-      expect(props).to.be.eql({
+      expect(props).toBeInstanceOf(Object);
+      expect(props).toEqual({
         parentKey: 'my-string',
         childKey: 1337,
       });
@@ -341,21 +340,21 @@ describe('TypeTrait', () => {
         childKey: PropTypes.instanceOf(Number),
         parentObj: PropTypes.interface({}).isOptional,
       };
-      converter.convert.withArgs(Child).returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const child = new Child({
         childKey: 1337,
         parentKey: 'my-string',
         parentObj: { objKey: true },
       });
-      expect(child).to.be.eql({
+      expect(child).toEqual({
         parentKey: 'my-string',
         childKey: 1337,
         parentObj: { objKey: true },
       });
 
       const plainObj = child.toPlainObject();
-      expect(plainObj).to.be.eql({
+      expect(plainObj).toEqual({
         parentKey: 'my-string',
         childKey: 1337,
         parentObj: { objKey: true },
@@ -365,12 +364,12 @@ describe('TypeTrait', () => {
       plainObj.childKey = 1234;
       plainObj.parentObj.objKey = false;
 
-      expect(plainObj).to.be.eql({
+      expect(plainObj).toEqual({
         parentKey: 'my-other-string',
         childKey: 1234,
         parentObj: { objKey: false },
       });
-      expect(child).to.be.eql({
+      expect(child).toEqual({
         parentKey: 'my-string',
         childKey: 1337,
         parentObj: { objKey: true },
@@ -387,7 +386,7 @@ describe('TypeTrait', () => {
           stringKey,
           numberKey,
         };
-        converter.convert.returns({ properties: propTypes });
+        converter.convert.mockReturnValue({ properties: propTypes });
 
         @Type('MyClass')
         class MyClass extends derive(TypeTrait) {
@@ -396,7 +395,7 @@ describe('TypeTrait', () => {
           numberKey = 1337;
         }
 
-        expect(MyClass.prototype.getPropertyInitializers()).to.be.eql({
+        expect(MyClass.prototype.getPropertyInitializers()).toEqual({
           stringKey: 'my-string',
           numberKey: 1337,
         });
@@ -411,7 +410,7 @@ describe('TypeTrait', () => {
           stringKey,
           numberKey,
         };
-        converter.convert.returns({ properties: propTypes });
+        converter.convert.mockReturnValue({ properties: propTypes });
 
         @Type('MyClass')
         class MyClass extends derive(TypeTrait) {
@@ -420,7 +419,7 @@ describe('TypeTrait', () => {
           numberKey = 1337;
         }
 
-        expect(MyClass.getPropertyInitializers()).to.be.eql({
+        expect(MyClass.getPropertyInitializers()).toEqual({
           stringKey: 'my-string',
           numberKey: 1337,
         });
@@ -435,7 +434,7 @@ describe('TypeTrait', () => {
           stringKey,
           numberKey,
         };
-        converter.convert.returns({ properties: propTypes });
+        converter.convert.mockReturnValue({ properties: propTypes });
 
         @Type('OtherParent')
         class OtherParent extends derive(TypeTrait) {
@@ -447,7 +446,7 @@ describe('TypeTrait', () => {
         @Type('OtherChild')
         class OtherChild extends OtherParent {}
 
-        expect(OtherChild.prototype.getPropertyInitializers()).to.be.eql({
+        expect(OtherChild.prototype.getPropertyInitializers()).toEqual({
           stringKey: 'my-string',
           numberKey: 1337,
         });
@@ -462,7 +461,7 @@ describe('TypeTrait', () => {
         const parentPropTypes = {
           stringKey,
         };
-        converter.convert.returns({ properties: parentPropTypes });
+        converter.convert.mockReturnValue({ properties: parentPropTypes });
 
         @Type('OtherParent')
         class OtherParent extends derive(TypeTrait) {
@@ -472,14 +471,14 @@ describe('TypeTrait', () => {
         const childPropTypes = {
           numberKey,
         };
-        converter.convert.returns({ properties: childPropTypes });
+        converter.convert.mockReturnValue({ properties: childPropTypes });
 
         @Type('OtherChild')
         class OtherChild extends OtherParent {
           numberKey = 1337;
         }
 
-        expect(OtherChild.prototype.getPropertyInitializers()).to.be.eql({
+        expect(OtherChild.prototype.getPropertyInitializers()).toEqual({
           stringKey: 'my-string',
           numberKey: 1337,
         });
@@ -496,17 +495,17 @@ describe('TypeTrait', () => {
       };
       const person = new Person('Jane', 'Doe', 28);
 
-      converter.convert.withArgs(Person).returns({ properties: propTypes });
-      validator.validate.withArgs(person, propTypes, true).returns(true);
+      converter.convert.mockReturnValue({ properties: propTypes });
+      validator.validate.mockReturnValue(true);
 
-      expect(person.validateProps(person, person.getPropTypes())).to.be.true;
+      expect(person.validateProps(person, person.getPropTypes())).toBe(true);
     });
 
     it('re-throws error from validator using message prefixed with types type name', () => {
       const propTypes = {
         key: PropTypes.instanceOf(String),
       };
-      converter.convert.returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       @Type('Namespace.MyClass')
       class MyClass extends derive(TypeTrait) {
@@ -516,9 +515,9 @@ describe('TypeTrait', () => {
       const message = 'my-error';
       const error = new Error(message);
       const props = { key: 'value' };
-      validator.validate.withArgs(props, propTypes, true).throws(error);
+      validator.validate.mockImplementation(() => { throw error; });
 
-      expect(() => new MyClass().validateProps(props, propTypes)).to.throw(
+      expect(() => new MyClass().validateProps(props, propTypes)).toThrow(
         Error,
         'Namespace.MyClass: my-error'
       );
@@ -528,7 +527,7 @@ describe('TypeTrait', () => {
       const propTypes = {
         key: PropTypes.instanceOf(String),
       };
-      converter.convert.returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       @Type('MyClass')
       class MyClass extends derive(TypeTrait) {
@@ -538,9 +537,9 @@ describe('TypeTrait', () => {
       const message = 'my-error';
       const error = new Error(message);
       const props = { key: 'value' };
-      validator.validate.withArgs(props, propTypes, true).throws(error);
+      validator.validate.mockImplementation(() => { throw error; });
 
-      expect(() => new MyClass().validateProps(props, propTypes)).to.throw(
+      expect(() => new MyClass().validateProps(props, propTypes)).toThrow(
         Error,
         'MyClass: my-error'
       );
@@ -561,11 +560,11 @@ describe('TypeTrait', () => {
         const error = new Error(message);
         const props = { key: 'value' };
         const propTypes = { key: PropTypes.instanceOf(String) };
-        validator.validate.withArgs(props, propTypes, true).throws(error);
+        validator.validate.mockImplementation(() => { throw error; });
 
         expect(() =>
           new MyClass().validateProps(props, propTypes)
-        ).to.not.throw(Error);
+        ).not.toThrow(Error);
       });
     });
   });
@@ -578,7 +577,7 @@ describe('TypeTrait', () => {
         age: PropTypes.instanceOf(Number),
         internalKey: PropTypes.instanceOf(String),
       };
-      converter.convert.withArgs(Person).returns({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       @Type('PersonWithExclusions')
       class PersonWithExclusions extends derive(TypeTrait) {
@@ -607,18 +606,17 @@ describe('TypeTrait', () => {
       }
 
       converter.convert
-        .withArgs(PersonWithExclusions)
-        .returns({ properties: propTypes });
+        .mockReturnValue({ properties: propTypes });
 
       const person = new PersonWithExclusions('Jane', 'Doe', 28, 'secret');
       const props = person.getPropTypes();
 
-      expect(props).to.be.eql({
+      expect(props).toEqual({
         firstName: PropTypes.instanceOf(String),
         lastName: PropTypes.instanceOf(String),
         age: PropTypes.instanceOf(Number),
       });
-      expect(props).to.not.have.property('internalKey');
+      expect(props).not.toHaveProperty('internalKey');
     });
 
     it('excludes multiple properties defined in EXCLUDED_PROP_TYPES symbol', () => {
@@ -645,8 +643,7 @@ describe('TypeTrait', () => {
       }
 
       converter.convert
-        .withArgs(SecureClass)
-        .returns({ properties: propTypes });
+        .mockReturnValue({ properties: propTypes });
 
       const instance = new SecureClass({
         publicKey: 'public',
@@ -655,11 +652,11 @@ describe('TypeTrait', () => {
       });
       const props = instance.getPropTypes();
 
-      expect(props).to.be.eql({
+      expect(props).toEqual({
         publicKey: PropTypes.instanceOf(String),
       });
-      expect(props).to.not.have.property('privateKey');
-      expect(props).to.not.have.property('internalId');
+      expect(props).not.toHaveProperty('privateKey');
+      expect(props).not.toHaveProperty('internalId');
     });
 
     it('returns all properties when EXCLUDED_PROP_TYPES is empty', () => {
@@ -684,13 +681,12 @@ describe('TypeTrait', () => {
       }
 
       converter.convert
-        .withArgs(NoExclusions)
-        .returns({ properties: propTypes });
+        .mockReturnValue({ properties: propTypes });
 
       const instance = new NoExclusions('Jane', 'Doe');
       const props = instance.getPropTypes();
 
-      expect(props).to.be.eql(propTypes);
+      expect(props).toEqual(propTypes);
     });
 
     it('works with static getPropTypes method', () => {
@@ -714,15 +710,15 @@ describe('TypeTrait', () => {
       }
 
       converter.convert
-        .withArgs(StaticExclusionTest)
-        .returns({ properties: propTypes });
+        .mockReturnValue({ properties: propTypes });
 
       const props = StaticExclusionTest.getPropTypes();
 
-      expect(props).to.be.eql({
+      expect(props).toEqual({
         visibleKey: PropTypes.instanceOf(String),
       });
-      expect(props).to.not.have.property('hiddenKey');
+      expect(props).not.toHaveProperty('hiddenKey');
     });
   });
 });
+

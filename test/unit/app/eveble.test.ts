@@ -1,6 +1,6 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach } from 'vitest';
+
 import { Type } from 'typend';
 import { kernel } from '@eveble/core';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
@@ -27,8 +27,6 @@ import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 import { Router } from '../../../src/infrastructure/router';
 
-chai.use(sinonChai);
-
 describe(`Eveble Module`, () => {
   // Props
   const appId = 'my-app-id';
@@ -48,8 +46,8 @@ describe(`Eveble Module`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -58,24 +56,24 @@ describe(`Eveble Module`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
-    library = stubInterface<types.Library>();
-    commitStorage = stubInterface<types.CommitStorage>();
-    commitObserver = stubInterface<types.CommitObserver>();
-    snapshotStorage = stubInterface<types.SnapshotStorage>();
-    snapshotSerializer = stubInterface<types.SnapshotSerializer>();
-    commandScheduler = stubInterface<types.CommandScheduler>();
+    library = mock<types.Library>();
+    commitStorage = mock<types.CommitStorage>();
+    commitObserver = mock<types.CommitObserver>();
+    snapshotStorage = mock<types.SnapshotStorage>();
+    snapshotSerializer = mock<types.SnapshotSerializer>();
+    commandScheduler = mock<types.CommandScheduler>();
 
     // Library
     injector.bind<types.Library>(BINDINGS.Library).toConstantValue(library);
-    library.getTypes.returns(new Map([]));
+    library.getTypes.mockReturnValue(new Map([]));
     // Commit
     injector
       .bind<types.CommitStorage>(BINDINGS.CommitStorage)
@@ -104,7 +102,7 @@ describe(`Eveble Module`, () => {
     appConfig = new AppConfig({
       appId: 'my-app-id',
     });
-    app = stubInterface<types.App>();
+    app = mock<types.App>();
     app.config = appConfig;
   });
 
@@ -122,7 +120,7 @@ describe(`Eveble Module`, () => {
       it('logs initializing top level dependencies', async () => {
         const eveble = new Eveble();
         await eveble.initialize(app, injector);
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`initializing top level dependencies`)
             .on(eveble)
             .in('initializeTopLevelDependencies')
@@ -133,9 +131,9 @@ describe(`Eveble Module`, () => {
         it('sets asserter on kernel', async () => {
           const eveble = new Eveble();
           await eveble.initialize(app, injector);
-          expect(kernel.asserter).to.be.instanceof(Asserter);
+          expect(kernel.asserter).toBeInstanceOf(Asserter);
 
-          expect(log.debug).to.be.calledWithExactly(
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`set asserter 'Asserter' on Kernel`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -145,22 +143,22 @@ describe(`Eveble Module`, () => {
         it('ensures that StatefulAssertion is registered on asserter', async () => {
           const eveble = new Eveble();
           await eveble.initialize(app, injector);
-          expect(kernel.asserter).to.be.instanceof(Asserter);
-          expect(kernel.asserter.hasAssertion(StatefulAssertion)).to.be.true;
+          expect(kernel.asserter).toBeInstanceOf(Asserter);
+          expect(kernel.asserter.hasAssertion(StatefulAssertion)).toBe(true);
         });
 
         it('ensures that StatusfulAssertion is registered on asserter', async () => {
           const eveble = new Eveble();
           await eveble.initialize(app, injector);
-          expect(kernel.asserter).to.be.instanceof(Asserter);
-          expect(kernel.asserter.hasAssertion(StatusfulAssertion)).to.be.true;
+          expect(kernel.asserter).toBeInstanceOf(Asserter);
+          expect(kernel.asserter.hasAssertion(StatusfulAssertion)).toBe(true);
         });
 
         it('ensures that AbilityAssertion is registered on asserter', async () => {
           const eveble = new Eveble();
           await eveble.initialize(app, injector);
-          expect(kernel.asserter).to.be.instanceof(Asserter);
-          expect(kernel.asserter.hasAssertion(AbilityAssertion)).to.be.true;
+          expect(kernel.asserter).toBeInstanceOf(Asserter);
+          expect(kernel.asserter.hasAssertion(AbilityAssertion)).toBe(true);
         });
       });
 
@@ -173,13 +171,13 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.Serializer>(
               BINDINGS.Serializer
             )
-          ).to.be.instanceof(EJSONSerializerAdapter);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(EJSONSerializerAdapter);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'EJSON' to constant value`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
           );
-          expect(log.debug).to.be.calledWithExactly(
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(
               `bound 'Serializer' to 'EJSONSerializerAdapter' in singleton scope`
             )
@@ -189,7 +187,7 @@ describe(`Eveble Module`, () => {
         });
 
         it('does not bound Serializer on Injector if its already bound prior to initialization', async () => {
-          const serializer = stubInterface<types.Serializer>();
+          const serializer = mock<types.Serializer>();
           const eveble = new Eveble();
           injector
             .bind<types.Serializer>(BINDINGS.Serializer)
@@ -200,15 +198,15 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.Serializer>(
               BINDINGS.Serializer
             )
-          ).to.be.equal(serializer);
+          ).toBe(serializer);
         });
 
         it('sets serializer on kernel', async () => {
           const eveble = new Eveble();
           await eveble.initialize(app, injector);
-          expect(kernel.serializer).to.be.instanceof(EJSONSerializerAdapter);
+          expect(kernel.serializer).toBeInstanceOf(EJSONSerializerAdapter);
 
-          expect(log.debug).to.be.calledWithExactly(
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`set serializer 'EJSONSerializerAdapter' on Kernel`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -216,7 +214,7 @@ describe(`Eveble Module`, () => {
         });
 
         it('registers types on serializer', async () => {
-          const serializer = stubInterface<types.Serializer>();
+          const serializer = mock<types.Serializer>();
           injector
             .bind<types.Serializer>(BINDINGS.Serializer)
             .toConstantValue(serializer);
@@ -236,27 +234,27 @@ describe(`Eveble Module`, () => {
             ['MyCommand', MyCommand as any],
             ['Namespace.MyEvent', MyEvent as any],
           ]);
-          library.getTypes.returns(registeredTypes);
+          library.getTypes.mockReturnValue(registeredTypes);
           const eveble = new Eveble();
           await eveble.initialize(app, injector);
 
-          expect(serializer.registerType).to.be.calledTwice;
-          expect(serializer.registerType).to.be.calledWithExactly(
+          expect(serializer.registerType).toHaveBeenCalledTimes(2);
+          expect(serializer.registerType).toHaveBeenCalledWith(
             'MyCommand',
             MyCommand
           );
-          expect(serializer.registerType).to.be.calledWithExactly(
+          expect(serializer.registerType).toHaveBeenCalledWith(
             'Namespace.MyEvent',
             MyEvent
           );
 
-          expect(log.debug).to.be.calledWithExactly(
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`registered type 'MyCommand' on 'Object' serializer`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
           );
 
-          expect(log.debug).to.be.calledWithExactly(
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(
               `registered type 'Namespace.MyEvent' on 'Object' serializer`
             )
@@ -273,8 +271,8 @@ describe(`Eveble Module`, () => {
 
           expect(
             await eveble.injector.getAsync<types.Router>(BINDINGS.Router)
-          ).to.be.equal(Router);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBe(Router);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'Router' as constant value`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -282,14 +280,14 @@ describe(`Eveble Module`, () => {
         });
 
         it('does not bound Router on Injector if its already bound prior to initialization', async () => {
-          const router = stubInterface<types.Router>();
+          const router = mock<types.Router>();
           const eveble = new Eveble();
           injector.bind<types.Router>(BINDINGS.Router).toConstantValue(router);
           await eveble.initialize(app, injector);
 
           expect(
             await eveble.injector.getAsync<types.Router>(BINDINGS.Router)
-          ).to.be.equal(router);
+          ).toBe(router);
         });
       });
 
@@ -302,8 +300,8 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.CommandBus>(
               BINDINGS.CommandBus
             )
-          ).to.be.instanceof(CommandBus);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(CommandBus);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'CommandBus' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -311,7 +309,7 @@ describe(`Eveble Module`, () => {
         });
 
         it('does not bound CommandBus on Injector if its already bound prior to initialization', async () => {
-          const commandBus = stubInterface<types.CommandBus>();
+          const commandBus = mock<types.CommandBus>();
           const eveble = new Eveble();
           injector
             .bind<types.CommandBus>(BINDINGS.CommandBus)
@@ -322,7 +320,7 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.CommandBus>(
               BINDINGS.CommandBus
             )
-          ).to.be.equal(commandBus);
+          ).toBe(commandBus);
         });
       });
 
@@ -333,8 +331,8 @@ describe(`Eveble Module`, () => {
 
           expect(
             await eveble.injector.getAsync<types.EventBus>(BINDINGS.EventBus)
-          ).to.be.instanceof(EventBus);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(EventBus);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'EventBus' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -342,7 +340,7 @@ describe(`Eveble Module`, () => {
         });
 
         it('does not bound EventBus on Injector if its already bound prior to initialization', async () => {
-          const eventBus = stubInterface<types.EventBus>();
+          const eventBus = mock<types.EventBus>();
           const eveble = new Eveble();
           injector
             .bind<types.EventBus>(BINDINGS.EventBus)
@@ -351,7 +349,7 @@ describe(`Eveble Module`, () => {
 
           expect(
             await eveble.injector.getAsync<types.EventBus>(BINDINGS.EventBus)
-          ).to.be.equal(eventBus);
+          ).toBe(eventBus);
         });
       });
 
@@ -364,8 +362,8 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.EventSourceableRepository>(
               BINDINGS.EventSourceableRepository
             )
-          ).to.be.instanceof(EventSourceableRepository);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(EventSourceableRepository);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'EventSourceableRepository' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -374,7 +372,7 @@ describe(`Eveble Module`, () => {
 
         it('does not bound EventSourceableRepository on Injector if its already bound prior to initialization', async () => {
           const eventSourceableRepository =
-            stubInterface<types.EventSourceableRepository>();
+            mock<types.EventSourceableRepository>();
           const eveble = new Eveble();
           injector
             .bind<types.EventSourceableRepository>(
@@ -387,7 +385,7 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.EventSourceableRepository>(
               BINDINGS.EventSourceableRepository
             )
-          ).to.be.equal(eventSourceableRepository);
+          ).toBe(eventSourceableRepository);
         });
       });
 
@@ -400,8 +398,8 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.CommitStore>(
               BINDINGS.CommitStore
             )
-          ).to.be.instanceof(CommitStore);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(CommitStore);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'CommitStore' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -409,7 +407,7 @@ describe(`Eveble Module`, () => {
         });
 
         it('does not bound CommitStore on Injector if its already bound prior to initialization', async () => {
-          const commitStore = stubInterface<types.CommitStore>();
+          const commitStore = mock<types.CommitStore>();
           const eveble = new Eveble();
           injector
             .bind<types.CommitStore>(BINDINGS.CommitStore)
@@ -420,7 +418,7 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.CommitStore>(
               BINDINGS.CommitStore
             )
-          ).to.be.equal(commitStore);
+          ).toBe(commitStore);
         });
       });
 
@@ -433,8 +431,8 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.CommitPublisher>(
               BINDINGS.CommitPublisher
             )
-          ).to.be.instanceof(CommitPublisher);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(CommitPublisher);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'CommitPublisher' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -442,7 +440,7 @@ describe(`Eveble Module`, () => {
         });
 
         it('does not bound CommitPublisher on Injector if its already bound prior to initialization', async () => {
-          const commitPublisher = stubInterface<types.CommitPublisher>();
+          const commitPublisher = mock<types.CommitPublisher>();
           const eveble = new Eveble();
           injector
             .bind<types.CommitPublisher>(BINDINGS.CommitPublisher)
@@ -453,7 +451,7 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.CommitPublisher>(
               BINDINGS.CommitPublisher
             )
-          ).to.be.equal(commitPublisher);
+          ).toBe(commitPublisher);
         });
       });
 
@@ -475,8 +473,8 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.Snapshotter>(
               BINDINGS.Snapshotter
             )
-          ).to.be.instanceof(Snapshotter);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(Snapshotter);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'Snapshotter' in singleton scope`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -484,7 +482,7 @@ describe(`Eveble Module`, () => {
         });
 
         it('does not bound Snapshotter on Injector if its already bound prior to initialization', async () => {
-          const snapshotter = stubInterface<types.Snapshotter>();
+          const snapshotter = mock<types.Snapshotter>();
           const eveble = new Eveble();
           injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
@@ -495,7 +493,7 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<types.Snapshotter>(
               BINDINGS.Snapshotter
             )
-          ).to.be.equal(snapshotter);
+          ).toBe(snapshotter);
         });
       });
 
@@ -518,8 +516,8 @@ describe(`Eveble Module`, () => {
             await eveble.injector.getAsync<any>(
               BINDINGS.CommandSchedulingService
             )
-          ).to.be.instanceof(CommandSchedulingService);
-          expect(log.debug).to.be.calledWithExactly(
+          ).toBeInstanceOf(CommandSchedulingService);
+          expect(log.debug).toHaveBeenCalledWith(
             new Log(`bound 'CommandSchedulingService' as constant value`)
               .on(eveble)
               .in('initializeTopLevelDependencies')
@@ -564,11 +562,11 @@ describe(`Eveble Module`, () => {
         await eveble.injector.getAsync<types.EventSourceableRepository>(
           BINDINGS.EventSourceableRepository
         );
-      expect(repository.isSnapshotting()).to.be.true;
-      expect(log.debug).to.be.calledWithExactly(
+      expect(repository.isSnapshotting()).toBe(true);
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`enabling snapshotting`).on(eveble).in('bindSnapshotter')
       );
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`enabled snapshotting`).on(eveble).in('bindSnapshotter')
       );
     });
@@ -592,13 +590,13 @@ describe(`Eveble Module`, () => {
         await eveble.injector.getAsync<types.EventSourceableRepository>(
           BINDINGS.EventSourceableRepository
         );
-      expect(repository.isSnapshotting()).to.be.false;
+      expect(repository.isSnapshotting()).toBe(false);
     });
   });
 
   describe(`on start`, () => {
     it(`starts publishing with commit publisher`, async () => {
-      const commitPublisher = stubInterface<types.CommitPublisher>();
+      const commitPublisher = mock<types.CommitPublisher>();
       injector.bind(BINDINGS.CommitPublisher).toConstantValue(commitPublisher);
 
       const eveble = new Eveble({
@@ -607,7 +605,7 @@ describe(`Eveble Module`, () => {
       await eveble.initialize(app, injector);
 
       await eveble.start();
-      expect(commitPublisher.startPublishing).to.be.calledOnce;
+      expect(commitPublisher.startPublishing).toHaveBeenCalledTimes(1);
     });
 
     it(`starts schedulers`, async () => {
@@ -623,13 +621,13 @@ describe(`Eveble Module`, () => {
       await eveble.initialize(app, injector);
 
       await eveble.start();
-      expect(commandScheduler.startScheduling).to.be.calledOnce;
+      expect(commandScheduler.startScheduling).toHaveBeenCalledTimes(1);
     });
   });
 
   describe(`on stop`, () => {
     it(`stops publishing with commit publisher`, async () => {
-      const commitPublisher = stubInterface<types.CommitPublisher>();
+      const commitPublisher = mock<types.CommitPublisher>();
       injector.bind(BINDINGS.CommitPublisher).toConstantValue(commitPublisher);
 
       const eveble = new Eveble({
@@ -640,8 +638,8 @@ describe(`Eveble Module`, () => {
       await eveble.start();
       await eveble.stop();
 
-      expect(commitPublisher.startPublishing).to.be.calledOnce;
-      expect(commitPublisher.stopPublishing).to.be.calledOnce;
+      expect(commitPublisher.startPublishing).toHaveBeenCalledTimes(1);
+      expect(commitPublisher.stopPublishing).toHaveBeenCalledTimes(1);
     });
 
     it(`stops schedulers`, async () => {
@@ -659,7 +657,8 @@ describe(`Eveble Module`, () => {
       await eveble.start();
       await eveble.stop();
 
-      expect(commandScheduler.stopScheduling).to.be.calledOnce;
+      expect(commandScheduler.stopScheduling).toHaveBeenCalledTimes(1);
     });
   });
 });
+

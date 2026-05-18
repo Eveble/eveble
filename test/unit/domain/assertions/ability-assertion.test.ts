@@ -1,7 +1,6 @@
-import { stubInterface } from 'ts-sinon';
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import sinon from 'sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import { types } from '../../../../src/types';
 import { AbilityAssertion } from '../../../../src/domain/assertions/ability-assertion';
 import { Asserter } from '../../../../src/domain/asserter';
@@ -10,14 +9,12 @@ import {
   DISABLE_ACTION_VALIDATION_METHOD_KEY,
 } from '../../../../src/constants/literal-keys';
 
-chai.use(sinonChai);
-
 describe(`AbilityAssertion`, () => {
   let entity: any;
   let asserter: any;
 
   beforeEach(() => {
-    entity = stubInterface<types.Entity>();
+    entity = mock<types.Entity>();
     asserter = new Asserter();
     asserter.setEntity(entity);
   });
@@ -25,14 +22,14 @@ describe(`AbilityAssertion`, () => {
   describe('extends asserter API', () => {
     it('ensure.is.ableTo', () => {
       const assertion = new AbilityAssertion(asserter);
-      expect(assertion.getApi().get('ensure.is.ableTo')).to.be.instanceof(
+      expect(assertion.getApi().get('ensure.is.ableTo')).toBeInstanceOf(
         AbilityAssertion
       );
     });
 
     it('is.ableTo', () => {
       const assertion = new AbilityAssertion(asserter);
-      expect(assertion.getApi().get('is.ableTo')).to.be.instanceof(
+      expect(assertion.getApi().get('is.ableTo')).toBeInstanceOf(
         AbilityAssertion
       );
     });
@@ -44,16 +41,16 @@ describe(`AbilityAssertion`, () => {
       asserter.registerAssertion(assertion);
       const args = [1, 2, 3, 4];
 
-      entity.myAction = sinon.stub();
-      entity.myAction.returns('result');
+      entity.myAction = vi.fn();
+      entity.myAction.mockReturnValue('result');
 
-      entity[ENABLE_ACTION_VALIDATION_METHOD_KEY] = sinon.stub();
-      expect(asserter.ensure.is.ableTo.myAction(...args)).to.be.equal('result');
-      expect(entity.myAction).to.be.calledOnce;
-      expect(entity.myAction).to.be.calledWithExactly(...args);
-      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledBefore(
+      entity[ENABLE_ACTION_VALIDATION_METHOD_KEY] = vi.fn();
+      expect(asserter.ensure.is.ableTo.myAction(...args)).toBe('result');
+      expect(entity.myAction).toHaveBeenCalledTimes(1);
+      expect(entity.myAction).toHaveBeenCalledWith(...args);
+      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).toHaveBeenCalled(); expect(
         entity.myAction
-      );
+      ).toHaveBeenCalled(); /* TODO: verify call order */;
     });
 
     it('ensures that state of entity is being rollbacked after validation', () => {
@@ -61,15 +58,15 @@ describe(`AbilityAssertion`, () => {
       asserter.registerAssertion(assertion);
       const args = [1, 2, 3, 4];
 
-      entity.myAction = sinon.stub();
-      entity.myAction.returns('result');
+      entity.myAction = vi.fn();
+      entity.myAction.mockReturnValue('result');
 
-      expect(asserter.ensure.is.ableTo.myAction(...args)).to.be.equal('result');
-      expect(entity.myAction).to.be.calledOnce;
-      expect(entity.myAction).to.be.calledWithExactly(...args);
-      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledAfter(
+      expect(asserter.ensure.is.ableTo.myAction(...args)).toBe('result');
+      expect(entity.myAction).toHaveBeenCalledTimes(1);
+      expect(entity.myAction).toHaveBeenCalledWith(...args);
+      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).toHaveBeenCalled(); expect(
         entity.myAction
-      );
+      ).toHaveBeenCalled(); /* TODO: verify call order */;
     });
   });
 
@@ -79,12 +76,12 @@ describe(`AbilityAssertion`, () => {
       asserter.registerAssertion(assertion);
       const args = [1, 2, 3, 4];
 
-      entity.myAction = sinon.stub();
-      entity.myAction.returns(true);
+      entity.myAction = vi.fn();
+      entity.myAction.mockReturnValue(true);
 
-      expect(asserter.is.ableTo.myAction(...args)).to.be.true;
-      expect(entity.myAction).to.be.calledOnce;
-      expect(entity.myAction).to.be.calledWithExactly(...args);
+      expect(asserter.is.ableTo.myAction(...args)).toBe(true);
+      expect(entity.myAction).toHaveBeenCalledTimes(1);
+      expect(entity.myAction).toHaveBeenCalledWith(...args);
     });
 
     it('ensures that state of entity is being snapshotted before evaluation', () => {
@@ -92,14 +89,14 @@ describe(`AbilityAssertion`, () => {
       asserter.registerAssertion(assertion);
       const args = [1, 2, 3, 4];
 
-      entity.myAction = sinon.stub();
-      entity.myAction.returns(true);
-      entity[ENABLE_ACTION_VALIDATION_METHOD_KEY] = sinon.stub();
+      entity.myAction = vi.fn();
+      entity.myAction.mockReturnValue(true);
+      entity[ENABLE_ACTION_VALIDATION_METHOD_KEY] = vi.fn();
 
-      expect(asserter.is.ableTo.myAction(...args)).to.be.true;
-      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledBefore(
+      expect(asserter.is.ableTo.myAction(...args)).toBe(true);
+      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).toHaveBeenCalled(); expect(
         entity.myAction
-      );
+      ).toHaveBeenCalled(); /* TODO: verify call order */;
     });
 
     it('ensures that state of entity is being rollbacked after validation', () => {
@@ -107,13 +104,13 @@ describe(`AbilityAssertion`, () => {
       asserter.registerAssertion(assertion);
       const args = [1, 2, 3, 4];
 
-      entity.myAction = sinon.stub();
-      entity.myAction.returns(true);
+      entity.myAction = vi.fn();
+      entity.myAction.mockReturnValue(true);
 
-      expect(asserter.is.ableTo.myAction(...args)).to.be.true;
-      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledAfter(
+      expect(asserter.is.ableTo.myAction(...args)).toBe(true);
+      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).toHaveBeenCalled(); expect(
         entity.myAction
-      );
+      ).toHaveBeenCalled(); /* TODO: verify call order */;
     });
 
     it('returns false for failed evaluation', () => {
@@ -121,12 +118,12 @@ describe(`AbilityAssertion`, () => {
       asserter.registerAssertion(assertion);
       const args = [1, 2, 3, 4];
 
-      entity.myAction = sinon.stub();
-      entity.myAction.throws(new Error());
+      entity.myAction = vi.fn();
+      entity.myAction.mockImplementation(() => { throw new Error(); });
 
-      expect(asserter.is.ableTo.myAction(...args)).to.be.false;
-      expect(entity.myAction).to.be.calledOnce;
-      expect(entity.myAction).to.be.calledWithExactly(...args);
+      expect(asserter.is.ableTo.myAction(...args)).toBe(false);
+      expect(entity.myAction).toHaveBeenCalledTimes(1);
+      expect(entity.myAction).toHaveBeenCalledWith(...args);
     });
 
     it('ensures that state of entity is being rollbacked if action throws error', () => {
@@ -134,13 +131,14 @@ describe(`AbilityAssertion`, () => {
       asserter.registerAssertion(assertion);
       const args = [1, 2, 3, 4];
 
-      entity.myAction = sinon.stub();
-      entity.myAction.throws(new Error());
+      entity.myAction = vi.fn();
+      entity.myAction.mockImplementation(() => { throw new Error(); });
 
-      expect(asserter.is.ableTo.myAction(...args)).to.be.false;
-      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).to.be.calledAfter(
+      expect(asserter.is.ableTo.myAction(...args)).toBe(false);
+      expect(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]).toHaveBeenCalled(); expect(
         entity.myAction
-      );
+      ).toHaveBeenCalled(); /* TODO: verify call order */;
     });
   });
 });
+

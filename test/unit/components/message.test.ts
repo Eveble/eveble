@@ -1,5 +1,5 @@
-import sinon from 'sinon';
-import { expect } from 'chai';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+
 import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
@@ -10,16 +10,16 @@ describe('Message', () => {
   let now: Date;
   let clock: any;
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(now.getTime());
+    clock = vi.useFakeTimers({ now });
   });
 
   afterEach(() => {
-    clock.restore();
+    vi.useRealTimers();
   });
 
   @Type('MyMessage', { isRegistrable: false })
@@ -31,25 +31,25 @@ describe('Message', () => {
   }
 
   it(`extends Serializable`, () => {
-    expect(Message.prototype).to.be.instanceof(Serializable);
+    expect(Message.prototype).toBeInstanceOf(Serializable);
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(Serializable.prototype)).to.be.true;
+    expect(isTyped(Serializable.prototype)).toBe(true);
   });
 
   it('defines the type name correctly', () => {
-    expect(Message.getTypeName()).to.equal('Message');
-    expect(Message.prototype.getTypeName()).to.equal('Message');
+    expect(Message.getTypeName()).toBe('Message');
+    expect(Message.prototype.getTypeName()).toBe('Message');
   });
 
   describe(`prop types`, () => {
     beforeEach(() => {
-      clock.restore();
+      vi.useRealTimers();
     });
 
     it('returns property types as an object', () => {
-      expect(Message.getPropTypes()).to.be.eql({
+      expect(Message.getPropTypes()).toEqual({
         timestamp: PropTypes.instanceOf(Date).isOptional,
         metadata: PropTypes.object.isOptional,
         schemaVersion: PropTypes.instanceOf(Number).isOptional,
@@ -60,18 +60,19 @@ describe('Message', () => {
   describe('construction', () => {
     it('initializes itself with current time as instance of Date if timestamp is undefined', () => {
       const message = new MyMessage();
-      expect(message.timestamp).to.be.eql(now);
+      expect(message.timestamp).toBeInstanceOf(Date);
+      expect(message.timestamp.getTime()).toBe(now.getTime());
     });
 
     it('takes required timestamp as a instance of Date and assigns it', () => {
       const message = new MyMessage({ timestamp: now });
-      expect(message.timestamp).to.be.eql(now);
+      expect(message.timestamp.getTime()).toBe(now.getTime());
     });
 
     it('takes metadata as an object and assigns it', () => {
       const metadata = { key: 'value' };
       const message = new MyMessage({ metadata });
-      expect(message.metadata).to.be.eql(metadata);
+      expect(message.metadata).toEqual(metadata);
     });
 
     it('requires explicit constructor for messages with property initializers', () => {
@@ -88,7 +89,7 @@ describe('Message', () => {
       }
 
       const message = new MyDefaultMessage({ key: 'my-key', timestamp: now });
-      expect(message).to.be.eql({
+      expect(message).toEqual({
         key: 'my-key',
         default: 'default',
         metadata: {},
@@ -98,14 +99,14 @@ describe('Message', () => {
   });
 
   describe('setters', () => {
-    context('metadata', () => {
+    describe('metadata', () => {
       it('attaches metadata to current instance of message', () => {
         const message = new MyCustomMessage({ name: 'Foo' });
         const metadata = {
           'my-key': 'my-value',
         };
         message.assignMetadata(metadata);
-        expect(message.getMetadata()).to.be.eql(metadata);
+        expect(message.getMetadata()).toEqual(metadata);
       });
 
       it('attaches additional metadata to already existing metadata on message', () => {
@@ -118,7 +119,7 @@ describe('Message', () => {
         };
         message.assignMetadata(metadata);
         message.assignMetadata(otherMetadata);
-        expect(message.getMetadata()).to.be.eql({
+        expect(message.getMetadata()).toEqual({
           'my-key': 'my-value',
           'other-key': 'other-value',
         });
@@ -146,7 +147,7 @@ describe('Message', () => {
         };
         message.assignMetadata(metadata);
         message.assignMetadata(changedMetadata);
-        expect(message.getMetadata()).to.be.eql({
+        expect(message.getMetadata()).toEqual({
           'level-1-a': {
             'level-2-a': 'level-2-a-value',
             'level-3-b': {
@@ -164,12 +165,12 @@ describe('Message', () => {
             'my-key': 'my-value',
           };
           message.assignMetadata(metadata);
-          expect(message.hasMetadata()).to.be.true;
+          expect(message.hasMetadata()).toBe(true);
         });
 
         it('returns false if metadata is not assigned to instance of message', () => {
           const message = new MyCustomMessage({ name: 'Foo' });
-          expect(message.hasMetadata()).to.be.false;
+          expect(message.hasMetadata()).toBe(false);
         });
       });
 
@@ -182,7 +183,7 @@ describe('Message', () => {
 
             const message = new MyCustomMessage({ name });
             message.setCorrelationId(key, id);
-            expect(message.getMetadata()).to.be.eql({
+            expect(message.getMetadata()).toEqual({
               correlation: {
                 myProcessId: id,
               },
@@ -196,7 +197,7 @@ describe('Message', () => {
 
             const message = new MyCustomMessage({ name });
             message.setCorrelationId(key, id);
-            expect(message.getMetadata()).to.be.eql({
+            expect(message.getMetadata()).toEqual({
               correlation: {
                 MyEventSourceable: id,
               },
@@ -210,7 +211,7 @@ describe('Message', () => {
 
             const message = new MyCustomMessage({ name });
             message.setCorrelationId(key, id);
-            expect(message.getMetadata()).to.be.eql({
+            expect(message.getMetadata()).toEqual({
               correlation: {
                 MyNamespace: {
                   MyEventSourceable: id,
@@ -218,8 +219,8 @@ describe('Message', () => {
               },
             });
 
-            expect(message.getCorrelationId(key)).to.be.equal(id);
-            expect(message.hasCorrelationId(key)).to.be.true;
+            expect(message.getCorrelationId(key)).toBe(id);
+            expect(message.hasCorrelationId(key)).toBe(true);
           });
         });
 
@@ -234,7 +235,7 @@ describe('Message', () => {
             });
 
             message.setCorrelationId(key, id);
-            expect(message.getCorrelationId(key)).to.be.equal(id);
+            expect(message.getCorrelationId(key)).toBe(id);
           });
 
           it(`returns undefined if correlation id can't be found`, () => {
@@ -244,7 +245,7 @@ describe('Message', () => {
             const message = new MyCustomMessage({
               name,
             });
-            expect(message.getCorrelationId(key)).to.be.equal(undefined);
+            expect(message.getCorrelationId(key)).toBe(undefined);
           });
         });
 
@@ -258,7 +259,7 @@ describe('Message', () => {
               name,
             });
             message.setCorrelationId(key, id);
-            expect(message.hasCorrelationId(key)).to.be.true;
+            expect(message.hasCorrelationId(key)).toBe(true);
           });
 
           it(`returns false if message does not contain event correlation id`, () => {
@@ -269,10 +270,11 @@ describe('Message', () => {
               name,
             });
 
-            expect(message.hasCorrelationId(key)).to.be.false;
+            expect(message.hasCorrelationId(key)).toBe(false);
           });
         });
       });
     });
   });
 });
+

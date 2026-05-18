@@ -1,8 +1,6 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll } from 'vitest';
 
-import { stubInterface } from 'ts-sinon';
 import { derived } from '@traits-ts/core';
 import { Logger } from '../../../src/core/logger';
 import { types } from '../../../src/types';
@@ -14,13 +12,11 @@ import {
 } from '../../../src/core/core-errors';
 import { RFC5424LoggingTrait } from '../../../src/traits/rfc-5424-logging.trait';
 
-chai.use(sinonChai);
-
 describe('Logger', () => {
   let levels: types.LogLevels;
   let transport: types.LogTransport;
 
-  before(() => {
+  beforeAll(() => {
     levels = {
       emerg: 0,
       alert: 1,
@@ -34,15 +30,15 @@ describe('Logger', () => {
   });
 
   beforeEach(() => {
-    transport = stubInterface<types.LogTransport>();
+    transport = mock<types.LogTransport>();
   });
 
   it(`has StatefulTrait in composition chain`, () => {
-    expect(derived(Logger.prototype, StatefulTrait)).to.be.true;
+    expect(derived(Logger.prototype, StatefulTrait)).toBe(true);
   });
 
   it(`has RFC5424LoggingTrait in composition chain`, () => {
-    expect(derived(Logger.prototype, RFC5424LoggingTrait)).to.be.true;
+    expect(derived(Logger.prototype, RFC5424LoggingTrait)).toBe(true);
   });
 
   describe(`construction`, () => {
@@ -53,27 +49,27 @@ describe('Logger', () => {
 
     it(`initializes transports as empty Map`, () => {
       const logger = new Logger(levels);
-      expect(logger.getTransports()).to.be.instanceof(Map);
-      expect(logger.getTransports()).to.be.eql(new Map());
+      expect(logger.getTransports()).toBeInstanceOf(Map);
+      expect(logger.getTransports()).toEqual(new Map());
     });
   });
 
   describe('levels', () => {
     it('returns assigned levels on construction', () => {
       const logger = new Logger(levels);
-      expect(logger.levels).to.be.eql(levels);
+      expect(logger.levels).toEqual(levels);
     });
 
     it('returns level priority number from levels', () => {
       const logger = new Logger(levels);
-      expect(logger.getPriority('emerg')).to.be.equal(0);
-      expect(logger.getPriority('alert')).to.be.equal(1);
-      expect(logger.getPriority('crit')).to.be.equal(2);
-      expect(logger.getPriority('error')).to.be.equal(3);
-      expect(logger.getPriority('warning')).to.be.equal(4);
-      expect(logger.getPriority('notice')).to.be.equal(5);
-      expect(logger.getPriority('info')).to.be.equal(6);
-      expect(logger.getPriority('debug')).to.be.equal(7);
+      expect(logger.getPriority('emerg')).toBe(0);
+      expect(logger.getPriority('alert')).toBe(1);
+      expect(logger.getPriority('crit')).toBe(2);
+      expect(logger.getPriority('error')).toBe(3);
+      expect(logger.getPriority('warning')).toBe(4);
+      expect(logger.getPriority('notice')).toBe(5);
+      expect(logger.getPriority('info')).toBe(6);
+      expect(logger.getPriority('debug')).toBe(7);
     });
   });
 
@@ -82,8 +78,8 @@ describe('Logger', () => {
       const logger = new Logger(levels);
       logger.start();
 
-      expect(logger.isInState(Logger.STATES.running)).to.be.true;
-      expect(logger.isRunning()).to.be.true;
+      expect(logger.isInState(Logger.STATES.running)).toBe(true);
+      expect(logger.isRunning()).toBe(true);
     });
 
     it(`allows to stop logging`, () => {
@@ -91,8 +87,8 @@ describe('Logger', () => {
       logger.start();
       logger.stop();
 
-      expect(logger.isInState(Logger.STATES.stopped)).to.be.true;
-      expect(logger.isStopped()).to.be.true;
+      expect(logger.isInState(Logger.STATES.stopped)).toBe(true);
+      expect(logger.isStopped()).toBe(true);
     });
   });
 
@@ -104,7 +100,7 @@ describe('Logger', () => {
             undefined as any as string,
             transport
           )
-        ).to.throw(
+        ).toThrow(
           InvalidTransportIdError,
           `Expected id argument to be string, got undefined`
         );
@@ -114,7 +110,7 @@ describe('Logger', () => {
         const id = 'my-transport';
         const logger = new Logger(levels);
         logger.registerTransport(id, transport);
-        expect(() => logger.registerTransport(id, transport)).to.throw(
+        expect(() => logger.registerTransport(id, transport)).toThrow(
           TransportExistsError,
           `Transport with id 'my-transport' would be overridden. To override existing mapping use <Logger.prototype.overrideTransport>`
         );
@@ -125,32 +121,32 @@ describe('Logger', () => {
 
         const logger = new Logger(levels);
         logger.registerTransport(id, transport);
-        expect(logger.getTransport(id)).to.equal(transport);
-        expect(logger.hasTransport(id)).to.be.true;
+        expect(logger.getTransport(id)).toBe(transport);
+        expect(logger.hasTransport(id)).toBe(true);
       });
 
       it('allows to override transport', () => {
         const id = 'my-transport';
-        const otherTransport = stubInterface<types.LogTransport>();
+        const otherTransport = mock<types.LogTransport>();
 
         const logger = new Logger(levels);
         logger.registerTransport(id, transport);
         expect(() => {
           logger.overrideTransport(id, otherTransport);
-        }).to.not.throw(Error);
-        expect(logger.getTransport(id)).to.equal(otherTransport);
+        }).not.toThrow(Error);
+        expect(logger.getTransport(id)).toBe(otherTransport);
       });
 
       it('returns transport by id', () => {
-        const consoleTransport = stubInterface<types.LogTransport>();
-        const fileTransport = stubInterface<types.LogTransport>();
+        const consoleTransport = mock<types.LogTransport>();
+        const fileTransport = mock<types.LogTransport>();
 
         const logger = new Logger(levels);
         logger.registerTransport('console', consoleTransport);
         logger.registerTransport('file', fileTransport);
-        expect(logger.getTransport('console')).to.equal(consoleTransport);
-        expect(logger.getTransport('file')).to.equal(fileTransport);
-        expect(logger.getTransport('non-existing-transport')).to.be.undefined;
+        expect(logger.getTransport('console')).toBe(consoleTransport);
+        expect(logger.getTransport('file')).toBe(fileTransport);
+        expect(logger.getTransport('non-existing-transport')).toBeUndefined();
       });
 
       it('removes transport', () => {
@@ -159,8 +155,8 @@ describe('Logger', () => {
         const logger = new Logger(levels);
         logger.registerTransport(id, transport);
         logger.removeTransport(id);
-        expect(logger.getTransport(id)).to.be.undefined;
-        expect(logger.hasTransport(id)).to.be.false;
+        expect(logger.getTransport(id)).toBeUndefined();
+        expect(logger.hasTransport(id)).toBe(false);
       });
     });
     describe('evaluation', () => {
@@ -168,20 +164,20 @@ describe('Logger', () => {
         const id = 'my-transport';
         const logger = new Logger(levels);
         logger.registerTransport(id, transport);
-        expect(logger.hasTransport(id)).to.be.true;
+        expect(logger.hasTransport(id)).toBe(true);
       });
 
       it(`returns false transport is not registered on logger`, () => {
         const id = 'my-transport';
         const logger = new Logger(levels);
-        expect(logger.hasTransport(id)).to.be.false;
+        expect(logger.hasTransport(id)).toBe(false);
       });
     });
 
     describe('getters', () => {
       it(`returns all transport mappings as a instance of map`, () => {
-        const cnsl = stubInterface<types.LogTransport>();
-        const file = stubInterface<types.LogTransport>();
+        const cnsl = mock<types.LogTransport>();
+        const file = mock<types.LogTransport>();
 
         const transports = new Map([
           ['console', cnsl],
@@ -191,7 +187,7 @@ describe('Logger', () => {
         const logger = new Logger(levels);
         logger.registerTransport('console', cnsl);
         logger.registerTransport('file', file);
-        expect(logger.getTransports()).to.be.eql(transports);
+        expect(logger.getTransports()).toEqual(transports);
       });
     });
   });
@@ -206,8 +202,8 @@ describe('Logger', () => {
       const message = 'My log message';
 
       logger.log(level, message);
-      expect(transport.log).to.be.calledOnce;
-      expect(transport.log).to.be.calledWith(level, message);
+      expect(transport.log).toHaveBeenCalledTimes(1);
+      expect(transport.log).toHaveBeenCalledWith(level, message);
     });
 
     it('only logs after starting', () => {
@@ -216,17 +212,17 @@ describe('Logger', () => {
 
       const message = 'My log message';
 
-      expect(logger.isRunning()).to.be.false;
-      expect(logger.isStopped()).to.be.true;
+      expect(logger.isRunning()).toBe(false);
+      expect(logger.isStopped()).toBe(true);
       logger.info(message);
-      expect(transport.log).to.not.be.called;
+      expect(transport.log).not.toHaveBeenCalled;
 
       logger.start();
-      expect(logger.isRunning()).to.be.true;
-      expect(logger.isStopped()).to.be.false;
+      expect(logger.isRunning()).toBe(true);
+      expect(logger.isStopped()).toBe(false);
       logger.info(message);
-      expect(transport.log).to.be.calledOnce;
-      expect(transport.log).to.be.calledWithExactly('info', message);
+      expect(transport.log).toHaveBeenCalledTimes(1);
+      expect(transport.log).toHaveBeenCalledWith('info', message);
     });
 
     it('allows logging output to be stopped', () => {
@@ -235,26 +231,26 @@ describe('Logger', () => {
 
       const message = 'My log message';
 
-      expect(logger.isRunning()).to.be.false;
-      expect(logger.isStopped()).to.be.true;
+      expect(logger.isRunning()).toBe(false);
+      expect(logger.isStopped()).toBe(true);
       logger.start();
-      expect(logger.isRunning()).to.be.true;
-      expect(logger.isStopped()).to.be.false;
+      expect(logger.isRunning()).toBe(true);
+      expect(logger.isStopped()).toBe(false);
 
       logger.info(message);
-      expect(transport.log).to.be.calledWithExactly('info', message);
+      expect(transport.log).toHaveBeenCalledWith('info', message);
 
       logger.stop();
-      expect(logger.isRunning()).to.be.false;
-      expect(logger.isStopped()).to.be.true;
+      expect(logger.isRunning()).toBe(false);
+      expect(logger.isStopped()).toBe(true);
 
       logger.info(message);
-      expect(transport.log).to.not.be.calledTwice;
+      expect(transport.log).not.toHaveBeenCalledTimes(2);
     });
 
     it('allows multiple logging transports to log same message', () => {
-      const firstTransport = stubInterface<types.LogTransport>();
-      const secondTransport = stubInterface<types.LogTransport>();
+      const firstTransport = mock<types.LogTransport>();
+      const secondTransport = mock<types.LogTransport>();
 
       const message = 'My log message';
 
@@ -264,27 +260,27 @@ describe('Logger', () => {
       logger.start();
 
       logger.debug(message);
-      expect(firstTransport.log).to.be.calledOnce;
-      expect(firstTransport.log).to.be.calledWithExactly('debug', message);
-      expect(secondTransport.log).to.be.calledOnce;
-      expect(secondTransport.log).to.be.calledWithExactly('debug', message);
+      expect(firstTransport.log).toHaveBeenCalledTimes(1);
+      expect(firstTransport.log).toHaveBeenCalledWith('debug', message);
+      expect(secondTransport.log).toHaveBeenCalledTimes(1);
+      expect(secondTransport.log).toHaveBeenCalledWith('debug', message);
     });
 
     it('assigns dynamic methods corresponding to logging level names', () => {
       const logger = new Logger(levels);
-      expect(logger.emerg).to.be.instanceof(Function);
-      expect(logger.emerg).to.be.instanceof(Function);
-      expect(logger.alert).to.be.instanceof(Function);
-      expect(logger.crit).to.be.instanceof(Function);
-      expect(logger.error).to.be.instanceof(Function);
-      expect(logger.warning).to.be.instanceof(Function);
-      expect(logger.notice).to.be.instanceof(Function);
-      expect(logger.info).to.be.instanceof(Function);
-      expect(logger.debug).to.be.instanceof(Function);
+      expect(logger.emerg).toBeInstanceOf(Function);
+      expect(logger.emerg).toBeInstanceOf(Function);
+      expect(logger.alert).toBeInstanceOf(Function);
+      expect(logger.crit).toBeInstanceOf(Function);
+      expect(logger.error).toBeInstanceOf(Function);
+      expect(logger.warning).toBeInstanceOf(Function);
+      expect(logger.notice).toBeInstanceOf(Function);
+      expect(logger.info).toBeInstanceOf(Function);
+      expect(logger.debug).toBeInstanceOf(Function);
     });
 
     it('ensures that dynamically assigned methods are not overriding existing methods set prior to initialization', () => {
-      const spy = sinon.stub();
+      const spy = vi.fn();
       class MyLogger extends Logger {
         info(): void {
           spy();
@@ -292,7 +288,7 @@ describe('Logger', () => {
       }
       const logger = new MyLogger(levels);
       logger.info();
-      expect(spy).to.be.calledOnce;
+      expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('ensures that log method from dynamic level methods is called with proper arguments', () => {
@@ -301,9 +297,9 @@ describe('Logger', () => {
       logger.registerTransport('my-id', transport);
 
       const args = ['my-message', 'first', 2, null, undefined];
-      expect(logger.info).to.be.instanceof(Function);
+      expect(logger.info).toBeInstanceOf(Function);
       logger.info('my-message', 'first', 2, null, undefined);
-      expect(transport.log).to.be.calledWith('info', ...args);
+      expect(transport.log).toHaveBeenCalledWith('info', ...args);
     });
 
     it('sets the log entries logging level', () => {
@@ -312,8 +308,9 @@ describe('Logger', () => {
       logger.registerTransport('my-id', transport);
       const logEntry: types.LogEntry = new Log('my-message');
       logger.info(logEntry);
-      expect(logEntry.level).to.be.equal('info');
-      expect(transport.log).to.be.calledWith('info', logEntry);
+      expect(logEntry.level).toBe('info');
+      expect(transport.log).toHaveBeenCalledWith('info', logEntry);
     });
   });
 });
+

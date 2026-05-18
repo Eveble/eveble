@@ -1,8 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach } from 'vitest';
+
 import { MongoClient } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import getenv from 'getenv';
 import {
   MongoDBClient,
@@ -12,9 +12,6 @@ import {
 import { types } from '../../../src/types';
 import { Injector } from '../../../src/core/injector';
 import { BINDINGS } from '../../../src/constants/bindings';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`MongoDB client`, () => {
   // Props
@@ -29,7 +26,7 @@ describe(`MongoDB client`, () => {
 
   beforeEach(async () => {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
+    log = mock<types.Logger>();
 
     injector = new Injector();
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
@@ -45,7 +42,7 @@ describe(`MongoDB client`, () => {
         options,
       });
 
-      expect(client.isConnected()).to.be.equal(false);
+      expect(client.isConnected()).toBe(false);
     });
 
     it(`connects client to MongoDB`, async () => {
@@ -58,7 +55,7 @@ describe(`MongoDB client`, () => {
 
       await client.initialize();
       await client.connect();
-      expect(client.isConnected()).to.be.equal(true);
+      expect(client.isConnected()).toBe(true);
 
       await client.disconnect();
     });
@@ -74,7 +71,7 @@ describe(`MongoDB client`, () => {
       await client.initialize();
       await client.connect();
       await client.disconnect();
-      expect(client.isConnected()).to.be.equal(false);
+      expect(client.isConnected()).toBe(false);
     });
 
     it(`reconnects client to MongoDB`, async () => {
@@ -88,9 +85,9 @@ describe(`MongoDB client`, () => {
       await client.initialize();
       await client.connect();
       await client.disconnect();
-      expect(client.isConnected()).to.be.equal(false);
+      expect(client.isConnected()).toBe(false);
       await client.reconnect();
-      expect(client.isConnected()).to.be.equal(true);
+      expect(client.isConnected()).toBe(true);
 
       await client.disconnect();
     });
@@ -162,8 +159,8 @@ describe(`MongoDB client`, () => {
         .listIndexes()
         .toArray();
       // First index is reserved for main key identifier "_id"
-      expect(foundIndexes[1].key).to.be.eql({ 'my-field': 1 });
-      expect(foundIndexes[1].unique).to.be.equal(true);
+      expect(foundIndexes[1].key).toEqual({ 'my-field': 1 });
+      expect(foundIndexes[1].unique).toBe(true);
 
       const db = client.getDatabase(customDatabaseName);
       await db.dropCollection(customCollectionName);
@@ -171,3 +168,4 @@ describe(`MongoDB client`, () => {
     });
   });
 });
+

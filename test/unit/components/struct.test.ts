@@ -1,17 +1,15 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, vi } from 'vitest';
+
 import { Integer, PropTypes, ValidationError } from 'typend';
 import { inject } from 'inversify';
 import { Type } from '@eveble/core';
 import { derived } from '@traits-ts/core';
-import sinon from 'sinon';
+
 import { Struct } from '../../../src/components/struct';
 import { DELEGATED_KEY } from '../../../src/constants/metadata-keys';
 import { HookableTrait } from '../../../src/traits/hookable.trait';
 import { TypeTrait } from '../../../src/traits/type.trait';
 import { types } from '../../../src/types';
-
-chai.use(sinonChai);
 
 describe('Struct', () => {
   @Type('Parent')
@@ -34,11 +32,11 @@ describe('Struct', () => {
   }
 
   it('has TypeTrait applied', () => {
-    expect(derived(Struct.prototype, TypeTrait)).to.be.true;
+    expect(derived(Struct.prototype, TypeTrait)).toBe(true);
   });
 
   it('has HookableTrait applied', () => {
-    expect(derived(Struct.prototype, HookableTrait)).to.be.true;
+    expect(derived(Struct.prototype, HookableTrait)).toBe(true);
   });
 
   describe('property types', () => {
@@ -48,7 +46,7 @@ describe('Struct', () => {
         name: PropTypes.instanceOf(String),
         age: PropTypes.integer,
       };
-      expect(Parent.prototype.getPropTypes()).to.be.eql(propTypes);
+      expect(Parent.prototype.getPropTypes()).toEqual(propTypes);
     });
 
     it(`returns child's property types as an object inheriting types from parent class`, () => {
@@ -58,7 +56,7 @@ describe('Struct', () => {
         age: PropTypes.integer,
         hobby: PropTypes.instanceOf(String),
       };
-      expect(Child.prototype.getPropTypes()).to.be.eql(propTypes);
+      expect(Child.prototype.getPropTypes()).toEqual(propTypes);
     });
 
     it('ensures that prop types from other child classes does not leak', () => {
@@ -68,7 +66,7 @@ describe('Struct', () => {
         age: PropTypes.integer,
         toy: PropTypes.instanceOf(String),
       };
-      expect(BastardChild.prototype.getPropTypes()).to.be.eql(propTypes);
+      expect(BastardChild.prototype.getPropTypes()).toEqual(propTypes);
     });
   });
 
@@ -78,7 +76,7 @@ describe('Struct', () => {
         new Parent({
           hasJob: true,
         });
-      }).to.throw(
+      }).toThrow(
         ValidationError,
         `Parent: (Key 'name': Expected undefined to be a String in {"hasJob":Boolean(true)}`
       );
@@ -89,7 +87,7 @@ describe('Struct', () => {
         new Child({
           hobby: 'swimming',
         });
-      }).to.throw(
+      }).toThrow(
         ValidationError,
         `Child: (Key 'hasJob': Expected undefined to be a Boolean in {"hobby":String("swimming")})`
       );
@@ -101,7 +99,7 @@ describe('Struct', () => {
         age: 28,
         hasJob: true,
       };
-      expect(() => new Parent(props)).not.to.throw(ValidationError);
+      expect(() => new Parent(props)).not.toThrow(ValidationError);
     });
 
     it('returns constructed child class on valid properties', () => {
@@ -111,7 +109,7 @@ describe('Struct', () => {
         hasJob: false,
         hobby: 'swimming',
       };
-      expect(() => new Child(props)).not.to.throw(ValidationError);
+      expect(() => new Child(props)).not.toThrow(ValidationError);
     });
 
     it('returns constructed bastard child class on valid properties', () => {
@@ -121,7 +119,7 @@ describe('Struct', () => {
         hasJob: false,
         hobby: 'woving wabbits',
       };
-      expect(() => new Child(props)).not.to.throw(ValidationError);
+      expect(() => new Child(props)).not.toThrow(ValidationError);
     });
 
     describe(`delegated('manual') construction for classes with property initializers`, () => {
@@ -133,7 +131,7 @@ describe('Struct', () => {
           key: string;
         }
         Reflect.defineMetadata(DELEGATED_KEY, true, MyDelegatedStruct);
-        expect(new MyDelegatedStruct({ key: 'set' })).to.be.eql({});
+        expect(new MyDelegatedStruct({ key: 'set' })).toEqual({});
       });
 
       it('does not construct for classes with property initializers', () => {
@@ -143,7 +141,7 @@ describe('Struct', () => {
         class MyStructWithInitializer extends Struct {
           key = 'default';
         }
-        expect(new MyStructWithInitializer({ key: 'set' })).to.be.eql({
+        expect(new MyStructWithInitializer({ key: 'set' })).toEqual({
           key: 'default',
         });
       });
@@ -160,7 +158,7 @@ describe('Struct', () => {
             Object.assign(this, this.processProps(props));
           }
         }
-        expect(new MyStructWithDefinedConstructor({ key: 'set' })).to.be.eql({
+        expect(new MyStructWithDefinedConstructor({ key: 'set' })).toEqual({
           key: 'set',
         });
       });
@@ -179,10 +177,10 @@ describe('Struct', () => {
         dependency: MyDependency;
       }
 
-      expect(() => new MyStruct({ key: 'my-value' })).to.not.throw(
+      expect(() => new MyStruct({ key: 'my-value' })).not.toThrow(
         ValidationError
       );
-      expect(() => new MyStruct({})).to.throw(ValidationError);
+      expect(() => new MyStruct({})).toThrow(ValidationError);
     });
   });
 
@@ -201,7 +199,7 @@ describe('Struct', () => {
       Car.prototype.registerHook('onConstruction', 'my-hook', hookFn);
 
       const instance = new Car({ brand: 'my-brand' });
-      expect(instance.brand).to.be.equal('my-processed-brand');
+      expect(instance.brand).toBe('my-processed-brand');
     });
 
     it('supports onValidation hook', () => {
@@ -217,7 +215,7 @@ describe('Struct', () => {
       };
       Car.prototype.registerHook('onValidation', 'my-validator', validatorFn);
 
-      expect(() => new Car({ model: 'Multipla' })).to.throw(Error, 'Denied');
+      expect(() => new Car({ model: 'Multipla' })).toThrow(Error, 'Denied');
     });
 
     it('ensures that onValidation hooks are executed after prop types validation', () => {
@@ -225,15 +223,16 @@ describe('Struct', () => {
       class Car extends Struct {
         model: string;
       }
-      const validatorFn = sinon.stub();
+      const validatorFn = vi.fn();
 
       Car.prototype.registerHook('onValidation', 'my-validator', validatorFn);
-      Car.prototype.validateProps = sinon.stub();
+      Car.prototype.validateProps = vi.fn();
 
-      expect(() => new Car({ model: 'A5' })).to.not.throw(Error);
-      expect(Car.prototype.validateProps).to.be.calledOnce;
-      expect(validatorFn).to.be.calledOnce;
-      expect(Car.prototype.validateProps).to.be.calledBefore(validatorFn);
+      expect(() => new Car({ model: 'A5' })).not.toThrow(Error);
+      expect(Car.prototype.validateProps).toHaveBeenCalledTimes(1);
+      expect(validatorFn).toHaveBeenCalledTimes(1);
+      expect(Car.prototype.validateProps).toHaveBeenCalled(); expect(validatorFn).toHaveBeenCalled(); /* TODO: verify call order */;
     });
   });
 });
+

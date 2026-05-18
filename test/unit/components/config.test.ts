@@ -1,13 +1,11 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it } from 'vitest';
+
 import { PropTypes, ValidationError } from 'typend';
 import { Type } from '@eveble/core';
 import { Config } from '../../../src/components/config';
 import { Struct } from '../../../src/components/struct';
 import { isTyped } from '../../../src/utils/helpers';
 import { InvalidConfigError } from '../../../src/core/core-errors';
-
-chai.use(sinonChai);
 
 describe(`Config`, () => {
   const simpleProps = {
@@ -58,22 +56,22 @@ describe(`Config`, () => {
   }
 
   it('extends Struct', () => {
-    expect(Config.prototype instanceof Struct).to.be.true;
+    expect(Config.prototype instanceof Struct).toBe(true);
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(Config.prototype)).to.be.true;
+    expect(isTyped(Config.prototype)).toBe(true);
   });
 
   describe(`construction`, () => {
     it(`takes properties for simple configuration and assigns them`, () => {
-      expect(new Simple(simpleProps)).to.be.eql({
+      expect(new Simple(simpleProps)).toEqual({
         ...simpleProps,
       });
     });
 
     it(`takes properties for complex configuration and assigns them`, () => {
-      expect(new Complex(complexProps)).to.be.eql({
+      expect(new Complex(complexProps)).toEqual({
         ...complexProps,
       });
     });
@@ -82,14 +80,14 @@ describe(`Config`, () => {
   describe(`conversion`, () => {
     it(`converts simple configuration to plain object`, () => {
       const config = new Simple(simpleProps);
-      expect(config.toPlainObject()).to.be.eql({
+      expect(config.toPlainObject()).toEqual({
         ...simpleProps,
       });
     });
 
     it(`converts complex configuration to plain object`, () => {
       const config = new Complex(complexProps);
-      expect(config.toPlainObject()).to.be.eql({
+      expect(config.toPlainObject()).toEqual({
         root: 'root-value',
         simple: {
           first: 'first-value',
@@ -108,34 +106,34 @@ describe(`Config`, () => {
   describe(`evaluation`, () => {
     it(`returns true if configuration has a set value for path`, () => {
       const config = new Complex(complexProps);
-      expect(config.has('root')).to.be.true;
-      expect(config.has('simple.first')).to.be.true;
-      expect(config.has('nested.nested-first')).to.be.true;
-      expect(config.has('nested.nested-second.nested-third')).to.be.true;
+      expect(config.has('root')).toBe(true);
+      expect(config.has('simple.first')).toBe(true);
+      expect(config.has('nested.nested-first')).toBe(true);
+      expect(config.has('nested.nested-second.nested-third')).toBe(true);
     });
 
     it(`returns false if configuration does not have set value for path`, () => {
       const config = new Complex(complexProps);
-      expect(config.has('notvalid')).to.be.false;
-      expect(config.has('simple.notvalid')).to.be.false;
-      expect(config.has('nested.nested-first-notvalid')).to.be.false;
-      expect(config.has('nested.nested-second.notvalid')).to.be.false;
+      expect(config.has('notvalid')).toBe(false);
+      expect(config.has('simple.notvalid')).toBe(false);
+      expect(config.has('nested.nested-first-notvalid')).toBe(false);
+      expect(config.has('nested.nested-second.notvalid')).toBe(false);
     });
 
     it(`returns true if value is configurable`, () => {
       const config = new Complex(complexProps);
-      expect(config.isConfigurable('root')).to.be.true;
-      expect(config.isConfigurable('simple.first')).to.be.true;
-      expect(config.isConfigurable('nested.nested-first')).to.be.true;
+      expect(config.isConfigurable('root')).toBe(true);
+      expect(config.isConfigurable('simple.first')).toBe(true);
+      expect(config.isConfigurable('nested.nested-first')).toBe(true);
       expect(config.isConfigurable('nested.nested-second.nested-third')).to.be
         .true;
     });
 
     it(`returns false if value is not configurable`, () => {
       const config = new Complex(complexProps);
-      expect(config.isConfigurable('not-root')).to.be.false;
-      expect(config.isConfigurable('simple.not-nested')).to.be.false;
-      expect(config.isConfigurable('nested.nested-not-first')).to.be.false;
+      expect(config.isConfigurable('not-root')).toBe(false);
+      expect(config.isConfigurable('simple.not-nested')).toBe(false);
+      expect(config.isConfigurable('nested.nested-not-first')).toBe(false);
       expect(config.isConfigurable('nested.nested-second.nested-not-third')).to
         .be.false;
     });
@@ -148,7 +146,7 @@ describe(`Config`, () => {
         first: PropTypes.instanceOf(String),
         second: PropTypes.instanceOf(Number),
       };
-      expect(Simple.prototype.getPropTypes()).to.be.eql(propTypes);
+      expect(Simple.prototype.getPropTypes()).toEqual(propTypes);
     });
 
     it(`returns prop types for complex configuration`, () => {
@@ -167,7 +165,7 @@ describe(`Config`, () => {
           }),
         }),
       };
-      expect(Complex.prototype.getPropTypes()).to.be.eql(propTypes);
+      expect(Complex.prototype.getPropTypes()).toEqual(propTypes);
     });
   });
 
@@ -201,8 +199,8 @@ describe(`Config`, () => {
         appId: 'my-id',
       };
       const appConfig = AppConfig.from<AppConfig>(props);
-      expect(appConfig.appId).to.be.equal('my-id');
-      expect(appConfig.logging).to.be.undefined;
+      expect(appConfig.appId).toBe('my-id');
+      expect(appConfig.logging).toBeUndefined();
     });
 
     it('constructs from nested configuration properties', () => {
@@ -214,10 +212,10 @@ describe(`Config`, () => {
         },
       };
       const appConfig = AppConfig.from<AppConfig>(props);
-      expect(appConfig.appId).to.be.equal('my-id');
-      expect(appConfig.logging).to.be.instanceof(LoggingConfig);
-      expect(appConfig.logging?.isEnabled).to.be.equal(true);
-      expect(appConfig.logging?.level).to.be.equal('emerg');
+      expect(appConfig.appId).toBe('my-id');
+      expect(appConfig.logging).toBeInstanceOf(LoggingConfig);
+      expect(appConfig.logging?.isEnabled).toBe(true);
+      expect(appConfig.logging?.level).toBe('emerg');
     });
   });
 
@@ -226,34 +224,34 @@ describe(`Config`, () => {
       it(`returns value from configuration`, () => {
         const config = new Complex(complexProps);
 
-        expect(config.get<string>('root')).to.be.equal('root-value');
-        expect(config.get<string>('simple.first')).to.be.equal('first-value');
-        expect(config.get<string>('nested.nested-first')).to.be.equal(
+        expect(config.get<string>('root')).toBe('root-value');
+        expect(config.get<string>('simple.first')).toBe('first-value');
+        expect(config.get<string>('nested.nested-first')).toBe(
           'nested-first-value'
         );
         expect(
           config.get<string>('nested.nested-second.nested-third')
-        ).to.be.equal('nested-third-value');
+        ).toBe('nested-third-value');
       });
 
       it(`returns undefined if value cannot be found on configuration`, () => {
         const config = new Complex(complexProps);
 
-        expect(config.get('notvalid')).to.be.equal(undefined);
-        expect(config.get('simple.notvalid')).to.be.equal(undefined);
-        expect(config.get('nested.nested-first-notvalid')).to.be.equal(
+        expect(config.get('notvalid')).toBe(undefined);
+        expect(config.get('simple.notvalid')).toBe(undefined);
+        expect(config.get('nested.nested-first-notvalid')).toBe(
           undefined
         );
         expect(
           config.get('nested.nested-second.nested-third-notvalid')
-        ).to.be.equal(undefined);
+        ).toBe(undefined);
       });
 
       it(`returns default value provided as second argument for unresolvable paths`, () => {
         const config = new Complex(complexProps);
         expect(
           config.get<string>('my-non-existing-path', 'default-value')
-        ).to.be.equal('default-value');
+        ).toBe('default-value');
       });
 
       it(`returns default values as fallback from class property initializers`, () => {
@@ -292,15 +290,15 @@ describe(`Config`, () => {
           },
         });
 
-        expect(config.get<string>('foo')).to.be.equal('foo-set');
-        expect(config.get<string>('lorem')).to.be.equal('lorem-set');
-        expect(config.get<number>('baz.bar')).to.be.equal(1337);
-        expect(config.get<boolean>('baz.qux.ipsum')).to.be.equal(false);
+        expect(config.get<string>('foo')).toBe('foo-set');
+        expect(config.get<string>('lorem')).toBe('lorem-set');
+        expect(config.get<number>('baz.bar')).toBe(1337);
+        expect(config.get<boolean>('baz.qux.ipsum')).toBe(false);
 
-        expect(config.getDefault<string>('foo')).to.be.equal('foo-default');
-        expect(config.getDefault('lorem')).to.be.equal(undefined);
-        expect(config.getDefault<number>('baz.bar')).to.be.equal(1234);
-        expect(config.getDefault<boolean>('baz.qux.ipsum')).to.be.equal(true);
+        expect(config.getDefault<string>('foo')).toBe('foo-default');
+        expect(config.getDefault('lorem')).toBe(undefined);
+        expect(config.getDefault<number>('baz.bar')).toBe(1234);
+        expect(config.getDefault<boolean>('baz.qux.ipsum')).toBe(true);
       });
     });
 
@@ -329,9 +327,9 @@ describe(`Config`, () => {
         }
 
         const config = new MyConfig({});
-        expect(config.getDefault<string>('foo')).to.be.equal('foo-default');
-        expect(config.getDefault<number>('baz.bar')).to.be.equal(1234);
-        expect(config.getDefault<boolean>('baz.qux.lorem')).to.be.equal(true);
+        expect(config.getDefault<string>('foo')).toBe('foo-default');
+        expect(config.getDefault<number>('baz.bar')).toBe(1234);
+        expect(config.getDefault<boolean>('baz.qux.lorem')).toBe(true);
       });
     });
 
@@ -361,17 +359,17 @@ describe(`Config`, () => {
           lorem: 'lorem-value',
           baz: { qax: 'qax-value' },
         });
-        expect(config.getExact('foo')).to.be.undefined;
-        expect(config.getExact('lorem')).to.be.equal('lorem-value');
-        expect(config.getExact('baz.bar')).to.be.undefined;
-        expect(config.getExact('baz.qux.lorem')).to.be.undefined;
-        expect(config.getExact('baz.qax')).to.be.equal('qax-value');
+        expect(config.getExact('foo')).toBeUndefined();
+        expect(config.getExact('lorem')).toBe('lorem-value');
+        expect(config.getExact('baz.bar')).toBeUndefined();
+        expect(config.getExact('baz.qux.lorem')).toBeUndefined();
+        expect(config.getExact('baz.qax')).toBe('qax-value');
       });
     });
   });
 
   describe(`mutators`, () => {
-    context('setting single value', () => {
+    describe('setting single value', () => {
       it(`throws ValidationError when trying to set a value that does not match prop types`, () => {
         @Type('Config.MyConfig', { isRegistrable: false })
         class MyConfig extends Config {
@@ -386,7 +384,7 @@ describe(`Config`, () => {
 
         expect(() => {
           config.set('key', 10);
-        }).to.throw(
+        }).toThrow(
           ValidationError,
           `Config.MyConfig: (Key 'key': Expected Number(10) to be a String in Config.MyConfig({"key":10}))`
         );
@@ -409,25 +407,25 @@ describe(`Config`, () => {
         const config = new Complex(props);
 
         config.set('root', 'root-set');
-        expect(config.get('root')).to.be.equal('root-set');
+        expect(config.get('root')).toBe('root-set');
 
         const setSimple = new Simple({ first: 'first-set', second: 10 });
         config.set('simple', setSimple);
-        expect(config.get<Simple>('simple')).to.be.eql(setSimple);
+        expect(config.get<Simple>('simple')).toEqual(setSimple);
 
         config.set('nested.nested-first', 'nested-first-set');
-        expect(config.get<string>('nested.nested-first')).to.be.equal(
+        expect(config.get<string>('nested.nested-first')).toBe(
           'nested-first-set'
         );
 
         config.set('nested.nested-second.nested-third', 'nested-third-set');
         expect(
           config.get<string>('nested.nested-second.nested-third')
-        ).to.be.equal('nested-third-set');
+        ).toBe('nested-third-set');
       });
     });
 
-    context('assigning multiple values', () => {
+    describe('assigning multiple values', () => {
       it(`throws ValidationError when trying to assign properties that does not match
     prop types`, () => {
         @Type('Config.MyConfig', { isRegistrable: false })
@@ -443,7 +441,7 @@ describe(`Config`, () => {
 
         expect(() => {
           config.assign({ key: 10 });
-        }).to.throw(
+        }).toThrow(
           ValidationError,
           `Config.MyConfig: (Key 'key': Expected Number(10) to be a String in Config.MyConfig({"key":10}))`
         );
@@ -451,7 +449,7 @@ describe(`Config`, () => {
 
       it(`assings multiple values by object as argument`, () => {
         const config = new Complex(complexProps);
-        expect(config).to.be.eql(complexProps);
+        expect(config).toEqual(complexProps);
 
         const assignableProps = {
           root: 'root-assigned',
@@ -465,12 +463,12 @@ describe(`Config`, () => {
         };
         config.assign(assignableProps);
 
-        expect(config).to.be.eql(assignableProps);
+        expect(config).toEqual(assignableProps);
       });
 
       it(`assigns multiple values by other instance of configuration as argument`, () => {
         const config = new Complex(complexProps);
-        expect(config).to.be.eql(complexProps);
+        expect(config).toEqual(complexProps);
 
         const assignableConfig = new Complex({
           root: 'first',
@@ -484,7 +482,7 @@ describe(`Config`, () => {
         });
         config.assign(assignableConfig);
 
-        expect(config).to.be.eql(assignableConfig);
+        expect(config).toEqual(assignableConfig);
       });
 
       it(`assigns matching new properties that are optional on construction`, () => {
@@ -508,7 +506,7 @@ describe(`Config`, () => {
             '*': 'star',
           },
         });
-        expect(config).to.be.eql({
+        expect(config).toEqual({
           separator: '-',
           transliterations: {
             '*': 'star',
@@ -527,7 +525,7 @@ describe(`Config`, () => {
       const invalidConfig = new MyInvalidConfig();
       expect(() => {
         config.merge(invalidConfig as any);
-      }).to.throw(
+      }).toThrow(
         InvalidConfigError,
         'MyConfig: configuration must be an instance implementing Configurable interface, got MyInvalidConfig({})'
       );
@@ -558,8 +556,8 @@ describe(`Config`, () => {
       const second = new Second({ secondKey: 'second' });
       first.include(second);
 
-      expect(first.get<string>('firstKey')).to.be.equal('first');
-      expect(first.get<string>('secondKey')).to.be.equal('second');
+      expect(first.get<string>('firstKey')).toBe('first');
+      expect(first.get<string>('secondKey')).toBe('second');
     });
 
     describe('simple', () => {
@@ -598,14 +596,14 @@ describe(`Config`, () => {
         });
 
         first.merge(second);
-        expect(first.getPropTypes()).to.be.eql({
+        expect(first.getPropTypes()).toEqual({
           schemaVersion: PropTypes.instanceOf(Number).isOptional,
           foo: PropTypes.instanceOf(String),
           key: PropTypes.instanceOf(String),
           baz: PropTypes.instanceOf(String),
         });
 
-        expect(first).to.be.eql({
+        expect(first).toEqual({
           foo: 'first-foo',
           baz: 'second-baz',
           key: 'first-key',
@@ -638,24 +636,24 @@ describe(`Config`, () => {
 
         first.merge(second);
 
-        expect(first.has('foo')).to.be.true;
-        expect(second.has('foo')).to.be.true;
+        expect(first.has('foo')).toBe(true);
+        expect(second.has('foo')).toBe(true);
 
-        expect(first.hasDefault('foo')).to.be.false;
-        expect(second.hasDefault('foo')).to.be.true;
+        expect(first.hasDefault('foo')).toBe(false);
+        expect(second.hasDefault('foo')).toBe(true);
 
-        expect(first.get<string>('foo')).to.be.equal('second-default-foo');
-        expect(second.get<string>('foo')).to.be.equal('second-default-foo');
+        expect(first.get<string>('foo')).toBe('second-default-foo');
+        expect(second.get<string>('foo')).toBe('second-default-foo');
 
-        expect(second.getDefault<string>('foo')).to.be.equal(
+        expect(second.getDefault<string>('foo')).toBe(
           'second-default-foo'
         );
-        expect(second.getDefault<string>('foo')).to.be.equal(
+        expect(second.getDefault<string>('foo')).toBe(
           'second-default-foo'
         );
 
-        expect(first.getExact<string>('foo')).to.be.equal('second-default-foo');
-        expect(second.getExact<string>('foo')).to.be.equal(
+        expect(first.getExact<string>('foo')).toBe('second-default-foo');
+        expect(second.getExact<string>('foo')).toBe(
           'second-default-foo'
         );
       });
@@ -714,13 +712,13 @@ describe(`Config`, () => {
         });
 
         first.merge(second);
-        expect(first.getPropTypes()).to.be.eql({
+        expect(first.getPropTypes()).toEqual({
           schemaVersion: PropTypes.instanceOf(Number).isOptional,
           foo: PropTypes.instanceOf(MyFirst),
           key: PropTypes.instanceOf(String),
           baz: PropTypes.instanceOf(MySecond),
         });
-        expect(first).to.be.eql({
+        expect(first).toEqual({
           foo: new MyFirst('first-foo'),
           baz: new MySecond('second-baz'),
           key: 'first-key',
@@ -775,7 +773,7 @@ describe(`Config`, () => {
         });
 
         first.merge(second);
-        expect(first.getPropTypes()).to.be.eql({
+        expect(first.getPropTypes()).toEqual({
           schemaVersion: PropTypes.instanceOf(Number).isOptional,
           foo: PropTypes.instanceOf(MyFirst),
           key: PropTypes.instanceOf(String),
@@ -789,7 +787,7 @@ describe(`Config`, () => {
             },
           }),
         });
-        expect(first).to.be.eql({
+        expect(first).toEqual({
           foo: new MyFirst('first-foo'),
           key: 'first-key',
           I: {
@@ -903,7 +901,7 @@ describe(`Config`, () => {
         });
 
         first.merge(second);
-        expect(first.getPropTypes()).to.be.eql({
+        expect(first.getPropTypes()).toEqual({
           schemaVersion: PropTypes.instanceOf(Number).isOptional,
           I: PropTypes.instanceOf(String),
           II: PropTypes.shape({
@@ -920,7 +918,7 @@ describe(`Config`, () => {
             pos2: PropTypes.instanceOf(String),
           }),
         });
-        expect(first).to.be.eql({
+        expect(first).toEqual({
           I: 'first-I',
           II: {
             foo: 'first-foo',
@@ -972,15 +970,16 @@ describe(`Config`, () => {
 
         first.merge(second);
 
-        expect(first.has('foo.baz.qux')).to.be.true;
-        expect(second.has('foo.baz.qux')).to.be.true;
+        expect(first.has('foo.baz.qux')).toBe(true);
+        expect(second.has('foo.baz.qux')).toBe(true);
 
-        expect(first.hasDefault('foo.baz.qux')).to.be.false;
-        expect(second.hasDefault('foo.baz.qux')).to.be.true;
+        expect(first.hasDefault('foo.baz.qux')).toBe(false);
+        expect(second.hasDefault('foo.baz.qux')).toBe(true);
 
-        expect(first.get<string>('foo.baz.qux')).to.be.equal('qux');
-        expect(second.get<string>('foo.baz.qux')).to.be.equal('qux');
+        expect(first.get<string>('foo.baz.qux')).toBe('qux');
+        expect(second.get<string>('foo.baz.qux')).toBe('qux');
       });
     });
   });
 });
+

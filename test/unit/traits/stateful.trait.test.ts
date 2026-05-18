@@ -1,14 +1,11 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, vi } from 'vitest';
+
 import { derive } from '@traits-ts/core';
 import {
   StatefulTrait,
   UndefinedStatesError,
   InvalidStateError,
 } from '../../../src/traits/stateful.trait';
-
-chai.use(sinonChai);
 
 describe(`StatefulTrait`, () => {
   class MyClass extends derive(StatefulTrait) {
@@ -24,7 +21,7 @@ describe(`StatefulTrait`, () => {
   describe('getters', () => {
     it('returns all available states', () => {
       const instance = new MyClass();
-      expect(instance.getSelectableStates()).to.be.eql({
+      expect(instance.getSelectableStates()).toEqual({
         created: 'created',
         filled: 'filled',
         processed: 'processed',
@@ -36,14 +33,14 @@ describe(`StatefulTrait`, () => {
     it(`allows to set state on instance `, () => {
       const instance = new MyClass();
       instance.setState(MyClass.STATES.created);
-      expect(instance.getState()).to.be.equal(MyClass.STATES.created);
+      expect(instance.getState()).toBe(MyClass.STATES.created);
       instance.setState(MyClass.STATES.filled);
-      expect(instance.getState()).to.be.equal(MyClass.STATES.filled);
+      expect(instance.getState()).toBe(MyClass.STATES.filled);
     });
 
     it(`throws UndefinedStatesError on instance with undefined states`, () => {
       const instance = new MyClassWithoutPredefinedStates();
-      expect(() => instance.setState('my-state')).to.throw(
+      expect(() => instance.setState('my-state')).toThrow(
         UndefinedStatesError,
         `MyClassWithoutPredefinedStates: states are not defined. Please define states as class(MyClass.STATES) property or define your getter as MyClass.prototype.getAvailableStates`
       );
@@ -51,29 +48,29 @@ describe(`StatefulTrait`, () => {
   });
 
   describe('evaluation', () => {
-    context('single state expectation', () => {
+    describe('single state expectation', () => {
       it(`returns true if instance is in expected state`, () => {
         const instance = new MyClass();
         instance.setState(MyClass.STATES.created);
-        expect(instance.isInState(MyClass.STATES.created)).to.be.true;
+        expect(instance.isInState(MyClass.STATES.created)).toBe(true);
       });
 
       it(`returns false if instance is not in expected state`, () => {
         const instance = new MyClass();
-        expect(instance.isInState(MyClass.STATES.filled)).to.be.false;
+        expect(instance.isInState(MyClass.STATES.filled)).toBe(false);
       });
 
       it(`allows to pass array to isInState as fallback`, () => {
         const instance = new MyClass();
-        instance.isInOneOfStates = sinon.spy(instance.isInOneOfStates);
+        instance.isInOneOfStates = vi.fn();
 
         instance.isInState(['created']);
-        expect(instance.isInOneOfStates).to.be.calledOnce;
-        expect(instance.isInOneOfStates).to.be.calledWithExactly(['created']);
+        expect(instance.isInOneOfStates).toHaveBeenCalledTimes(1);
+        expect(instance.isInOneOfStates).toHaveBeenCalledWith(['created']);
       });
     });
 
-    context('one of states expectation', () => {
+    describe('one of states expectation', () => {
       it(`returns true if instance is one of expected state`, () => {
         const instance = new MyClass();
         instance.setState(MyClass.STATES.filled);
@@ -82,8 +79,8 @@ describe(`StatefulTrait`, () => {
             MyClass.STATES.filled,
             MyClass.STATES.processed,
           ])
-        ).to.be.true;
-        expect(instance.isInOneOfStates(MyClass.STATES.filled)).to.be.true;
+        ).toBe(true);
+        expect(instance.isInOneOfStates(MyClass.STATES.filled)).toBe(true);
       });
 
       it(`returns false if instance is not in one of expected state`, () => {
@@ -93,16 +90,16 @@ describe(`StatefulTrait`, () => {
             MyClass.STATES.filled,
             MyClass.STATES.processed,
           ])
-        ).to.be.false;
-        expect(instance.isInOneOfStates(MyClass.STATES.filled)).to.be.false;
+        ).toBe(false);
+        expect(instance.isInOneOfStates(MyClass.STATES.filled)).toBe(false);
       });
     });
 
-    context('evaluating if state is not nil', () => {
+    describe('evaluating if state is not nil', () => {
       it(`returns true if instance has state assigned(is not nil)`, () => {
         const instance = new MyClass();
         instance.setState(MyClass.STATES.filled);
-        expect(instance.hasState()).to.be.true;
+        expect(instance.hasState()).toBe(true);
       });
 
       it(`returns false if instance has no state assigned(is nil)`, () => {
@@ -111,7 +108,7 @@ describe(`StatefulTrait`, () => {
         Object.defineProperty(instance, 'state', {
           value: undefined,
         });
-        expect(instance.hasState()).to.be.false;
+        expect(instance.hasState()).toBe(false);
       });
     });
   });
@@ -121,7 +118,7 @@ describe(`StatefulTrait`, () => {
       const instance = new MyClass();
       instance.setState(MyClass.STATES.created);
 
-      expect(() => instance.validateState(MyClass.STATES.filled)).to.throw(
+      expect(() => instance.validateState(MyClass.STATES.filled)).toThrow(
         InvalidStateError,
         `MyClass: expected current state of 'created' to be in one of states: 'filled'`
       );
@@ -136,7 +133,7 @@ describe(`StatefulTrait`, () => {
           MyClass.STATES.filled,
           MyClass.STATES.processed,
         ])
-      ).to.throw(
+      ).toThrow(
         InvalidStateError,
         `MyClass: expected current state of 'created' to be in one of states: 'filled, processed'`
       );
@@ -153,7 +150,8 @@ describe(`StatefulTrait`, () => {
           [MyClass.STATES.filled, MyClass.STATES.processed],
           error
         )
-      ).to.throw(MyError);
+      ).toThrow(MyError);
     });
   });
 });
+

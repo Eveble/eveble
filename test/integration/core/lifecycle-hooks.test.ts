@@ -1,15 +1,10 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll } from 'vitest';
+
 import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe('app lifecycle hooks', () => {
   // ================================= TEST HELPERS ================================= //
@@ -34,7 +29,7 @@ describe('app lifecycle hooks', () => {
       'afterShutdown',
     ];
     for (const hookName of hookNames) {
-      hooks[hookName] = sinon.spy();
+      hooks[hookName] = vi.fn();
     }
     return hooks;
   };
@@ -189,21 +184,21 @@ describe('app lifecycle hooks', () => {
     });
 
     app = new MyApp({ modules: [secondModule] });
-    const log = stubInterface<types.Logger>();
+    const log = mock<types.Logger>();
     app.injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
   });
 
   // Readability and 'understanding' is archived by writing expectations manually with use of few letter helpers to not clutter tests with full blown expectation statements.
   const never = function (hook): void {
-    expect(hook).not.to.have.been.called;
+    expect(hook).not.toHaveBeenCalled();
   };
 
   const once = function (hook): void {
-    expect(hook).to.have.been.calledOnce;
+    expect(hook).toHaveBeenCalledTimes(1);
   };
 
   const twice = function (hook): void {
-    expect(hook).to.have.been.calledTwice;
+    expect(hook).toHaveBeenCalledTimes(2);
   };
 
   const before = function (firstHook, secondHook): void {
@@ -215,16 +210,16 @@ describe('app lifecycle hooks', () => {
 
     // firstModule
     once(firstModule.beforeInitialize);
-    before(firstModule.beforeInitialize, secondModule.beforeInitialize);
+    beforeAll(firstModule.beforeInitialize, secondModule.beforeInitialize);
     once(firstModule.onInitialize);
     once(firstModule.afterInitialize);
-    before(firstModule.afterInitialize, secondModule.afterInitialize);
+    beforeAll(firstModule.afterInitialize, secondModule.afterInitialize);
     // secondModule
     once(secondModule.beforeInitialize);
-    before(secondModule.beforeInitialize, app.beforeInitialize);
+    beforeAll(secondModule.beforeInitialize, app.beforeInitialize);
     once(secondModule.onInitialize);
     once(secondModule.afterInitialize);
-    before(secondModule.afterInitialize, app.afterInitialize);
+    beforeAll(secondModule.afterInitialize, app.afterInitialize);
     // app
     once(app.beforeInitialize);
     once(app.onInitialize);
@@ -258,19 +253,19 @@ describe('app lifecycle hooks', () => {
 
     // first Module
     once(firstModule.beforeStart);
-    before(firstModule.beforeStart, secondModule.beforeStart);
+    beforeAll(firstModule.beforeStart, secondModule.beforeStart);
     once(firstModule.onStart);
-    before(firstModule.onStart, secondModule.onStart);
+    beforeAll(firstModule.onStart, secondModule.onStart);
     once(firstModule.afterStart);
-    before(firstModule.afterStart, secondModule.afterStart);
+    beforeAll(firstModule.afterStart, secondModule.afterStart);
 
     // secondModule
     once(secondModule.beforeStart);
-    before(secondModule.beforeStart, app.beforeStart);
+    beforeAll(secondModule.beforeStart, app.beforeStart);
     once(secondModule.onStart);
-    before(secondModule.onStart, app.onStart);
+    beforeAll(secondModule.onStart, app.onStart);
     once(secondModule.afterStart);
-    before(secondModule.afterStart, app.afterStart);
+    beforeAll(secondModule.afterStart, app.afterStart);
     // app
     once(app.beforeStart);
     once(app.onStart);
@@ -306,19 +301,19 @@ describe('app lifecycle hooks', () => {
 
     // firstModule
     once(firstModule.beforeStop);
-    before(firstModule.beforeStop, secondModule.beforeStop);
+    beforeAll(firstModule.beforeStop, secondModule.beforeStop);
     once(firstModule.onStop);
-    before(firstModule.onStop, secondModule.onStop);
+    beforeAll(firstModule.onStop, secondModule.onStop);
     once(firstModule.afterStop);
-    before(firstModule.afterStop, secondModule.afterStop);
+    beforeAll(firstModule.afterStop, secondModule.afterStop);
 
     // secondModule
     once(secondModule.beforeStop);
-    before(secondModule.beforeStop, app.beforeStop);
+    beforeAll(secondModule.beforeStop, app.beforeStop);
     once(secondModule.onStop);
-    before(secondModule.onStop, app.onStop);
+    beforeAll(secondModule.onStop, app.onStop);
     once(secondModule.afterStop);
-    before(secondModule.afterStop, app.afterStop);
+    beforeAll(secondModule.afterStop, app.afterStop);
 
     // app
     once(app.beforeStop);
@@ -356,19 +351,19 @@ describe('app lifecycle hooks', () => {
 
     // firstModule
     once(firstModule.beforeShutdown);
-    before(firstModule.beforeShutdown, secondModule.beforeShutdown);
+    beforeAll(firstModule.beforeShutdown, secondModule.beforeShutdown);
     once(firstModule.onShutdown);
-    before(firstModule.onShutdown, secondModule.onShutdown);
+    beforeAll(firstModule.onShutdown, secondModule.onShutdown);
     once(firstModule.afterShutdown);
-    before(firstModule.afterShutdown, secondModule.afterShutdown);
+    beforeAll(firstModule.afterShutdown, secondModule.afterShutdown);
 
     // secondModule
     once(secondModule.beforeShutdown);
-    before(secondModule.beforeShutdown, app.beforeShutdown);
+    beforeAll(secondModule.beforeShutdown, app.beforeShutdown);
     once(secondModule.onShutdown);
-    before(secondModule.onShutdown, app.onShutdown);
+    beforeAll(secondModule.onShutdown, app.onShutdown);
     once(secondModule.afterShutdown);
-    before(secondModule.afterShutdown, app.afterShutdown);
+    beforeAll(secondModule.afterShutdown, app.afterShutdown);
 
     // app
     once(app.beforeShutdown);
@@ -408,19 +403,19 @@ describe('app lifecycle hooks', () => {
     */
     // firstModule
     once(firstModule.beforeStop);
-    before(firstModule.beforeStop, secondModule.beforeStop);
+    beforeAll(firstModule.beforeStop, secondModule.beforeStop);
     once(firstModule.onStop);
-    before(firstModule.onStop, secondModule.onStop);
+    beforeAll(firstModule.onStop, secondModule.onStop);
     once(firstModule.afterStop);
-    before(firstModule.afterStop, secondModule.afterStop);
+    beforeAll(firstModule.afterStop, secondModule.afterStop);
 
     // secondModule
     once(secondModule.beforeStop);
-    before(secondModule.beforeStop, app.beforeStop);
+    beforeAll(secondModule.beforeStop, app.beforeStop);
     once(secondModule.onStop);
-    before(secondModule.onStop, app.onStop);
+    beforeAll(secondModule.onStop, app.onStop);
     once(secondModule.afterStop);
-    before(secondModule.afterStop, app.afterStop);
+    beforeAll(secondModule.afterStop, app.afterStop);
 
     // app
     once(app.beforeStop);
@@ -432,19 +427,19 @@ describe('app lifecycle hooks', () => {
     */
     // firstModule
     once(firstModule.beforeReset);
-    before(firstModule.beforeReset, secondModule.beforeReset);
+    beforeAll(firstModule.beforeReset, secondModule.beforeReset);
     once(firstModule.onReset);
-    before(firstModule.onReset, secondModule.onReset);
+    beforeAll(firstModule.onReset, secondModule.onReset);
     once(firstModule.afterReset);
-    before(firstModule.afterReset, secondModule.afterReset);
+    beforeAll(firstModule.afterReset, secondModule.afterReset);
 
     // secondModule
     once(secondModule.beforeReset);
-    before(secondModule.beforeReset, app.beforeReset);
+    beforeAll(secondModule.beforeReset, app.beforeReset);
     once(secondModule.onReset);
-    before(secondModule.onReset, app.onReset);
+    beforeAll(secondModule.onReset, app.onReset);
     once(secondModule.afterReset);
-    before(secondModule.afterReset, app.afterReset);
+    beforeAll(secondModule.afterReset, app.afterReset);
 
     // app
     once(app.beforeReset);
@@ -456,19 +451,19 @@ describe('app lifecycle hooks', () => {
     */
     // firstModule
     twice(firstModule.beforeStart);
-    before(firstModule.beforeStart, secondModule.beforeStart);
+    beforeAll(firstModule.beforeStart, secondModule.beforeStart);
     twice(firstModule.onStart);
-    before(firstModule.onStart, secondModule.onStart);
+    beforeAll(firstModule.onStart, secondModule.onStart);
     twice(firstModule.afterStart);
-    before(firstModule.afterStart, secondModule.afterStart);
+    beforeAll(firstModule.afterStart, secondModule.afterStart);
 
     // secondModule
     twice(secondModule.beforeStart);
-    before(secondModule.beforeStart, app.beforeStart);
+    beforeAll(secondModule.beforeStart, app.beforeStart);
     twice(secondModule.onStart);
-    before(secondModule.onStart, app.onStart);
+    beforeAll(secondModule.onStart, app.onStart);
     twice(secondModule.afterStart);
-    before(secondModule.afterStart, app.afterStart);
+    beforeAll(secondModule.afterStart, app.afterStart);
 
     // app
     twice(app.beforeStart);
@@ -525,19 +520,19 @@ describe('app lifecycle hooks', () => {
     */
     // firstModule
     once(firstModule.beforeReset);
-    before(firstModule.beforeReset, secondModule.beforeReset);
+    beforeAll(firstModule.beforeReset, secondModule.beforeReset);
     once(firstModule.onReset);
-    before(firstModule.onReset, secondModule.onReset);
+    beforeAll(firstModule.onReset, secondModule.onReset);
     once(firstModule.afterReset);
-    before(firstModule.afterReset, secondModule.afterReset);
+    beforeAll(firstModule.afterReset, secondModule.afterReset);
 
     // secondModule
     once(secondModule.beforeReset);
-    before(secondModule.beforeReset, app.beforeReset);
+    beforeAll(secondModule.beforeReset, app.beforeReset);
     once(secondModule.onReset);
-    before(secondModule.onReset, app.onReset);
+    beforeAll(secondModule.onReset, app.onReset);
     once(secondModule.afterReset);
-    before(secondModule.afterReset, app.afterReset);
+    beforeAll(secondModule.afterReset, app.afterReset);
 
     // app
     once(app.beforeReset);

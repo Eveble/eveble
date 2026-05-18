@@ -1,9 +1,17 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+
 import delay from 'delay';
-import { stubInterface } from 'ts-sinon';
+
 import { Collection } from 'mongodb';
 import { Type, kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
@@ -27,9 +35,6 @@ import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
 
 import { Guid } from '../../../src/domain/value-objects/guid';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`Observing and publishing new commits`, () => {
   @Type('ObservingAndPublishingNewCommits.MyCommand')
@@ -57,8 +62,8 @@ describe(`Observing and publishing new commits`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -66,9 +71,9 @@ describe(`Observing and publishing new commits`, () => {
   };
 
   const setupDefaultConfiguration = function (): void {
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -121,7 +126,7 @@ describe(`Observing and publishing new commits`, () => {
     }
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     setupDefaultConfiguration();
@@ -139,7 +144,7 @@ describe(`Observing and publishing new commits`, () => {
     await collections.commitStore.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
   });
 
@@ -190,10 +195,10 @@ describe(`Observing and publishing new commits`, () => {
     });
 
     it(`starts publishing commits by observing changes done on storage`, async () => {
-      const commandHandler = sinon.stub();
+      const commandHandler = vi.fn();
       commandBus.registerHandler(MyCommand, commandHandler);
 
-      const eventHandler = sinon.stub();
+      const eventHandler = vi.fn();
       eventBus.registerHandler(MyEvent, eventHandler);
 
       const sendingAppId = 'my-sending-app-id';
@@ -202,10 +207,13 @@ describe(`Observing and publishing new commits`, () => {
       const receivingAppId = 'my-receiving-app-id';
       const receivingWorkerId = 'my-receiving-worker-id';
 
-      config.get.withArgs('appId').returns(receivingAppId);
-      config.get.withArgs('workerId').returns(receivingWorkerId);
+      config.get.calledWith('appId').mockReturnValue(receivingAppId);
+      config.get.calledWith('workerId').mockReturnValue(receivingWorkerId);
 
       await commitPublisher.startPublishing();
+
+      // Give the publisher time to initialize the change stream
+      await delay(100);
 
       const commitToPublishAsSendingApp = generateCommit(
         sendingAppId,
@@ -214,36 +222,70 @@ describe(`Observing and publishing new commits`, () => {
 
       await storage.save(commitToPublishAsSendingApp);
 
-      await delay(500);
+      // Wait for the commit to be processed by polling
+      let foundCommitAfterObserving: Commit | undefined;
+      let receivers: any[] = [];
+      const maxAttempts = 30; // 30 attempts * 200ms = 6 seconds max
+      const delayBetweenAttempts = 200;
 
-      const foundCommitAfterObserving = (await storage.findById(
-        commitId
-      )) as Commit;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        foundCommitAfterObserving = (await storage.findById(
+          commitId
+        )) as Commit;
+        receivers = foundCommitAfterObserving?.receivers || [];
 
-      const receivers = foundCommitAfterObserving?.receivers;
-      expect(receivers).to.be.instanceof(Array);
-      expect(receivers).to.have.length(2);
+        // Log for debugging
+        if (attempt % 5 === 0) {
+          console.log(
+            `Attempt ${attempt}: receivers length = ${receivers.length}`
+          );
+        }
+
+        if (receivers.length === 2) {
+          break; // Success - commit has been processed
+        }
+
+        await delay(delayBetweenAttempts);
+      }
+
+      // Add diagnostic information if it fails
+      if (receivers.length !== 2) {
+        console.log(
+          'Command handler called:',
+          commandHandler.mock.calls.length,
+          'times'
+        );
+        console.log(
+          'Event handler called:',
+          eventHandler.mock.calls.length,
+          'times'
+        );
+        console.log('Actual receivers:', JSON.stringify(receivers, null, 2));
+      }
+
+      expect(receivers).toBeInstanceOf(Array);
+      expect(receivers).toHaveLength(2);
       // First receiver(the "sender" app)
-      expect(receivers[0].appId).to.be.equal(sendingAppId);
-      expect(receivers[0].state).to.be.equal('received');
-      expect(receivers[0].receivedAt).to.be.instanceof(Date);
-      expect(receivers[0].publishedAt).to.be.undefined;
-      expect(receivers[0].failedAt).to.be.undefined;
+      expect(receivers[0].appId).toBe(sendingAppId);
+      expect(receivers[0].state).toBe('received');
+      expect(receivers[0].receivedAt).toBeInstanceOf(Date);
+      expect(receivers[0].publishedAt).toBeUndefined();
+      expect(receivers[0].failedAt).toBeUndefined();
       // Second receiver(the "receiving" app)
-      expect(receivers[1].appId).to.be.equal(receivingAppId);
-      expect(receivers[1].workerId).to.be.equal(receivingWorkerId);
-      expect(receivers[1].state).to.be.equal('published');
-      expect(receivers[1].receivedAt).to.be.instanceof(Date);
-      expect(receivers[1].publishedAt).to.be.instanceof(Date);
-      expect(receivers[1].failedAt).to.be.undefined;
+      expect(receivers[1].appId).toBe(receivingAppId);
+      expect(receivers[1].workerId).toBe(receivingWorkerId);
+      expect(receivers[1].state).toBe('published');
+      expect(receivers[1].receivedAt).toBeInstanceOf(Date);
+      expect(receivers[1].publishedAt).toBeInstanceOf(Date);
+      expect(receivers[1].failedAt).toBeUndefined();
 
       await commitPublisher.stopPublishing();
     });
 
     it(`stops publishing commits by stopping observing changes done on storage`, async () => {
-      const commandHandler = sinon.stub();
+      const commandHandler = vi.fn();
       commandBus.registerHandler(MyCommand, commandHandler);
-      const eventHandler = sinon.stub();
+      const eventHandler = vi.fn();
       eventBus.registerHandler(MyEvent, eventHandler);
 
       const sendingAppId = 'my-sending-app-id';
@@ -252,8 +294,8 @@ describe(`Observing and publishing new commits`, () => {
       const receivingAppId = 'my-receiving-app-id';
       const receivingWorkerId = 'my-receiving-worker-id';
 
-      config.get.withArgs('appId').returns(receivingAppId);
-      config.get.withArgs('workerId').returns(receivingWorkerId);
+      config.get.calledWith('appId').mockReturnValue(receivingAppId);
+      config.get.calledWith('workerId').mockReturnValue(receivingWorkerId);
 
       await commitPublisher.startPublishing();
       await commitPublisher.stopPublishing();
@@ -269,15 +311,15 @@ describe(`Observing and publishing new commits`, () => {
       )) as Commit;
 
       const receivers = foundCommitAfterObserving?.receivers;
-      expect(receivers).to.be.instanceof(Array);
-      expect(receivers).to.have.length(1);
+      expect(receivers).toBeInstanceOf(Array);
+      expect(receivers).toHaveLength(1);
       // First receiver(the "sender" app)
-      expect(receivers[0].appId).to.be.equal(sendingAppId);
-      expect(receivers[0].workerId).to.be.equal(sendingWorkerId);
-      expect(receivers[0].state).to.be.equal('received');
-      expect(receivers[0].receivedAt).to.be.instanceof(Date);
-      expect(receivers[0].publishedAt).to.be.undefined;
-      expect(receivers[0].failedAt).to.be.undefined;
+      expect(receivers[0].appId).toBe(sendingAppId);
+      expect(receivers[0].workerId).toBe(sendingWorkerId);
+      expect(receivers[0].state).toBe('received');
+      expect(receivers[0].receivedAt).toBeInstanceOf(Date);
+      expect(receivers[0].publishedAt).toBeUndefined();
+      expect(receivers[0].failedAt).toBeUndefined();
     });
   });
 });

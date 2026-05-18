@@ -1,38 +1,35 @@
-import chai, { expect } from 'chai';
-import { stubInterface } from 'ts-sinon';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
+
 import { kernel, Type } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import { types } from '../../../src/types';
 import { SerializableTrait } from '../../../src/traits/serializable.trait';
-
-chai.use(sinonChai);
 
 describe('SerializableTrait', () => {
   let originalConverter: any;
   let converter: any;
   let serializer: any;
 
-  before(() => {
+  beforeAll(() => {
     originalConverter = kernel.converter;
   });
 
   beforeEach(() => {
-    converter = stubInterface<types.Converter>();
+    converter = mock<types.Converter>();
     kernel.setConverter(converter);
 
-    serializer = stubInterface<types.Serializer>();
+    serializer = mock<types.Serializer>();
     kernel.setSerializer(serializer);
 
-    converter.convert.returns({ properties: {} });
+    converter.convert.mockReturnValue({ properties: {} });
   });
 
   afterEach(() => {
     kernel.setSerializer(undefined as any);
   });
 
-  after(() => {
+  afterAll(() => {
     kernel.setConverter(originalConverter);
   });
 
@@ -41,24 +38,24 @@ describe('SerializableTrait', () => {
       @Type()
       class MyClass extends derive(SerializableTrait) {}
 
-      expect(new MyClass().getTypeName()).to.be.equal('MyClass');
-      expect(MyClass.getTypeName()).to.be.equal('MyClass');
+      expect(new MyClass().getTypeName()).toBe('MyClass');
+      expect(MyClass.getTypeName()).toBe('MyClass');
     });
 
     it('returns the defined type name to the type', () => {
       @Type('MyNamedClass')
       class MyClass extends derive(SerializableTrait) {}
 
-      expect(new MyClass().getTypeName()).to.be.equal('MyNamedClass');
-      expect(MyClass.getTypeName()).to.be.equal('MyNamedClass');
+      expect(new MyClass().getTypeName()).toBe('MyNamedClass');
+      expect(MyClass.getTypeName()).toBe('MyNamedClass');
     });
 
     it('returns the defined type name with namespace', () => {
       @Type('Namespace.MyClass')
       class MyClass extends derive(SerializableTrait) {}
 
-      expect(new MyClass().getTypeName()).to.be.equal('Namespace.MyClass');
-      expect(MyClass.getTypeName()).to.be.equal('Namespace.MyClass');
+      expect(new MyClass().getTypeName()).toBe('Namespace.MyClass');
+      expect(MyClass.getTypeName()).toBe('Namespace.MyClass');
     });
   });
 
@@ -67,12 +64,13 @@ describe('SerializableTrait', () => {
       @Type('Person', { isRegistrable: false })
       class Person extends derive(SerializableTrait) {}
 
-      const serialized = sinon.stub();
+      const serialized = vi.fn();
       const person = new Person();
-      serializer.toJSONValue.returns(serialized);
-      expect(person.toJSONValue()).to.be.eql(serialized);
-      expect(serializer.toJSONValue).to.be.calledOnce;
-      expect(serializer.toJSONValue).to.be.calledWithExactly(person);
+      serializer.toJSONValue.mockReturnValue(serialized);
+      expect(person.toJSONValue()).toEqual(serialized);
+      expect(serializer.toJSONValue).toHaveBeenCalledTimes(1);
+      expect(serializer.toJSONValue).toHaveBeenCalledWith(person);
     });
   });
 });
+

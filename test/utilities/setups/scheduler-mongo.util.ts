@@ -9,6 +9,9 @@ import {
 import { BINDINGS } from '../../../src/constants/bindings';
 import { types } from '../../../src/types';
 
+// Cache to ensure the same database name is used throughout a test suite
+const dbNameCache = new Map<string, string>();
+
 export const setupSchedulerMongo = async function (
   injector: types.Injector,
   clients: Record<string, types.Client>,
@@ -26,7 +29,17 @@ export const setupSchedulerMongo = async function (
 
   const target = 'scheduler';
   const url = getUrl(target);
-  const databaseName = getDatabaseName(target);
+
+  // CRITICAL: Cache database name to ensure consistency
+  // Use cached name if it exists, otherwise generate and cache
+  let databaseName: string;
+  if (dbNameCache.has(target)) {
+    databaseName = dbNameCache.get(target)!;
+  } else {
+    databaseName = getDatabaseName(target);
+    dbNameCache.set(target, databaseName);
+  }
+
   const collectionName = getCollectionName(target);
   const options = {
     ssl: isSSL(target),
@@ -54,4 +67,22 @@ export const setupSchedulerMongo = async function (
   collections.scheduler = collection;
 
   return { mongoClient, collection, databaseName, collectionName };
+};
+
+/**
+ * Clears the database name cache.
+ * Call this in afterAll() to ensure clean state for next test file.
+ */
+export const clearSchedulerDatabaseCache = function (): void {
+  dbNameCache.clear();
+};
+
+/**
+ * Gets the cached database name for a target without regenerating it.
+ * Useful when you need to verify the database name being used.
+ */
+export const getCachedDatabaseName = function (
+  target: string
+): string | undefined {
+  return dbNameCache.get(target);
 };

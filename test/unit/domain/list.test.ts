@@ -1,6 +1,5 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, vi } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { Serializable } from '../../../src/components/serializable';
 import { List } from '../../../src/domain/list';
@@ -9,8 +8,6 @@ import {
   ElementAlreadyExistsError,
   IdentifiableAlreadyExistsError,
 } from '../../../src/domain/domain-errors';
-
-chai.use(sinonChai);
 
 describe('List', () => {
   @Type('Item', { isRegistrable: false })
@@ -52,7 +49,7 @@ describe('List', () => {
   }
 
   it('extends Array', () => {
-    expect(List.prototype).to.be.instanceof(Array);
+    expect(List.prototype).toBeInstanceOf(Array);
   });
 
   describe('construction', () => {
@@ -65,11 +62,11 @@ describe('List', () => {
       const listKey = 'items';
 
       const list = new List<Item>(source, listKey, Item, serializables);
-      expect(list.getSource()).to.be.equal(source);
-      expect(list.getListKey()).to.be.equal(listKey);
-      expect(list.getSerializableType()).to.be.equal(Item);
+      expect(list.getSource()).toBe(source);
+      expect(list.getListKey()).toBe(listKey);
+      expect(list.getSerializableType()).toBe(Item);
 
-      expect(list).to.have.length(2);
+      expect(list).toHaveLength(2);
       expect(list).to.have.eql([serializables[0], serializables[1]]);
     });
   });
@@ -86,9 +83,9 @@ describe('List', () => {
         const list = source.in<Item>('items');
         const result = list.toPlainObject();
 
-        expect(result).to.be.eql([{ name: 'first' }, { name: 'second' }]);
-        expect(result[0]).to.not.be.instanceof(Item);
-        expect(result[1]).to.not.be.instanceof(Item);
+        expect(result).toEqual([{ name: 'first' }, { name: 'second' }]);
+        expect(result[0]).not.toBeInstanceOf(Item);
+        expect(result[1]).not.toBeInstanceOf(Item);
       });
 
       it('converting other values', () => {
@@ -99,7 +96,7 @@ describe('List', () => {
           }
 
           toJSONValue() {
-            return sinon.stub();
+            return vi.fn();
           }
         }
 
@@ -114,9 +111,9 @@ describe('List', () => {
         const list = source.in<Item>('items');
         const result = list.toPlainObject();
 
-        expect(result).to.be.eql(['first', 'second']);
-        expect(result[0]).to.not.be.instanceof(MyString);
-        expect(result[1]).to.not.be.instanceof(MyString);
+        expect(result).toEqual(['first', 'second']);
+        expect(result[0]).not.toBeInstanceOf(MyString);
+        expect(result[1]).not.toBeInstanceOf(MyString);
       });
     });
   });
@@ -127,8 +124,8 @@ describe('List', () => {
       source.in<Item>('items').create({
         name: 'my-item-name',
       });
-      expect(source.items[0]).to.be.instanceof(Item);
-      expect(source.items[0]).to.be.be.eql(
+      expect(source.items[0]).toBeInstanceOf(Item);
+      expect(source.items[0]).toEqual(
         new Item({
           name: 'my-item-name',
         })
@@ -138,17 +135,17 @@ describe('List', () => {
     it('ensures that add method is called for adding new element to list', () => {
       const source = new Order({ id: 'my-order-id', items: [] });
       const list = source.in<Item>('items');
-      list.add = sinon.stub();
+      list.add = vi.fn();
 
       list.create({
         name: 'my-item-name',
       });
-      expect(list.add).to.be.calledOnce;
-      expect(list.add).to.be.calledWithMatch(
+      expect(list.add).toHaveBeenCalledTimes(1);
+      expect(list.add).toHaveBeenCalledWith(expect.objectContaining(
         new Item({
           name: 'my-item-name',
         })
-      );
+      ));
     });
   });
 
@@ -158,8 +155,8 @@ describe('List', () => {
       const element = new Item({ name: 'my-item-name' });
 
       source.in<Item>('items').add(element);
-      expect(source.items[0]).to.be.instanceof(Item);
-      expect(source.items[0]).to.be.eql(
+      expect(source.items[0]).toBeInstanceOf(Item);
+      expect(source.items[0]).toEqual(
         new Item({
           name: 'my-item-name',
         })
@@ -171,7 +168,7 @@ describe('List', () => {
       const element = new Item({ name: 'my-item-name' });
 
       source.in<Item>('items').add(element);
-      expect(() => source.in<Item>('items').add(element)).to.throw(
+      expect(() => source.in<Item>('items').add(element)).toThrow(
         ElementAlreadyExistsError,
         `Order@my-order-id: already has same 'Item' on 'items' list`
       );
@@ -182,8 +179,8 @@ describe('List', () => {
       const element = new Employee({ id: 'my-employee-id' });
 
       source.in<Employee>('employees').add(element);
-      expect(source.employees[0]).to.be.instanceof(Employee);
-      expect(source.employees[0]).to.be.eql(
+      expect(source.employees[0]).toBeInstanceOf(Employee);
+      expect(source.employees[0]).toEqual(
         new Employee({
           id: 'my-employee-id',
         })
@@ -195,7 +192,7 @@ describe('List', () => {
       const element = new Employee({ id: 'my-employee-id' });
 
       source.in<Employee>('employees').add(element);
-      expect(() => source.in<Employee>('employees').add(element)).to.throw(
+      expect(() => source.in<Employee>('employees').add(element)).toThrow(
         IdentifiableAlreadyExistsError,
         `Company@my-company-id: already has 'Employee' with id 'my-employee-id' on 'employees' list`
       );
@@ -208,8 +205,8 @@ describe('List', () => {
       const element = new Item({ name: 'my-item-name' });
 
       source.in<Item>('items').add(element);
-      expect(source.items[0]).to.be.instanceof(Item);
-      expect(source.items[0]).to.be.eql(
+      expect(source.items[0]).toBeInstanceOf(Item);
+      expect(source.items[0]).toEqual(
         new Item({
           name: 'my-item-name',
         })
@@ -222,12 +219,12 @@ describe('List', () => {
       const secondElement = new Item({ name: 'my-second-name' });
 
       source.in<Item>('items').add(firstElement);
-      expect(source.items[0]).to.be.equal(firstElement);
+      expect(source.items[0]).toBe(firstElement);
 
       source
         .in<Item>('items')
         .overrideBy('name', 'my-first-name', secondElement);
-      expect(source.items[0]).to.be.equal(secondElement);
+      expect(source.items[0]).toBe(secondElement);
     });
 
     it('overrides pre-existing identifiable on the list', () => {
@@ -239,11 +236,11 @@ describe('List', () => {
       });
 
       source.in<Employee>('employees').add(firstElement);
-      expect(source.employees[0]).to.be.equal(firstElement);
+      expect(source.employees[0]).toBe(firstElement);
       source
         .in<Employee>('employees')
         .overrideBy('id', firstElement.getId(), secondElement);
-      expect(source.employees[0]).to.be.equal(secondElement);
+      expect(source.employees[0]).toBe(secondElement);
     });
   });
 
@@ -270,7 +267,7 @@ describe('List', () => {
       source.in<Item>('items').add(secondElement);
       expect(
         source.in<Item>('items').getBy('name', 'my-first-name')
-      ).to.be.equal(firstElement);
+      ).toBe(firstElement);
     });
   });
 
@@ -283,14 +280,14 @@ describe('List', () => {
       source.in<Item>('items').add(secondElement);
       expect(
         source.in<Item>('items').getByOrThrow('name', 'my-first-name')
-      ).to.be.equal(firstElement);
+      ).toBe(firstElement);
     });
 
     it(`throws ElementNotFoundError if element can't be found on the list`, () => {
       const source = new Order({ id: 'my-order-id', items: [] });
       expect(() =>
         source.in<Item>('items').getByOrThrow('name', 'my-item-name')
-      ).to.throw(
+      ).toThrow(
         ElementNotFoundError,
         `Order@my-order-id: does not contain 'Item' with name 'String("my-item-name")' on 'items' list`
       );
@@ -309,14 +306,14 @@ describe('List', () => {
       source.in<Employee>('employees').add(secondElement);
       expect(
         source.in<Employee>('employees').getById('my-first-id')
-      ).to.be.equal(firstElement);
+      ).toBe(firstElement);
     });
 
     it(`returns undefined for identifiable element that can't be found`, () => {
       const source = new Company({ id: 'my-company-id', employees: [] });
       expect(
         source.in<Employee>('employees').getById('my-first-id')
-      ).to.be.equal(undefined);
+      ).toBe(undefined);
     });
   });
 
@@ -332,14 +329,14 @@ describe('List', () => {
       source.in<Employee>('employees').add(secondElement);
       expect(
         source.in<Employee>('employees').getByIdOrThrow('my-first-id')
-      ).to.be.equal(firstElement);
+      ).toBe(firstElement);
     });
 
     it(`throws ElementNotFoundError if identifiable element can't be found`, () => {
       const source = new Company({ id: 'my-company-id', employees: [] });
       expect(() =>
         source.in<Employee>('employees').getByIdOrThrow('my-first-id')
-      ).to.throw(
+      ).toThrow(
         ElementNotFoundError,
         `Company@my-company-id: does not contain 'Employee' with id 'my-first-id' on 'employees' list`
       );
@@ -350,11 +347,11 @@ describe('List', () => {
     it('aliases getByIdOrThrow', () => {
       const source = new Company({ id: 'my-company-id', employees: [] });
       const list = source.in<Employee>('employees');
-      list.getByIdOrThrow = sinon.stub();
+      list.getByIdOrThrow = vi.fn();
 
       list.findById('my-first-id');
-      expect(list.getByIdOrThrow).to.be.calledOnce;
-      expect(list.getByIdOrThrow).to.be.calledWithExactly('my-first-id');
+      expect(list.getByIdOrThrow).toHaveBeenCalledTimes(1);
+      expect(list.getByIdOrThrow).toHaveBeenCalledWith('my-first-id');
     });
   });
 
@@ -362,11 +359,11 @@ describe('List', () => {
     it('aliases getByOrThrow', () => {
       const source = new Order({ id: 'my-order-id', items: [] });
       const list = source.in<Item>('items');
-      list.getByOrThrow = sinon.stub();
+      list.getByOrThrow = vi.fn();
 
       list.findBy('name', 'my-first-name');
-      expect(list.getByOrThrow).to.be.calledOnce;
-      expect(list.getByOrThrow).to.be.calledWithExactly(
+      expect(list.getByOrThrow).toHaveBeenCalledTimes(1);
+      expect(list.getByOrThrow).toHaveBeenCalledWith(
         'name',
         'my-first-name'
       );
@@ -394,13 +391,13 @@ describe('List', () => {
       const source = new Order({ id: 'my-order-id', items: [] });
       const element = new Item({ name: 'my-first-name' });
       source.in<Item>('items').add(element);
-      expect(source.in<Item>('items').hasSame(element)).to.be.true;
+      expect(source.in<Item>('items').hasSame(element)).toBe(true);
     });
 
     it('returns false for non-matching element', () => {
       const source = new Order({ id: 'my-order-id', items: [] });
       const element = new Item({ name: 'my-first-name' });
-      expect(source.in<Item>('items').hasSame(element)).to.be.false;
+      expect(source.in<Item>('items').hasSame(element)).toBe(false);
     });
   });
 
@@ -425,7 +422,7 @@ describe('List', () => {
       const source = new Company({ id: 'my-company-id', employees: [] });
       const element = new Employee({ id: 'my-id' });
       source.in<Employee>('employees').replaceById(element.id, element);
-      expect(source.in<Employee>('employees').getById('my-id')).to.be.equal(
+      expect(source.in<Employee>('employees').getById('my-id')).toBe(
         element
       );
     });
@@ -438,7 +435,7 @@ describe('List', () => {
       source
         .in<Employee>('employees')
         .replaceById(updatedElement.id, updatedElement);
-      expect(source.in<Employee>('employees').getById('my-id')).to.be.equal(
+      expect(source.in<Employee>('employees').getById('my-id')).toBe(
         updatedElement
       );
     });
@@ -454,7 +451,7 @@ describe('List', () => {
         name: 'my-name',
       });
       source.in<Item>('items').replaceBy('name', element.name, element);
-      expect(source.in<Item>('items').getBy('name', 'my-name')).to.be.equal(
+      expect(source.in<Item>('items').getBy('name', 'my-name')).toBe(
         element
       );
     });
@@ -465,7 +462,7 @@ describe('List', () => {
       const secondElement = new Item({ name: 'my-name' });
       source.in<Item>('items').add(firstElement);
       source.in<Item>('items').replaceBy('name', 'my-name', secondElement);
-      expect(source.in<Item>('items').getBy('name', 'my-name')).to.be.equal(
+      expect(source.in<Item>('items').getBy('name', 'my-name')).toBe(
         secondElement
       );
       expect(source.in<Item>('items').getBy('name', 'my-name')).to.be.not.equal(
@@ -483,13 +480,13 @@ describe('List', () => {
       });
       source.in<Employee>('employees').add(firstElement);
       source.in<Employee>('employees').add(secondElement);
-      expect(source.employees).to.have.length(2);
+      expect(source.employees).toHaveLength(2);
       expect(source.employees).to.be.have.members([
         firstElement,
         secondElement,
       ]);
       source.in<Employee>('employees').removeById('my-first-id');
-      expect(source.employees).to.have.length(1);
+      expect(source.employees).toHaveLength(1);
       expect(source.employees).to.be.have.members([secondElement]);
     });
   });
@@ -501,10 +498,10 @@ describe('List', () => {
       const secondElement = new Item({ name: 'my-second-name' });
       source.in<Item>('items').add(firstElement);
       source.in<Item>('items').add(secondElement);
-      expect(source.items).to.have.length(2);
+      expect(source.items).toHaveLength(2);
       expect(source.items).to.be.have.members([firstElement, secondElement]);
       source.in<Item>('items').removeBy('name', 'my-first-name');
-      expect(source.items).to.have.length(1);
+      expect(source.items).toHaveLength(1);
       expect(source.items).to.be.have.members([secondElement]);
     });
   });
@@ -518,13 +515,13 @@ describe('List', () => {
       });
       source.in<Employee>('employees').add(firstElement);
       source.in<Employee>('employees').add(secondElement);
-      expect(source.employees).to.have.length(2);
+      expect(source.employees).toHaveLength(2);
       expect(source.employees).to.be.have.members([
         firstElement,
         secondElement,
       ]);
       source.in<Employee>('employees').deleteById('my-first-id');
-      expect(source.employees).to.have.length(1);
+      expect(source.employees).toHaveLength(1);
       expect(source.employees).to.be.have.members([secondElement]);
     });
   });
@@ -536,10 +533,10 @@ describe('List', () => {
       const secondElement = new Item({ name: 'my-second-name' });
       source.in<Item>('items').add(firstElement);
       source.in<Item>('items').add(secondElement);
-      expect(source.items).to.have.length(2);
+      expect(source.items).toHaveLength(2);
       expect(source.items).to.be.have.members([firstElement, secondElement]);
       source.in<Item>('items').deleteBy('name', 'my-first-name');
-      expect(source.items).to.have.length(1);
+      expect(source.items).toHaveLength(1);
       expect(source.items).to.be.have.members([secondElement]);
     });
   });
@@ -547,7 +544,7 @@ describe('List', () => {
   describe('first', () => {
     it('returns undefined for empty list', () => {
       const source = new Order({ id: 'my-order-id', items: [] });
-      expect(source.in<Item>('items').first()).to.be.equal(undefined);
+      expect(source.in<Item>('items').first()).toBe(undefined);
     });
 
     it('returns first element from the list', () => {
@@ -556,14 +553,14 @@ describe('List', () => {
       const secondElement = new Item({ name: 'my-second-name' });
       source.in<Item>('items').add(firstElement);
       source.in<Item>('items').add(secondElement);
-      expect(source.in<Item>('items').first()).to.be.equal(firstElement);
+      expect(source.in<Item>('items').first()).toBe(firstElement);
     });
   });
 
   describe('last', () => {
     it('returns undefined for empty list', () => {
       const source = new Order({ id: 'my-order-id', items: [] });
-      expect(source.in<Item>('items').last()).to.be.equal(undefined);
+      expect(source.in<Item>('items').last()).toBe(undefined);
     });
 
     it('returns last element from the list', () => {
@@ -572,7 +569,8 @@ describe('List', () => {
       const secondElement = new Item({ name: 'my-second-name' });
       source.in<Item>('items').add(firstElement);
       source.in<Item>('items').add(secondElement);
-      expect(source.in<Item>('items').last()).to.be.equal(secondElement);
+      expect(source.in<Item>('items').last()).toBe(secondElement);
     });
   });
 });
+

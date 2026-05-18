@@ -1,9 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+
 import { MongoClient, Collection } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import getenv from 'getenv';
 import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
@@ -23,9 +22,6 @@ import {
   CommitConcurrencyError,
 } from '../../../src/infrastructure/infrastructure-errors';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`CommitMongoDBStorage`, () => {
   @Type('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
@@ -42,7 +38,6 @@ describe(`CommitMongoDBStorage`, () => {
   let mongoClient: MongoClient;
   let injector: Injector;
   let collection: Collection;
-  let collectionMock: any;
   let commitSerializer: any;
   let storage: CommitMongoDBStorage;
 
@@ -82,7 +77,7 @@ describe(`CommitMongoDBStorage`, () => {
     });
   };
 
-  before(async () => {
+  beforeAll(async () => {
     const mongoUrl = getenv.string('EVEBLE_COMMITSTORE_MONGODB_URL');
     const mongoClientOptions = {};
     // Remove deprecated options for v6
@@ -95,11 +90,10 @@ describe(`CommitMongoDBStorage`, () => {
     const collectionName =
       getenv.string('EVEBLE_COMMITSTORE_MONGODB_COLLECTION') || 'commits';
     collection = mongoClient.db(dbName).collection(collectionName);
-    collectionMock = sinon.mock(collection);
 
     injector = new Injector();
     storage = new CommitMongoDBStorage();
-    commitSerializer = stubInterface<types.CommitSerializer>();
+    commitSerializer = mock<types.CommitSerializer>();
 
     injector
       .bind<types.CommitSerializer>(BINDINGS.CommitSerializer)
@@ -110,7 +104,7 @@ describe(`CommitMongoDBStorage`, () => {
     injector.injectInto(storage);
   });
 
-  after(async () => {
+  afterAll(async () => {
     await mongoClient.close();
   });
 
@@ -120,54 +114,47 @@ describe(`CommitMongoDBStorage`, () => {
   describe(`adding commit`, () => {
     it(`inserts commit to MongoDB collection`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
-      commitSerializer.serialize.withArgs(commit).returns(serializedCommit);
+      const serializedCommit = mock<types.MongoDBSerializedCommit>();
+      commitSerializer.serialize.calledWith(commit).mockReturnValue(serializedCommit);
 
-      collectionMock.expects('insertOne').withArgs(serializedCommit).resolves({
+      vi.spyOn(collection, 'insertOne').mockResolvedValue({
         insertedId: commitId,
         acknowledged: true,
       });
 
       const result = await storage.save(commit);
-      expect(result).to.be.equal(commitId);
-      expect(commitSerializer.serialize).to.be.calledOnce;
-      expect(commitSerializer.serialize).to.be.calledWithExactly(commit);
-
-      collectionMock.verify();
+      expect(result).toBe(commitId);
+      expect(commitSerializer.serialize).toHaveBeenCalledTimes(1);
+      expect(commitSerializer.serialize).toHaveBeenCalledWith(commit);
+      expect(collection.insertOne).toHaveBeenCalledWith(serializedCommit);
     });
 
     it(`throws AddingCommitFailedError on unsuccessful document insertion`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
-      commitSerializer.serialize.withArgs(commit).returns(serializedCommit);
+      const serializedCommit = mock<types.MongoDBSerializedCommit>();
+      commitSerializer.serialize.calledWith(commit).mockReturnValue(serializedCommit);
 
-      collectionMock
-        .expects('insertOne')
-        .withArgs(serializedCommit)
-        .resolves({ acknowledged: false, insertedId: null });
+      vi.spyOn(collection, 'insertOne').mockResolvedValue({ acknowledged: false, insertedId: null });
 
       await expect(
-        storage.save(generateCommit(commitId, eventSourceableId, 1))
-      ).to.eventually.be.rejectedWith(
+        storage.save(commit)
+      ).rejects.toThrow(
         AddingCommitFailedError,
         `CommitMongoDBStorage: adding commit with id '${commitId.toString()}' failed on '${appId}'`
       );
 
-      collectionMock.verify();
+      expect(collection.insertOne).toHaveBeenCalledWith(serializedCommit);
     });
 
     it(`throws CommitConcurrencyError on duplicated key error`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
-      commitSerializer.serialize.withArgs(commit).returns(serializedCommit);
+      const serializedCommit = mock<types.MongoDBSerializedCommit>();
+      commitSerializer.serialize.calledWith(commit).mockReturnValue(serializedCommit);
 
       const error = new Error('duplicate key error index');
       (error as any).code = 11000;
 
-      collectionMock
-        .expects('insertOne')
-        .withArgs(serializedCommit)
-        .rejects(error);
+      vi.spyOn(collection, 'insertOne').mockRejectedValue(error);
 
       const query = {
         sourceId: eventSourceableId,
@@ -178,18 +165,19 @@ describe(`CommitMongoDBStorage`, () => {
           version: 1,
         },
       };
-      collectionMock.expects('findOne').withArgs(query, options).resolves({
+      vi.spyOn(collection, 'findOne').mockResolvedValue({
         version: 10,
       });
 
       await expect(
-        storage.save(generateCommit(commitId, eventSourceableId, 1))
-      ).to.eventually.be.rejectedWith(
+        storage.save(commit)
+      ).rejects.toThrow(
         CommitConcurrencyError,
         `CommitMongoDBStorage.MyEventSourceable: expected event sourceable with id of '${eventSourceableId.toString()}' to be at version 0 but is at version 1`
       );
 
-      collectionMock.verify();
+      expect(collection.insertOne).toHaveBeenCalledWith(serializedCommit);
+      expect(collection.findOne).toHaveBeenCalledWith(query, options);
     });
   });
 
@@ -204,25 +192,22 @@ describe(`CommitMongoDBStorage`, () => {
           version: 1,
         },
       };
-      collectionMock.expects('findOne').withArgs(query, options).resolves({
+      vi.spyOn(collection, 'findOne').mockResolvedValue({
         version: 10,
       });
 
       const lastCommitVersion = await storage.findLastVersionById(
         eventSourceableId
       );
-      expect(lastCommitVersion).to.be.equal(10);
-
-      collectionMock.verify();
+      expect(lastCommitVersion).toBe(10);
+      expect(collection.findOne).toHaveBeenCalledWith(query, options);
     });
 
     it(`returns undefined when commit cannot be found for event sourceable's`, async () => {
-      collectionMock.expects('findOne').resolves(null);
+      vi.spyOn(collection, 'findOne').mockResolvedValue(null);
 
       const lastCommitVersion = await storage.findLastVersionById('my-id');
-      expect(lastCommitVersion).to.be.equal(undefined);
-
-      collectionMock.verify();
+      expect(lastCommitVersion).toBe(undefined);
     });
   });
 
@@ -231,37 +216,32 @@ describe(`CommitMongoDBStorage`, () => {
       const query = {
         _id: commitId,
       };
-      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
+      const serializedCommit = mock<types.MongoDBSerializedCommit>();
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      collectionMock
-        .expects('findOne')
-        .withArgs(query)
-        .resolves(serializedCommit);
-      commitSerializer.deserialize.withArgs(serializedCommit).returns(commit);
+      vi.spyOn(collection, 'findOne').mockResolvedValue(serializedCommit);
+      commitSerializer.deserialize.calledWith(serializedCommit).mockReturnValue(commit);
 
       const foundCommit = await storage.findById(commitId);
-      expect(foundCommit).to.be.instanceof(Commit);
-      expect(foundCommit).to.be.eql(
+      expect(foundCommit).toBeInstanceOf(Commit);
+      expect(foundCommit).toEqual(
         generateCommit(commitId, eventSourceableId, 1)
       );
-      expect(commitSerializer.deserialize).to.be.calledOnce;
-      expect(commitSerializer.deserialize).to.be.calledWithExactly(
+      expect(commitSerializer.deserialize).toHaveBeenCalledTimes(1);
+      expect(commitSerializer.deserialize).toHaveBeenCalledWith(
         serializedCommit
       );
-
-      collectionMock.verify();
+      expect(collection.findOne).toHaveBeenCalledWith(query);
     });
 
     it(`returns undefined if commit by id can't be found`, async () => {
       const query = {
         _id: commitId,
       };
-      collectionMock.expects('findOne').withArgs(query).resolves(null);
+      vi.spyOn(collection, 'findOne').mockResolvedValue(null);
 
       const foundCommit = await storage.findById(commitId);
-      expect(foundCommit).to.be.equal(undefined);
-
-      collectionMock.verify();
+      expect(foundCommit).toBe(undefined);
+      expect(collection.findOne).toHaveBeenCalledWith(query);
     });
 
     it(`returns commits by event sourcealbe's id and version offset`, async () => {
@@ -270,7 +250,6 @@ describe(`CommitMongoDBStorage`, () => {
           return undefined;
         },
       };
-      const findResultMock = sinon.mock(findResult);
 
       const query = {
         sourceId: eventSourceableId,
@@ -281,15 +260,12 @@ describe(`CommitMongoDBStorage`, () => {
       const options = {
         sort: { version: 1 },
       };
-      collectionMock
-        .expects('find')
-        .withArgs(query, options)
-        .returns(findResult);
+      vi.spyOn(collection, 'find').mockReturnValue(findResult);
 
       const firstCommitId = new Guid().toString();
       const secondCommitId = new Guid().toString();
-      const firstSerializedCommit = sinon.stub();
-      const secondSerializedCommit = sinon.stub();
+      const firstSerializedCommit = vi.fn();
+      const secondSerializedCommit = vi.fn();
       const firstCommit = generateCommit(firstCommitId, eventSourceableId, 10);
       const secondCommit = generateCommit(
         secondCommitId,
@@ -297,21 +273,17 @@ describe(`CommitMongoDBStorage`, () => {
         11
       );
 
-      findResultMock
-        .expects('toArray')
-        .resolves([firstSerializedCommit, secondSerializedCommit]);
+      vi.spyOn(findResult, 'toArray').mockResolvedValue([firstSerializedCommit, secondSerializedCommit]);
       commitSerializer.deserialize
-        .withArgs(firstSerializedCommit)
-        .returns(firstCommit);
+        .calledWith(firstSerializedCommit)
+        .mockReturnValue(firstCommit);
       commitSerializer.deserialize
-        .withArgs(secondSerializedCommit)
-        .returns(secondCommit);
+        .calledWith(secondSerializedCommit)
+        .mockReturnValue(secondCommit);
 
       const foundCommits = await storage.getCommits(eventSourceableId, 10);
-      expect(foundCommits).to.be.eql([firstCommit, secondCommit]);
-
-      findResultMock.verify();
-      collectionMock.verify();
+      expect(foundCommits).toEqual([firstCommit, secondCommit]);
+      expect(collection.find).toHaveBeenCalledWith(query, options);
     });
 
     it(`returns empty array when no commits can be found for version offset`, async () => {
@@ -320,17 +292,13 @@ describe(`CommitMongoDBStorage`, () => {
           return undefined;
         },
       };
-      const findResultMock = sinon.mock(findResult);
 
-      collectionMock.expects('find').returns(findResult);
+      vi.spyOn(collection, 'find').mockReturnValue(findResult);
 
-      findResultMock.expects('toArray').resolves([]);
+      vi.spyOn(findResult, 'toArray').mockResolvedValue([]);
 
       const foundCommits = await storage.getCommits(eventSourceableId, 10);
-      expect(foundCommits).to.be.eql([]);
-
-      findResultMock.verify();
-      collectionMock.verify();
+      expect(foundCommits).toEqual([]);
     });
 
     it(`returns all commits for every event sourceable`, async () => {
@@ -339,9 +307,9 @@ describe(`CommitMongoDBStorage`, () => {
       const thirdCommitId = new Guid().toString();
       const otherEventSourceableId = 'my-other-id';
 
-      const firstSerializedCommit = sinon.stub();
-      const secondSerializedCommit = sinon.stub();
-      const thirdSerializedCommit = sinon.stub();
+      const firstSerializedCommit = vi.fn();
+      const secondSerializedCommit = vi.fn();
+      const thirdSerializedCommit = vi.fn();
       const firstCommit = generateCommit(firstCommitId, eventSourceableId, 1);
       const secondCommit = generateCommit(secondCommitId, eventSourceableId, 2);
       const thirdCommit = generateCommit(
@@ -355,32 +323,27 @@ describe(`CommitMongoDBStorage`, () => {
           return undefined;
         },
       };
-      const findResultMock = sinon.mock(findResult);
 
-      collectionMock.expects('find').withArgs({}, {}).returns(findResult);
+      vi.spyOn(collection, 'find').mockReturnValue(findResult);
 
-      findResultMock
-        .expects('toArray')
-        .resolves([
-          firstSerializedCommit,
-          secondSerializedCommit,
-          thirdSerializedCommit,
-        ]);
+      vi.spyOn(findResult, 'toArray').mockResolvedValue([
+        firstSerializedCommit,
+        secondSerializedCommit,
+        thirdSerializedCommit,
+      ]);
       commitSerializer.deserialize
-        .withArgs(firstSerializedCommit)
-        .returns(firstCommit);
+        .calledWith(firstSerializedCommit)
+        .mockReturnValue(firstCommit);
       commitSerializer.deserialize
-        .withArgs(secondSerializedCommit)
-        .returns(secondCommit);
+        .calledWith(secondSerializedCommit)
+        .mockReturnValue(secondCommit);
       commitSerializer.deserialize
-        .withArgs(thirdSerializedCommit)
-        .returns(thirdCommit);
+        .calledWith(thirdSerializedCommit)
+        .mockReturnValue(thirdCommit);
 
       const foundCommit = await storage.getAllCommits();
-      expect(foundCommit).to.be.eql([firstCommit, secondCommit, thirdCommit]);
-
-      findResultMock.verify();
-      collectionMock.verify();
+      expect(foundCommit).toEqual([firstCommit, secondCommit, thirdCommit]);
+      expect(collection.find).toHaveBeenCalledWith({}, {});
     });
   });
 
@@ -406,7 +369,7 @@ describe(`CommitMongoDBStorage`, () => {
         },
       };
 
-      collectionMock.expects('updateOne').withArgs(filter, update).resolves({
+      vi.spyOn(collection, 'updateOne').mockResolvedValue({
         modifiedCount: 1,
         acknowledged: true,
       });
@@ -417,23 +380,19 @@ describe(`CommitMongoDBStorage`, () => {
         workerId,
         now
       );
-      expect(result).to.be.true;
-
-      collectionMock.verify();
+      expect(result).toBe(true);
+      expect(collection.updateOne).toHaveBeenCalledWith(filter, update);
     });
 
     it(`throws UpdatingCommitError when commit can't be updated to published`, async () => {
-      collectionMock
-        .expects('updateOne')
-        .resolves({ modifiedCount: 0, acknowledged: true });
+      vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 0, acknowledged: true });
 
       await expect(
         storage.flagCommitAsPublished(commitId, appId, workerId, now)
-      ).to.eventually.be.rejectedWith(
+      ).rejects.toThrow(
         UpdatingCommitError,
         `CommitMongoDBStorage: updating commit with id '${commitId}' failed on '${appId}'`
       );
-      collectionMock.verify();
     });
 
     it(`flags commit as failed`, async () => {
@@ -457,10 +416,7 @@ describe(`CommitMongoDBStorage`, () => {
         },
       };
 
-      collectionMock
-        .expects('updateOne')
-        .withArgs(filter, update)
-        .resolves({ modifiedCount: 1, acknowledged: true });
+      vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 1, acknowledged: true });
 
       const result = await storage.flagCommitAsFailed(
         commitId,
@@ -468,23 +424,19 @@ describe(`CommitMongoDBStorage`, () => {
         workerId,
         now
       );
-      expect(result).to.be.true;
-
-      collectionMock.verify();
+      expect(result).toBe(true);
+      expect(collection.updateOne).toHaveBeenCalledWith(filter, update);
     });
 
     it(`throws UpdatingCommitError when commit can't be updated to failed`, async () => {
-      collectionMock
-        .expects('updateOne')
-        .resolves({ modifiedCount: 0, acknowledged: true });
+      vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 0, acknowledged: true });
 
       expect(
         storage.flagCommitAsFailed(commitId, appId, workerId, now)
-      ).to.eventually.be.rejectedWith(
+      ).rejects.toThrow(
         UpdatingCommitError,
         `CommitMongoDBStorage: updating commit with id '${commitId}' failed on '${appId}'`
       );
-      collectionMock.verify();
     });
 
     it(`flags commit as timeouted`, async () => {
@@ -510,13 +462,10 @@ describe(`CommitMongoDBStorage`, () => {
       };
 
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
+      const serializedCommit = mock<types.MongoDBSerializedCommit>();
 
-      collectionMock
-        .expects('findOneAndUpdate')
-        .withArgs(query, update)
-        .resolves(serializedCommit);
-      commitSerializer.deserialize.withArgs(serializedCommit).returns(commit);
+      vi.spyOn(collection, 'findOneAndUpdate').mockResolvedValue(serializedCommit);
+      commitSerializer.deserialize.calledWith(serializedCommit).mockReturnValue(commit);
 
       const foundCommit = await storage.flagAndResolveCommitAsTimeouted(
         commitId,
@@ -524,14 +473,16 @@ describe(`CommitMongoDBStorage`, () => {
         workerId,
         now
       );
-      expect(foundCommit).to.be.instanceof(Commit);
-      expect(foundCommit).to.be.equal(commit);
-
-      collectionMock.verify();
+      expect(foundCommit).toBeInstanceOf(Commit);
+      expect(foundCommit).toBe(commit);
+      expect(collection.findOneAndUpdate).toHaveBeenCalledWith(query, update, {
+        returnDocument: 'after',
+      });
     });
 
     it(`locks commit`, async () => {
-      const clock = sinon.useFakeTimers(now.getTime());
+      const clock = vi.useFakeTimers(now.getTime());
+      const expectedReceivedAt = new Date();
 
       const registeredQuery = {
         $or: [
@@ -557,7 +508,7 @@ describe(`CommitMongoDBStorage`, () => {
             state: 'received',
             appId,
             workerId,
-            receivedAt: now,
+            receivedAt: expectedReceivedAt,
           },
         },
       };
@@ -566,13 +517,10 @@ describe(`CommitMongoDBStorage`, () => {
       };
 
       const commit = generateCommit(commitId, eventSourceableId, 1);
-      const serializedCommit = stubInterface<types.MongoDBSerializedCommit>();
+      const serializedCommit = mock<types.MongoDBSerializedCommit>();
 
-      collectionMock
-        .expects('findOneAndUpdate')
-        .withArgs(filter, update, options)
-        .resolves(serializedCommit);
-      commitSerializer.deserialize.withArgs(serializedCommit).returns(commit);
+      vi.spyOn(collection, 'findOneAndUpdate').mockResolvedValue(serializedCommit);
+      commitSerializer.deserialize.calledWith(serializedCommit).mockReturnValue(commit);
 
       const foundCommit = await storage.lockCommit(
         commitId,
@@ -580,11 +528,11 @@ describe(`CommitMongoDBStorage`, () => {
         workerId,
         registeredAndNotReceivedYetQuery
       );
-      expect(foundCommit).to.be.instanceof(Commit);
-      expect(foundCommit).to.be.equal(commit);
+      expect(foundCommit).toBeInstanceOf(Commit);
+      expect(foundCommit).toBe(commit);
 
-      collectionMock.verify();
-      clock.restore();
+      expect(collection.findOneAndUpdate).toHaveBeenCalledWith(filter, update, options);
+      vi.useRealTimers();
     });
   });
 });

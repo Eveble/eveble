@@ -1,9 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll } from 'vitest';
+
 import PulseOriginal from '@pulsecron/pulse';
-import { stubInterface } from 'ts-sinon';
+
 import { Db } from 'mongodb';
 import { MongoDBClient } from '../../../src/app/clients/mongodb-client';
 import { PulseClient } from '../../../src/app/clients/pulse-client';
@@ -14,13 +13,10 @@ import { BINDINGS } from '../../../src/constants/bindings';
 import { Log } from '../../../src/components/log-entry';
 import { InvalidStateError } from '../../../src/traits/stateful.trait';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`PulseClient`, () => {
   let props: Record<string, any>;
 
-  before(() => {
+  beforeAll(() => {
     props = {
       id: new Guid(),
       databaseName: 'my-database',
@@ -48,19 +44,19 @@ describe(`PulseClient`, () => {
 
   const setupDoubles = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
+    log = mock<types.Logger>();
 
-    Pulse = sinon.stub();
-    pulseInstance = stubInterface<PulseOriginal>();
-    Pulse.returns(pulseInstance);
+    Pulse = vi.fn();
+    pulseInstance = mock<PulseOriginal>();
+    Pulse.mockImplementation(function() { return pulseInstance; });
 
     mongoClient = {
-      getDatabase: sinon.stub(),
-      isConnected: sinon.stub(),
+      getDatabase: vi.fn(),
+      isConnected: vi.fn(),
       url: 'mongodb://root:password@localhost:27017/',
     };
-    db = stubInterface<Db>();
-    mongoClient.getDatabase.returns(db);
+    db = mock<Db>();
+    mongoClient.getDatabase.mockReturnValue(db);
 
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     injector.bind<any>(BINDINGS.Pulse.library).toConstantValue(Pulse);
@@ -85,9 +81,9 @@ describe(`PulseClient`, () => {
         databaseName: props.databaseName,
         collectionName: props.collectionName,
       });
-      expect(instance.id).to.be.equal(props.id);
-      expect(instance.databaseName).to.be.equal(props.databaseName);
-      expect(instance.collectionName).to.be.equal(props.collectionName);
+      expect(instance.id).toBe(props.id);
+      expect(instance.databaseName).toBe(props.databaseName);
+      expect(instance.collectionName).toBe(props.collectionName);
     });
 
     it(`allows to define id as a String`, () => {
@@ -97,21 +93,21 @@ describe(`PulseClient`, () => {
         databaseName: props.databaseName,
         collectionName: props.collectionName,
       });
-      expect(instance.id).to.be.equal(id);
-      expect(instance.databaseName).to.be.equal(props.databaseName);
-      expect(instance.collectionName).to.be.equal(props.collectionName);
+      expect(instance.id).toBe(id);
+      expect(instance.databaseName).toBe(props.databaseName);
+      expect(instance.collectionName).toBe(props.collectionName);
     });
 
     it(`takes object with additional optional properties: options and assigns them`, () => {
       const instance = new PulseClient(props);
-      expect(instance.id).to.be.equal(props.id);
-      expect(instance.databaseName).to.be.equal(props.databaseName);
-      expect(instance.collectionName).to.be.equal(props.collectionName);
-      expect(instance.options).to.be.eql(props.options);
+      expect(instance.id).toBe(props.id);
+      expect(instance.databaseName).toBe(props.databaseName);
+      expect(instance.collectionName).toBe(props.collectionName);
+      expect(instance.options).toEqual(props.options);
     });
 
     it(`sets the client state to constructed upon successful creation`, async () => {
-      expect(client.isInState(PulseClient.STATES.constructed)).to.be.true;
+      expect(client.isInState(PulseClient.STATES.constructed)).toBe(true);
     });
   });
 
@@ -120,7 +116,7 @@ describe(`PulseClient`, () => {
       await injector.injectIntoAsync(client);
       await client.initialize();
 
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`initializing client '${props.id}'`)
           .on(client)
           .in(client.initialize)
@@ -130,38 +126,38 @@ describe(`PulseClient`, () => {
       );
     });
 
-    context('successful initialization', () => {
+    describe('successful initialization', () => {
       it(`initializes client with MongoDB database`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        expect(client.library).to.be.equal(pulseInstance);
+        expect(client.library).toBe(pulseInstance);
 
-        expect(mongoClient.getDatabase).to.be.calledOnce;
-        expect(mongoClient.getDatabase).to.be.calledWithExactly(
+        expect(mongoClient.getDatabase).toHaveBeenCalledTimes(1);
+        expect(mongoClient.getDatabase).toHaveBeenCalledWith(
           props.databaseName
         );
 
-        expect(Pulse).to.be.calledOnce;
-        expect(Pulse).to.be.calledWithNew;
-        expect(Pulse).to.be.calledWith({
+        expect(Pulse).toHaveBeenCalledTimes(1);
+        expect(Pulse).toHaveBeenCalledTimes(1);
+        expect(Pulse).toHaveBeenCalledWith({
           mongo: db,
           ...props.options,
         });
-        expect(pulseInstance.start).to.not.be.called;
+        expect(pulseInstance.start).not.toHaveBeenCalled;
       });
 
       it(`sets the client state to initialized upon successful creation`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
-        expect(client.isInState(PulseClient.STATES.initialized)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.initialized)).toBe(true);
       });
 
       it('logs successful client initialization', async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`successfully initialized client '${props.id}'`)
             .on(client)
             .in(client.initialize)
@@ -172,33 +168,33 @@ describe(`PulseClient`, () => {
       });
     });
 
-    context('failed initialization', () => {
+    describe('failed initialization', () => {
       it('re-throws error from Pulse on creation', async () => {
         const error = new Error('my-error');
-        Pulse.throws(error);
+        Pulse.mockImplementation(function() { throw error; });
         await injector.injectIntoAsync(client);
 
-        await expect(client.initialize()).to.eventually.be.rejectedWith(
+        await expect(client.initialize()).rejects.toThrow(
           'my-error'
         );
       });
 
       it('sets the client state to failed when error is thrown on initialization', async () => {
         const error = new Error('my-error');
-        Pulse.throws(error);
+        Pulse.mockImplementation(function() { throw error; });
         await injector.injectIntoAsync(client);
 
-        await expect(client.initialize()).to.eventually.be.rejectedWith(error);
-        expect(client.isInState(PulseClient.STATES.failed)).to.be.true;
+        await expect(client.initialize()).rejects.toThrow(error);
+        expect(client.isInState(PulseClient.STATES.failed)).toBe(true);
       });
 
       it('logs failed initialization as an error', async () => {
         const error = new Error('my-error');
-        Pulse.throws(error);
+        Pulse.mockImplementation(function() { throw error; });
         await injector.injectIntoAsync(client);
 
-        await expect(client.initialize()).to.eventually.be.rejectedWith(error);
-        expect(log.error).to.be.calledWithExactly(
+        await expect(client.initialize()).rejects.toThrow(error);
+        expect(log.error).toHaveBeenCalledWith(
           new Log(
             `failed to initialize client '${props.id}' do to error: ${error}`
           )
@@ -214,7 +210,7 @@ describe(`PulseClient`, () => {
 
   describe(`connection`, () => {
     it('throws InvalidStateError if client is not initialized prior to establishing connection', async () => {
-      expect(client.connect()).to.eventually.be.rejectedWith(
+      expect(client.connect()).rejects.toThrow(
         InvalidStateError,
         `PulseClient: expected current state of 'constructed' to be in one of states: 'initialized, connected, stopped'`
       );
@@ -224,42 +220,42 @@ describe(`PulseClient`, () => {
       await injector.injectIntoAsync(client);
       await client.initialize();
       await client.connect();
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`connecting client '${props.id}'`).on(client).in(client.connect)
       );
     });
 
-    context('successful connection', () => {
+    describe('successful connection', () => {
       it(`connects client to MongoDB`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(pulseInstance.start).to.not.be.called;
+        expect(pulseInstance.start).not.toHaveBeenCalled;
       });
 
       it(`ensures that connection can be established only once`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.connect();
 
-        expect(pulseInstance.start).to.not.be.called;
-        expect(client.isInState(MongoDBClient.STATES.connected)).to.be.true;
+        expect(pulseInstance.start).not.toHaveBeenCalled;
+        expect(client.isInState(MongoDBClient.STATES.connected)).toBe(true);
       });
 
       it(`sets the client state to connected upon successful connection with MongoDB`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(client.isInState(PulseClient.STATES.connected)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.connected)).toBe(true);
       });
 
       it('logs successful connection', async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`connected client '${props.id}'`)
             .on(client)
             .in(client.connect)
@@ -267,18 +263,18 @@ describe(`PulseClient`, () => {
       });
     });
 
-    context('failed connection', () => {
+    describe('failed connection', () => {
       it('re-throws error from Pulse on creation', async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
         const error = new Error('my-error');
-        pulseInstance.start.rejects(error);
+        pulseInstance.start.mockRejectedValue(error);
         await client.connect();
 
         await expect(
           client.startProcessing('test-job')
-        ).to.eventually.be.rejectedWith(
+        ).rejects.toThrow(
           'Pulse client must be connected before starting processing'
         );
       });
@@ -296,24 +292,24 @@ describe(`PulseClient`, () => {
           client.setState(PulseClient.STATES.failed);
         }
 
-        expect(client.isInState(PulseClient.STATES.failed)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.failed)).toBe(true);
       });
     });
 
     describe('evaluating connected client', () => {
       it('returns true if client is connected', async () => {
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
 
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(client.isConnected()).to.be.equal(true);
+        expect(client.isConnected()).toBe(true);
       });
 
       it('returns false if client is not connected', async () => {
-        mongoClient.isConnected.returns(false);
+        mongoClient.isConnected.mockReturnValue(false);
 
-        expect(client.isConnected()).to.be.equal(false);
+        expect(client.isConnected()).toBe(false);
       });
     });
 
@@ -322,21 +318,21 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.stop();
-        expect(pulseInstance.stop).to.be.calledOnce;
+        expect(pulseInstance.stop).toHaveBeenCalledTimes(1);
       });
 
       it(`logs information about client being stopped`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.stop();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`stopping client '${props.id}'`).on(client).in(client.stop)
         );
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`stopped client '${props.id}'`).on(client).in(client.stop)
         );
       });
@@ -345,9 +341,9 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.stop();
-        expect(client.isInState(PulseClient.STATES.stopped)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.stopped)).toBe(true);
       });
     });
 
@@ -356,23 +352,23 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.disconnect();
-        expect(pulseInstance.stop).to.be.calledOnce;
+        expect(pulseInstance.stop).toHaveBeenCalledTimes(1);
       });
 
       it(`logs information about client being disconnected`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.disconnect();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`disconnecting client '${props.id}'`)
             .on(client)
             .in(client.disconnect)
         );
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`disconnected client '${props.id}'`)
             .on(client)
             .in(client.disconnect)
@@ -383,18 +379,18 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.disconnect();
-        expect(client.isInState(PulseClient.STATES.disconnected)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.disconnected)).toBe(true);
       });
 
       it(`destroys Pulse library instance`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.disconnect();
-        expect(client.library).to.be.undefined;
+        expect(client.library).toBeUndefined();
       });
     });
 
@@ -403,12 +399,12 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        mongoClient.isConnected.returns(true);
+        mongoClient.isConnected.mockReturnValue(true);
         await client.disconnect();
-        mongoClient.isConnected.returns(false);
+        mongoClient.isConnected.mockReturnValue(false);
         await client.reconnect();
-        expect(pulseInstance.stop).to.be.calledOnce;
-        expect(pulseInstance.start).to.not.be.called;
+        expect(pulseInstance.stop).toHaveBeenCalledTimes(1);
+        expect(pulseInstance.start).not.toHaveBeenCalled;
       });
 
       it(`logs information about client being reconnected`, async () => {
@@ -417,7 +413,7 @@ describe(`PulseClient`, () => {
         await client.connect();
         await client.disconnect();
         await client.reconnect();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`reconnecting client '${props.id}'`)
             .on(client)
             .in(client.reconnect)
@@ -430,7 +426,7 @@ describe(`PulseClient`, () => {
         await client.connect();
         await client.disconnect();
         await client.reconnect();
-        expect(client.isInState(PulseClient.STATES.connected)).to.be.true;
+        expect(client.isInState(PulseClient.STATES.connected)).toBe(true);
       });
     });
   });
@@ -441,10 +437,10 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(pulseInstance.on.args[0][0]).to.equal('ready');
-        const handler = pulseInstance.on.args[0][1];
+        expect(pulseInstance.on.mock.calls[0][0]).toBe('ready');
+        const handler = pulseInstance.on.mock.calls[0][1];
         handler();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`activated client '${props.id}'`)
             .on(client)
             .in('initializeEventHandlers')
@@ -459,10 +455,10 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(pulseInstance.on.args[1][0]).to.equal('start');
-        const handler = pulseInstance.on.args[1][1];
+        expect(pulseInstance.on.mock.calls[1][0]).toBe('start');
+        const handler = pulseInstance.on.mock.calls[1][1];
         await handler(job);
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`started job '${job.attrs.name}'`)
             .on(client)
             .in('initializeEventHandlers')
@@ -477,10 +473,10 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(pulseInstance.on.args[2][0]).to.equal('complete');
-        const handler = pulseInstance.on.args[2][1];
+        expect(pulseInstance.on.mock.calls[2][0]).toBe('complete');
+        const handler = pulseInstance.on.mock.calls[2][1];
         await handler(job);
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`completed job '${job.attrs.name}'`)
             .on(client)
             .in('initializeEventHandlers')
@@ -495,10 +491,10 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(pulseInstance.on.args[3][0]).to.equal('success');
-        const handler = pulseInstance.on.args[3][1];
+        expect(pulseInstance.on.mock.calls[3][0]).toBe('success');
+        const handler = pulseInstance.on.mock.calls[3][1];
         await handler(job);
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`successful job '${job.attrs.name}'`)
             .on(client)
             .in('initializeEventHandlers')
@@ -513,11 +509,11 @@ describe(`PulseClient`, () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
         await client.connect();
-        expect(pulseInstance.on.args[4][0]).to.equal('fail');
-        const handler = pulseInstance.on.args[4][1];
+        expect(pulseInstance.on.mock.calls[4][0]).toBe('fail');
+        const handler = pulseInstance.on.mock.calls[4][1];
         const error = new Error('my-error');
         await handler(error, job);
-        expect(log.error).to.be.calledWith(
+        expect(log.error).toHaveBeenCalledWith(
           new Log(`failed job '${job.attrs.name}' do to error: ${error}`)
             .on(client)
             .in('initializeEventHandlers')
@@ -538,7 +534,8 @@ describe(`PulseClient`, () => {
           processEvery: interval,
         },
       });
-      expect(instance.getInterval()).to.be.equal(interval);
+      expect(instance.getInterval()).toBe(interval);
     });
   });
 });
+

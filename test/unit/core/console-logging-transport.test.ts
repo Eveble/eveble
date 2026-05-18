@@ -1,15 +1,12 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
-import sinon from 'sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll } from 'vitest';
+
 import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { types } from '../../../src/types';
 import { ConsoleTransport } from '../../../src/core/logging-transports/console-transport';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Injector } from '../../../src/core/injector';
 import { Log } from '../../../src/components/log-entry';
-
-chai.use(sinonChai);
 
 describe('ConsoleTransport', () => {
   let injector: types.Injector;
@@ -22,7 +19,7 @@ describe('ConsoleTransport', () => {
   let logger: any;
   let levels: types.LogLevels;
 
-  before(() => {
+  beforeAll(() => {
     levels = {
       emerg: 0,
       alert: 1,
@@ -37,32 +34,32 @@ describe('ConsoleTransport', () => {
 
   beforeEach(() => {
     winston = {
-      createLogger: sinon.stub(),
+      createLogger: vi.fn(),
       transports: {
-        Console: sinon.stub(),
+        Console: vi.fn(),
       },
       format: {
-        errors: sinon.stub(),
-        timestamp: sinon.stub(),
-        colorize: sinon.stub(),
-        printf: sinon.stub(),
-        combine: sinon.stub(),
+        errors: vi.fn(),
+        timestamp: vi.fn(),
+        colorize: vi.fn(),
+        printf: vi.fn(),
+        combine: vi.fn(),
       },
-      addColors: sinon.stub(),
+      addColors: vi.fn(),
     };
-    combinedFormat = sinon.stub();
-    winston.format.combine.returns(combinedFormat);
+    combinedFormat = vi.fn();
+    winston.format.combine.mockReturnValue(combinedFormat);
     winstonLogger = {
-      debug: sinon.stub(),
-      emerg: sinon.stub(),
+      debug: vi.fn(),
+      emerg: vi.fn(),
     };
-    winston.createLogger.returns(winstonLogger);
+    winston.createLogger.mockReturnValue(winstonLogger);
 
-    logger = stubInterface<types.Logger>();
+    logger = mock<types.Logger>();
     logger.levels = levels;
 
-    simpleFormatter = stubInterface<types.Logger>();
-    detailedFormatter = stubInterface<types.Logger>();
+    simpleFormatter = mock<types.Logger>();
+    detailedFormatter = mock<types.Logger>();
 
     injector = new Injector();
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(logger);
@@ -121,35 +118,35 @@ describe('ConsoleTransport', () => {
     it('takes required level as a string as first and config as instance of LogTransportConfig and assigns them', () => {
       const level = 'debug';
       const transport = new ConsoleTransport(level, config);
-      expect(transport.level).to.be.equal(level);
-      expect(transport.config).to.be.equal(config);
+      expect(transport.level).toBe(level);
+      expect(transport.config).toBe(config);
     });
 
     it('annotates winston property for property injection', () => {
       const level = 'debug';
       const transport = new ConsoleTransport(level, config);
       injector.injectInto(transport);
-      expect(winston.createLogger).to.be.calledOnce;
+      expect(winston.createLogger).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('initialization', () => {
-    context('creating winston logger', () => {
+    describe('creating winston logger', () => {
       it(`creates with logging level assigned from instance`, () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
         injector.injectInto(transport);
-        expect(winston.createLogger).to.be.calledOnce;
-        expect(winston.createLogger.args[0][0].level).to.be.equal('debug');
-        expect(transport.client).to.be.equal(winstonLogger);
+        expect(winston.createLogger).toHaveBeenCalledTimes(1);
+        expect(winston.createLogger.mock.calls[0][0].level).toBe('debug');
+        expect(transport.client).toBe(winstonLogger);
       });
 
       it(`creates with logging levels assigned from logger instance`, () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
         injector.injectInto(transport);
-        expect(winston.createLogger).to.be.calledOnce;
-        expect(winston.createLogger.args[0][0].levels).to.be.equal(
+        expect(winston.createLogger).toHaveBeenCalledTimes(1);
+        expect(winston.createLogger.mock.calls[0][0].levels).toBe(
           logger.levels
         );
       });
@@ -158,10 +155,10 @@ describe('ConsoleTransport', () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
         injector.injectInto(transport);
-        expect(winston.createLogger).to.be.calledOnce;
-        expect(winston.createLogger.args[0][0].transports).to.be.an('array');
-        expect(winston.createLogger.args[0][0].transports).to.have.length(1);
-        expect(winston.createLogger.args[0][0].transports).to.be.eql([
+        expect(winston.createLogger).toHaveBeenCalledTimes(1);
+        expect(winston.createLogger.mock.calls[0][0].transports).toBeInstanceOf(Array);
+        expect(winston.createLogger.mock.calls[0][0].transports).toHaveLength(1);
+        expect(winston.createLogger.mock.calls[0][0].transports).toEqual([
           new winston.transports.Console(),
         ]);
       });
@@ -170,8 +167,8 @@ describe('ConsoleTransport', () => {
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
         injector.injectInto(transport);
-        expect(winston.createLogger).to.be.calledOnce;
-        expect(winston.createLogger.args[0][0].format).to.be.equal(
+        expect(winston.createLogger).toHaveBeenCalledTimes(1);
+        expect(winston.createLogger.mock.calls[0][0].format).toBe(
           combinedFormat
         );
       });
@@ -181,19 +178,19 @@ describe('ConsoleTransport', () => {
       const level = 'debug';
       const transport = new ConsoleTransport(level, config);
       injector.injectInto(transport);
-      expect(winston.addColors).to.be.calledOnce;
-      expect(winston.addColors).to.be.calledWithExactly(config.logColors);
+      expect(winston.addColors).toHaveBeenCalledTimes(1);
+      expect(winston.addColors).toHaveBeenCalledWith(config.logColors);
     });
 
-    context('formatting', () => {
-      context('stacktrace', () => {
+    describe('formatting', () => {
+      describe('stacktrace', () => {
         it('enables stacktrace on passed errors', () => {
           config.set('flags.includeStackTrace', true);
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.errors).to.be.calledWith({ stack: true });
+          expect(winston.format.errors).toHaveBeenCalledWith({ stack: true });
         });
 
         it('disables stacktrace on passed errors', () => {
@@ -202,20 +199,20 @@ describe('ConsoleTransport', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.errors).to.be.calledWith({
+          expect(winston.format.errors).toHaveBeenCalledWith({
             stack: false,
           });
         });
       });
 
-      context('timestamp', () => {
+      describe('timestamp', () => {
         it('enables timestamp', () => {
           config.set('flags.isTimestamped', true);
 
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.timestamp).to.be.calledWith({
+          expect(winston.format.timestamp).toHaveBeenCalledWith({
             format: config.get('timestampFormat'),
           });
         });
@@ -228,7 +225,7 @@ describe('ConsoleTransport', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.timestamp).to.be.calledWith({
+          expect(winston.format.timestamp).toHaveBeenCalledWith({
             format: timestampFormat,
           });
         });
@@ -239,11 +236,11 @@ describe('ConsoleTransport', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.timestamp).to.not.be.called;
+          expect(winston.format.timestamp).not.toHaveBeenCalled;
         });
       });
 
-      context('colorization', () => {
+      describe('colorization', () => {
         it('enables colorization', () => {
           config.set('flags.isColored', true);
           config.set('flags.isWholeLineColored', false);
@@ -251,7 +248,7 @@ describe('ConsoleTransport', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.colorize).to.be.calledWith({
+          expect(winston.format.colorize).toHaveBeenCalledWith({
             all: false,
           });
         });
@@ -263,7 +260,7 @@ describe('ConsoleTransport', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.colorize).to.be.calledWith({
+          expect(winston.format.colorize).toHaveBeenCalledWith({
             all: true,
           });
         });
@@ -274,21 +271,21 @@ describe('ConsoleTransport', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
           injector.injectInto(transport);
-          expect(winston.format.colorize).to.not.be.called;
+          expect(winston.format.colorize).not.toHaveBeenCalled;
         });
       });
 
       it('combines all formatting selections', () => {
-        winston.format.errors.returns('errors');
-        winston.format.timestamp.returns('timestamp');
-        winston.format.colorize.returns('colorize');
-        winston.format.printf.returns('printf');
+        winston.format.errors.mockReturnValue('errors');
+        winston.format.timestamp.mockReturnValue('timestamp');
+        winston.format.colorize.mockReturnValue('colorize');
+        winston.format.printf.mockReturnValue('printf');
 
         const level = 'debug';
         const transport = new ConsoleTransport(level, config);
         injector.injectInto(transport);
-        expect(winston.format.combine).to.be.calledOnce;
-        expect(winston.format.combine).to.be.calledWith(
+        expect(winston.format.combine).toHaveBeenCalledTimes(1);
+        expect(winston.format.combine).toHaveBeenCalledWith(
           'errors',
           'timestamp',
           'colorize',
@@ -296,7 +293,7 @@ describe('ConsoleTransport', () => {
         );
       });
 
-      context('printf', () => {
+      describe('printf', () => {
         it('uses simple formatter for log entries with simple formatting enabled', () => {
           const level = 'debug';
           const transport = new ConsoleTransport(level, config);
@@ -305,9 +302,9 @@ describe('ConsoleTransport', () => {
           const log = new Log('my-message').format({ isSimple: true });
           transport.formatEntry(log);
 
-          expect(simpleFormatter.format).to.be.calledOnce;
-          expect(simpleFormatter.format).to.be.calledWith(log);
-          expect(detailedFormatter.format).to.not.be.called;
+          expect(simpleFormatter.format).toHaveBeenCalledTimes(1);
+          expect(simpleFormatter.format).toHaveBeenCalledWith(log);
+          expect(detailedFormatter.format).not.toHaveBeenCalled();
         });
 
         it('uses as default detailed formatter for log entries', () => {
@@ -318,20 +315,20 @@ describe('ConsoleTransport', () => {
           const log = new Log('my-message');
           transport.formatEntry(log);
 
-          expect(detailedFormatter.format).to.be.calledOnce;
-          expect(detailedFormatter.format).to.be.calledWith(log);
-          expect(simpleFormatter.format).to.not.be.called;
+          expect(detailedFormatter.format).toHaveBeenCalledTimes(1);
+          expect(detailedFormatter.format).toHaveBeenCalledWith(log, config);
+          expect(simpleFormatter.format).not.toHaveBeenCalled();
         });
       });
     });
 
     it(`takes optional custom winston's combined format as third argument on construction`, () => {
-      const customFormat = sinon.stub();
+      const customFormat = vi.fn();
       const level = 'debug';
       const transport = new ConsoleTransport(level, config, customFormat);
       injector.injectInto(transport);
-      expect(winston.createLogger).to.be.calledOnce;
-      expect(winston.createLogger.args[0][0].format).to.be.equal(customFormat);
+      expect(winston.createLogger).toHaveBeenCalledTimes(1);
+      expect(winston.createLogger.mock.calls[0][0].format).toBe(customFormat);
     });
   });
 
@@ -343,8 +340,8 @@ describe('ConsoleTransport', () => {
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);
-      expect(winstonLogger.debug).to.be.calledOnce;
-      expect(winstonLogger.debug).to.be.calledWith(...args);
+      expect(winstonLogger.debug).toHaveBeenCalledTimes(1);
+      expect(winstonLogger.debug).toHaveBeenCalledWith(...args);
     });
 
     it(`skips logging entry on loggable level not matching transport's priority`, () => {
@@ -354,10 +351,11 @@ describe('ConsoleTransport', () => {
 
       const args = ['my-message', 'first', 2, null, undefined];
       transport.log('debug', 'my-message', 'first', 2, null, undefined);
-      expect(winstonLogger.debug).to.not.be.called;
+      expect(winstonLogger.debug).not.toHaveBeenCalled();
       transport.log('emerg', 'my-message', 'first', 2, null, undefined);
-      expect(winstonLogger.emerg).to.be.calledOnce;
-      expect(winstonLogger.emerg).to.be.calledWith(...args);
+      expect(winstonLogger.emerg).toHaveBeenCalledTimes(1);
+      expect(winstonLogger.emerg).toHaveBeenCalledWith(...args);
     });
   });
 });
+

@@ -1,8 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+
 import { Collection } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import { kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
@@ -35,9 +35,6 @@ import { AbilityAssertion } from '../../../src/domain/assertions/ability-asserti
 import { setupCommitStoreMongo } from '../../utilities/setups/commit-store-mongo.util';
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`Saving Event Sourceable state to storage`, () => {
   // Props
   const appId = 'my-app-id';
@@ -60,8 +57,8 @@ describe(`Saving Event Sourceable state to storage`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -70,13 +67,13 @@ describe(`Saving Event Sourceable state to storage`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.isEnabled').returns(true);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -161,37 +158,37 @@ describe(`Saving Event Sourceable state to storage`, () => {
     taskListId: Guid,
     title: string
   ): void {
-    expect(commit).to.be.instanceof(Commit);
-    expect(commit.id).to.be.a('string'); // Generated from MongoDBStorage
-    expect(commit.sourceId).to.be.equal(taskListId.toString());
-    expect(commit.version).to.be.equal(1);
-    expect(commit.eventSourceableType).to.be.equal('TaskList');
+    expect(commit).toBeInstanceOf(Commit);
+    expect(commit.id).toBeTypeOf('string'); // Generated from MongoDBStorage
+    expect(commit.sourceId).toBe(taskListId.toString());
+    expect(commit.version).toBe(1);
+    expect(commit.eventSourceableType).toBe('TaskList');
 
-    expect(commit.events).to.be.instanceof(Array);
+    expect(commit.events).toBeInstanceOf(Array);
     const firstEvent = commit.events[0] as any;
-    expect(firstEvent).to.be.instanceof(TaskListCreated);
-    expect(firstEvent.sourceId).to.be.eql(taskListId);
-    expect(firstEvent.timestamp).to.be.instanceof(Date);
-    expect(firstEvent.version).to.be.equal(1);
-    expect(firstEvent.title).to.be.equal(title);
-    expect(firstEvent.tasks).to.be.eql([]);
+    expect(firstEvent).toBeInstanceOf(TaskListCreated);
+    expect(firstEvent.sourceId).toEqual(taskListId);
+    expect(firstEvent.timestamp).toBeInstanceOf(Date);
+    expect(firstEvent.version).toBe(1);
+    expect(firstEvent.title).toBe(title);
+    expect(firstEvent.tasks).toEqual([]);
 
-    expect(commit.commands).to.be.instanceof(Array);
-    expect(commit.commands).to.be.eql([]);
+    expect(commit.commands).toBeInstanceOf(Array);
+    expect(commit.commands).toEqual([]);
 
-    expect(commit.insertedAt).to.be.instanceof(Date);
-    expect(commit.sentBy).to.be.equal(appId);
+    expect(commit.insertedAt).toBeInstanceOf(Date);
+    expect(commit.sentBy).toBe(appId);
 
-    expect(commit.receivers).to.be.instanceof(Array);
-    expect(commit.receivers[0]).to.be.instanceof(CommitReceiver);
-    expect(commit.receivers[0].state).to.be.equal('published');
-    expect(commit.receivers[0].appId).to.be.equal(appId);
-    expect(commit.receivers[0].workerId).to.be.equal(workerId);
-    expect(commit.receivers[0].receivedAt).to.be.instanceof(Date);
-    expect(commit.receivers[0].publishedAt).to.be.instanceof(Date);
+    expect(commit.receivers).toBeInstanceOf(Array);
+    expect(commit.receivers[0]).toBeInstanceOf(CommitReceiver);
+    expect(commit.receivers[0].state).toBe('published');
+    expect(commit.receivers[0].appId).toBe(appId);
+    expect(commit.receivers[0].workerId).toBe(workerId);
+    expect(commit.receivers[0].receivedAt).toBeInstanceOf(Date);
+    expect(commit.receivers[0].publishedAt).toBeInstanceOf(Date);
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     await setupSnapshotterMongo(injector, clients, collections);
@@ -214,7 +211,7 @@ describe(`Saving Event Sourceable state to storage`, () => {
     await collections.snapshotter.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
     await clients.snapshotter.disconnect();
 
@@ -244,7 +241,7 @@ describe(`Saving Event Sourceable state to storage`, () => {
     });
 
     it(`persists event sourcable as commit and snapshots it when snapshotter is defined`, async () => {
-      config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+      config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
       const title = 'my-title';
       const createList = new CreateTaskList({
@@ -278,8 +275,9 @@ describe(`Saving Event Sourceable state to storage`, () => {
         title,
         tasks: [],
       });
-      expect(foundSnapshot).to.be.instanceof(TaskList);
-      expect(foundSnapshot).to.be.eql(expectedSnapshot);
+      expect(foundSnapshot).toBeInstanceOf(TaskList);
+      expect(foundSnapshot).toEqual(expectedSnapshot);
     });
   });
 });
+

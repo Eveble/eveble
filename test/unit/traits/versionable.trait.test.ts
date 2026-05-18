@@ -1,5 +1,5 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
+import { expect, describe, it, vi } from 'vitest';
+
 import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { derive } from '@traits-ts/core';
@@ -27,7 +27,7 @@ describe(`VersionableTrait`, () => {
         schemaVersion: number | undefined;
       }
 
-      expect(MyClass.getPropTypes().schemaVersion).to.be.eql(
+      expect(MyClass.getPropTypes().schemaVersion).toEqual(
         PropTypes.instanceOf(Number).isOptional
       );
     });
@@ -38,8 +38,8 @@ describe(`VersionableTrait`, () => {
       class MyClass extends derive(VersionableTrait) {}
 
       expect(() =>
-        MyClass.prototype.registerLegacyTransformer('1' as any, sinon.stub())
-      ).to.throw(
+        MyClass.prototype.registerLegacyTransformer('1' as any, vi.fn())
+      ).toThrow(
         InvalidSchemaVersionError,
         'MyClass: schema version must be a number, got String("1")'
       );
@@ -48,10 +48,10 @@ describe(`VersionableTrait`, () => {
     it('throws LegacyTransformerAlreadyExistsError when hook would be overridden', () => {
       class MyClass extends derive(VersionableTrait) {}
 
-      MyClass.prototype.registerLegacyTransformer(1, sinon.stub());
+      MyClass.prototype.registerLegacyTransformer(1, vi.fn());
       expect(() =>
-        MyClass.prototype.registerLegacyTransformer(1, sinon.stub())
-      ).to.throw(
+        MyClass.prototype.registerLegacyTransformer(1, vi.fn())
+      ).toThrow(
         LegacyTransformerAlreadyExistsError,
         'MyClass: legacy transformer for schema version 1 already exists'
       );
@@ -61,9 +61,9 @@ describe(`VersionableTrait`, () => {
       class MyClass extends derive(VersionableTrait) {}
 
       const schemaVersion = 1;
-      const transformer = sinon.stub();
+      const transformer = vi.fn();
       MyClass.prototype.registerLegacyTransformer(schemaVersion, transformer);
-      expect(MyClass.prototype.getLegacyTransformer(schemaVersion)).to.be.equal(
+      expect(MyClass.prototype.getLegacyTransformer(schemaVersion)).toBe(
         transformer
       );
     });
@@ -72,8 +72,8 @@ describe(`VersionableTrait`, () => {
       class MyClass extends derive(VersionableTrait) {}
 
       const schemaVersion = 1;
-      const transformer = sinon.stub();
-      const otherTransformer = sinon.stub();
+      const transformer = vi.fn();
+      const otherTransformer = vi.fn();
 
       MyClass.prototype.registerLegacyTransformer(schemaVersion, transformer);
       expect(() =>
@@ -81,8 +81,8 @@ describe(`VersionableTrait`, () => {
           schemaVersion,
           otherTransformer
         )
-      ).to.not.throw(LegacyTransformerAlreadyExistsError);
-      expect(MyClass.prototype.getLegacyTransformer(schemaVersion)).to.be.equal(
+      ).not.toThrow(LegacyTransformerAlreadyExistsError);
+      expect(MyClass.prototype.getLegacyTransformer(schemaVersion)).toBe(
         otherTransformer
       );
     });
@@ -90,7 +90,7 @@ describe(`VersionableTrait`, () => {
     it(`throws LegacyTransformerNotFoundError if legacy transformer for schema version can't be found`, () => {
       class MyClass extends derive(VersionableTrait) {}
 
-      expect(() => MyClass.prototype.getLegacyTransformer(1)).to.throw(
+      expect(() => MyClass.prototype.getLegacyTransformer(1)).toThrow(
         LegacyTransformerNotFoundError,
         `MyClass: legacy transformer for schema version 1 was not found`
       );
@@ -100,9 +100,9 @@ describe(`VersionableTrait`, () => {
       class MyClass extends derive(VersionableTrait) {}
 
       const schemaVersion = 1;
-      const transformer = sinon.stub();
+      const transformer = vi.fn();
       MyClass.prototype.registerLegacyTransformer(schemaVersion, transformer);
-      expect(MyClass.prototype.getLegacyTransformer(schemaVersion)).to.be.equal(
+      expect(MyClass.prototype.getLegacyTransformer(schemaVersion)).toBe(
         transformer
       );
     });
@@ -112,7 +112,7 @@ describe(`VersionableTrait`, () => {
         class MyClass extends derive(VersionableTrait) {}
 
         const schemaVersion = 1;
-        const transformer = sinon.stub();
+        const transformer = vi.fn();
         MyClass.prototype.registerLegacyTransformer(schemaVersion, transformer);
         expect(MyClass.prototype.hasLegacyTransformer(schemaVersion)).to.be
           .true;
@@ -138,7 +138,7 @@ describe(`VersionableTrait`, () => {
         }
         return new MyClass();
       };
-      expect(ctor).to.throw(
+      expect(ctor).toThrow(
         NotVersionableError,
         `MyClass: class must implement Versionable and Hookable interfaces`
       );
@@ -154,7 +154,7 @@ describe(`VersionableTrait`, () => {
         }
         return new MyClass();
       };
-      expect(ctor).to.throw(
+      expect(ctor).toThrow(
         NotVersionableError,
         `MyClass: class must implement Versionable and Hookable interfaces`
       );
@@ -168,7 +168,7 @@ describe(`VersionableTrait`, () => {
         }
         return new MyClass();
       };
-      expect(ctor).to.throw(
+      expect(ctor).toThrow(
         InvalidLegacyTransformerError,
         `MyClass: declared legacy transformer under key 'myPropKey' for schema version of 1 must be annotating method`
       );
@@ -198,7 +198,7 @@ describe(`VersionableTrait`, () => {
         .true;
       expect(
         MyClass.prototype.getHook('onConstruction', 'versionable')
-      ).to.be.equal(MyClass.prototype.transformLegacyProps);
+      ).toBe(MyClass.prototype.transformLegacyProps);
     });
 
     it.skip('does not leak legacy transformers in parent-child relation', () => {
@@ -225,18 +225,18 @@ describe(`VersionableTrait`, () => {
       const propsV0 = {
         key: 'initial-string',
       };
-      expect(Parent.prototype.transformLegacyProps(propsV0)).to.be.eql({
+      expect(Parent.prototype.transformLegacyProps(propsV0)).toEqual({
         key: 'parent-version-1',
         schemaVersion: 1,
       });
 
-      expect(Child.prototype.transformLegacyProps(propsV0)).to.be.eql({
+      expect(Child.prototype.transformLegacyProps(propsV0)).toEqual({
         key: 'child-version-1',
         schemaVersion: 1,
       });
     });
 
-    context('v0', () => {
+    describe('v0', () => {
       it('does not transform types that have no legacy transformers assigned', () => {
         class MyClass extends derive(VersionableTrait) {
           key: string;
@@ -244,13 +244,13 @@ describe(`VersionableTrait`, () => {
         const propsV0 = {
           key: 'my-string',
         };
-        expect(MyClass.prototype.transformLegacyProps(propsV0)).to.be.eql(
+        expect(MyClass.prototype.transformLegacyProps(propsV0)).toEqual(
           propsV0
         );
       });
     });
 
-    context('v1', () => {
+    describe('v1', () => {
       it('transforms legacy props that are 1 version behind', () => {
         class MyClass extends derive(VersionableTrait, HookableTrait) {
           key: string;
@@ -268,7 +268,7 @@ describe(`VersionableTrait`, () => {
           key: 'my-version-1-string',
           schemaVersion: 1,
         };
-        expect(MyClass.prototype.transformLegacyProps(propsV0)).to.be.eql(
+        expect(MyClass.prototype.transformLegacyProps(propsV0)).toEqual(
           propsV1
         );
       });
@@ -287,13 +287,13 @@ describe(`VersionableTrait`, () => {
           key: 'my-version-1-string',
           schemaVersion: 1,
         };
-        expect(MyClass.prototype.transformLegacyProps(propsV1)).to.be.eql(
+        expect(MyClass.prototype.transformLegacyProps(propsV1)).toEqual(
           propsV1
         );
       });
     });
 
-    context('vN', () => {
+    describe('vN', () => {
       it('transforms legacy props that are 2 version behind', () => {
         class MyClass extends derive(VersionableTrait, HookableTrait) {
           key: string;
@@ -317,7 +317,7 @@ describe(`VersionableTrait`, () => {
           key: 'my-version-2-string',
           schemaVersion: 2,
         };
-        expect(MyClass.prototype.transformLegacyProps(propsV0)).to.be.eql(
+        expect(MyClass.prototype.transformLegacyProps(propsV0)).toEqual(
           propsV2
         );
       });
@@ -343,10 +343,11 @@ describe(`VersionableTrait`, () => {
           key: 'my-version-2-string',
           schemaVersion: 2,
         };
-        expect(MyClass.prototype.transformLegacyProps(propsV2)).to.be.eql(
+        expect(MyClass.prototype.transformLegacyProps(propsV2)).toEqual(
           propsV2
         );
       });
     });
   });
 });
+

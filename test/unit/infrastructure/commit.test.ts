@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it, beforeEach, beforeAll } from 'vitest';
+
 import { ValidationError } from 'typend';
 import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
@@ -23,7 +24,7 @@ describe(`Commit`, () => {
   const now: Date = new Date();
 
   it(`extends Struct`, () => {
-    expect(Commit.prototype).to.be.instanceof(Struct);
+    expect(Commit.prototype).toBeInstanceOf(Struct);
   });
 
   const id = 'my-id';
@@ -66,15 +67,15 @@ describe(`Commit`, () => {
         ],
       });
 
-      expect(commit.id).to.be.equal(commitId);
-      expect(commit.sourceId).to.be.equal(id);
-      expect(commit.version).to.be.equal(1);
-      expect(commit.eventSourceableType).to.be.equal('MyProcess');
-      expect(commit.events).to.be.eql([firstEvent, secondEvent]);
-      expect(commit.commands).to.be.eql([firstCommand, secondCommand]);
-      expect(commit.insertedAt).to.be.equal(now);
-      expect(commit.sentBy).to.be.equal('my-app-id');
-      expect(commit.receivers).to.be.eql([
+      expect(commit.id).toBe(commitId);
+      expect(commit.sourceId).toBe(id);
+      expect(commit.version).toBe(1);
+      expect(commit.eventSourceableType).toBe('MyProcess');
+      expect(commit.events).toEqual([firstEvent, secondEvent]);
+      expect(commit.commands).toEqual([firstCommand, secondCommand]);
+      expect(commit.insertedAt).toBe(now);
+      expect(commit.sentBy).toBe('my-app-id');
+      expect(commit.receivers).toEqual([
         new CommitReceiver({
           state: 'received',
           appId: 'my-app-id',
@@ -113,8 +114,8 @@ describe(`Commit`, () => {
         receivers: [firstReceiver, secondReceiver],
       });
 
-      expect(commit.getReceiver(firstAppId)).to.be.equal(firstReceiver);
-      expect(commit.getReceiver(secondAppId)).to.be.equal(secondReceiver);
+      expect(commit.getReceiver(firstAppId)).toBe(firstReceiver);
+      expect(commit.getReceiver(secondAppId)).toBe(secondReceiver);
     });
 
     it('allows to add receiver to commit receivers collection', () => {
@@ -144,7 +145,7 @@ describe(`Commit`, () => {
         receivers: [firstReceiver],
       });
       commit.addReceiver(secondReceiver);
-      expect(commit.receivers).to.be.eql([firstReceiver, secondReceiver]);
+      expect(commit.receivers).toEqual([firstReceiver, secondReceiver]);
     });
   });
 
@@ -161,7 +162,7 @@ describe(`Commit`, () => {
         sentBy: 'my-app-id',
         receivers: [],
       });
-      expect(commit.getEventTypeNames()).to.be.eql([
+      expect(commit.getEventTypeNames()).toEqual([
         'Commit.FirstEvent',
         'Commit.SecondEvent',
       ]);
@@ -179,7 +180,7 @@ describe(`Commit`, () => {
         sentBy: 'my-app-id',
         receivers: [],
       });
-      expect(commit.getCommandTypeNames()).to.be.eql([
+      expect(commit.getCommandTypeNames()).toEqual([
         'Commit.FirstCommand',
         'Commit.SecondCommand',
       ]);
@@ -190,7 +191,7 @@ describe(`Commit`, () => {
 describe(`CommitReceiver`, () => {
   let now: Date;
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
@@ -201,16 +202,16 @@ describe(`CommitReceiver`, () => {
         appId: 'my-app-id',
         receivedAt: now,
       });
-      expect(receiver.state).to.be.equal(CommitReceiver.STATES.received);
-      expect(receiver.appId).to.be.equal('my-app-id');
-      expect(receiver.receivedAt).to.be.equal(now);
+      expect(receiver.state).toBe(CommitReceiver.STATES.received);
+      expect(receiver.appId).toBe('my-app-id');
+      expect(receiver.receivedAt).toBe(now);
     });
   });
 
   describe('working with state', () => {
     let props: Record<string, any>;
 
-    before(() => {
+    beforeAll(() => {
       props = {
         state: 'received',
         appId: 'my-app-id',
@@ -223,9 +224,9 @@ describe(`CommitReceiver`, () => {
         ...props,
         state: CommitReceiver.STATES.received,
       });
-      expect(commit.getState()).to.be.equal(CommitReceiver.STATES.received);
+      expect(commit.getState()).toBe(CommitReceiver.STATES.received);
       commit.setState(CommitReceiver.STATES.published);
-      expect(commit.getState()).to.be.equal(CommitReceiver.STATES.published);
+      expect(commit.getState()).toBe(CommitReceiver.STATES.published);
     });
 
     it(`returns true if commit is in state`, () => {
@@ -233,7 +234,7 @@ describe(`CommitReceiver`, () => {
         ...props,
         state: CommitReceiver.STATES.received,
       });
-      expect(commit.isInState(CommitReceiver.STATES.received)).to.be.true;
+      expect(commit.isInState(CommitReceiver.STATES.received)).toBe(true);
     });
 
     it(`returns false if commit is not in state`, () => {
@@ -241,7 +242,7 @@ describe(`CommitReceiver`, () => {
         ...props,
         state: CommitReceiver.STATES.received,
       });
-      expect(commit.isInState(CommitReceiver.STATES.published)).to.be.false;
+      expect(commit.isInState(CommitReceiver.STATES.published)).toBe(false);
     });
 
     it(`returns true if commit is one of state`, () => {
@@ -255,7 +256,7 @@ describe(`CommitReceiver`, () => {
           CommitReceiver.STATES.timeouted,
           CommitReceiver.STATES.failed,
         ])
-      ).to.be.true;
+      ).toBe(true);
       expect(commit.isInOneOfStates(CommitReceiver.STATES.timeouted)).to.be
         .true;
     });
@@ -270,13 +271,13 @@ describe(`CommitReceiver`, () => {
           CommitReceiver.STATES.timeouted,
           CommitReceiver.STATES.failed,
         ])
-      ).to.be.false;
+      ).toBe(false);
       expect(commit.isInOneOfStates(CommitReceiver.STATES.published)).to.be
         .false;
     });
 
     it('allows only available states to be set', () => {
-      expect(CommitReceiver.STATES).to.be.eql({
+      expect(CommitReceiver.STATES).toEqual({
         received: 'received',
         published: 'published',
         timeouted: 'timeouted',
@@ -287,7 +288,7 @@ describe(`CommitReceiver`, () => {
     it('throws ValidationError if state is not in one of allowed values on creation', () => {
       expect(() => {
         new CommitReceiver({ ...props, state: 'notValidState' });
-      }).to.throw(
+      }).toThrow(
         ValidationError,
         `Expected String("notValidState") to be one of: String("received"), String("published"), String("timeouted"), String("failed")`
       );
@@ -300,7 +301,7 @@ describe(`CommitReceiver`, () => {
       });
       expect(() => {
         commit.setState('notValidState');
-      }).to.throw(
+      }).toThrow(
         ValidationError,
         `Expected String("notValidState") to be one of: String("received"), String("published"), String("timeouted"), String("failed")`
       );
@@ -320,32 +321,33 @@ describe(`CommitReceiver`, () => {
 
     it('allows to flag commit receiver as published', () => {
       receiver.flagAsPublished(workerId);
-      expect(receiver.isInState(CommitReceiver.STATES.published)).to.be.true;
-      expect(receiver.publishedAt).to.be.instanceof(Date);
-      expect(receiver.workerId).to.be.equal(workerId);
+      expect(receiver.isInState(CommitReceiver.STATES.published)).toBe(true);
+      expect(receiver.publishedAt).toBeInstanceOf(Date);
+      expect(receiver.workerId).toBe(workerId);
     });
 
     it('allows to flag commit receiver as timeouted', () => {
       receiver.flagAsTimeouted(workerId);
-      expect(receiver.isInState(CommitReceiver.STATES.timeouted)).to.be.true;
-      expect(receiver.failedAt).to.be.instanceof(Date);
-      expect(receiver.workerId).to.be.equal(workerId);
+      expect(receiver.isInState(CommitReceiver.STATES.timeouted)).toBe(true);
+      expect(receiver.failedAt).toBeInstanceOf(Date);
+      expect(receiver.workerId).toBe(workerId);
     });
 
     it('allows to flag commit receiver as failed', () => {
       receiver.flagAsFailed(workerId);
-      expect(receiver.isInState(CommitReceiver.STATES.failed)).to.be.true;
-      expect(receiver.failedAt).to.be.instanceof(Date);
-      expect(receiver.workerId).to.be.equal(workerId);
+      expect(receiver.isInState(CommitReceiver.STATES.failed)).toBe(true);
+      expect(receiver.failedAt).toBeInstanceOf(Date);
+      expect(receiver.workerId).toBe(workerId);
     });
 
     it('allows to re-flag commit receiver as received', () => {
       receiver.flagAsTimeouted(workerId);
-      expect(receiver.isInState(CommitReceiver.STATES.timeouted)).to.be.true;
+      expect(receiver.isInState(CommitReceiver.STATES.timeouted)).toBe(true);
       receiver.flagAsReceived(workerId);
-      expect(receiver.isInState(CommitReceiver.STATES.received)).to.be.true;
-      expect(receiver.receivedAt).to.be.instanceof(Date);
-      expect(receiver.workerId).to.be.equal(workerId);
+      expect(receiver.isInState(CommitReceiver.STATES.received)).toBe(true);
+      expect(receiver.receivedAt).toBeInstanceOf(Date);
+      expect(receiver.workerId).toBe(workerId);
     });
   });
 });
+

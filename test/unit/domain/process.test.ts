@@ -1,7 +1,5 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
 import { Process } from '../../../src/domain/process';
@@ -13,9 +11,6 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 import { History } from '../../../src/domain/history';
 import { EventIdMismatchError } from '../../../src/domain/domain-errors';
 import { initial } from '../../../src/annotations/initial';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`Process`, () => {
   let now: Date;
@@ -69,16 +64,15 @@ describe(`Process`, () => {
     }
   }
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(now.getTime());
+    clock = vi.useFakeTimers(now.getTime());
 
     handlers = {
-      MyCommand: sinon.spy(),
-      MyEvent: sinon.spy(),
+      MyCommand: vi.fn(), MyEvent: vi.fn(),
     };
 
     props = {
@@ -105,64 +99,64 @@ describe(`Process`, () => {
   });
 
   afterEach(() => {
-    clock.restore();
+    vi.useRealTimers();
   });
 
   it(`extends EventSourceable`, () => {
-    expect(Process.prototype).to.be.instanceof(EventSourceable);
+    expect(Process.prototype).toBeInstanceOf(EventSourceable);
   });
 
   it('defines the type name correctly', () => {
-    expect(Process.getTypeName()).to.equal('Process');
-    expect(Process.prototype.getTypeName()).to.equal('Process');
+    expect(Process.getTypeName()).toBe('Process');
+    expect(Process.prototype.getTypeName()).toBe('Process');
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(Process.prototype)).to.be.true;
+    expect(isTyped(Process.prototype)).toBe(true);
   });
 
   describe(`construction`, () => {
     it(`makes the id publicly available`, () => {
       const id = 'my-id';
       const process = new Process({ id });
-      expect(process.getId()).to.be.equal(id);
+      expect(process.getId()).toBe(id);
     });
 
     it(`sets the initial version to 0`, () => {
       const process = new Process({ id: 'my-id' });
-      expect(process.getVersion()).to.be.equal(0);
+      expect(process.getVersion()).toBe(0);
     });
 
     it(`initializes uncommitted changes as empty array`, () => {
       const process = new Process({ id: 'my-id' });
-      expect(process.getEvents()).to.be.eql([]);
+      expect(process.getEvents()).toEqual([]);
     });
 
     it(`initializes untriggered commands as empty array`, () => {
       const process = new Process({ id: 'my-id' });
-      expect(process.getCommands()).to.be.eql([]);
+      expect(process.getCommands()).toEqual([]);
     });
 
     describe('construction flows', () => {
       describe('initializing command flow', () => {
         it(`takes a command as initializing message and assigns only id`, () => {
           const process = new MyCommandProcess(commands.MyCommand);
-          expect(process.id).to.be.equal(props.id);
+          expect(process.id).toBe(props.id);
         });
 
         it(`ensures that manual handling of command is required`, () => {
           const process = new MyCommandProcess(commands.MyCommand);
-          expect(process.id).to.be.equal(props.id);
-          expect(handlers.MyCommand).to.not.be.called;
+          expect(process.id).toBe(props.id);
+          expect(handlers.MyCommand).not.toHaveBeenCalled;
         });
 
         it(`initializes process instance and handles command after construction`, () => {
           const process = new MyCommandProcess(commands.MyCommand);
-          expect(process.id).to.be.equal(props.id);
+          expect(process.id).toBe(props.id);
           process.initialize();
           process.handle(commands.MyCommand);
-          expect(handlers.MyCommand).to.be.calledOnce;
-          expect(handlers.MyCommand).to.be.calledWithExactly(
+          expect(handlers.MyCommand).toHaveBeenCalledTimes(1);
+          expect(handlers.MyCommand).toHaveBeenCalledWith(
             commands.MyCommand
           );
         });
@@ -170,25 +164,25 @@ describe(`Process`, () => {
       describe('initializing event flow', () => {
         it(`takes a event as initializing message and assings newly created id`, () => {
           const process = new MyEventProcess(events.MyEvent);
-          expect(process.id).to.not.be.equal(props.id);
-          expect(process.id).to.be.instanceof(Guid);
+          expect(process.id).not.toEqual(props.id);
+          expect(process.id).toBeInstanceOf(Guid);
         });
 
         it(`ensures that manual handling of event is required`, () => {
           const process = new MyEventProcess(events.MyEvent);
-          expect(process.id).to.not.be.equal(props.id);
-          expect(process.id).to.be.instanceof(Guid);
-          expect(handlers.MyEvent).to.not.be.called;
+          expect(process.id).not.toEqual(props.id);
+          expect(process.id).toBeInstanceOf(Guid);
+          expect(handlers.MyEvent).not.toHaveBeenCalled;
         });
 
         it(`initializes process instance and handles event after construction`, () => {
           const process = new MyEventProcess(events.MyEvent);
-          expect(process.id).to.not.be.equal(props.id);
-          expect(process.id).to.be.instanceof(Guid);
+          expect(process.id).not.toEqual(props.id);
+          expect(process.id).toBeInstanceOf(Guid);
           process.initialize();
           process.handle(events.MyEvent);
-          expect(handlers.MyEvent).to.be.calledOnce;
-          expect(handlers.MyEvent).to.be.calledWithExactly(events.MyEvent);
+          expect(handlers.MyEvent).toHaveBeenCalledTimes(1);
+          expect(handlers.MyEvent).toHaveBeenCalledWith(events.MyEvent);
         });
       });
 
@@ -196,14 +190,14 @@ describe(`Process`, () => {
         it('takes instance of History with list of Event instances', () => {
           const history = new History([events.MyEvent]);
           const aggregate = new MyProcess(history);
-          expect(aggregate.getId()).to.equal(events.MyEvent.sourceId);
+          expect(aggregate.getId()).toBe(events.MyEvent.sourceId);
         });
 
         it('ensures that manual replay of history is required', () => {
           const history = new History([events.MyEvent]);
           const aggregate = new MyProcess(history);
-          aggregate.replayHistory = sinon.stub();
-          expect(aggregate.replayHistory).to.not.be.called;
+          aggregate.replayHistory = vi.fn();
+          expect(aggregate.replayHistory).not.toHaveBeenCalled;
         });
 
         it('initializes aggregate and replies history', () => {
@@ -211,8 +205,8 @@ describe(`Process`, () => {
           const aggregate = new MyProcess(history);
           aggregate.initialize();
           aggregate.replayHistory(history);
-          expect(aggregate.getId()).to.equal(events.MyEvent.sourceId);
-          expect(handlers.MyEvent).to.have.been.calledWithExactly(
+          expect(aggregate.getId()).toBe(events.MyEvent.sourceId);
+          expect(handlers.MyEvent).toHaveBeenCalledWith(
             events.MyEvent
           );
         });
@@ -226,12 +220,12 @@ describe(`Process`, () => {
         public static correlationKey = 'myCorrelationKey';
       }
 
-      expect(MyCorrelationProcess.getCorrelationKey()).to.be.equal(
+      expect(MyCorrelationProcess.getCorrelationKey()).toBe(
         'myCorrelationKey'
       );
       expect(
         new MyCorrelationProcess({ id: 'my-id' }).getCorrelationKey()
-      ).to.equal('myCorrelationKey');
+      ).toBe('myCorrelationKey');
     });
 
     it('allows to define custom correlation key with static setter', () => {
@@ -241,18 +235,18 @@ describe(`Process`, () => {
       }
 
       MyCorrelationProcess.setCorrelationKey('myOtherCorrelationKey');
-      expect(MyCorrelationProcess.getCorrelationKey()).to.be.equal(
+      expect(MyCorrelationProcess.getCorrelationKey()).toBe(
         'myOtherCorrelationKey'
       );
       expect(
         new MyCorrelationProcess({ id: 'my-id' }).getCorrelationKey()
-      ).to.equal('myOtherCorrelationKey');
+      ).toBe('myOtherCorrelationKey');
     });
 
     it('returns default correlation key as process type name', () => {
       @Type('Process.MyCorrelationProcess')
       class MyCorrelationProcess extends Process {}
-      expect(MyCorrelationProcess.getCorrelationKey()).to.be.equal(
+      expect(MyCorrelationProcess.getCorrelationKey()).toBe(
         'Process.MyCorrelationProcess'
       );
     });
@@ -322,7 +316,8 @@ describe(`Process`, () => {
       const instance = new MyProcess({ id: 'my-id' });
       expect(() => {
         instance.record(event);
-      }).to.not.throw(EventIdMismatchError);
+      }).not.toThrow(EventIdMismatchError);
     });
   });
 });
+

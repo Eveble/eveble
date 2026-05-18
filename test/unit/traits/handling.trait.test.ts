@@ -1,6 +1,5 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, vi } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import { Command } from '../../../src/components/command';
@@ -11,8 +10,6 @@ import { UnhandleableTypeError } from '../../../src/messaging/messaging-errors';
 import { handle } from '../../../src/annotations/handle';
 import { subscribe } from '../../../src/annotations/subscribe';
 import { HANDLERS } from '../../../src/constants/literal-keys';
-
-chai.use(sinonChai);
 
 describe('HandlingTrait', () => {
   @Type('MyCommand', { isRegistrable: false })
@@ -27,8 +24,8 @@ describe('HandlingTrait', () => {
 
   describe('handlers setup', () => {
     it('registers handlers as a instance of a Map', () => {
-      const commandHandler = sinon.stub();
-      const eventHandler = sinon.stub();
+      const commandHandler = vi.fn();
+      const eventHandler = vi.fn();
       const handlers = new Map();
       handlers.set(MyCommand, commandHandler);
       handlers.set(MyEvent, eventHandler);
@@ -42,28 +39,28 @@ describe('HandlingTrait', () => {
       }
 
       const controller = new MyController();
-      controller.registerHandler = sinon.stub();
+      controller.registerHandler = vi.fn();
       controller.initialize();
 
-      expect(controller.registerHandler).to.be.calledTwice;
-      expect(controller.registerHandler).to.be.calledWithExactly(
+      expect(controller.registerHandler).toHaveBeenCalledTimes(2);
+      expect(controller.registerHandler).toHaveBeenCalledWith(
         MyCommand,
         commandHandler
       );
-      expect(controller.registerHandler).to.be.calledWithExactly(
+      expect(controller.registerHandler).toHaveBeenCalledWith(
         MyEvent,
         eventHandler
       );
     });
 
     it('registers handlers with custom registrator', () => {
-      const commandHandler = sinon.stub();
-      const eventHandler = sinon.stub();
+      const commandHandler = vi.fn();
+      const eventHandler = vi.fn();
       const handlers = new Map();
       handlers.set(MyCommand, commandHandler);
       handlers.set(MyEvent, eventHandler);
 
-      const registrator = sinon.stub();
+      const registrator = vi.fn();
       class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
@@ -74,22 +71,22 @@ describe('HandlingTrait', () => {
       }
 
       const controller = new MyController();
-      controller.registerHandler = sinon.stub();
+      controller.registerHandler = vi.fn();
       controller.initialize();
 
-      expect(registrator).to.be.calledTwice;
-      expect(registrator).to.be.calledWithExactly(MyCommand, commandHandler);
-      expect(registrator).to.be.calledWithExactly(MyEvent, eventHandler);
+      expect(registrator).toHaveBeenCalledTimes(2);
+      expect(registrator).toHaveBeenCalledWith(MyCommand, commandHandler);
+      expect(registrator).toHaveBeenCalledWith(MyEvent, eventHandler);
     });
 
     it('binds on setup each handler to instance of a controller before its registration', () => {
-      const commandHandler = sinon.stub();
-      const eventHandler = sinon.stub();
+      const commandHandler = vi.fn();
+      const eventHandler = vi.fn();
       const handlers = new Map();
       handlers.set(MyCommand, commandHandler);
       handlers.set(MyEvent, eventHandler);
 
-      const registrator = sinon.stub();
+      const registrator = vi.fn();
       class MyController extends derive(HandlingTrait) {
         initialize(): void {
           this.setupHandlers({
@@ -100,27 +97,27 @@ describe('HandlingTrait', () => {
       }
 
       const controller = new MyController();
-      controller.registerHandler = sinon.stub();
+      controller.registerHandler = vi.fn();
       controller.initialize();
 
-      expect(registrator).to.be.calledTwice;
+      expect(registrator).toHaveBeenCalledTimes(2);
       // MyCommand
-      expect(registrator.args[0][0]).to.be.equal(MyCommand);
+      expect(registrator.mock.calls[0][0]).toBe(MyCommand);
       expect(
         Object.create(commandHandler.prototype) instanceof
-          registrator.args[0][1]
-      ).to.be.true;
+          registrator.mock.calls[0][1]
+      ).toBe(true);
       // MyEvent
-      expect(registrator.args[1][0]).to.be.equal(MyEvent);
+      expect(registrator.mock.calls[1][0]).toBe(MyEvent);
       expect(
-        Object.create(eventHandler.prototype) instanceof registrator.args[1][1]
-      ).to.be.true;
-      expect(controller.registerHandler).to.not.be.called;
+        Object.create(eventHandler.prototype) instanceof registrator.mock.calls[1][1]
+      ).toBe(true);
+      expect(controller.registerHandler).not.toHaveBeenCalled();
     });
 
     it('ensures that unhandleable message types passed in handler mappings are throwing UnhnandleableTypeError', () => {
       const handlers = new Map();
-      handlers.set(MyEvent, sinon.stub());
+      handlers.set(MyEvent, vi.fn());
 
       class MyController extends derive(HandlingTrait) {
         initialize(): void {
@@ -132,7 +129,7 @@ describe('HandlingTrait', () => {
       const controller = new MyController();
       controller.setHandleableTypes([Command]);
 
-      expect(() => controller.initialize()).to.throw(
+      expect(() => controller.initialize()).toThrow(
         UnhandleableTypeError,
         `MyController: type must be one of: [Command]; got MyEvent`
       );
@@ -140,7 +137,7 @@ describe('HandlingTrait', () => {
 
     it('ensures that valid message types passed in handler mappings are handleable', () => {
       const handlers = new Map();
-      handlers.set(MyEvent, sinon.stub());
+      handlers.set(MyEvent, vi.fn());
 
       class MyController extends derive(HandlingTrait) {
         initialize(): void {
@@ -152,12 +149,12 @@ describe('HandlingTrait', () => {
       const controller = new MyController();
       controller.setHandleableTypes([Event]);
 
-      expect(() => controller.initialize()).to.not.throw(UnhandleableTypeError);
+      expect(() => controller.initialize()).not.toThrow(UnhandleableTypeError);
     });
 
     it('ensures that message types passed in handler mappings are handleable on runtime', () => {
       const handlers = new Map();
-      handlers.set(MyEvent, sinon.stub());
+      handlers.set(MyEvent, vi.fn());
 
       class MyController extends derive(HandlingTrait) {
         initialize(): void {
@@ -168,18 +165,18 @@ describe('HandlingTrait', () => {
         }
       }
       const controller = new MyController();
-      expect(() => controller.initialize()).to.throw(
+      expect(() => controller.initialize()).toThrow(
         UnhandleableTypeError,
         `MyController: type must be one of: [Command]; got MyEvent`
       );
     });
 
     it('overrides pre-existing handlers for message type set prior to the initialization', () => {
-      const originalHandler = sinon.stub();
+      const originalHandler = vi.fn();
       const originalHandlers = new Map();
       originalHandlers.set(MyCommand, originalHandler);
 
-      const overridingHandler = sinon.stub();
+      const overridingHandler = vi.fn();
       const overridingHandlers = new Map();
       overridingHandlers.set(MyCommand, overridingHandler);
 
@@ -197,11 +194,11 @@ describe('HandlingTrait', () => {
       }
 
       const controller = new MyController();
-      controller.overrideHandler = sinon.stub();
+      controller.overrideHandler = vi.fn();
       controller.initialize();
 
-      expect(controller.overrideHandler).to.be.calledOnce;
-      expect(controller.overrideHandler).to.be.calledWithExactly(
+      expect(controller.overrideHandler).toHaveBeenCalledTimes(1);
+      expect(controller.overrideHandler).toHaveBeenCalledWith(
         MyCommand,
         overridingHandler
       );
@@ -235,10 +232,10 @@ describe('HandlingTrait', () => {
         }
       }
       const controller = new MyController();
-      controller.registerHandler = sinon.stub();
+      controller.registerHandler = vi.fn();
       controller.initialize();
-      expect(controller.registerHandler).to.be.calledOnce;
-      expect(controller.registerHandler).to.be.calledWithExactly(
+      expect(controller.registerHandler).toHaveBeenCalledTimes(1);
+      expect(controller.registerHandler).toHaveBeenCalledWith(
         MyCommand,
         controller.MyCommandHandlerMethod
       );
@@ -270,10 +267,10 @@ describe('HandlingTrait', () => {
         }
       }
       const controller = new MyController();
-      controller.registerHandler = sinon.stub();
+      controller.registerHandler = vi.fn();
       controller.initialize();
-      expect(controller.registerHandler).to.be.calledOnce;
-      expect(controller.registerHandler).to.be.calledWithExactly(
+      expect(controller.registerHandler).toHaveBeenCalledTimes(1);
+      expect(controller.registerHandler).toHaveBeenCalledWith(
         MyEvent,
         controller.MyEventHandlerMethod
       );
@@ -284,7 +281,7 @@ describe('HandlingTrait', () => {
     describe('evaluating handlers', () => {
       it('returns true if message type has a registered handler', () => {
         const handlers = new Map();
-        handlers.set(MyCommand, sinon.stub());
+        handlers.set(MyCommand, vi.fn());
         class MyController extends derive(HandlingTrait) {
           constructor() {
             super();
@@ -292,19 +289,19 @@ describe('HandlingTrait', () => {
           }
         }
         const controller = new MyController();
-        expect(controller.hasHandler(MyCommand)).to.be.true;
+        expect(controller.hasHandler(MyCommand)).toBe(true);
       });
       it('returns false if message type has no registered handler', () => {
         class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
-        expect(controller.hasHandler(MyCommand)).to.be.false;
+        expect(controller.hasHandler(MyCommand)).toBe(false);
       });
     });
 
     describe('manipulation', () => {
       it('removes handler for message type', () => {
         const handlers = new Map();
-        handlers.set(MyCommand, sinon.stub());
+        handlers.set(MyCommand, vi.fn());
         class MyController extends derive(HandlingTrait) {
           constructor() {
             super();
@@ -312,9 +309,9 @@ describe('HandlingTrait', () => {
           }
         }
         const controller = new MyController();
-        expect(controller.hasHandler(MyCommand)).to.be.true;
+        expect(controller.hasHandler(MyCommand)).toBe(true);
         controller.removeHandler(MyCommand);
-        expect(controller.hasHandler(MyCommand)).to.be.false;
+        expect(controller.hasHandler(MyCommand)).toBe(false);
       });
     });
   });
@@ -325,9 +322,9 @@ describe('HandlingTrait', () => {
 
       const controller = new MyController();
       controller.setHandleableTypes(Command);
-      expect(controller.getHandleableTypes()).to.be.an('array');
-      expect(controller.getHandleableTypes()).to.have.length(1);
-      expect(controller.getHandleableTypes()).to.be.eql([Command]);
+      expect(controller.getHandleableTypes()).toBeInstanceOf(Array);
+      expect(controller.getHandleableTypes()).toHaveLength(1);
+      expect(controller.getHandleableTypes()).toEqual([Command]);
     });
 
     it('sets handleabe types to a single message type', () => {
@@ -335,9 +332,9 @@ describe('HandlingTrait', () => {
 
       const controller = new MyController();
       controller.setHandleableTypes(Command);
-      expect(controller.getHandleableTypes()).to.be.an('array');
-      expect(controller.getHandleableTypes()).to.have.length(1);
-      expect(controller.getHandleableTypes()).to.be.eql([Command]);
+      expect(controller.getHandleableTypes()).toBeInstanceOf(Array);
+      expect(controller.getHandleableTypes()).toHaveLength(1);
+      expect(controller.getHandleableTypes()).toEqual([Command]);
     });
 
     it('sets handleabe types to a multiple message types', () => {
@@ -345,18 +342,18 @@ describe('HandlingTrait', () => {
 
       const controller = new MyController();
       controller.setHandleableTypes([Command, Event]);
-      expect(controller.getHandleableTypes()).to.be.an('array');
-      expect(controller.getHandleableTypes()).to.have.length(2);
-      expect(controller.getHandleableTypes()).to.be.eql([Command, Event]);
+      expect(controller.getHandleableTypes()).toBeInstanceOf(Array);
+      expect(controller.getHandleableTypes()).toHaveLength(2);
+      expect(controller.getHandleableTypes()).toEqual([Command, Event]);
     });
 
     it('returns Message type as default handleabe type', () => {
       class MyController extends derive(HandlingTrait) {}
 
       const controller = new MyController();
-      expect(controller.getHandleableTypes()).to.be.an('array');
-      expect(controller.getHandleableTypes()).to.have.length(1);
-      expect(controller.getHandleableTypes()).to.be.eql([Message]);
+      expect(controller.getHandleableTypes()).toBeInstanceOf(Array);
+      expect(controller.getHandleableTypes()).toHaveLength(1);
+      expect(controller.getHandleableTypes()).toEqual([Message]);
     });
 
     describe('evaluation', () => {
@@ -364,50 +361,50 @@ describe('HandlingTrait', () => {
         class MyController extends derive(HandlingTrait) {}
 
         const controller = new MyController();
-        expect(controller.isHandleabe(Command)).to.be.true;
+        expect(controller.isHandleabe(Command)).toBe(true);
       });
 
       it('returns true if handleable types are empty array for any message type', () => {
         class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
-        expect(controller.isHandleabe(Command)).to.be.true;
+        expect(controller.isHandleabe(Command)).toBe(true);
       });
 
       it('returns true if message type is handleable', () => {
         class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         controller.setHandleableTypes(MyCommand);
-        expect(controller.getHandleableTypes()).to.be.eql([MyCommand]);
-        expect(controller.isHandleabe(MyCommand)).to.be.true;
+        expect(controller.getHandleableTypes()).toEqual([MyCommand]);
+        expect(controller.isHandleabe(MyCommand)).toBe(true);
       });
 
       it('returns true if message type is handleable by inheritance relation(subclass)', () => {
         class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         controller.setHandleableTypes(Command);
-        expect(controller.getHandleableTypes()).to.be.eql([Command]);
-        expect(controller.isHandleabe(MyCommand)).to.be.true;
+        expect(controller.getHandleableTypes()).toEqual([Command]);
+        expect(controller.isHandleabe(MyCommand)).toBe(true);
       });
 
       it('returns false if message type is not handleable', () => {
         class MyController extends derive(HandlingTrait) {}
         const controller = new MyController();
         controller.setHandleableTypes(Event);
-        expect(controller.getHandleableTypes()).to.be.eql([Event]);
-        expect(controller.isHandleabe(MyCommand)).to.be.false;
+        expect(controller.getHandleableTypes()).toEqual([Event]);
+        expect(controller.isHandleabe(MyCommand)).toBe(false);
       });
 
-      context('runtime', () => {
+      describe('runtime', () => {
         it('returns true if message type is handleable on runtime evaluation', () => {
           class MyController extends derive(HandlingTrait) {}
           const controller = new MyController();
-          expect(controller.isHandleabe(MyCommand, Command)).to.be.true;
+          expect(controller.isHandleabe(MyCommand, Command)).toBe(true);
         });
 
         it('returns false if message  type is not handleable on runtime evaluation', () => {
           class MyController extends derive(HandlingTrait) {}
           const controller = new MyController();
-          expect(controller.isHandleabe(MyCommand, Event)).to.be.false;
+          expect(controller.isHandleabe(MyCommand, Event)).toBe(false);
         });
       });
     });
@@ -415,7 +412,7 @@ describe('HandlingTrait', () => {
 
   describe('handlers', () => {
     it('returns all registered handlers', () => {
-      const handlers = new Map([[MyCommand, sinon.stub()]]);
+      const handlers = new Map([[MyCommand, vi.fn()]]);
       class MyController extends derive(HandlingTrait) {
         constructor() {
           super();
@@ -423,13 +420,13 @@ describe('HandlingTrait', () => {
         }
       }
       const controller = new MyController();
-      expect(controller.getHandlers()).to.be.equal(handlers);
+      expect(controller.getHandlers()).toBe(handlers);
     });
 
     it('returns all handled message types', () => {
       const handlers = new Map();
-      handlers.set(MyCommand, sinon.stub());
-      handlers.set(MyEvent, sinon.stub());
+      handlers.set(MyCommand, vi.fn());
+      handlers.set(MyEvent, vi.fn());
 
       class MyController extends derive(HandlingTrait) {
         constructor() {
@@ -439,13 +436,13 @@ describe('HandlingTrait', () => {
       }
 
       const controller = new MyController();
-      expect(controller.getHandledTypes()).to.be.eql([MyCommand, MyEvent]);
+      expect(controller.getHandledTypes()).toEqual([MyCommand, MyEvent]);
     });
 
     it('returns all handled message types - type names', () => {
       const handlers = new Map();
-      handlers.set(MyCommand, sinon.stub());
-      handlers.set(MyEvent, sinon.stub());
+      handlers.set(MyCommand, vi.fn());
+      handlers.set(MyEvent, vi.fn());
 
       class MyController extends derive(HandlingTrait) {
         constructor() {
@@ -455,7 +452,7 @@ describe('HandlingTrait', () => {
       }
 
       const controller = new MyController();
-      expect(controller.getHandledTypesNames()).to.be.eql([
+      expect(controller.getHandledTypesNames()).toEqual([
         'MyCommand',
         'MyEvent',
       ]);
@@ -464,8 +461,8 @@ describe('HandlingTrait', () => {
     describe('resolving handled message types by subclass matching', () => {
       it('returns all handled types by matching subclassing of Command', () => {
         const handlers = new Map();
-        handlers.set(MyCommand, sinon.stub());
-        handlers.set(MyEvent, sinon.stub());
+        handlers.set(MyCommand, vi.fn());
+        handlers.set(MyEvent, vi.fn());
 
         class MyController extends derive(HandlingTrait) {
           constructor() {
@@ -475,14 +472,14 @@ describe('HandlingTrait', () => {
         }
 
         const controller = new MyController();
-        expect(controller.getHandled(Command)).to.be.eql([MyCommand]);
-        expect(controller.getHandledCommands()).to.be.eql([MyCommand]);
+        expect(controller.getHandled(Command)).toEqual([MyCommand]);
+        expect(controller.getHandledCommands()).toEqual([MyCommand]);
       });
 
       it('returns all handled types by matching subclassing of Event', () => {
         const handlers = new Map();
-        handlers.set(MyCommand, sinon.stub());
-        handlers.set(MyEvent, sinon.stub());
+        handlers.set(MyCommand, vi.fn());
+        handlers.set(MyEvent, vi.fn());
 
         class MyController extends derive(HandlingTrait) {
           constructor() {
@@ -492,14 +489,14 @@ describe('HandlingTrait', () => {
         }
 
         const controller = new MyController();
-        expect(controller.getHandled(Event)).to.be.eql([MyEvent]);
-        expect(controller.getHandledEvents()).to.be.eql([MyEvent]);
+        expect(controller.getHandled(Event)).toEqual([MyEvent]);
+        expect(controller.getHandledEvents()).toEqual([MyEvent]);
       });
 
       it('returns all handled types by matching subclassing of Message', () => {
         const handlers = new Map();
-        handlers.set(MyCommand, sinon.stub());
-        handlers.set(MyEvent, sinon.stub());
+        handlers.set(MyCommand, vi.fn());
+        handlers.set(MyEvent, vi.fn());
 
         class MyController extends derive(HandlingTrait) {
           constructor() {
@@ -509,8 +506,8 @@ describe('HandlingTrait', () => {
         }
 
         const controller = new MyController();
-        expect(controller.getHandled(Message)).to.be.eql([MyCommand, MyEvent]);
-        expect(controller.getHandledMessages()).to.be.eql([MyCommand, MyEvent]);
+        expect(controller.getHandled(Message)).toEqual([MyCommand, MyEvent]);
+        expect(controller.getHandledMessages()).toEqual([MyCommand, MyEvent]);
       });
     });
   });
@@ -520,21 +517,21 @@ describe('HandlingTrait', () => {
       class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
       controller.setHandleableTypes(Command);
-      expect(controller.ensureHandleability(MyCommand)).to.be.true;
+      expect(controller.ensureHandleability(MyCommand)).toBe(true);
     });
 
     it(`returns true for message type that can be handled by inheritance relation`, () => {
       class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
       controller.setHandleableTypes(Command);
-      expect(controller.ensureHandleability(MyCommand)).to.be.true;
+      expect(controller.ensureHandleability(MyCommand)).toBe(true);
     });
 
     it(`throws ValidationError if message type is not one of the handleable types`, () => {
       class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
       controller.setHandleableTypes(Command);
-      expect(() => controller.ensureHandleability(MyEvent)).to.throw(
+      expect(() => controller.ensureHandleability(MyEvent)).toThrow(
         UnhandleableTypeError,
         'MyController: type must be one of: [Command]; got MyEvent'
       );
@@ -543,10 +540,11 @@ describe('HandlingTrait', () => {
     it(`allows to pass handleable types as second argument for custom validation`, () => {
       class MyController extends derive(HandlingTrait) {}
       const controller = new MyController();
-      expect(() => controller.ensureHandleability(MyCommand, [Event])).to.throw(
+      expect(() => controller.ensureHandleability(MyCommand, [Event])).toThrow(
         UnhandleableTypeError,
         'MyController: type must be one of: [Event]; got MyCommand'
       );
     });
   });
 });
+

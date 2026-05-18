@@ -1,6 +1,6 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
-import { stubInterface } from 'ts-sinon';
+import { mockFn } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import {
   Standard,
   UnconvertibleStandardError,
@@ -27,7 +27,7 @@ describe('Standard', () => {
   }
 
   beforeEach(() => {
-    converter = sinon.stub();
+    converter = mockFn();
   });
 
   const id = 'my-standard';
@@ -39,31 +39,31 @@ describe('Standard', () => {
   describe('construction', () => {
     it('takes first id argument as a string and second isConvertible as boolean and assigns them', () => {
       const standard = new MyStandard(id, isConvertible);
-      expect(standard.id).to.be.equal(id);
-      expect(standard.isConvertible).to.be.equal(isConvertible);
+      expect(standard.id).toBe(id);
+      expect(standard.isConvertible).toBe(isConvertible);
     });
 
     it('takes optional codes as an array with required types and assings them', () => {
       const standard = new MyStandard(id, isConvertible, codes);
-      expect(standard.codes).to.be.equal(codes);
+      expect(standard.codes).toBe(codes);
     });
   });
 
   describe('accessors', () => {
     it('getId', () => {
       const standard = new MyStandard(id, isConvertible);
-      expect(standard.getId()).to.be.equal(id);
+      expect(standard.getId()).toBe(id);
     });
 
     describe('getCodes', () => {
       it('returns assigned codes during construction', () => {
         const standard = new MyStandard(id, isConvertible, codes);
-        expect(standard.getCodes()).to.be.equal(codes);
+        expect(standard.getCodes()).toBe(codes);
       });
 
       it('returns empty array if codes are unavailable', () => {
         const standard = new MyStandard(id, isConvertible);
-        expect(standard.getCodes()).to.be.eql([]);
+        expect(standard.getCodes()).toEqual([]);
       });
     });
   });
@@ -72,12 +72,12 @@ describe('Standard', () => {
     describe('isValid', () => {
       it('returns boolean if code is valid', () => {
         const standard = new MyStandard(id, isConvertible, codes);
-        expect(standard.isValid('my-first-code')).to.be.true;
+        expect(standard.isValid('my-first-code')).toBe(true);
       });
 
       it('throws Error if method is not implemented on standard and codes array is not assigned during construction', () => {
         const standard = new MyStandard(id, isConvertible);
-        expect(() => standard.isValid('my-first-code')).to.throw(
+        expect(() => standard.isValid('my-first-code')).toThrow(
           UnimplementedError,
           'Not implemented'
         );
@@ -88,22 +88,20 @@ describe('Standard', () => {
       it('allows to convert code to another standard', () => {
         const code = 'my-first-code';
         const convertedCode = 'converted-code';
-        const otherStandard = stubInterface<types.Standard<string>>();
-        converter.withArgs(code).returns(convertedCode);
+        const otherStandard = mockFn<types.Standard<string>>();
+        converter.calledWith(code).mockReturnValue(convertedCode);
 
         const standard = new MyStandard(id, isConvertible, codes);
-        expect(standard.convert(code, otherStandard)).to.be.equal(
-          convertedCode
-        );
-        expect(converter).to.be.calledOnce;
-        expect(converter).to.be.calledWith(code, otherStandard);
+        expect(standard.convert(code, otherStandard)).toBe(convertedCode);
+        expect(converter).toHaveBeenCalledTimes(1);
+        expect(converter).toHaveBeenCalledWith(code, otherStandard);
       });
 
       it('throws UnconvertibleStandardError if provided standard does not support conversion', () => {
         const code = 'my-first-code';
-        const otherStandard = stubInterface<types.Standard<string>>();
+        const otherStandard = mockFn<types.Standard<string>>();
         const standard = new Standard(id, false, codes);
-        expect(() => standard.convert(code, otherStandard)).to.throw(
+        expect(() => standard.convert(code, otherStandard)).toThrow(
           UnconvertibleStandardError
         );
       });

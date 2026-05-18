@@ -1,14 +1,11 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import { Type, Entity } from '../../../src';
 import {
   DISABLE_ACTION_VALIDATION_METHOD_KEY,
   ENABLE_ACTION_VALIDATION_METHOD_KEY,
 } from '../../../src/constants/literal-keys';
 import { can } from '../../../src/decorators/can';
-
-chai.use(sinonChai);
 
 describe('can', () => {
   const id = 'my-id';
@@ -18,8 +15,8 @@ describe('can', () => {
   let actionMethod: any;
 
   beforeEach(() => {
-    validationFn = sinon.stub();
-    actionMethod = sinon.stub();
+    validationFn = vi.fn();
+    actionMethod = vi.fn();
   });
 
   @Type('can.Person')
@@ -43,17 +40,17 @@ describe('can', () => {
       const person = new Person({ id, name: joeDoe });
       person[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
       person.changeName(joeMama);
-      expect(validationFn).to.be.calledOnce;
-      expect(validationFn).to.be.calledWith(person, joeMama);
-      expect(actionMethod).to.be.not.called;
+      expect(validationFn).toHaveBeenCalledTimes(1);
+      expect(validationFn).toHaveBeenCalledWith(person, joeMama);
+      expect(actionMethod).not.toHaveBeenCalled();
     });
 
     it('ensures that action method is not executed on action validation', () => {
       const person = new Person({ id, name: joeDoe });
       person[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
       person.changeName(joeMama);
-      expect(validationFn).to.be.calledOnce;
-      expect(actionMethod).to.be.not.called;
+      expect(validationFn).toHaveBeenCalledTimes(1);
+      expect(actionMethod).not.toHaveBeenCalled();
     });
 
     it('ensures that validation function is skipped on disabled action validation', () => {
@@ -61,8 +58,8 @@ describe('can', () => {
       person[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
       person[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
       person.changeName(joeMama);
-      expect(actionMethod).to.be.calledOnce;
-      expect(validationFn).to.be.not.called;
+      expect(actionMethod).toHaveBeenCalledTimes(1);
+      expect(validationFn).not.toHaveBeenCalled();
     });
 
     it('ensures that action method is called upon disabled action validation', () => {
@@ -70,9 +67,10 @@ describe('can', () => {
       person[ENABLE_ACTION_VALIDATION_METHOD_KEY]();
       person[DISABLE_ACTION_VALIDATION_METHOD_KEY]();
       person.changeName(joeMama);
-      expect(actionMethod).to.be.calledOnce;
-      expect(actionMethod).to.be.calledWith(joeMama);
-      expect(validationFn).to.be.not.called;
+      expect(actionMethod).toHaveBeenCalledTimes(1);
+      expect(actionMethod).toHaveBeenCalledWith(joeMama);
+      expect(validationFn).not.toHaveBeenCalled();
     });
   });
 });
+

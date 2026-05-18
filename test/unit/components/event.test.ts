@@ -1,5 +1,5 @@
-import sinon from 'sinon';
-import { expect } from 'chai';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+
 import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { Message } from '../../../src/components/message';
@@ -12,16 +12,16 @@ describe('Event', () => {
   let now: Date;
   let clock: any;
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(now.getTime());
+    clock = vi.useFakeTimers(now.getTime());
   });
 
   afterEach(() => {
-    clock.restore();
+    vi.useRealTimers();
   });
 
   @Type('MyEvent', { isRegistrable: false })
@@ -33,21 +33,21 @@ describe('Event', () => {
   }
 
   it(`extends Message`, () => {
-    expect(Event.prototype).to.be.instanceof(Message);
+    expect(Event.prototype).toBeInstanceOf(Message);
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(Event.prototype)).to.be.true;
+    expect(isTyped(Event.prototype)).toBe(true);
   });
 
   it('defines the type name correctly', () => {
-    expect(Event.getTypeName()).to.equal('Event');
-    expect(Event.prototype.getTypeName()).to.equal('Event');
+    expect(Event.getTypeName()).toBe('Event');
+    expect(Event.prototype.getTypeName()).toBe('Event');
   });
 
   describe('prop types', () => {
     it('takes required sourceId property as a string or Guid', () => {
-      expect(Event.getPropTypes().sourceId).to.be.eql(
+      expect(Event.getPropTypes().sourceId).toEqual(
         PropTypes.oneOf([
           PropTypes.instanceOf(String),
           PropTypes.instanceOf(Guid),
@@ -56,35 +56,35 @@ describe('Event', () => {
     });
 
     it('takes optional version property as a number', () => {
-      expect(Event.getPropTypes().version).to.be.eql(
+      expect(Event.getPropTypes().version).toEqual(
         PropTypes.instanceOf(Number).isOptional
       );
     });
 
     it('takes optional timestamp property as a Date', () => {
-      clock.restore();
+      vi.useRealTimers();
 
-      expect(Event.getPropTypes().timestamp).to.be.eql(
+      expect(Event.getPropTypes().timestamp).toEqual(
         PropTypes.instanceOf(Date).isOptional
       );
     });
 
     it('takes optional metadata property as an object', () => {
-      expect(Event.getPropTypes().metadata).to.be.eql(
+      expect(Event.getPropTypes().metadata).toEqual(
         PropTypes.object.isOptional
       );
     });
   });
 
   describe(`construction`, () => {
-    context('required properties', () => {
+    describe('required properties', () => {
       it(`takes an object with sourceId property as a string`, () => {
         const sourceId = 'my-id';
         expect(
           new MyEvent({
             sourceId,
           }).sourceId
-        ).to.be.equal(sourceId);
+        ).toBe(sourceId);
       });
 
       it(`takes an object with sourceId property  as a guid`, () => {
@@ -93,11 +93,11 @@ describe('Event', () => {
           new MyEvent({
             sourceId,
           }).sourceId
-        ).to.be.equal(sourceId);
+        ).toBe(sourceId);
       });
     });
 
-    context('optional properties', () => {
+    describe('optional properties', () => {
       it(`takes an object with optional timestamp property as a date`, () => {
         const sourceId = new Guid();
         const timestamp = new Date();
@@ -105,12 +105,12 @@ describe('Event', () => {
           sourceId,
           timestamp,
         });
-        expect(event.sourceId).to.be.equal(sourceId);
-        expect(event.timestamp).to.be.equal(timestamp);
+        expect(event.sourceId).toBe(sourceId);
+        expect(event.timestamp).toBe(timestamp);
       });
 
       it('adds current date if property timestamp is missing on construction', () => {
-        expect(new MyEvent({ sourceId: 'my-id' }).timestamp).to.be.instanceof(
+        expect(new MyEvent({ sourceId: 'my-id' }).timestamp).toBeInstanceOf(
           Date
         );
       });
@@ -121,7 +121,7 @@ describe('Event', () => {
           key: 'value',
         };
         const event = new MyEvent({ sourceId, metadata });
-        expect(event.metadata).to.be.eql(metadata);
+        expect(event.metadata).toEqual(metadata);
       });
     });
 
@@ -131,9 +131,8 @@ describe('Event', () => {
           sourceId: 'my-id',
           name: 'set-durning-construction',
         });
-        expect(Object.isFrozen(message)).to.be.true;
-        // eslint-disable-next-line no-return-assign
-        expect(() => (message.name = 'set-after')).to.throw(TypeError);
+        expect(Object.isFrozen(message)).toBe(true);
+        expect(() => (message.name = 'set-after')).toThrow(TypeError);
       });
 
       it('requires explicit constructor for messages with property initializers', () => {
@@ -155,8 +154,8 @@ describe('Event', () => {
           key: 'my-key',
           timestamp: now,
         });
-        expect(Object.isFrozen(message)).to.be.true;
-        expect(message).to.be.eql({
+        expect(Object.isFrozen(message)).toBe(true);
+        expect(message).toEqual({
           sourceId: 'my-id',
           key: 'my-key',
           default: 'default',
@@ -174,7 +173,7 @@ describe('Event', () => {
         new MyEvent({
           sourceId,
         }).getId()
-      ).to.be.equal(sourceId);
+      ).toBe(sourceId);
     });
 
     it(`returns event source id as a guid`, () => {
@@ -183,7 +182,8 @@ describe('Event', () => {
         new MyEvent({
           sourceId,
         }).getId()
-      ).to.be.equal(sourceId);
+      ).toBe(sourceId);
     });
   });
 });
+

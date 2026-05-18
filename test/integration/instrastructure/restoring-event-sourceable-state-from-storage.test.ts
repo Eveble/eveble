@@ -1,7 +1,6 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+
 import { Collection } from 'mongodb';
 import { kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
@@ -36,9 +35,6 @@ import { StatusfulAssertion } from '../../../src/domain/assertions/statusful-ass
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
 import { InfiniteTaskCompletionPolicy } from '../../domains/task-list/infinite-task-completion-policy';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`Restoring event sourceable state from storage`, () => {
   // Props
   const appId = 'my-app-id';
@@ -60,8 +56,8 @@ describe(`Restoring event sourceable state from storage`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -70,12 +66,12 @@ describe(`Restoring event sourceable state from storage`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -161,7 +157,7 @@ describe(`Restoring event sourceable state from storage`, () => {
     kernel.setSerializer(serializer);
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     await setupSnapshotterMongo(injector, clients, collections);
@@ -184,7 +180,7 @@ describe(`Restoring event sourceable state from storage`, () => {
     await collections.snapshotter.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
     await clients.snapshotter.disconnect();
 
@@ -198,7 +194,7 @@ describe(`Restoring event sourceable state from storage`, () => {
         const notExistingTaskId = new Guid();
         await expect(
           repository.find(TaskList, notExistingTaskId)
-        ).to.eventually.be.rejectedWith(
+        ).rejects.toThrow(
           EventsNotFoundError,
           `No events found for event sourceable 'TaskList' with id '${notExistingTaskId.toString()}'`
         );
@@ -225,15 +221,15 @@ describe(`Restoring event sourceable state from storage`, () => {
           TaskList,
           taskListId
         )) as TaskList;
-        expect(rehydratedEs.isInState(TaskList.STATES.open)).to.be.true;
-        expect(rehydratedEs.title).to.be.equal('my-title');
-        expect(rehydratedEs.tasks).to.be.eql([]);
+        expect(rehydratedEs.isInState(TaskList.STATES.open)).toBe(true);
+        expect(rehydratedEs.title).toBe('my-title');
+        expect(rehydratedEs.tasks).toEqual([]);
       });
     });
 
     describe(`restoring snapshot`, () => {
       it(`returns event sourceable restored from snapshot`, async () => {
-        config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+        config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
         const createList = new CreateTaskList({
           targetId: taskListId,
@@ -253,13 +249,13 @@ describe(`Restoring event sourceable state from storage`, () => {
           TaskList,
           taskListId
         )) as TaskList;
-        expect(restoredSnapshot.isInState(TaskList.STATES.open)).to.be.true;
-        expect(restoredSnapshot.title).to.be.equal('my-title');
-        expect(restoredSnapshot.tasks).to.be.eql([]);
+        expect(restoredSnapshot.isInState(TaskList.STATES.open)).toBe(true);
+        expect(restoredSnapshot.title).toBe('my-title');
+        expect(restoredSnapshot.tasks).toEqual([]);
       });
 
       it(`returns event sourceable restored from snapshot with replayed remaining eventSourceable events from commit store`, async () => {
-        config.get.withArgs('eveble.Snapshotter.frequency').returns(2);
+        config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(2);
 
         const createList = new CreateTaskList({
           targetId: taskListId,
@@ -291,11 +287,12 @@ describe(`Restoring event sourceable state from storage`, () => {
           TaskList,
           taskListId
         )) as TaskList;
-        expect(rehydratedEs.isInState(TaskList.STATES.open)).to.be.true;
-        expect(rehydratedEs.title).to.be.equal('my-title');
-        expect(rehydratedEs.tasks).to.be.eql([]);
-        expect(rehydratedEs.employeeId).to.be.eql(employeeId);
+        expect(rehydratedEs.isInState(TaskList.STATES.open)).toBe(true);
+        expect(rehydratedEs.title).toBe('my-title');
+        expect(rehydratedEs.tasks).toEqual([]);
+        expect(rehydratedEs.employeeId).toEqual(employeeId);
       });
     });
   });
 });
+

@@ -1,5 +1,5 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
+import { expect, describe, it, vi } from 'vitest';
+
 import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';
 
@@ -8,7 +8,7 @@ describe('requiring modules', () => {
     class SubModule extends Module {
       // Regression test -> this was invoked twice at some point
       afterInitialize(): void {
-        this.injector?.bind('x').toConstantValue(sinon.spy());
+        this.injector?.bind('x').toConstantValue(vi.fn());
       }
     }
 
@@ -29,6 +29,6 @@ describe('requiring modules', () => {
     };
     expect(() => {
       appInit();
-    }).to.not.throw(Error);
+    }).not.toThrow(Error);
   });
 });

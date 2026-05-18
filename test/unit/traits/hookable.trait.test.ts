@@ -1,6 +1,5 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, vi } from 'vitest';
+
 import { derive } from '@traits-ts/core';
 import {
   HookableTrait,
@@ -11,8 +10,6 @@ import {
 } from '../../../src/traits/hookable.trait';
 import { HOOKABLE_KEY } from '../../../src/constants/metadata-keys';
 
-chai.use(sinonChai);
-
 describe('HookableTrait', () => {
   describe('registration', () => {
     it('registers hook for specific action with id as a string and fn as a function', () => {
@@ -20,10 +17,10 @@ describe('HookableTrait', () => {
 
       const action = 'my-action';
       const id = 'my-id';
-      const fn = sinon.spy();
+      const fn = vi.fn();
 
       MyClass.prototype.registerHook(action, id, fn);
-      expect(MyClass.prototype.getHook(action, id)).to.be.equal(fn);
+      expect(MyClass.prototype.getHook(action, id)).toBe(fn);
     });
 
     it(`throws InvalidHookActionError when action is not a string`, () => {
@@ -33,21 +30,19 @@ describe('HookableTrait', () => {
         MyClass.prototype.registerHook(
           undefined as any as string,
           'my-id',
-          sinon.spy()
+          vi.fn()
         );
-      }).to.throw(
-        InvalidHookActionError,
-        `Expected action argument to be string, got undefined`
+      }).toThrow(
+        InvalidHookActionError, `Expected action argument to be string, got undefined`
       );
       expect(() => {
         MyClass.prototype.registerHook(
           null as any as string,
           'my-id',
-          sinon.spy()
+          vi.fn()
         );
-      }).to.throw(
-        InvalidHookActionError,
-        `Expected action argument to be string, got null`
+      }).toThrow(
+        InvalidHookActionError, `Expected action argument to be string, got null`
       );
     });
 
@@ -58,21 +53,19 @@ describe('HookableTrait', () => {
         MyClass.prototype.registerHook(
           'my-action',
           undefined as any as string,
-          sinon.spy()
+          vi.fn()
         );
-      }).to.throw(
-        InvalidHookIdError,
-        `Expected id argument to be string, got undefined`
+      }).toThrow(
+        InvalidHookIdError, `Expected id argument to be string, got undefined`
       );
       expect(() => {
         MyClass.prototype.registerHook(
           'my-action',
           null as any as string,
-          sinon.spy()
+          vi.fn()
         );
-      }).to.throw(
-        InvalidHookIdError,
-        `Expected id argument to be string, got null`
+      }).toThrow(
+        InvalidHookIdError, `Expected id argument to be string, got null`
       );
     });
 
@@ -81,11 +74,11 @@ describe('HookableTrait', () => {
 
       const action = 'my-new-action';
       const id = 'my-id';
-      const fn = sinon.spy();
+      const fn = vi.fn();
 
       expect(() => {
         MyClass.prototype.registerHook(action, id, fn);
-      }).to.not.throw(Error);
+      }).not.toThrow(Error);
     });
 
     it('throws HookAlreadyExistsError when hook would be overridden', () => {
@@ -93,12 +86,12 @@ describe('HookableTrait', () => {
 
       const action = 'my-action';
       const id = 'my-id';
-      const fn = sinon.spy();
+      const fn = vi.fn();
 
       MyClass.prototype.registerHook(action, id, fn);
       expect(() => {
         MyClass.prototype.registerHook(action, id, fn);
-      }).to.throw(
+      }).toThrow(
         HookAlreadyExistsError,
         `MyClass: hook for action 'my-action' with id 'my-id' would be overwritten. Avoid overriding of existing hooks do to inconsistent behavior`
       );
@@ -109,10 +102,10 @@ describe('HookableTrait', () => {
 
       const action = 'my-action';
       const id = 'my-id';
-      const fn = sinon.spy();
+      const fn = vi.fn();
 
       MyClass.prototype.registerHook(action, id, fn);
-      expect(MyClass.prototype.getHook(action, id)).to.be.equal(fn);
+      expect(MyClass.prototype.getHook(action, id)).toBe(fn);
     });
 
     it(`throws HookNotFoundError when hook can't be found`, () => {
@@ -123,7 +116,7 @@ describe('HookableTrait', () => {
 
       expect(() => {
         MyClass.prototype.getHookOrThrow(notExistingAction, notExistingId);
-      }).to.throw(
+      }).toThrow(
         HookNotFoundError,
         `MyClass: hook for action 'my-not-existing-action' with id 'my-not-existing-id' can't be found`
       );
@@ -134,10 +127,10 @@ describe('HookableTrait', () => {
 
       const action = 'my-action';
       const id = 'my-id';
-      const fn = sinon.spy();
+      const fn = vi.fn();
 
       MyClass.prototype.registerHook(action, id, fn);
-      expect(Reflect.getOwnMetadata(HOOKABLE_KEY, MyClass)).to.be.true;
+      expect(Reflect.getOwnMetadata(HOOKABLE_KEY, MyClass)).toBe(true);
     });
 
     it(`ensures that hooks registered under same action and different id are resolved from both: parent and child`, () => {
@@ -147,16 +140,16 @@ describe('HookableTrait', () => {
       const action = 'my-action';
       const parentId = 'parent-id';
       const childId = 'child-id';
-      const parentFn = sinon.spy();
-      const childFn = sinon.spy();
+      const parentFn = vi.fn();
+      const childFn = vi.fn();
 
       Parent.prototype.registerHook(action, parentId, parentFn);
       Child.prototype.overrideHook(action, childId, childFn);
 
-      expect(Parent.prototype.hasHook(action, parentId)).to.be.true;
-      expect(Child.prototype.hasHook(action, childId)).to.be.true;
+      expect(Parent.prototype.hasHook(action, parentId)).toBe(true);
+      expect(Child.prototype.hasHook(action, childId)).toBe(true);
 
-      expect(Child.prototype.getActions()).to.be.eql({
+      expect(Child.prototype.getActions()).toEqual({
         'my-action': {
           'parent-id': parentFn,
           'child-id': childFn,
@@ -172,10 +165,10 @@ describe('HookableTrait', () => {
 
         const action = 'my-action';
         const id = 'my-id';
-        const fn = sinon.spy();
+        const fn = vi.fn();
 
         MyClass.prototype.registerHook(action, id, fn);
-        expect(MyClass.prototype.hasAction(action)).to.be.true;
+        expect(MyClass.prototype.hasAction(action)).toBe(true);
       });
 
       it('returns false if hooks does not exist for action', () => {
@@ -183,10 +176,10 @@ describe('HookableTrait', () => {
 
         const action = 'my-action';
         const id = 'my-id';
-        const fn = sinon.spy();
+        const fn = vi.fn();
 
         MyClass.prototype.registerHook(action, id, fn);
-        expect(MyClass.prototype.hasAction('non-existing-action')).to.be.false;
+        expect(MyClass.prototype.hasAction('non-existing-action')).toBe(false);
       });
     });
 
@@ -196,10 +189,10 @@ describe('HookableTrait', () => {
 
         const action = 'my-action';
         const id = 'my-id';
-        const fn = sinon.spy();
+        const fn = vi.fn();
 
         MyClass.prototype.registerHook(action, id, fn);
-        expect(MyClass.prototype.hasHook(action, id)).to.be.true;
+        expect(MyClass.prototype.hasHook(action, id)).toBe(true);
       });
 
       it('returns false if hook does not exist for action and id', () => {
@@ -207,7 +200,7 @@ describe('HookableTrait', () => {
 
         const action = 'my-action';
         const id = 'my-id';
-        const fn = sinon.spy();
+        const fn = vi.fn();
 
         MyClass.prototype.registerHook(action, id, fn);
         expect(MyClass.prototype.hasHook('non-existing-action', id)).to.be
@@ -225,8 +218,8 @@ describe('HookableTrait', () => {
       const action = 'my-action';
       const firstId = 'first';
       const secondId = 'second';
-      const firstFn = sinon.spy();
-      const secondFn = sinon.spy();
+      const firstFn = vi.fn();
+      const secondFn = vi.fn();
 
       MyClass.prototype.registerHook(action, firstId, firstFn);
       MyClass.prototype.registerHook(action, secondId, secondFn);
@@ -234,7 +227,7 @@ describe('HookableTrait', () => {
         first: firstFn,
         second: secondFn,
       };
-      expect(MyClass.prototype.getHooks(action)).to.be.eql(expected);
+      expect(MyClass.prototype.getHooks(action)).toEqual(expected);
     });
 
     it('returns collection of all registered actions', () => {
@@ -243,8 +236,8 @@ describe('HookableTrait', () => {
       const action = 'my-action';
       const firstId = 'first';
       const secondId = 'second';
-      const firstFn = sinon.spy();
-      const secondFn = sinon.spy();
+      const firstFn = vi.fn();
+      const secondFn = vi.fn();
 
       MyClass.prototype.registerHook(action, firstId, firstFn);
       MyClass.prototype.registerHook(action, secondId, secondFn);
@@ -254,13 +247,13 @@ describe('HookableTrait', () => {
           second: secondFn,
         },
       };
-      expect(MyClass.prototype.getActions()).to.be.eql(expected);
+      expect(MyClass.prototype.getActions()).toEqual(expected);
     });
 
     it('returns empty collection on non registered action', () => {
       class MyClass extends derive(HookableTrait) {}
 
-      expect(MyClass.prototype.getActions()).to.be.eql({});
+      expect(MyClass.prototype.getActions()).toEqual({});
     });
   });
 
@@ -270,12 +263,12 @@ describe('HookableTrait', () => {
 
       const action = 'my-action';
       const id = 'my-id';
-      const fn = sinon.spy();
+      const fn = vi.fn();
 
       MyClass.prototype.registerHook(action, id, fn);
-      expect(MyClass.prototype.hasHook(action, id)).to.be.true;
+      expect(MyClass.prototype.hasHook(action, id)).toBe(true);
       MyClass.prototype.removeHook(action, id);
-      expect(MyClass.prototype.hasHook(action, id)).to.be.false;
+      expect(MyClass.prototype.hasHook(action, id)).toBe(false);
     });
 
     it(`ensures that hook from parent can't removed on child class instance`, () => {
@@ -284,15 +277,15 @@ describe('HookableTrait', () => {
 
       const action = 'my-action';
       const id = 'my-id';
-      const fn = sinon.spy();
+      const fn = vi.fn();
 
       Parent.prototype.registerHook(action, id, fn);
-      expect(Parent.prototype.hasHook(action, id)).to.be.true;
-      expect(Child.prototype.hasHook(action, id)).to.be.true;
+      expect(Parent.prototype.hasHook(action, id)).toBe(true);
+      expect(Child.prototype.hasHook(action, id)).toBe(true);
 
       Child.prototype.removeHook(action, id);
-      expect(Child.prototype.hasHook(action, id)).to.be.true;
-      expect(Parent.prototype.hasHook(action, id)).to.be.true;
+      expect(Child.prototype.hasHook(action, id)).toBe(true);
+      expect(Parent.prototype.hasHook(action, id)).toBe(true);
     });
 
     it(`allows to remove overriding hook on child even if parent hs already registered hook under same action and id`, () => {
@@ -301,19 +294,19 @@ describe('HookableTrait', () => {
 
       const action = 'my-action';
       const id = 'my-id';
-      const parentFn = sinon.spy();
-      const childFn = sinon.spy();
+      const parentFn = vi.fn();
+      const childFn = vi.fn();
 
       Parent.prototype.registerHook(action, id, parentFn);
       Child.prototype.overrideHook(action, id, childFn);
-      expect(Parent.prototype.hasHook(action, id)).to.be.true;
-      expect(Child.prototype.hasHook(action, id)).to.be.true;
+      expect(Parent.prototype.hasHook(action, id)).toBe(true);
+      expect(Child.prototype.hasHook(action, id)).toBe(true);
 
       Child.prototype.removeHook(action, id);
-      expect(Child.prototype.hasHook(action, id)).to.be.true;
-      expect(Child.prototype.getHook(action, id)).to.be.equal(parentFn);
-      expect(Parent.prototype.hasHook(action, id)).to.be.true;
-      expect(Parent.prototype.getHook(action, id)).to.be.equal(parentFn);
+      expect(Child.prototype.hasHook(action, id)).toBe(true);
+      expect(Child.prototype.getHook(action, id)).toBe(parentFn);
+      expect(Parent.prototype.hasHook(action, id)).toBe(true);
+      expect(Parent.prototype.getHook(action, id)).toBe(parentFn);
     });
   });
 
@@ -325,14 +318,15 @@ describe('HookableTrait', () => {
       const myParentInstance = new MyParent();
       const myChildInstance = new MyChild();
 
-      myParentInstance.registerHook('onConstruction', 'parent', sinon.spy());
-      myChildInstance.registerHook('onConstruction', 'child', sinon.spy());
+      myParentInstance.registerHook('onConstruction', 'parent', vi.fn());
+      myChildInstance.registerHook('onConstruction', 'child', vi.fn());
 
-      expect(myParentInstance.hasHook('onConstruction', 'parent')).to.be.true;
-      expect(myParentInstance.hasHook('onConstruction', 'child')).to.be.false;
+      expect(myParentInstance.hasHook('onConstruction', "parent")).toBe(true);
+      expect(myParentInstance.hasHook('onConstruction', 'child')).toBe(false);
 
-      expect(myChildInstance.hasHook('onConstruction', 'parent')).to.be.false;
-      expect(myChildInstance.hasHook('onConstruction', 'child')).to.be.true;
+      expect(myChildInstance.hasHook('onConstruction', 'parent')).toBe(false);
+      expect(myChildInstance.hasHook('onConstruction', 'child')).toBe(true);
     });
   });
 });
+

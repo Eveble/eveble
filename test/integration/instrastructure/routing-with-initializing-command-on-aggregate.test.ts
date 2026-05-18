@@ -1,9 +1,16 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import {
+  expect,
+  describe,
+  it,
+  afterEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+
 import { Collection } from 'mongodb';
-import sinon from 'sinon';
+
 import { kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
 import { EventSourceableRepository } from '../../../src/infrastructure/event-sourceable-repository';
@@ -48,9 +55,6 @@ import { Guid } from '../../../src/domain/value-objects/guid';
 import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`Routing with initializing Command on Aggregate`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
@@ -78,8 +82,8 @@ describe(`Routing with initializing Command on Aggregate`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -88,12 +92,12 @@ describe(`Routing with initializing Command on Aggregate`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -183,7 +187,7 @@ describe(`Routing with initializing Command on Aggregate`, () => {
     kernel.setSerializer(serializer);
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     await setupSnapshotterMongo(injector, clients, collections);
@@ -200,7 +204,7 @@ describe(`Routing with initializing Command on Aggregate`, () => {
     await collections.snapshotter.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
     await clients.snapshotter.disconnect();
 
@@ -209,9 +213,9 @@ describe(`Routing with initializing Command on Aggregate`, () => {
   });
 
   it(`registers initializing handler on command bus for initializing Command`, async () => {
-    expect(commandBus.hasHandler(CreateTaskList)).to.be.true;
+    expect(commandBus.hasHandler(CreateTaskList)).toBe(true);
     const foundBoundToRouterHandler = commandBus.getHandler(CreateTaskList);
-    expect((foundBoundToRouterHandler as any).original).to.be.equal(
+    expect((foundBoundToRouterHandler as any).original).toBe(
       TaskListRouter.prototype.initializingMessageHandler
     );
   });
@@ -230,12 +234,12 @@ describe(`Routing with initializing Command on Aggregate`, () => {
       TaskList,
       taskListId
     )) as TaskList;
-    expect(foundTaskList).to.be.instanceof(TaskList);
-    expect(foundTaskList.id).to.be.eql(taskListId);
-    expect(foundTaskList.getState()).to.be.eql('created');
-    expect(foundTaskList.title).to.be.equal(title);
-    expect(foundTaskList.tasks).to.be.eql([]);
-    expect(foundTaskList.employeeId).to.be.undefined;
+    expect(foundTaskList).toBeInstanceOf(TaskList);
+    expect(foundTaskList.id).toEqual(taskListId);
+    expect(foundTaskList.getState()).toEqual('created');
+    expect(foundTaskList.title).toBe(title);
+    expect(foundTaskList.tasks).toEqual([]);
+    expect(foundTaskList.employeeId).toBeUndefined();
   });
 
   it('handles multiple commands with initializing Command to Aggregate', async () => {
@@ -300,11 +304,11 @@ describe(`Routing with initializing Command on Aggregate`, () => {
       TaskList,
       taskListId
     )) as TaskList;
-    expect(foundTaskList).to.be.instanceof(TaskList);
-    expect(foundTaskList.id).to.be.eql(taskListId);
-    expect(foundTaskList.getState()).to.be.eql('closed');
-    expect(foundTaskList.title).to.be.equal(title);
-    expect(foundTaskList.tasks).to.be.eql([
+    expect(foundTaskList).toBeInstanceOf(TaskList);
+    expect(foundTaskList.id).toEqual(taskListId);
+    expect(foundTaskList.getState()).toEqual('closed');
+    expect(foundTaskList.title).toBe(title);
+    expect(foundTaskList.tasks).toEqual([
       new Task({
         id: firstTaskId,
         name: 'my-first-task',
@@ -318,11 +322,11 @@ describe(`Routing with initializing Command on Aggregate`, () => {
         state: 'completed',
       }),
     ]);
-    expect(foundTaskList.employeeId).to.be.eql(employeeId);
+    expect(foundTaskList.employeeId).toEqual(employeeId);
   });
 
   it('throws DomainError on initializing Command handler on Aggregate', async () => {
-    const domainExceptionHandler = sinon.stub();
+    const domainExceptionHandler = vi.fn();
     eventBus.registerHandler(DomainException, domainExceptionHandler);
 
     const taskListId = new Guid();
@@ -333,25 +337,23 @@ describe(`Routing with initializing Command on Aggregate`, () => {
       title: inappropriateTitle,
     });
 
-    await expect(commandBus.handle(createList)).to.eventually.be.rejectedWith(
+    await expect(commandBus.handle(createList)).rejects.toThrow(
       InappropriateTaskListTitleError,
       `Title for task list with id '${taskListId}' can't use inappropriate words like '${inappropriateTitle}'`
     );
 
-    await expect(
-      repository.find(TaskList, taskListId)
-    ).to.eventually.be.rejectedWith(
+    await expect(repository.find(TaskList, taskListId)).rejects.toThrow(
       EventsNotFoundError,
       `No events found for event sourceable 'TaskList' with id '${taskListId}'`
     );
 
-    const domainException = domainExceptionHandler.getCall(0).args[0];
-    expect(domainException).to.be.instanceof(DomainException);
-    expect(domainException.thrower).to.be.equal('TaskList');
-    expect(domainException.error).to.be.instanceof(
+    const domainException = domainExceptionHandler.mock.calls[0][0];
+    expect(domainException).toBeInstanceOf(DomainException);
+    expect(domainException.thrower).toBe('TaskList');
+    expect(domainException.error).toBeInstanceOf(
       InappropriateTaskListTitleError
     );
-    expect(domainException.error).to.be.eql(
+    expect(domainException.error).toEqual(
       new InappropriateTaskListTitleError(
         taskListId.toString(),
         inappropriateTitle
@@ -360,7 +362,7 @@ describe(`Routing with initializing Command on Aggregate`, () => {
   });
 
   it('throws DomainError on Command handler on Aggregate', async () => {
-    const domainExceptionHandler = sinon.stub();
+    const domainExceptionHandler = vi.fn();
     eventBus.registerHandler(DomainException, domainExceptionHandler);
 
     const taskListId = new Guid();
@@ -386,16 +388,16 @@ describe(`Routing with initializing Command on Aggregate`, () => {
     await commandBus.handle(openList);
     await commandBus.handle(closeList);
 
-    await expect(commandBus.handle(createTask)).to.eventually.be.rejectedWith(
+    await expect(commandBus.handle(createTask)).rejects.toThrow(
       TaskListClosedError,
       `Can't add new tasks to closed task list with id '${taskListId}'`
     );
 
-    const domainException = domainExceptionHandler.getCall(0).args[0];
-    expect(domainException).to.be.instanceof(DomainException);
-    expect(domainException.thrower).to.be.equal('TaskList');
-    expect(domainException.error).to.be.instanceof(TaskListClosedError);
-    expect(domainException.error).to.be.eql(
+    const domainException = domainExceptionHandler.mock.calls[0][0];
+    expect(domainException).toBeInstanceOf(DomainException);
+    expect(domainException.thrower).toBe('TaskList');
+    expect(domainException.error).toBeInstanceOf(TaskListClosedError);
+    expect(domainException.error).toEqual(
       new TaskListClosedError(taskListId.toString())
     );
   });

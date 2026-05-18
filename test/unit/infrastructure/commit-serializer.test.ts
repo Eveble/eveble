@@ -1,6 +1,6 @@
-import chai, { expect } from 'chai';
-import { stubInterface } from 'ts-sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach } from 'vitest';
+
 import { Type } from '@eveble/core';
 import {
   Commit,
@@ -13,8 +13,6 @@ import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { Injector } from '../../../src/core/injector';
-
-chai.use(sinonChai);
 
 describe(`CommitSerializer`, () => {
   @Type('CommitMongoDBStorage.MyCommand', { isRegistrable: false })
@@ -133,7 +131,7 @@ describe(`CommitSerializer`, () => {
   let commitSerializer: CommitSerializer;
 
   beforeEach(() => {
-    serializer = stubInterface<types.Serializer>();
+    serializer = mock<types.Serializer>();
 
     injector = new Injector();
     commitSerializer = new CommitSerializer();
@@ -152,43 +150,44 @@ describe(`CommitSerializer`, () => {
 
   it('serializes commit', () => {
     serializer.toData
-      .withArgs(commit.events[0])
-      .returns(srlzdCommit.events[0].data);
+      .calledWith(commit.events[0])
+      .mockReturnValue(srlzdCommit.events[0].data);
     serializer.toData
-      .withArgs(commit.commands[0])
-      .returns(srlzdCommit.commands[0].data);
+      .calledWith(commit.commands[0])
+      .mockReturnValue(srlzdCommit.commands[0].data);
 
     const result = commitSerializer.serialize(commit);
-    expect(result).to.be.instanceof(Object);
-    expect(result).to.be.eql(srlzdCommit);
-    expect(serializer.toData).to.be.calledWithExactly(commit.events[0]);
-    expect(serializer.toData).to.be.calledWithExactly(commit.commands[0]);
+    expect(result).toBeInstanceOf(Object);
+    expect(result).toEqual(srlzdCommit);
+    expect(serializer.toData).toHaveBeenCalledWith(commit.events[0]);
+    expect(serializer.toData).toHaveBeenCalledWith(commit.commands[0]);
   });
 
   it('deserializes commit', () => {
-    serializer.hasType.withArgs('CommitMongoDBStorage.MyCommand').returns(true);
-    serializer.hasType.withArgs('CommitMongoDBStorage.MyEvent').returns(true);
+    serializer.hasType.calledWith('CommitMongoDBStorage.MyCommand').mockReturnValue(true);
+    serializer.hasType.calledWith('CommitMongoDBStorage.MyEvent').mockReturnValue(true);
     serializer.fromData
-      .withArgs(srlzdCommit.events[0].data)
-      .returns(commit.events[0]);
+      .calledWith(srlzdCommit.events[0].data)
+      .mockReturnValue(commit.events[0]);
     serializer.fromData
-      .withArgs(srlzdCommit.commands[0].data)
-      .returns(commit.commands[0]);
+      .calledWith(srlzdCommit.commands[0].data)
+      .mockReturnValue(commit.commands[0]);
 
     const result = commitSerializer.deserialize(srlzdCommit);
-    expect(result).to.be.instanceof(Commit);
-    expect(result).to.be.eql(commit);
-    expect(serializer.hasType).to.be.calledWithExactly(
+    expect(result).toBeInstanceOf(Commit);
+    expect(result).toEqual(commit);
+    expect(serializer.hasType).toHaveBeenCalledWith(
       'CommitMongoDBStorage.MyCommand'
     );
-    expect(serializer.hasType).to.be.calledWithExactly(
+    expect(serializer.hasType).toHaveBeenCalledWith(
       'CommitMongoDBStorage.MyEvent'
     );
-    expect(serializer.fromData).to.be.calledWithExactly(
+    expect(serializer.fromData).toHaveBeenCalledWith(
       srlzdCommit.events[0].data
     );
-    expect(serializer.fromData).to.be.calledWithExactly(
+    expect(serializer.fromData).toHaveBeenCalledWith(
       srlzdCommit.commands[0].data
     );
   });
 });
+

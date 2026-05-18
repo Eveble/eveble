@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it, beforeEach, beforeAll } from 'vitest';
+
 import { ObjectId } from 'mongodb';
 import { ScheduledJob } from '../../../src/infrastructure/structs/scheduled-job';
 import { PulseScheduledJobTransformer } from '../../../src/infrastructure/transformers/pulse-scheduled-job-transformer';
@@ -8,7 +9,7 @@ describe('PulseScheduledJobTransformer', () => {
   let job: any;
   let transformer: PulseScheduledJobTransformer;
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
@@ -36,20 +37,20 @@ describe('PulseScheduledJobTransformer', () => {
 
   it(`transforms Agenda's Job to ScheduledJob`, () => {
     const scheduledJob = transformer.transform(job);
-    expect(scheduledJob).to.be.instanceof(ScheduledJob);
-    expect(scheduledJob.id).to.be.equal('5d84acfe15bb71183f5cfee3');
-    expect(scheduledJob.name).to.be.equal('send scheduled command');
-    expect(scheduledJob.priority).to.be.equal(0);
-    expect(scheduledJob.nextRunAt).to.be.undefined;
-    expect((scheduledJob as any).lastModifiedBy).to.be.undefined;
-    expect((scheduledJob as any).type).to.be.undefined;
-    expect(scheduledJob.state).to.be.undefined;
+    expect(scheduledJob).toBeInstanceOf(ScheduledJob);
+    expect(scheduledJob.id).toBe('5d84acfe15bb71183f5cfee3');
+    expect(scheduledJob.name).toBe('send scheduled command');
+    expect(scheduledJob.priority).toBe(0);
+    expect(scheduledJob.nextRunAt).toBeUndefined();
+    expect((scheduledJob as any).lastModifiedBy).toBeUndefined();
+    expect((scheduledJob as any).type).toBeUndefined();
+    expect(scheduledJob.state).toBeUndefined();
   });
 
   it(`transform lastFinishedAt property name from Agenda's job to completedAt`, () => {
     job.attrs.lastFinishedAt = now;
     const scheduledJob = transformer.transform(job);
-    expect(scheduledJob.completedAt).to.be.instanceof(Date);
+    expect(scheduledJob.completedAt).toBeInstanceOf(Date);
   });
 
   describe('determines scheduled job state based on available dates', () => {
@@ -57,7 +58,7 @@ describe('PulseScheduledJobTransformer', () => {
       it('determines failed state of job if failedAt property is present on job attrs', () => {
         job.attrs.failedAt = now;
         const scheduledJob = transformer.transform(job);
-        expect(scheduledJob.isInState(ScheduledJob.STATES.failed)).to.be.true;
+        expect(scheduledJob.isInState(ScheduledJob.STATES.failed)).toBe(true);
       });
       it('ensures precedents of determining failed state over completed, locked, enqueued states', () => {
         job.attrs.failedAt = now;
@@ -66,7 +67,7 @@ describe('PulseScheduledJobTransformer', () => {
         job.attrs.nextRunAt = now;
 
         const scheduledJob = transformer.transform(job);
-        expect(scheduledJob.isInState(ScheduledJob.STATES.failed)).to.be.true;
+        expect(scheduledJob.isInState(ScheduledJob.STATES.failed)).toBe(true);
       });
     });
     describe('completed', () => {
@@ -91,7 +92,7 @@ describe('PulseScheduledJobTransformer', () => {
       it('determines locked job state if lockedAt property is present on job attrs', () => {
         job.attrs.lockedAt = now;
         const scheduledJob = transformer.transform(job);
-        expect(scheduledJob.isInState(ScheduledJob.STATES.locked)).to.be.true;
+        expect(scheduledJob.isInState(ScheduledJob.STATES.locked)).toBe(true);
       });
 
       it('ensures precedents of determining locked state over enqueued state', () => {
@@ -99,27 +100,28 @@ describe('PulseScheduledJobTransformer', () => {
         job.attrs.nextRunAt = now;
 
         const scheduledJob = transformer.transform(job);
-        expect(scheduledJob.isInState(ScheduledJob.STATES.locked)).to.be.true;
+        expect(scheduledJob.isInState(ScheduledJob.STATES.locked)).toBe(true);
       });
     });
     describe('enqueued', () => {
       it('determines enqueued job state if nextRunAt property is present on job attrs', () => {
         job.attrs.nextRunAt = now;
         const scheduledJob = transformer.transform(job);
-        expect(scheduledJob.isInState(ScheduledJob.STATES.enqueued)).to.be.true;
+        expect(scheduledJob.isInState(ScheduledJob.STATES.enqueued)).toBe(true);
       });
 
       it('ensures precedents of determining enqueued state over returning null', () => {
         job.attrs.nextRunAt = now;
 
         const scheduledJob = transformer.transform(job);
-        expect(scheduledJob.isInState(ScheduledJob.STATES.enqueued)).to.be.true;
+        expect(scheduledJob.isInState(ScheduledJob.STATES.enqueued)).toBe(true);
       });
     });
 
     it(`sets state to undefined if state of job can't be determined`, () => {
       const scheduledJob = transformer.transform(job);
-      expect(scheduledJob.isInState(undefined)).to.be.true;
+      expect(scheduledJob.isInState(undefined)).toBe(true);
     });
   });
 });
+

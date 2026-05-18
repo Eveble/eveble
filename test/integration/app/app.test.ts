@@ -1,7 +1,14 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
-import sinon from 'sinon';
+import { mock, mockFn } from 'vitest-mock-extended';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  afterAll,
+} from 'vitest';
+
 import Pulse from '@pulsecron/pulse';
 import { MongoClient, Collection, Db } from 'mongodb';
 import { kernel, Type } from '@eveble/core';
@@ -23,8 +30,6 @@ import { MongoDBSnapshotStorageModule } from '../../../src/app/modules/mongodb-s
 import { PulseCommandSchedulerModule } from '../../../src/app/modules/pulse-command-scheduler-module';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
-chai.use(sinonChai);
-
 describe(`App`, () => {
   let injector: Injector;
   let log: any;
@@ -32,12 +37,12 @@ describe(`App`, () => {
 
   beforeEach(() => {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
+    log = mock<types.Logger>();
 
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
 
     originalProcessOn = process.on;
-    (process as any).on = sinon.stub();
+    (process as any).on = mockFn();
   });
 
   afterEach(() => {
@@ -46,7 +51,7 @@ describe(`App`, () => {
     kernel.setInjector(undefined as any);
   });
 
-  after(() => {
+  afterAll(() => {
     process.on = originalProcessOn;
   });
 
@@ -57,7 +62,7 @@ describe(`App`, () => {
   describe('construction', () => {
     it(`initializes modules array with Eveble module if list is missing on properties`, () => {
       const app = new App({});
-      expect(app.modules[0]).to.be.instanceof(Eveble);
+      expect(app.modules[0]).toBeInstanceOf(Eveble);
     });
     it(`does not modify modules array if Eveble module is present`, () => {
       class MyModule extends Module {}
@@ -65,8 +70,8 @@ describe(`App`, () => {
       const eveble = new Eveble();
       const modules = [userModule, eveble];
       const app = new App({ modules });
-      expect(app.modules[0]).to.be.equal(userModule);
-      expect(app.modules[1]).to.be.equal(eveble);
+      expect(app.modules[0]).toBe(userModule);
+      expect(app.modules[1]).toBe(eveble);
     });
     it(`initializes configuration as AppConfig if plain object is passed`, () => {
       const config = {
@@ -74,40 +79,34 @@ describe(`App`, () => {
         logging: new LoggingConfig({ isEnabled: false }),
       };
       const app = new App({ config });
-      expect(app.config).to.be.instanceof(AppConfig);
-      expect(app.config.get('appId')).to.be.equal('my-custom-app-id');
-      expect(app.config.get('logging')).to.be.instanceof(LoggingConfig);
-      expect(app.config.get('logging.isEnabled')).to.be.equal(false);
+      expect(app.config).toBeInstanceOf(AppConfig);
+      expect(app.config.get('appId')).toBe('my-custom-app-id');
+      expect(app.config.get('logging')).toBeInstanceOf(LoggingConfig);
+      expect(app.config.get('logging.isEnabled')).toBe(false);
     });
     describe(`configuration`, () => {
       describe(`CommitStore`, () => {
         it(`configures timeout as an integer and sets the default value`, () => {
           const app = new App({});
-          expect(app.config.get('eveble.CommitStore.timeout')).to.be.equal(
-            600000
-          );
+          expect(app.config.get('eveble.CommitStore.timeout')).toBe(600000);
         });
       });
       describe(`Snapshotter`, () => {
         it(`configures isEnabled as a boolean and sets the default value`, () => {
           const app = new App({});
-          expect(app.config.get('eveble.Snapshotter.isEnabled')).to.be.equal(
-            true
-          );
+          expect(app.config.get('eveble.Snapshotter.isEnabled')).toBe(true);
         });
         it(`configures frequency as a integer and sets the default value`, () => {
           const app = new App({});
-          expect(app.config.get('eveble.Snapshotter.frequency')).to.be.equal(
-            10
-          );
+          expect(app.config.get('eveble.Snapshotter.frequency')).toBe(10);
         });
       });
       describe(`CommandScheduler`, () => {
         it(`configures isEnabled as a boolean and sets the default value`, () => {
           const app = new App({});
-          expect(
-            app.config.get('eveble.CommandScheduler.isEnabled')
-          ).to.be.equal(true);
+          expect(app.config.get('eveble.CommandScheduler.isEnabled')).toBe(
+            true
+          );
         });
       });
     });
@@ -121,10 +120,12 @@ describe(`App`, () => {
           injector,
         });
         await app.initialize();
-        expect(log.debug).to.be.calledWithMatch(
-          new Log(`initializing graceful shutdown for process signals`)
-            .on(app)
-            .in('initializeGracefulShutdown')
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`initializing graceful shutdown for process signals`)
+              .on(app)
+              .in('initializeGracefulShutdown')
+          )
         );
         await app.shutdown();
       });
@@ -135,14 +136,16 @@ describe(`App`, () => {
           injector,
         });
         await app.initialize();
-        expect((process as any).on.getCall(0).args[0]).to.be.equal('SIGINT');
-        expect((process as any).on.args[0][1].original).to.be.equal(
+        expect((process as any).on.mock.calls[0][0]).toBe('SIGINT');
+        expect((process as any).on.mock.calls[0][1].original).toBe(
           app.onProcessSignal
         );
-        expect(log.debug).to.be.calledWithMatch(
-          new Log(`registers graceful shutdown for code: 'SIGINT'`)
-            .on(app)
-            .in('initializeGracefulShutdown')
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`registers graceful shutdown for code: 'SIGINT'`)
+              .on(app)
+              .in('initializeGracefulShutdown')
+          )
         );
         await app.shutdown();
       });
@@ -153,14 +156,16 @@ describe(`App`, () => {
           injector,
         });
         await app.initialize();
-        expect((process as any).on.getCall(1).args[0]).to.be.equal('SIGTERM');
-        expect((process as any).on.args[1][1].original).to.be.equal(
+        expect((process as any).on.mock.calls[1][0]).toBe('SIGTERM');
+        expect((process as any).on.mock.calls[1][1].original).toBe(
           app.onProcessSignal
         );
-        expect(log.debug).to.be.calledWithMatch(
-          new Log(`registers graceful shutdown for code: 'SIGTERM'`)
-            .on(app)
-            .in('initializeGracefulShutdown')
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`registers graceful shutdown for code: 'SIGTERM'`)
+              .on(app)
+              .in('initializeGracefulShutdown')
+          )
         );
         await app.shutdown();
       });
@@ -171,15 +176,17 @@ describe(`App`, () => {
           injector,
         });
         await app.initialize();
-        expect((process as any).on.getCall(2).args[0]).to.be.equal('SIGQUIT');
-        expect((process as any).on.args[2][1].original).to.be.equal(
+        expect((process as any).on.mock.calls[2][0]).toBe('SIGQUIT');
+        expect((process as any).on.mock.calls[2][1].original).toBe(
           app.onProcessSignal
         );
 
-        expect(log.debug).to.be.calledWithMatch(
-          new Log(`registers graceful shutdown for code: 'SIGQUIT'`)
-            .on(app)
-            .in('initializeGracefulShutdown')
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`registers graceful shutdown for code: 'SIGQUIT'`)
+              .on(app)
+              .in('initializeGracefulShutdown')
+          )
         );
         await app.shutdown();
       });
@@ -202,10 +209,12 @@ describe(`App`, () => {
           injector,
         });
         await app.initialize();
-        expect(log.debug).to.be.calledWithMatch(
-          new Log(`initializing external dependencies`)
-            .on(app)
-            .in('initializeExternalDependencies')
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`initializing external dependencies`)
+              .on(app)
+              .in('initializeExternalDependencies')
+          )
         );
         await app.shutdown();
       });
@@ -217,23 +226,34 @@ describe(`App`, () => {
           });
           await app.initialize();
           const pulse = await app.injector.get<any>(BINDINGS.Pulse.library);
-          expect(pulse).to.be.equal(Pulse);
-          expect(log.debug).to.be.calledWithMatch(
-            new Log(`bound 'Pulse.library' as constant value`)
-              .on(app)
-              .in('initializeExternalDependencies')
+          expect(pulse).toBe(Pulse);
+          expect(log.debug).toHaveBeenCalledWith(
+            expect.objectContaining(
+              new Log(`bound 'Pulse.library' as constant value`)
+                .on(app)
+                .in('initializeExternalDependencies')
+            )
           );
           await app.shutdown();
         });
         it('does not override existing Pulse library on injector', async () => {
-          const PulseStub = sinon.stub();
-          const pulseInstance = stubInterface<Pulse>();
-          PulseStub.returns(pulseInstance);
-          injector.bind(BINDINGS.Pulse.library).toConstantValue(PulseStub);
+          const pulseInstance = mock<Pulse>();
+
+          class PulseStub {
+            constructor(options?: any) {
+              return pulseInstance as any;
+            }
+          }
+
+          const PulseConstructorSpy = vi.fn(PulseStub);
+
+          injector
+            .bind(BINDINGS.Pulse.library)
+            .toConstantValue(PulseConstructorSpy);
           const app = new App({ injector, modules: [] });
           await app.initialize();
           const pulse = await app.injector.get<any>(BINDINGS.Pulse.library);
-          expect(pulse).to.be.equal(PulseStub);
+          expect(pulse).toBe(PulseConstructorSpy);
           await app.shutdown();
         });
       });
@@ -242,25 +262,37 @@ describe(`App`, () => {
           const app = new App({ modules: [], injector });
           await app.initialize();
           const mongodb = await app.injector.get<any>(BINDINGS.MongoDB.library);
-          expect(mongodb).to.be.eql(MongoClient);
-          expect(log.debug).to.be.calledWithMatch(
-            new Log(`bound 'MongoDB.library' as constant value`)
-              .on(app)
-              .in('initializeExternalDependencies')
+          expect(mongodb).toEqual(MongoClient);
+          expect(log.debug).toHaveBeenCalledWith(
+            expect.objectContaining(
+              new Log(`bound 'MongoDB.library' as constant value`)
+                .on(app)
+                .in('initializeExternalDependencies')
+            )
           );
           await app.shutdown();
         });
         it('does not override existing MongoDB library on injector', async () => {
-          const MongoClientStub = sinon.stub();
-          const mongoClientInstance = stubInterface<MongoClient>();
-          const collection = stubInterface<Collection<any>>();
-          const db = stubInterface<Db>();
-          db.collection.returns(collection);
-          mongoClientInstance.db.returns(db);
-          MongoClientStub.returns(mongoClientInstance);
+          const mongoClientInstance = mock<MongoClient>();
+          const collection = mock<Collection<any>>();
+          const db = mock<Db>();
+
+          db.collection.mockReturnValue(collection);
+          mongoClientInstance.db.mockReturnValue(db);
+
+          // Create a mock constructor that returns the mocked instance
+          class MongoClientStub {
+            constructor(url?: string, options?: any) {
+              return mongoClientInstance as any;
+            }
+          }
+
+          const MongoClientConstructorSpy = vi.fn(MongoClientStub);
+
           injector
             .bind<any>(BINDINGS.MongoDB.library)
-            .toConstantValue(MongoClientStub);
+            .toConstantValue(MongoClientConstructorSpy);
+
           const app = new App({
             injector,
             config: new AppConfig({
@@ -273,9 +305,10 @@ describe(`App`, () => {
               }),
             }),
           });
+
           await app.initialize();
           const mongodb = await injector.get<any>(BINDINGS.MongoDB.library);
-          expect(mongodb).to.be.eql(MongoClientStub);
+          expect(mongodb).toBe(MongoClientConstructorSpy);
           await app.shutdown();
         });
       });
@@ -289,8 +322,12 @@ describe(`App`, () => {
         });
 
         await app.initialize();
-        expect(log.debug).to.be.calledWithMatch(
-          new Log(`initializing schedulers`).on(app).in('initializeSchedulers')
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`initializing schedulers`)
+              .on(app)
+              .in('initializeSchedulers')
+          )
         );
         await app.shutdown();
       });
@@ -307,17 +344,17 @@ describe(`App`, () => {
 
           await app.initialize();
 
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(3);
-          expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[2]).to.be.instanceof(Eveble);
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(3);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
+          expect(app.modules[1]).toBeInstanceOf(MongoDBSnapshotStorageModule);
+          expect(app.modules[2]).toBeInstanceOf(Eveble);
 
           await app.shutdown();
         });
 
         it('does not include module if CommandScheduler is bound prior to initialization on Injector', async () => {
-          const commandScheduler = stubInterface<types.CommandScheduler>();
+          const commandScheduler = mock<types.CommandScheduler>();
 
           const config = new AppConfig({
             appId: 'my-id',
@@ -330,16 +367,16 @@ describe(`App`, () => {
           app.injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
 
           await app.initialize();
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(3);
-          expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[2]).to.be.instanceof(Eveble);
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(3);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
+          expect(app.modules[1]).toBeInstanceOf(MongoDBSnapshotStorageModule);
+          expect(app.modules[2]).toBeInstanceOf(Eveble);
           expect(
             await app.injector.get<types.CommandScheduler>(
               BINDINGS.CommandScheduler
             )
-          ).to.be.equal(commandScheduler);
+          ).toBe(commandScheduler);
 
           await app.shutdown();
         });
@@ -354,19 +391,21 @@ describe(`App`, () => {
           const app = new App({ config, injector });
 
           await app.initialize();
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(4);
-          expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[2]).to.be.instanceof(PulseCommandSchedulerModule);
-          expect(app.modules[3]).to.be.instanceof(Eveble);
-          expect(log.debug).to.be.calledWithMatch(
-            new Log(
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(4);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
+          expect(app.modules[1]).toBeInstanceOf(MongoDBSnapshotStorageModule);
+          expect(app.modules[2]).toBeInstanceOf(PulseCommandSchedulerModule);
+          expect(app.modules[3]).toBeInstanceOf(Eveble);
+          expect(log.debug).toHaveBeenCalledWith(
+            expect.objectContaining(
               new Log(
-                `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
+                new Log(
+                  `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
+                )
+                  .on(app)
+                  .in('initializeSchedulers')
               )
-                .on(app)
-                .in('initializeSchedulers')
             )
           );
           await app.shutdown();
@@ -381,8 +420,10 @@ describe(`App`, () => {
           injector,
         });
         await app.initialize();
-        expect(log.debug).to.be.calledWithMatch(
-          new Log(`initializing storages`).on(app).in('initializeStorages')
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`initializing storages`).on(app).in('initializeStorages')
+          )
         );
         await app.shutdown();
       });
@@ -399,17 +440,17 @@ describe(`App`, () => {
           app.injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
 
           await app.initialize();
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(3);
-          expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(PulseCommandSchedulerModule);
-          expect(app.modules[2]).to.be.instanceof(Eveble);
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(3);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
+          expect(app.modules[1]).toBeInstanceOf(PulseCommandSchedulerModule);
+          expect(app.modules[2]).toBeInstanceOf(Eveble);
 
           await app.shutdown();
         });
 
         it('does not include module if SnapshotStorage is bound prior to initialization on Injector', async () => {
-          const snapshotStorageStub = stubInterface<types.SnapshotStorage>();
+          const snapshotStorageStub = mock<types.SnapshotStorage>();
 
           const config = new AppConfig({
             appId: 'my-id',
@@ -422,16 +463,16 @@ describe(`App`, () => {
             .toConstantValue(snapshotStorageStub);
 
           await app.initialize();
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(3);
-          expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(PulseCommandSchedulerModule);
-          expect(app.modules[2]).to.be.instanceof(Eveble);
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(3);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
+          expect(app.modules[1]).toBeInstanceOf(PulseCommandSchedulerModule);
+          expect(app.modules[2]).toBeInstanceOf(Eveble);
           expect(
             await app.injector.get<types.SnapshotStorage>(
               BINDINGS.SnapshotStorage
             )
-          ).to.be.equal(snapshotStorageStub);
+          ).toBe(snapshotStorageStub);
 
           await app.shutdown();
         });
@@ -446,18 +487,20 @@ describe(`App`, () => {
           const app = new App({ config, injector });
 
           await app.initialize();
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(4);
-          expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(app.modules[1]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[2]).to.be.instanceof(PulseCommandSchedulerModule);
-          expect(app.modules[3]).to.be.instanceof(Eveble);
-          expect(log.debug).to.be.calledWithMatch(
-            new Log(
-              `added 'SnapshotStorage' as 'MongoDBSnapshotStorageModule' to application modules`
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(4);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
+          expect(app.modules[1]).toBeInstanceOf(MongoDBSnapshotStorageModule);
+          expect(app.modules[2]).toBeInstanceOf(PulseCommandSchedulerModule);
+          expect(app.modules[3]).toBeInstanceOf(Eveble);
+          expect(log.debug).toHaveBeenCalledWith(
+            expect.objectContaining(
+              new Log(
+                `added 'SnapshotStorage' as 'MongoDBSnapshotStorageModule' to application modules`
+              )
+                .on(app)
+                .in('initializeStorages')
             )
-              .on(app)
-              .in('initializeStorages')
           );
           await app.shutdown();
         });
@@ -465,8 +508,8 @@ describe(`App`, () => {
 
       describe('MongoDBCommitStorageModule', () => {
         it('does not include module if CommitStore is bound prior to initialization on Injector', async () => {
-          const commitStorageStub = stubInterface<types.CommitStorage>();
-          const commitObserverStub = stubInterface<types.CommitObserver>();
+          const commitStorageStub = mock<types.CommitStorage>();
+          const commitObserverStub = mock<types.CommitObserver>();
 
           const config = new AppConfig({
             appId: 'my-id',
@@ -482,19 +525,19 @@ describe(`App`, () => {
             .toConstantValue(commitObserverStub);
 
           await app.initialize();
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(3);
-          expect(app.modules[0]).to.be.instanceof(MongoDBSnapshotStorageModule);
-          expect(app.modules[1]).to.be.instanceof(PulseCommandSchedulerModule);
-          expect(app.modules[2]).to.be.instanceof(Eveble);
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(3);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBSnapshotStorageModule);
+          expect(app.modules[1]).toBeInstanceOf(PulseCommandSchedulerModule);
+          expect(app.modules[2]).toBeInstanceOf(Eveble);
           expect(
             await app.injector.get<types.CommitStorage>(BINDINGS.CommitStorage)
-          ).to.be.equal(commitStorageStub);
+          ).toBe(commitStorageStub);
           expect(
             await app.injector.get<types.CommitObserver>(
               BINDINGS.CommitObserver
             )
-          ).to.be.equal(commitObserverStub);
+          ).toBe(commitObserverStub);
           await app.shutdown();
         });
 
@@ -505,15 +548,17 @@ describe(`App`, () => {
           const app = new App({ config, injector });
 
           await app.initialize();
-          expect(app.modules).to.be.instanceof(Array);
-          expect(app.modules).to.have.length(4);
-          expect(app.modules[0]).to.be.instanceof(MongoDBCommitStorageModule);
-          expect(log.debug).to.be.calledWithMatch(
-            new Log(
-              `added 'CommitStorage' as 'MongoDBCommitStorageModule' to application modules`
+          expect(app.modules).toBeInstanceOf(Array);
+          expect(app.modules).toHaveLength(4);
+          expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
+          expect(log.debug).toHaveBeenCalledWith(
+            expect.objectContaining(
+              new Log(
+                `added 'CommitStorage' as 'MongoDBCommitStorageModule' to application modules`
+              )
+                .on(app)
+                .in('initializeStorages')
             )
-              .on(app)
-              .in('initializeStorages')
           );
           await app.shutdown();
         });
@@ -525,7 +570,7 @@ describe(`App`, () => {
         modules: [],
         injector,
       });
-      expect(injector.get<types.App>(BINDINGS.App)).to.be.equal(app);
+      expect(injector.get<types.App>(BINDINGS.App)).toBe(app);
     });
   });
 
@@ -540,8 +585,8 @@ describe(`App`, () => {
     let eventBus: any;
 
     beforeEach(() => {
-      commandBus = stubInterface<types.CommandBus>();
-      eventBus = stubInterface<types.EventBus>();
+      commandBus = mock<types.CommandBus>();
+      eventBus = mock<types.EventBus>();
 
       app = new App();
       app.injector
@@ -557,12 +602,12 @@ describe(`App`, () => {
         targetId: new Guid(),
       });
 
-      commandBus.send.resolves('result');
+      commandBus.send.mockResolvedValue('result');
 
       const result = await app.send(command);
-      expect(result).to.be.equal('result');
-      expect(commandBus.send).to.be.calledOnce;
-      expect(commandBus.send).to.be.calledWithExactly(command);
+      expect(result).toBe('result');
+      expect(commandBus.send).toHaveBeenCalledTimes(1);
+      expect(commandBus.send).toHaveBeenCalledWith(command);
     });
 
     it(`publishes event through event bus`, async () => {
@@ -571,16 +616,16 @@ describe(`App`, () => {
       });
 
       await app.publish(event);
-      expect(eventBus.publish).to.be.calledOnce;
-      expect(eventBus.publish).to.be.calledWithExactly(event);
+      expect(eventBus.publish).toHaveBeenCalledTimes(1);
+      expect(eventBus.publish).toHaveBeenCalledWith(event);
     });
 
     it(`subscribes to event with handler on event bus`, async () => {
-      const handler = sinon.spy();
+      const handler = vi.fn();
 
       await app.subscribeTo(MyEvent, handler);
-      expect(eventBus.subscribeTo).to.be.calledOnce;
-      expect(eventBus.subscribeTo).to.be.calledWithExactly(MyEvent, handler);
+      expect(eventBus.subscribeTo).toHaveBeenCalledTimes(1);
+      expect(eventBus.subscribeTo).toHaveBeenCalledWith(MyEvent, handler);
     });
   });
 });

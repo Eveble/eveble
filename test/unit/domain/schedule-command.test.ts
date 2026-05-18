@@ -1,5 +1,5 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+
 import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
 import { Command, Assignment } from '../../../src/components/command';
@@ -11,16 +11,16 @@ describe('ScheduleCommand', () => {
   let now: Date;
   let clock: any;
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(now.getTime());
+    clock = vi.useFakeTimers(now.getTime());
   });
 
   afterEach(() => {
-    clock.restore();
+    vi.useRealTimers();
   });
 
   @Type('MyCommand', { isRegistrable: false })
@@ -29,21 +29,21 @@ describe('ScheduleCommand', () => {
   }
 
   it(`extends Command`, () => {
-    expect(ScheduleCommand.prototype).to.be.instanceof(Command);
+    expect(ScheduleCommand.prototype).toBeInstanceOf(Command);
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(ScheduleCommand.prototype)).to.be.true;
+    expect(isTyped(ScheduleCommand.prototype)).toBe(true);
   });
 
   it('defines the type name correctly', () => {
-    expect(ScheduleCommand.getTypeName()).to.equal('ScheduleCommand');
-    expect(ScheduleCommand.prototype.getTypeName()).to.equal('ScheduleCommand');
+    expect(ScheduleCommand.getTypeName()).toBe('ScheduleCommand');
+    expect(ScheduleCommand.prototype.getTypeName()).toBe('ScheduleCommand');
   });
 
   describe('prop types', () => {
     it('takes required targetId property as a string or Guid', () => {
-      expect(ScheduleCommand.getPropTypes().targetId).to.be.eql(
+      expect(ScheduleCommand.getPropTypes().targetId).toEqual(
         PropTypes.oneOf([
           PropTypes.instanceOf(String),
           PropTypes.instanceOf(Guid),
@@ -52,7 +52,7 @@ describe('ScheduleCommand', () => {
     });
 
     it('takes required command property as a Command', () => {
-      clock.restore();
+      vi.useRealTimers();
       const shape = PropTypes.interface({
         targetId: PropTypes.oneOf([
           PropTypes.instanceOf(String),
@@ -87,26 +87,26 @@ describe('ScheduleCommand', () => {
         getLegacyTransformers: PropTypes.instanceOf(Function),
         getLegacyTransformer: PropTypes.instanceOf(Function),
       });
-      expect(ScheduleCommand.getPropTypes().command).to.be.eql(shape);
+      expect(ScheduleCommand.getPropTypes().command).toEqual(shape);
     });
 
     it('takes optional timestamp property as a Date', () => {
-      clock.restore();
+      vi.useRealTimers();
 
-      expect(ScheduleCommand.getPropTypes().timestamp).to.be.eql(
+      expect(ScheduleCommand.getPropTypes().timestamp).toEqual(
         PropTypes.instanceOf(Date).isOptional
       );
     });
 
     it('takes optional metadata property as an object', () => {
-      expect(ScheduleCommand.getPropTypes().metadata).to.be.eql(
+      expect(ScheduleCommand.getPropTypes().metadata).toEqual(
         PropTypes.object.isOptional
       );
     });
   });
 
   describe(`construction`, () => {
-    context('required properties', () => {
+    describe('required properties', () => {
       it(`takes an object with targetId property as a string and command as Command instance`, () => {
         const targetId = 'my-id';
         const command = new MyCommand({ targetId, key: 'my-key' });
@@ -114,8 +114,8 @@ describe('ScheduleCommand', () => {
           targetId,
           command,
         });
-        expect(scheduleCommand.targetId).to.be.equal(targetId);
-        expect(scheduleCommand.command).to.be.equal(command);
+        expect(scheduleCommand.targetId).toBe(targetId);
+        expect(scheduleCommand.command).toBe(command);
       });
 
       it(`takes an object with targetId property as a Guid and command as Command instance`, () => {
@@ -125,8 +125,8 @@ describe('ScheduleCommand', () => {
           targetId,
           command,
         });
-        expect(scheduleCommand.targetId).to.be.equal(targetId);
-        expect(scheduleCommand.command).to.be.equal(command);
+        expect(scheduleCommand.targetId).toBe(targetId);
+        expect(scheduleCommand.command).toBe(command);
       });
     });
 
@@ -140,7 +140,7 @@ describe('ScheduleCommand', () => {
           command,
           timestamp,
         });
-        expect(scheduleCommand.timestamp).to.be.equal(timestamp);
+        expect(scheduleCommand.timestamp).toBe(timestamp);
       });
 
       it('adds current date if property timestamp is missing on construction', () => {
@@ -148,7 +148,7 @@ describe('ScheduleCommand', () => {
         const command = new MyCommand({ targetId, key: 'my-key' });
         expect(
           new ScheduleCommand({ targetId, command }).timestamp
-        ).to.be.instanceof(Date);
+        ).toBeInstanceOf(Date);
       });
 
       it(`takes an object with optional metadata property as an object`, () => {
@@ -162,7 +162,7 @@ describe('ScheduleCommand', () => {
           command,
           metadata,
         });
-        expect(scheduleCommand.metadata).to.be.eql(metadata);
+        expect(scheduleCommand.metadata).toEqual(metadata);
       });
     });
   });
@@ -187,7 +187,7 @@ describe('ScheduleCommand', () => {
       });
       command.schedule(assignment);
       const scheduleMessage = new ScheduleCommand({ targetId, command });
-      expect(scheduleMessage.getDeliveryDate()).to.be.equal(deliverAt);
+      expect(scheduleMessage.getDeliveryDate()).toBe(deliverAt);
     });
   });
 
@@ -212,7 +212,7 @@ describe('ScheduleCommand', () => {
         });
         command.schedule(assignment);
         const scheduleMessage = new ScheduleCommand({ targetId, command });
-        expect(scheduleMessage.isDeliverable()).to.be.true;
+        expect(scheduleMessage.isDeliverable()).toBe(true);
       });
 
       it(`returns false if command is not deliverable(deliver at date is in future)`, () => {
@@ -234,8 +234,9 @@ describe('ScheduleCommand', () => {
         });
         command.schedule(assignment);
         const scheduleMessage = new ScheduleCommand({ targetId, command });
-        expect(scheduleMessage.isDeliverable()).to.be.false;
+        expect(scheduleMessage.isDeliverable()).toBe(false);
       });
     });
   });
 });
+

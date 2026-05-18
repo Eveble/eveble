@@ -1,7 +1,5 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
-import chaiAsPromised from 'chai-as-promised';
+import { expect, describe, it, vi } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { derive, derived } from '@traits-ts/core';
 import { Command } from '../../../src/components/command';
@@ -22,9 +20,6 @@ import { subscribe } from '../../../src/annotations/subscribe';
 import { hasPostConstruct } from '../../../src/utils/inversify';
 import { HandlingTrait } from '../../../src/traits/handling.trait';
 
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
-
 describe('OneToOneHandlingTrait', () => {
   @Type('MyCommand', { isRegistrable: false })
   class MyCommand extends Command<MyCommand> {
@@ -44,27 +39,27 @@ describe('OneToOneHandlingTrait', () => {
   it(`has HandlingTrait in composition chain`, () => {
     class TestClass extends derive(OneToOneHandlingTrait) {}
 
-    expect(derived(TestClass.prototype, HandlingTrait)).to.be.true;
+    expect(derived(TestClass.prototype, HandlingTrait)).toBe(true);
   });
 
   describe('construction', () => {
     it('ensures that controller can be initialized without handlers', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
-      expect(() => new MyController()).to.not.throw(Error);
+      expect(() => new MyController()).not.toThrow(Error);
     });
 
     it('initializes with empty handlers as instance of map', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
-      expect(controller.getHandlers()).to.be.instanceof(Map);
-      expect(controller.getHandlers()).to.be.empty;
+      expect(controller.getHandlers()).toBeInstanceOf(Map);
+      expect(controller.getHandlers()).toHaveLength(0);
     });
 
     it('initializes with empty handleable types as instance of array', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
-      expect(controller.getHandleableTypes()).to.be.instanceof(Array);
-      expect(controller.getHandleableTypes()).to.be.eql([Message]);
+      expect(controller.getHandleableTypes()).toBeInstanceOf(Array);
+      expect(controller.getHandleableTypes()).toEqual([Message]);
     });
   });
 
@@ -77,9 +72,9 @@ describe('OneToOneHandlingTrait', () => {
       }
       const controller = new MyController();
       controller.initialize();
-      expect(controller.getHandlers()).to.be.instanceof(Map);
+      expect(controller.getHandlers()).toBeInstanceOf(Map);
       const boundHandler = controller.getHandlers().get(MyCommand);
-      expect(boundHandler).to.be.a('function');
+      expect(boundHandler).toBeTypeOf('function');
     });
 
     it('ensure that handlers from handlers mapping are bound to the instance', () => {
@@ -90,11 +85,11 @@ describe('OneToOneHandlingTrait', () => {
       }
       const controller = new MyController();
       controller.initialize();
-      expect(controller.getHandlers()).to.be.instanceof(Map);
+      expect(controller.getHandlers()).toBeInstanceOf(Map);
       const boundHandler = controller.getHandlers().get(MyCommand);
       expect(
         controller.MyCommandHandlerMethod === (boundHandler as any).original
-      ).to.be.true; // Compare bound function to handler function
+      ).toBe(true); // Compare bound function to handler function
     });
 
     it('setups all handlers from subscribes mapping method on initialization', () => {
@@ -105,9 +100,9 @@ describe('OneToOneHandlingTrait', () => {
       }
       const controller = new MyController();
       controller.initialize();
-      expect(controller.getHandlers()).to.be.instanceof(Map);
+      expect(controller.getHandlers()).toBeInstanceOf(Map);
       const boundHandler = controller.getHandlers().get(MyEvent);
-      expect(boundHandler).to.be.a('function');
+      expect(boundHandler).toBeTypeOf('function');
     });
 
     it('ensure that handlers from subscribes mapping are bound to the instance', () => {
@@ -118,16 +113,16 @@ describe('OneToOneHandlingTrait', () => {
       }
       const controller = new MyController();
       controller.initialize();
-      expect(controller.getHandlers()).to.be.instanceof(Map);
+      expect(controller.getHandlers()).toBeInstanceOf(Map);
       const boundHandler = controller.getHandlers().get(MyEvent);
       expect(controller.MyEventHandlerMethod === (boundHandler as any).original)
-        .to.be.true; // Compare bound function to handler function
+        .toBe(true); // Compare bound function to handler function
     });
 
     it('annotates initializes as post construction method for Inversify', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       // const controller = new MyController();
-      expect(hasPostConstruct(MyController)).to.be.true;
+      expect(hasPostConstruct(MyController)).toBe(true);
     });
   });
 
@@ -138,8 +133,8 @@ describe('OneToOneHandlingTrait', () => {
 
       class InvalidType {}
       expect(() =>
-        controller.registerHandler(InvalidType as any, sinon.stub())
-      ).to.throw(
+        controller.registerHandler(InvalidType as any, vi.fn())
+      ).toThrow(
         UnhandleableTypeError,
         'MyController: type must be one of: [Message]; got InvalidType'
       );
@@ -151,7 +146,7 @@ describe('OneToOneHandlingTrait', () => {
 
       expect(() =>
         controller.registerHandler(MyCommand, undefined as any as types.Handler)
-      ).to.throw(
+      ).toThrow(
         InvalidHandlerError,
         `MyController: provided handler for 'MyCommand' must be a function, got undefined`
       );
@@ -161,10 +156,10 @@ describe('OneToOneHandlingTrait', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      controller.registerHandler(MyCommand, sinon.stub());
+      controller.registerHandler(MyCommand, vi.fn());
       expect(() =>
-        controller.registerHandler(MyCommand, sinon.stub())
-      ).to.throw(
+        controller.registerHandler(MyCommand, vi.fn())
+      ).toThrow(
         HandlerExistError,
         `MyController: handler for 'MyCommand' already exists`
       );
@@ -174,18 +169,18 @@ describe('OneToOneHandlingTrait', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      const handler = sinon.stub();
+      const handler = vi.fn();
       controller.registerHandler(MyCommand, handler);
-      expect(controller.getHandler(MyCommand)).to.be.equal(handler);
+      expect(controller.getHandler(MyCommand)).toBe(handler);
     });
 
     it('registers one to one relational handler for a namespaced type', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      const handler = sinon.stub();
+      const handler = vi.fn();
       controller.registerHandler(NamespacedCommand, handler);
-      expect(controller.getHandler(NamespacedCommand)).to.be.equal(handler);
+      expect(controller.getHandler(NamespacedCommand)).toBe(handler);
     });
   });
 
@@ -194,13 +189,13 @@ describe('OneToOneHandlingTrait', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      const handler = sinon.stub();
-      const otherHandler = sinon.stub();
+      const handler = vi.fn();
+      const otherHandler = vi.fn();
       controller.registerHandler(MyCommand, handler);
       expect(() =>
         controller.overrideHandler(MyCommand, otherHandler)
-      ).to.not.throw(HandlerExistError);
-      expect(controller.getHandler(MyCommand)).to.be.equal(otherHandler);
+      ).not.toThrow(HandlerExistError);
+      expect(controller.getHandler(MyCommand)).toBe(otherHandler);
     });
   });
 
@@ -209,14 +204,14 @@ describe('OneToOneHandlingTrait', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      controller.registerHandler(NamespacedCommand, sinon.stub());
-      expect(controller.hasHandler(NamespacedCommand)).to.be.true;
+      controller.registerHandler(NamespacedCommand, vi.fn());
+      expect(controller.hasHandler(NamespacedCommand)).toBe(true);
     });
 
     it('returns false if message type has no registered handler', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
-      expect(controller.hasHandler(NamespacedCommand)).to.be.false;
+      expect(controller.hasHandler(NamespacedCommand)).toBe(false);
     });
   });
 
@@ -227,7 +222,7 @@ describe('OneToOneHandlingTrait', () => {
         const controller = new MyController();
 
         class InvalidType {}
-        expect(() => controller.getHandler(InvalidType as any)).to.throw(
+        expect(() => controller.getHandler(InvalidType as any)).toThrow(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
         );
@@ -237,25 +232,25 @@ describe('OneToOneHandlingTrait', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        const handler = sinon.stub();
+        const handler = vi.fn();
         controller.registerHandler(MyCommand, handler);
-        expect(controller.getHandler(MyCommand)).to.be.equal(handler);
+        expect(controller.getHandler(MyCommand)).toBe(handler);
       });
 
       it('returns handler for namespaced message type as a function', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        const handler = sinon.stub();
+        const handler = vi.fn();
         controller.registerHandler(NamespacedCommand, handler);
-        expect(controller.getHandler(NamespacedCommand)).to.be.equal(handler);
+        expect(controller.getHandler(NamespacedCommand)).toBe(handler);
       });
 
       it('returns undefined for message type that does not have registered handler', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        expect(controller.getHandler(MyCommand)).to.be.equal(undefined);
+        expect(controller.getHandler(MyCommand)).toBe(undefined);
       });
     });
 
@@ -265,7 +260,7 @@ describe('OneToOneHandlingTrait', () => {
         const controller = new MyController();
 
         class InvalidType {}
-        expect(() => controller.getHandlerOrThrow(InvalidType as any)).to.throw(
+        expect(() => controller.getHandlerOrThrow(InvalidType as any)).toThrow(
           InvalidMessageableType,
           `Type 'InvalidType' must implement Messageable interface`
         );
@@ -275,7 +270,7 @@ describe('OneToOneHandlingTrait', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        expect(() => controller.getHandlerOrThrow(MyCommand)).to.throw(
+        expect(() => controller.getHandlerOrThrow(MyCommand)).toThrow(
           HandlerNotFoundError,
           `MyController: handler for type 'MyCommand' can't be found`
         );
@@ -285,18 +280,18 @@ describe('OneToOneHandlingTrait', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        const handler = sinon.stub();
+        const handler = vi.fn();
         controller.registerHandler(MyCommand, handler);
-        expect(controller.getHandlerOrThrow(MyCommand)).to.be.equal(handler);
+        expect(controller.getHandlerOrThrow(MyCommand)).toBe(handler);
       });
 
       it('returns handler for namespaced message type as a function', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        const handler = sinon.stub();
+        const handler = vi.fn();
         controller.registerHandler(NamespacedCommand, handler);
-        expect(controller.getHandlerOrThrow(NamespacedCommand)).to.be.equal(
+        expect(controller.getHandlerOrThrow(NamespacedCommand)).toBe(
           handler
         );
       });
@@ -307,10 +302,10 @@ describe('OneToOneHandlingTrait', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        const handler = sinon.stub();
-        controller.registerHandler(MyEvent, sinon.stub());
+        const handler = vi.fn();
+        controller.registerHandler(MyEvent, vi.fn());
         controller.registerHandler(MyCommand, handler);
-        expect(controller.getTypeByHandler(handler)).to.be.equal(MyCommand);
+        expect(controller.getTypeByHandler(handler)).toBe(MyCommand);
       });
 
       it('resolves message type for bound handler reference', () => {
@@ -327,18 +322,18 @@ describe('OneToOneHandlingTrait', () => {
         }
         const controller = new MyController();
 
-        const handler = sinon.stub();
-        controller.registerCommandHandler(NamespacedCommand, sinon.stub());
+        const handler = vi.fn();
+        controller.registerCommandHandler(NamespacedCommand, vi.fn());
         controller.registerCommandHandler(MyCommand, handler);
-        expect(controller.getTypeByHandler(handler)).to.be.equal(MyCommand);
+        expect(controller.getTypeByHandler(handler)).toBe(MyCommand);
       });
 
       it('returns undefined for unregistered handler reference', () => {
         class MyController extends derive(OneToOneHandlingTrait) {}
         const controller = new MyController();
 
-        const handler = sinon.stub();
-        expect(controller.getTypeByHandler(handler)).to.be.undefined;
+        const handler = vi.fn();
+        expect(controller.getTypeByHandler(handler)).toBeUndefined();
       });
     });
   });
@@ -348,10 +343,10 @@ describe('OneToOneHandlingTrait', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      controller.registerHandler(MyCommand, sinon.stub());
-      expect(controller.hasHandler(MyCommand)).to.be.true;
+      controller.registerHandler(MyCommand, vi.fn());
+      expect(controller.hasHandler(MyCommand)).toBe(true);
       controller.removeHandler(MyCommand);
-      expect(controller.hasHandler(MyCommand)).to.be.false;
+      expect(controller.hasHandler(MyCommand)).toBe(false);
     });
   });
 
@@ -361,7 +356,7 @@ describe('OneToOneHandlingTrait', () => {
       const controller = new MyController();
 
       const command = new MyCommand({ targetId: 'my-id', key: 'my-string' });
-      expect(controller.handle(command)).to.eventually.be.rejectedWith(
+      expect(controller.handle(command)).rejects.toThrow(
         HandlerNotFoundError,
         `MyController: handler for type 'MyCommand' can't be found`
       );
@@ -371,26 +366,27 @@ describe('OneToOneHandlingTrait', () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      const handler = sinon.stub();
+      const handler = vi.fn();
       controller.registerHandler(MyCommand, handler);
 
       const command = new MyCommand({ targetId: 'my-id', key: 'my-string' });
       await controller.handle(command);
-      expect(handler).to.be.calledOnce;
-      expect(handler).to.be.calledWithExactly(command);
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenCalledWith(command);
     });
 
     it('ensures that result of handling one to one relational handler is returned back', async () => {
       class MyController extends derive(OneToOneHandlingTrait) {}
       const controller = new MyController();
 
-      const handler = sinon.stub();
+      const handler = vi.fn();
       const result = 'my-result';
-      handler.returns(result);
+      handler.mockReturnValue(result);
       controller.registerHandler(MyCommand, handler);
 
       const command = new MyCommand({ targetId: 'my-id', key: 'my-string' });
-      expect(await controller.handle(command)).to.be.equal(result);
+      expect(await controller.handle(command)).toBe(result);
     });
   });
 });
+

@@ -1,5 +1,5 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it } from 'vitest';
+
 import { injectable, inject, postConstruct, preDestroy } from 'inversify';
 import {
   getInjectedPropertyNames,
@@ -11,8 +11,6 @@ import {
   getPropertiesToValidate,
   isPropertyInjected,
 } from '../../../src/utils/inversify';
-
-chai.use(sinonChai);
 
 describe('InversifyJS Metadata Utilities - Inheritance', () => {
   const SERVICE_ID = {
@@ -57,8 +55,10 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
 
       const properties = getInjectedPropertyNames(ChildService);
 
-      expect(properties).to.have.lengthOf(3);
-      expect(properties).to.include.members(['logger', 'db', 'cache']);
+      expect(properties).toHaveLength(3);
+      expect(properties).toEqual(
+        expect.arrayContaining(['logger', 'db', 'cache'])
+      );
     });
 
     it('collects injected properties from multiple inheritance levels', () => {
@@ -82,8 +82,10 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
 
       const properties = getInjectedPropertyNames(ChildService);
 
-      expect(properties).to.have.lengthOf(3);
-      expect(properties).to.include.members(['logger', 'db', 'cache']);
+      expect(properties).toHaveLength(3);
+      expect(properties).toEqual(
+        expect.arrayContaining(['logger', 'db', 'cache'])
+      );
     });
 
     it('handles property override in child class', () => {
@@ -103,7 +105,7 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
       const properties = getInjectedPropertyNames(ChildService);
 
       // Should still have 'logger', even if overridden
-      expect(properties).to.include('logger');
+      expect(properties).toContain('logger');
     });
 
     it('returns correct details for inherited properties', () => {
@@ -121,15 +123,15 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
 
       const details = getInjectedPropertyDetails(ChildService);
 
-      expect(details.size).to.equal(2);
+      expect(details.size).toBe(2);
 
       const loggerDetails = details.get('logger');
       expect(loggerDetails).to.exist;
-      expect(loggerDetails!.serviceIdentifier).to.equal(SERVICE_ID.Logger);
+      expect(loggerDetails!.serviceIdentifier).toBe(SERVICE_ID.Logger);
 
       const dbDetails = details.get('db');
       expect(dbDetails).to.exist;
-      expect(dbDetails!.serviceIdentifier).to.equal(SERVICE_ID.Database);
+      expect(dbDetails!.serviceIdentifier).toBe(SERVICE_ID.Database);
     });
   });
 
@@ -146,10 +148,10 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         regularMethod() {}
       }
 
-      expect(hasPostConstruct(ChildService)).to.be.true;
+      expect(hasPostConstruct(ChildService)).toBe(true);
 
       const methods = getPostConstructMethodNames(ChildService);
-      expect(methods).to.include('baseInit');
+      expect(methods).toContain('baseInit');
     });
 
     it('collects @postConstruct from both parent and child', () => {
@@ -165,11 +167,13 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         childInit() {}
       }
 
-      expect(hasPostConstruct(ChildService)).to.be.true;
+      expect(hasPostConstruct(ChildService)).toBe(true);
 
       const methods = getPostConstructMethodNames(ChildService);
-      expect(methods).to.have.lengthOf(2);
-      expect(methods).to.include.members(['baseInit', 'childInit']);
+      expect(methods).toHaveLength(2);
+      expect(methods).toEqual(
+        expect.arrayContaining(['baseInit', 'childInit'])
+      );
     });
 
     it('collects @postConstruct from multiple inheritance levels', () => {
@@ -193,12 +197,10 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
 
       const methods = getPostConstructMethodNames(ChildService);
 
-      expect(methods).to.have.lengthOf(3);
-      expect(methods).to.include.members([
-        'grandParentInit',
-        'parentInit',
-        'childInit',
-      ]);
+      expect(methods).toHaveLength(3);
+      expect(methods).toEqual(
+        expect.arrayContaining(['grandParentInit', 'parentInit', 'childInit'])
+      );
     });
 
     it('detects @preDestroy in parent class', () => {
@@ -213,10 +215,10 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         regularMethod() {}
       }
 
-      expect(hasPreDestroy(ChildService)).to.be.true;
+      expect(hasPreDestroy(ChildService)).toBe(true);
 
       const methods = getPreDestroyMethodNames(ChildService);
-      expect(methods).to.include('baseCleanup');
+      expect(methods).toContain('baseCleanup');
     });
 
     it('collects @preDestroy from both parent and child', () => {
@@ -232,11 +234,13 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         childCleanup() {}
       }
 
-      expect(hasPreDestroy(ChildService)).to.be.true;
+      expect(hasPreDestroy(ChildService)).toBe(true);
 
       const methods = getPreDestroyMethodNames(ChildService);
-      expect(methods).to.have.lengthOf(2);
-      expect(methods).to.include.members(['baseCleanup', 'childCleanup']);
+      expect(methods).toHaveLength(2);
+      expect(methods).toEqual(
+        expect.arrayContaining(['baseCleanup', 'childCleanup'])
+      );
     });
 
     it('handles multiple lifecycle hooks at different levels', () => {
@@ -259,18 +263,16 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
       }
 
       const postConstructMethods = getPostConstructMethodNames(ChildService);
-      expect(postConstructMethods).to.have.lengthOf(2);
-      expect(postConstructMethods).to.include.members([
-        'baseInit',
-        'childInit',
-      ]);
+      expect(postConstructMethods).toHaveLength(2);
+      expect(postConstructMethods).toEqual(
+        expect.arrayContaining(['baseInit', 'childInit'])
+      );
 
       const preDestroyMethods = getPreDestroyMethodNames(ChildService);
-      expect(preDestroyMethods).to.have.lengthOf(2);
-      expect(preDestroyMethods).to.include.members([
-        'baseCleanup',
-        'childCleanup',
-      ]);
+      expect(preDestroyMethods).toHaveLength(2);
+      expect(preDestroyMethods).toEqual(
+        expect.arrayContaining(['baseCleanup', 'childCleanup'])
+      );
     });
   });
 
@@ -294,11 +296,13 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
 
       const properties = getPropertiesToValidate(ChildService);
       // Should include methods
-      expect(properties).to.include.members(['baseMethod', 'childMethod']);
+      expect(properties).toEqual(
+        expect.arrayContaining(['baseMethod', 'childMethod'])
+      );
 
       // Should NOT include injected properties
-      expect(properties).to.not.include('logger');
-      expect(properties).to.not.include('db');
+      expect(properties).not.toContain('logger');
+      expect(properties).not.toContain('db');
     });
 
     it('excludes inherited lifecycle hooks from validation', () => {
@@ -321,11 +325,13 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
       const properties = getPropertiesToValidate(ChildService);
 
       // Should include regular methods
-      expect(properties).to.include.members(['baseMethod', 'childMethod']);
+      expect(properties).toEqual(
+        expect.arrayContaining(['baseMethod', 'childMethod'])
+      );
 
       // Should NOT include lifecycle hooks
-      expect(properties).to.not.include('baseInit');
-      expect(properties).to.not.include('childInit');
+      expect(properties).not.toContain('baseInit');
+      expect(properties).not.toContain('childInit');
     });
 
     it('correctly identifies inherited injected properties', () => {
@@ -343,9 +349,9 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         public regularProp = 'value';
       }
 
-      expect(isPropertyInjected(ChildService, 'logger')).to.be.true;
-      expect(isPropertyInjected(ChildService, 'db')).to.be.true;
-      expect(isPropertyInjected(ChildService, 'regularProp')).to.be.false;
+      expect(isPropertyInjected(ChildService, 'logger')).toBe(true);
+      expect(isPropertyInjected(ChildService, 'db')).toBe(true);
+      expect(isPropertyInjected(ChildService, 'regularProp')).toBe(false);
     });
   });
 
@@ -388,22 +394,21 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
       }
 
       const properties = getInjectedPropertyNames(Level4);
-      expect(properties).to.have.lengthOf(4);
-      expect(properties).to.include.members([
-        'logger',
-        'db',
-        'cache',
-        'config',
-      ]);
+      expect(properties).toHaveLength(4);
+      expect(properties).toEqual(
+        expect.arrayContaining(['logger', 'db', 'cache', 'config'])
+      );
 
       const postConstructMethods = getPostConstructMethodNames(Level4);
-      expect(postConstructMethods).to.have.lengthOf(4);
-      expect(postConstructMethods).to.include.members([
-        'level1Init',
-        'level2Init',
-        'level3Init',
-        'level4Init',
-      ]);
+      expect(postConstructMethods).toHaveLength(4);
+      expect(postConstructMethods).toEqual(
+        expect.arrayContaining([
+          'level1Init',
+          'level2Init',
+          'level3Init',
+          'level4Init',
+        ])
+      );
     });
 
     it('handles mixed inheritance with and without decorators', () => {
@@ -425,8 +430,8 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
       }
 
       const properties = getInjectedPropertyNames(ChildWithInjection);
-      expect(properties).to.have.lengthOf(2);
-      expect(properties).to.include.members(['logger', 'db']);
+      expect(properties).toHaveLength(2);
+      expect(properties).toEqual(expect.arrayContaining(['logger', 'db']));
     });
 
     it('handles class with only inherited metadata', () => {
@@ -445,13 +450,13 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         someMethod() {}
       }
 
-      expect(hasPostConstruct(ChildService)).to.be.true;
-      expect(getInjectedPropertyNames(ChildService)).to.include('logger');
+      expect(hasPostConstruct(ChildService)).toBe(true);
+      expect(getInjectedPropertyNames(ChildService)).toContain('logger');
 
       const validateProps = getPropertiesToValidate(ChildService);
-      expect(validateProps).to.include('someMethod');
-      expect(validateProps).to.not.include('logger');
-      expect(validateProps).to.not.include('init');
+      expect(validateProps).toContain('someMethod');
+      expect(validateProps).not.toContain('logger');
+      expect(validateProps).not.toContain('init');
     });
   });
 
@@ -466,8 +471,8 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         init() {}
       }
 
-      expect(hasPostConstruct(StandaloneService)).to.be.true;
-      expect(getInjectedPropertyNames(StandaloneService)).to.include('logger');
+      expect(hasPostConstruct(StandaloneService)).toBe(true);
+      expect(getInjectedPropertyNames(StandaloneService)).toContain('logger');
     });
 
     it('handles non-injectable parent class', () => {
@@ -484,7 +489,7 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
 
       // Should only find metadata from injectable child
       const properties = getInjectedPropertyNames(InjectableChild);
-      expect(properties).to.include('logger');
+      expect(properties).toContain('logger');
     });
 
     it('returns empty arrays when no metadata exists in chain', () => {
@@ -493,11 +498,13 @@ describe('InversifyJS Metadata Utilities - Inheritance', () => {
         regularMethod() {}
       }
 
-      expect(getInjectedPropertyNames(ServiceWithNoMetadata)).to.be.empty;
-      expect(getPostConstructMethodNames(ServiceWithNoMetadata)).to.be.empty;
-      expect(getPreDestroyMethodNames(ServiceWithNoMetadata)).to.be.empty;
-      expect(hasPostConstruct(ServiceWithNoMetadata)).to.be.false;
-      expect(hasPreDestroy(ServiceWithNoMetadata)).to.be.false;
+      expect(getInjectedPropertyNames(ServiceWithNoMetadata)).toHaveLength(0);
+      expect(getPostConstructMethodNames(ServiceWithNoMetadata)).toHaveLength(
+        0
+      );
+      expect(getPreDestroyMethodNames(ServiceWithNoMetadata)).toHaveLength(0);
+      expect(hasPostConstruct(ServiceWithNoMetadata)).toBe(false);
+      expect(hasPreDestroy(ServiceWithNoMetadata)).toBe(false);
     });
   });
 });

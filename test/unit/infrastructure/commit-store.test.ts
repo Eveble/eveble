@@ -1,8 +1,6 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { Aggregate } from '../../../src/domain/aggregate';
@@ -20,9 +18,6 @@ import {
 import { CommitConcurrencyError } from '../../../src/infrastructure/infrastructure-errors';
 import { Log } from '../../../src/components/log-entry';
 import { BINDINGS } from '../../../src/constants/bindings';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`CommitStore`, () => {
   @Type('CommitStore.MyEventSourceable', { isRegistrable: false })
@@ -55,18 +50,18 @@ describe(`CommitStore`, () => {
   let commitPublisher: any;
   let commitStore: CommitStore;
 
-  before(() => {
+  beforeAll(() => {
     now = new Date();
   });
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers(now.getTime());
+    clock = vi.useFakeTimers({ now });
 
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
-    storage = stubInterface<types.CommitStorage>();
-    commitPublisher = stubInterface<types.CommitPublisher>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
+    storage = mock<types.CommitStorage>();
+    commitPublisher = mock<types.CommitPublisher>();
 
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
@@ -79,23 +74,23 @@ describe(`CommitStore`, () => {
   });
 
   afterEach(() => {
-    clock.restore();
+    vi.useRealTimers();
   });
 
   beforeEach(() => {
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
 
     commitStore = new CommitStore();
     injector.injectInto(commitStore);
-    storage.generateId.returns(undefined);
+    storage.generateId.mockReturnValue(undefined);
   });
 
   describe(`creating commit`, () => {
     it(`creates a first commit for an aggregate`, async () => {
       const commitId = new Guid('91f09174-aebc-48e9-9ce8-672a670ede37');
-      storage.findLastVersionById.returns(undefined);
-      storage.generateId.returns(commitId);
+      storage.findLastVersionById.mockReturnValue(undefined);
+      storage.generateId.mockReturnValue(commitId);
 
       const id = 'my-id';
       const aggregate = new MyAggregate({ id });
@@ -113,8 +108,8 @@ describe(`CommitStore`, () => {
       aggregate.record(secondEvent);
 
       const commit = await commitStore.createCommit(aggregate);
-      expect(commit).to.be.instanceOf(Commit);
-      expect(commit).to.be.eql(
+      expect(commit).toBeInstanceOf(Commit);
+      expect(commit).toEqual(
         new Commit({
           id: commitId.toString(),
           sourceId: id,
@@ -149,8 +144,8 @@ describe(`CommitStore`, () => {
 
     it(`creates a first commit for a process`, async () => {
       const commitId = new Guid('91f09174-aebc-48e9-9ce8-672a670ede37');
-      storage.findLastVersionById.returns(undefined);
-      storage.generateId.returns(commitId);
+      storage.findLastVersionById.mockReturnValue(undefined);
+      storage.generateId.mockReturnValue(commitId);
 
       const id = 'my-id';
       const process = new MyProcess({ id });
@@ -178,8 +173,8 @@ describe(`CommitStore`, () => {
       process.record(secondEvent);
 
       const commit = await commitStore.createCommit(process);
-      expect(commit).to.be.instanceOf(Commit);
-      expect(commit).to.be.eql(
+      expect(commit).toBeInstanceOf(Commit);
+      expect(commit).toEqual(
         new Commit({
           id: commitId.toString(),
           sourceId: id,
@@ -215,8 +210,8 @@ describe(`CommitStore`, () => {
     it(`creates another commit for event sourceable`, async () => {
       const foundLastCommitVersion = 10;
       const commitId = new Guid('91f09174-aebc-48e9-9ce8-672a670ede37');
-      storage.findLastVersionById.returns(foundLastCommitVersion);
-      storage.generateId.returns(commitId);
+      storage.findLastVersionById.mockReturnValue(foundLastCommitVersion);
+      storage.generateId.mockReturnValue(commitId);
 
       const id = 'my-id';
       const firstEvent = new MyEvent({
@@ -238,8 +233,8 @@ describe(`CommitStore`, () => {
       eventSourceable.version = 10;
 
       const commit = await commitStore.createCommit(eventSourceable);
-      expect(commit).to.be.instanceOf(Commit);
-      expect(commit).to.be.eql(
+      expect(commit).toBeInstanceOf(Commit);
+      expect(commit).toEqual(
         new Commit({
           id: commitId.toString(),
           sourceId: id,
@@ -274,16 +269,16 @@ describe(`CommitStore`, () => {
 
     it(`throws CommitConcurrencyError if the version in the store does not equal the expected version`, async () => {
       const foundLastCommitVersion = 10;
-      storage.findLastVersionById.returns(foundLastCommitVersion);
+      storage.findLastVersionById.mockReturnValue(foundLastCommitVersion);
 
       const eventSourceable = new MyEventSourceable({
         id: 'my-id',
         version: 20,
       });
 
-      expect(
+      await expect(
         commitStore.createCommit(eventSourceable)
-      ).to.eventually.be.rejectedWith(
+      ).rejects.toThrow(
         CommitConcurrencyError,
         `MyEventSourceable: expected event sourceable with id of 'my-id' to be at version 20 but is at version 10`
       );
@@ -296,8 +291,8 @@ describe(`CommitStore`, () => {
 
       await commitStore.createCommit(eventSourceable);
 
-      expect(log.debug).to.be.calledOnce;
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledTimes(1);
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(
           `creating commit for 'CommitStore.MyEventSourceable@my-id' with expected at version 0`
         )
@@ -309,7 +304,7 @@ describe(`CommitStore`, () => {
   });
 
   describe(`saving commit`, () => {
-    context('successful', () => {
+    describe('successful', () => {
       it(`stores commit on storage and returns commit id assigned by storage`, async () => {
         const commit = new Commit({
           id: 'commit-id',
@@ -323,11 +318,11 @@ describe(`CommitStore`, () => {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.save.withArgs(commit).returns(commitId);
+        storage.save.calledWith(commit).mockReturnValue(commitId);
 
-        expect(await commitStore.save(commit)).to.be.equal(commitId);
-        expect(storage.save).to.be.calledOnce;
-        expect(storage.save).to.be.calledWithExactly(commit);
+        expect(await commitStore.save(commit)).toBe(commitId);
+        expect(storage.save).toHaveBeenCalledTimes(1);
+        expect(storage.save).toHaveBeenCalledWith(commit);
       });
 
       it(`logs adding commit`, async () => {
@@ -343,11 +338,11 @@ describe(`CommitStore`, () => {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.save.withArgs(commit).returns(commitId);
+        storage.save.calledWith(commit).mockReturnValue(commitId);
 
         await commitStore.save(commit);
-        expect(log.debug).to.be.calledTwice;
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledTimes(2);
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`adding commit for 'MyEventSourceable@my-id'`)
             .on(commitStore)
             .in(commitStore.save)
@@ -368,11 +363,11 @@ describe(`CommitStore`, () => {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.save.withArgs(commit).returns(commitId);
+        storage.save.calledWith(commit).mockReturnValue(commitId);
 
         await commitStore.save(commit);
-        expect(log.debug).to.be.calledTwice;
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledTimes(2);
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(
             `added commit with id 'commit-id' for 'MyEventSourceable@my-id'`
           )
@@ -395,15 +390,15 @@ describe(`CommitStore`, () => {
           receivers: [],
         });
         const commitId = 'commit-id';
-        storage.save.withArgs(commit).returns(commitId);
+        storage.save.calledWith(commit).mockReturnValue(commitId);
 
         await commitStore.save(commit);
-        expect(commitPublisher.publishChanges).to.be.calledOnce;
-        expect(commitPublisher.publishChanges).to.be.calledWithExactly(commit);
+        expect(commitPublisher.publishChanges).toHaveBeenCalledTimes(1);
+        expect(commitPublisher.publishChanges).toHaveBeenCalledWith(commit);
       });
     });
 
-    context('failed', () => {
+    describe('failed', () => {
       it(`logs unsuccessful commit addition upon storage error`, async () => {
         const commit = new Commit({
           id: 'commit-id',
@@ -417,13 +412,13 @@ describe(`CommitStore`, () => {
           receivers: [],
         });
         const error = new Error('my-error');
-        storage.save.withArgs(commit).rejects(error);
+        storage.save.calledWith(commit).mockRejectedValue(error);
 
-        await expect(commitStore.save(commit)).to.eventually.be.rejectedWith(
+        await expect(commitStore.save(commit)).rejects.toThrow(
           error
         );
-        expect(log.error).to.be.calledOnce;
-        expect(log.error).to.be.calledWithExactly(
+        expect(log.error).toHaveBeenCalledTimes(1);
+        expect(log.error).toHaveBeenCalledWith(
           new Log(
             `failed adding commit for 'MyEventSourceable@my-id' do to error: Error: my-error`
           )
@@ -433,7 +428,7 @@ describe(`CommitStore`, () => {
         );
       });
 
-      it(`rethrows any thrown error on storage`, () => {
+      it(`rethrows any thrown error on storage`, async () => {
         const commit = new Commit({
           id: 'commit-id',
           sourceId: 'my-id',
@@ -446,12 +441,10 @@ describe(`CommitStore`, () => {
           receivers: [],
         });
         storage.save
-          .withArgs(commit)
-          .throws(
-            new CommitConcurrencyError('MyTypeName', 'my-id', '123', '7')
-          );
+          .calledWith(commit)
+          .mockImplementation(() => { throw new CommitConcurrencyError('MyTypeName', 'my-id', '123', '7'); });
 
-        expect(commitStore.save(commit)).to.eventually.be.rejectedWith(
+        await expect(commitStore.save(commit)).rejects.toThrow(
           CommitConcurrencyError,
           `MyTypeName: expected event sourceable with id of 'my-id' to be at version 123 but is at version 7`
         );
@@ -473,29 +466,29 @@ describe(`CommitStore`, () => {
         sentBy: appId,
         receivers: [],
       });
-      storage.findById.withArgs(commitId).resolves(commit);
+      storage.findById.calledWith(commitId).mockResolvedValue(commit);
 
       const foundCommit = await commitStore.findById(commitId);
-      expect(foundCommit).to.be.instanceof(Commit);
-      expect(foundCommit).to.be.eql(commit);
+      expect(foundCommit).toBeInstanceOf(Commit);
+      expect(foundCommit).toEqual(commit);
     });
 
     it(`returns undefined if commit by id can't be found`, async () => {
       const commitId = 'commit-id';
-      storage.findById.withArgs(commitId).resolves(undefined);
+      storage.findById.calledWith(commitId).mockResolvedValue(undefined);
 
       const foundCommit = await storage.findById(commitId);
-      expect(foundCommit).to.be.equal(undefined);
+      expect(foundCommit).toBe(undefined);
     });
   });
 
   describe(`returning events`, () => {
     it(`returns all events versioned by batch for given event sourceable`, async () => {
-      const firstEvent = sinon.spy();
-      const secondEvent = sinon.spy();
-      const thirdEvent = sinon.spy();
+      const firstEvent = vi.fn();
+      const secondEvent = vi.fn();
+      const thirdEvent = vi.fn();
 
-      storage.getCommits.withArgs('my-id', 1).returns([
+      storage.getCommits.calledWith('my-id', 1).mockReturnValue([
         {
           events: [firstEvent, secondEvent],
         },
@@ -505,17 +498,17 @@ describe(`CommitStore`, () => {
       ]);
 
       const events = await commitStore.getEvents('my-id');
-      expect(events).to.be.eql([firstEvent, secondEvent, thirdEvent]);
-      expect(storage.getCommits).to.be.calledOnce;
-      expect(storage.getCommits).to.be.calledWithExactly('my-id', 1);
+      expect(events).toEqual([firstEvent, secondEvent, thirdEvent]);
+      expect(storage.getCommits).toHaveBeenCalledTimes(1);
+      expect(storage.getCommits).toHaveBeenCalledWith('my-id', 1);
     });
 
     it(`allows to pass version offset to skip events`, async () => {
-      const firstEvent = sinon.spy();
-      const secondEvent = sinon.spy();
-      const thirdEvent = sinon.spy();
+      const firstEvent = vi.fn();
+      const secondEvent = vi.fn();
+      const thirdEvent = vi.fn();
 
-      storage.getCommits.withArgs('my-id', 20).returns([
+      storage.getCommits.calledWith('my-id', 20).mockReturnValue([
         {
           events: [firstEvent, secondEvent],
         },
@@ -525,24 +518,24 @@ describe(`CommitStore`, () => {
       ]);
 
       const events = await commitStore.getEvents('my-id', 20);
-      expect(events).to.be.eql([firstEvent, secondEvent, thirdEvent]);
-      expect(storage.getCommits).to.be.calledOnce;
-      expect(storage.getCommits).to.be.calledWithExactly('my-id', 20);
+      expect(events).toEqual([firstEvent, secondEvent, thirdEvent]);
+      expect(storage.getCommits).toHaveBeenCalledTimes(1);
+      expect(storage.getCommits).toHaveBeenCalledWith('my-id', 20);
     });
 
     it(`returns empty array if commits for event sourceable can't be found`, async () => {
-      storage.getCommits.withArgs('my-id').returns([]);
+      storage.getCommits.calledWith('my-id').mockReturnValue([]);
 
       const events = await commitStore.getEvents('my-id');
-      expect(events).to.be.eql([]);
+      expect(events).toEqual([]);
     });
 
     it(`returns all events from all available commits`, async () => {
-      const firstEvent = sinon.spy();
-      const secondEvent = sinon.spy();
-      const thirdEvent = sinon.spy();
+      const firstEvent = vi.fn();
+      const secondEvent = vi.fn();
+      const thirdEvent = vi.fn();
 
-      storage.getAllCommits.returns([
+      storage.getAllCommits.mockReturnValue([
         {
           events: [firstEvent, secondEvent],
         },
@@ -552,14 +545,15 @@ describe(`CommitStore`, () => {
       ]);
 
       const allEvents = await commitStore.getAllEvents();
-      expect(allEvents).to.be.eql([firstEvent, secondEvent, thirdEvent]);
+      expect(allEvents).toEqual([firstEvent, secondEvent, thirdEvent]);
     });
 
     it(`returns empty when no commits are available`, async () => {
-      storage.getAllCommits.returns([]);
+      storage.getAllCommits.mockReturnValue([]);
 
       const allEvents = await commitStore.getAllEvents();
-      expect(allEvents).to.be.eql([]);
+      expect(allEvents).toEqual([]);
     });
   });
 });
+

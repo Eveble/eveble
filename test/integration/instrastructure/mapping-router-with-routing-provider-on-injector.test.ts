@@ -1,7 +1,6 @@
-import chai, { expect } from 'chai';
-import { stubInterface } from 'ts-sinon';
-import sinonChai from 'sinon-chai';
-import chaiAsPromised from 'chai-as-promised';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach } from 'vitest';
+
 import { Type, kernel } from '@eveble/core';
 import { Aggregate } from '../../../src/domain/aggregate';
 import { Process } from '../../../src/domain/process';
@@ -20,9 +19,6 @@ import { route } from '../../../src/annotations/route';
 
 import { Router } from '../../../src/infrastructure/router';
 import { initial } from '../../../src/annotations/initial';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`Mapping Router with routing provider on Injector`, () => {
   @Type('RoutesProvider.MyCommand')
@@ -47,8 +43,8 @@ describe(`Mapping Router with routing provider on Injector`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -58,7 +54,7 @@ describe(`Mapping Router with routing provider on Injector`, () => {
   const setupEvebleDependencies = function (): void {
     commandBus = new CommandBus();
     eventBus = new EventBus();
-    repository = stubInterface<types.EventSourceableRepository>();
+    repository = mock<types.EventSourceableRepository>();
 
     // Serializer
     injector.bind<any>(BINDINGS.EJSON).toConstantValue(createEJSON());
@@ -98,7 +94,7 @@ describe(`Mapping Router with routing provider on Injector`, () => {
       class NotAnAggregate {}
       expect(() =>
         injector.bind<types.Router>('MyRouter').toRoute(NotAnAggregate as any)
-      ).to.throw(
+      ).toThrow(
         InvalidEventSourceableError,
         `Injector: expected EventSourceableType to be constructor type of EventSourceable, got NotAnAggregate`
       );
@@ -116,8 +112,8 @@ describe(`Mapping Router with routing provider on Injector`, () => {
       }
       injector.bind<types.Router>('MyRouter').toRoute(MyAggregate);
       const router = injector.get<types.Router>('MyRouter');
-      expect(router.InitializingMessageType).to.be.equal(MyCommand);
-      expect(router.routedCommands).to.be.eql([]);
+      expect(router.InitializingMessageType).toBe(MyCommand);
+      expect(router.routedCommands).toEqual([]);
     });
 
     it(`create router for aggregate with routed commands`, async () => {
@@ -132,8 +128,8 @@ describe(`Mapping Router with routing provider on Injector`, () => {
       }
       injector.bind<types.Router>('MyRouter').toRoute(MyAggregate);
       const router = injector.get<types.Router>('MyRouter');
-      expect(router.InitializingMessageType).to.be.equal(MyCommand);
-      expect(router.routedCommands).to.be.eql([MyOtherCommand]);
+      expect(router.InitializingMessageType).toBe(MyCommand);
+      expect(router.routedCommands).toEqual([MyOtherCommand]);
     });
   });
 
@@ -142,7 +138,7 @@ describe(`Mapping Router with routing provider on Injector`, () => {
       class NotAProcess {}
       expect(() =>
         injector.bind<types.Router>('MyRouter').toRoute(NotAProcess as any)
-      ).to.throw(
+      ).toThrow(
         InvalidEventSourceableError,
         `Injector: expected EventSourceableType to be constructor type of EventSourceable, got NotAProcess`
       );
@@ -160,8 +156,8 @@ describe(`Mapping Router with routing provider on Injector`, () => {
       }
       injector.bind<types.Router>('MyRouter').toRoute(MyProcess);
       const MyRouter = injector.get<types.Router>('MyRouter');
-      expect(MyRouter.InitializingMessageType).to.be.equal(MyCommand);
-      expect(MyRouter.routedCommands).to.be.eql([]);
+      expect(MyRouter.InitializingMessageType).toBe(MyCommand);
+      expect(MyRouter.routedCommands).toEqual([]);
     });
 
     it(`create router for process with routed commands`, async () => {
@@ -176,8 +172,8 @@ describe(`Mapping Router with routing provider on Injector`, () => {
       }
       injector.bind<types.Router>('MyRouter').toRoute(MyProcess);
       const MyRouter = injector.get<types.Router>('MyRouter');
-      expect(MyRouter.InitializingMessageType).to.be.equal(MyCommand);
-      expect(MyRouter.routedCommands).to.be.eql([MyOtherCommand]);
+      expect(MyRouter.InitializingMessageType).toBe(MyCommand);
+      expect(MyRouter.routedCommands).toEqual([MyOtherCommand]);
     });
 
     it(`create router for process with routed events`, async () => {
@@ -200,9 +196,10 @@ describe(`Mapping Router with routing provider on Injector`, () => {
       }
       injector.bind<types.Router>('MyRouter').toRoute(MyProcess);
       const MyRouter = injector.get<types.Router>('MyRouter');
-      expect(MyRouter.InitializingMessageType).to.be.equal(MyCommand);
-      expect(MyRouter.routedCommands).to.be.eql([MyOtherCommand]);
-      expect(MyRouter.routedEvents).to.be.eql([MyEvent, MyOtherEvent]);
+      expect(MyRouter.InitializingMessageType).toBe(MyCommand);
+      expect(MyRouter.routedCommands).toEqual([MyOtherCommand]);
+      expect(MyRouter.routedEvents).toEqual([MyEvent, MyOtherEvent]);
     });
   });
 });
+

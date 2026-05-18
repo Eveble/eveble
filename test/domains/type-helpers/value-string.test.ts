@@ -1,69 +1,64 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, afterEach, vi } from 'vitest';
+
 import { UnmatchedTypeError } from 'typend';
 import { ValueString } from '../../../src/domain/type-helpers/value-string';
 import { NON_ENUMERABLE_VALUE_KEY } from '../../../src/constants/literal-keys';
-
-chai.use(sinonChai);
 
 describe('ValueString', () => {
   class MyValue extends ValueString {}
   class MyOtherValue extends ValueString {}
 
   it('extends String', () => {
-    expect(ValueString.prototype).to.be.instanceof(String);
+    expect(ValueString.prototype).toBeInstanceOf(String);
   });
 
   it('ensures that provided value is stored under non enumerable value property', () => {
     const val = new ValueString('foo');
-    expect((val as any)[NON_ENUMERABLE_VALUE_KEY]).to.be.equal('foo');
-    expect(Object.keys(val).includes('value')).to.be.false;
+    expect((val as any)[NON_ENUMERABLE_VALUE_KEY]).toBe('foo');
+    expect(Object.keys(val).includes('value')).toBe(false);
   });
 
   it('ensures that value can be compared truthfully', () => {
-    expect(new ValueString('foo')).to.be.eql(new ValueString('foo'));
+    expect(new ValueString('foo')).toEqual(new ValueString('foo'));
   });
 
   it('ensures that value can be compared falsy', () => {
-    expect(new ValueString('foo')).not.to.be.eql(new ValueString('bar'));
+    expect(new ValueString('foo')).not.toEqual(new ValueString('bar'));
   });
 
   describe('creation', () => {
     it('from', () => {
       const value = 'foo';
       const result = MyValue.from(value);
-      expect(result).to.be.instanceof(MyValue);
-      expect(result.valueOf()).to.be.equal(value);
+      expect(result).toBeInstanceOf(MyValue);
+      expect(result.valueOf()).toBe(value);
     });
   });
 
   describe('conversion', () => {
     it('toString', () => {
-      expect(new ValueString('foo').toString()).to.be.equal('foo');
+      expect(new ValueString('foo').toString()).toBe('foo');
     });
 
     it('valueOf', () => {
-      expect(new ValueString('foo').valueOf()).to.be.equal('foo');
+      expect(new ValueString('foo').valueOf()).toBe('foo');
     });
 
     it('toPlainObject', () => {
-      expect(new ValueString('foo').toPlainObject()).to.be.equal('foo');
+      expect(new ValueString('foo').toPlainObject()).toBe('foo');
     });
 
     describe('transformer', () => {
       describe('as single instance', () => {
         it('to', () => {
           const transformer = MyValue.transformer();
-          expect(transformer.to(new MyValue('my-value'))).to.be.equal(
-            'my-value'
-          );
+          expect(transformer.to(new MyValue('my-value'))).toBe('my-value');
         });
         it('from', () => {
           const transformer = MyValue.transformer();
           const result = transformer.from('my-value');
-          expect(result).to.be.instanceof(MyValue);
-          expect(result).to.be.eql(new MyValue('my-value'));
+          expect(result).toBeInstanceOf(MyValue);
+          expect(result).toEqual(new MyValue('my-value'));
         });
       });
 
@@ -72,14 +67,14 @@ describe('ValueString', () => {
           const transformer = MyValue.transformer();
           expect(
             transformer.to([new MyValue('first'), new MyValue('second')])
-          ).to.have.members(['first', 'second']);
+          ).toEqual(expect.arrayContaining(['first', 'second']));
         });
         it('from', () => {
           const transformer = MyValue.transformer();
           const result = transformer.from(['first', 'second']);
-          expect(result).to.be.an('array');
-          expect(result[0]).to.be.eql(new MyValue('first'));
-          expect(result[1]).to.be.eql(new MyValue('second'));
+          expect(Array.isArray(result)).toBe(true);
+          expect(result[0]).toEqual(new MyValue('first'));
+          expect(result[1]).toEqual(new MyValue('second'));
         });
       });
     });
@@ -88,7 +83,7 @@ describe('ValueString', () => {
   describe('comparison', () => {
     describe('equality', () => {
       it('is not equal if compared with a null value', () => {
-        expect(new MyValue('my-value').equals(null)).to.be.false;
+        expect(new MyValue('my-value').equals(null)).toBe(false);
       });
 
       it('returns true if both instance are equal', () => {
@@ -115,15 +110,15 @@ describe('ValueString', () => {
     });
 
     it('throws UnmatchedTypeError when provide type is not a string', () => {
-      expect(() => new ValueString(2 as any)).to.throw(
+      expect(() => new ValueString(2 as any)).toThrow(
         UnmatchedTypeError,
         `Expected Number(2) to be a String`
       );
     });
 
     it('iterates over registered onValidation hooks', () => {
-      const firstValidator = sinon.stub();
-      const secondValidator = sinon.stub();
+      const firstValidator = vi.fn();
+      const secondValidator = vi.fn();
 
       ValueString.prototype.registerHook(
         'onValidation',
@@ -138,15 +133,15 @@ describe('ValueString', () => {
 
       const value = 'foo';
       new ValueString(value);
-      expect(firstValidator).to.be.calledOnce;
-      expect(firstValidator).to.be.calledWith(value);
-      expect(secondValidator).to.be.calledOnce;
-      expect(secondValidator).to.be.calledWith(value);
+      expect(firstValidator).toHaveBeenCalledTimes(1);
+      expect(firstValidator).toHaveBeenCalledWith(value);
+      expect(secondValidator).toHaveBeenCalledTimes(1);
+      expect(secondValidator).toHaveBeenCalledWith(value);
     });
 
     it('ensures that error is thrown upon invalid value', () => {
-      const firstValidator = sinon.stub();
-      const secondValidator = sinon.stub();
+      const firstValidator = vi.fn();
+      const secondValidator = vi.fn();
 
       ValueString.prototype.registerHook(
         'onValidation',
@@ -159,9 +154,11 @@ describe('ValueString', () => {
         secondValidator
       );
       const error = new Error('invalid-value');
-      secondValidator.throws(error);
+      secondValidator.mockImplementation(() => {
+        throw error;
+      });
 
-      expect(() => new ValueString('foo')).to.throw(error);
+      expect(() => new ValueString('foo')).toThrow(error);
     });
   });
 });

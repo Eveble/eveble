@@ -1,6 +1,6 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, beforeAll } from 'vitest';
+
 import * as winston from 'winston';
 import { LogTransportConfig } from '../../../src/configs/log-transport-config';
 import { types } from '../../../src/types';
@@ -11,8 +11,6 @@ import { SimpleLogFormatter } from '../../../src/core/logging-transports/formatt
 import { DetailedLogFormatter } from '../../../src/core/logging-transports/formatters/detailed-log-entry-formatter';
 import { StringifingConverter } from '../../../src/core/logging-transports/formatters/converters/stringifing-converter';
 import { LogMetadata, Log } from '../../../src/components/log-entry';
-
-chai.use(sinonChai);
 
 describe('ConsoleTransport', () => {
   let injector: types.Injector;
@@ -25,7 +23,7 @@ describe('ConsoleTransport', () => {
   let levels: types.LogLevels;
   let transport: ConsoleTransport;
 
-  before(() => {
+  beforeAll(() => {
     levels = {
       emerg: 0,
       alert: 1,
@@ -39,7 +37,7 @@ describe('ConsoleTransport', () => {
   });
 
   beforeEach(() => {
-    logger = stubInterface<types.Logger>();
+    logger = mock<types.Logger>();
     logger.levels = levels;
 
     // Simplify testing for time being
@@ -113,7 +111,7 @@ describe('ConsoleTransport', () => {
       injector.injectInto(transport);
     });
 
-    context('with message only', () => {
+    describe('with message only', () => {
       it('formats a message String with default configuration', () => {
         const winstonLogObj = {
           message: 'my-message',
@@ -123,7 +121,7 @@ describe('ConsoleTransport', () => {
         };
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal(
+        expect(str).toBe(
           '$ 2019-10-07T02:51:35│my-app-id│info: my-message '
         );
       });
@@ -138,7 +136,7 @@ describe('ConsoleTransport', () => {
         config.set('flags.isLabeled', false);
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal('$ info: my-message ');
+        expect(str).toBe('$ info: my-message ');
       });
 
       it('does not show initial if its not set on configuration', () => {
@@ -151,7 +149,7 @@ describe('ConsoleTransport', () => {
         config.set('parts.initial', '');
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal('my-app-id│info: my-message ');
+        expect(str).toBe('my-app-id│info: my-message ');
       });
 
       it('does not show timestamp if timestamped is disabled on configuration', () => {
@@ -164,7 +162,7 @@ describe('ConsoleTransport', () => {
         config.set('flags.isTimestamped', false);
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal('$ my-app-id│info: my-message ');
+        expect(str).toBe('$ my-app-id│info: my-message ');
       });
 
       it('shows label if labeled is enabled and label is set on configuration', () => {
@@ -179,13 +177,13 @@ describe('ConsoleTransport', () => {
         config.set('parts.label', 'my-app-id');
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal(
+        expect(str).toBe(
           '$ 2019-10-07T02:51:35│my-app-id│info: my-message '
         );
       });
     });
 
-    context('with multiple primitive arguments passed after message', () => {
+    describe('with multiple primitive arguments passed after message', () => {
       it('formats message with additional primitive arguments', () => {
         const winstonLogObj = {
           message: 'my-message',
@@ -196,13 +194,13 @@ describe('ConsoleTransport', () => {
         };
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).to.be.equal(
+        expect(str).toBe(
           "$ 2019-10-07T02:51:35│my-app-id│info: my-message 1 'str' true null undefined"
         );
       });
     });
 
-    context('with multiple Object arguments passed after message', () => {
+    describe('with multiple Object arguments passed after message', () => {
       it('formats a message with additional Object arguments', () => {
         class MyClass {
           constructor(props) {
@@ -224,7 +222,7 @@ describe('ConsoleTransport', () => {
 
         const str = transport.formatEntry(winstonLogObj);
 
-        expect(str).to.be.equal(
+        expect(str).toBe(
           '$ 2019-10-07T02:51:35│my-app-id│info: my-message \n' +
             "MyClass { first: 'first-value' } \n" +
             "{ second: 'second-value' }"
@@ -232,7 +230,7 @@ describe('ConsoleTransport', () => {
       });
     });
 
-    context('with additional metadata', () => {
+    describe('with additional metadata', () => {
       class MyClass {
         first: string;
 
@@ -304,7 +302,7 @@ describe('ConsoleTransport', () => {
 
       it('formats a message with additional metadata', () => {
         const str = transport.formatEntry(logEntry);
-        expect(str).to.be.equal(
+        expect(str).toBe(
           '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
             'function arguments:\n' +
             "  first: 'first-value',\n" +
@@ -320,7 +318,7 @@ describe('ConsoleTransport', () => {
         it('omits all log details on simple message with additional simple formatting context', () => {
           logEntry.options.isSimple = true;
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal('my-message ');
+          expect(str).toBe('my-message ');
         });
 
         it('ensure that rest arguments are passed through', () => {
@@ -333,7 +331,7 @@ describe('ConsoleTransport', () => {
           ];
           logEntry.options.isSimple = true;
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal("my-message 1 'str' true null undefined");
+          expect(str).toBe("my-message 1 'str' true null undefined");
         });
       });
 
@@ -346,7 +344,7 @@ describe('ConsoleTransport', () => {
             new LogMetadata('result', 'my-result')
           );
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               "result:  'my-result'"
           );
@@ -360,7 +358,7 @@ describe('ConsoleTransport', () => {
             new LogMetadata('my-title', myClassInstance)
           );
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               "my-title:  MyClass { first: 'first-value', second: { '1': 'one' } }"
           );
@@ -371,7 +369,7 @@ describe('ConsoleTransport', () => {
         it('formats a message with function arguments logged only', () => {
           logEntry.metadata.delete('properties');
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'function arguments:\n' +
               "  first: 'first-value',\n" +
@@ -385,7 +383,7 @@ describe('ConsoleTransport', () => {
           logEntry.metadata.get('arguments').keys = ['first', 'second'];
           logEntry.metadata.delete('properties');
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'function arguments:\n' +
               "  first: 'first-value', second: 'second-value'"
@@ -396,7 +394,7 @@ describe('ConsoleTransport', () => {
           logEntry.metadata.delete('properties');
           logEntry.metadata.get('arguments').value = [];
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message '
           );
         });
@@ -406,7 +404,7 @@ describe('ConsoleTransport', () => {
         it('formats a message with class properties logged only', () => {
           logEntry.metadata.delete('arguments');
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'class properties:\n' +
               "  first: 'first-value', second: [Object]"
@@ -417,7 +415,7 @@ describe('ConsoleTransport', () => {
           logEntry.metadata.get('properties').keys = ['first', 'second'];
           logEntry.metadata.delete('arguments');
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message \n' +
               'class properties:\n' +
               "  first: 'first-value', second: [Object]"
@@ -430,7 +428,7 @@ describe('ConsoleTransport', () => {
           delete (myClassInstance as any).second;
           delete (myClassInstance as any).third;
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyClass::myMethod: my-message '
           );
         });
@@ -442,7 +440,7 @@ describe('ConsoleTransport', () => {
           config.set('abbreviationLength', 3);
 
           const str = transport.formatEntry(logEntry);
-          expect(str).to.be.equal(
+          expect(str).toBe(
             '$ 2019-10-07T02:51:35│my-app-id│info│MyC::myM: my-message \n' +
               'function arguments:\n' +
               "  first: 'first-value',\n" +
@@ -457,3 +455,4 @@ describe('ConsoleTransport', () => {
     });
   });
 });
+

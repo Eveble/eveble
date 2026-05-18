@@ -1,48 +1,46 @@
-import chai, { expect } from 'chai';
-import { stubInterface } from 'ts-sinon';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+
 import { Type, kernel } from '@eveble/core';
 import { derive } from '@traits-ts/core';
 import { types } from '../../../src/types';
 import { EjsonableTrait } from '../../../src/traits/ejsonable.trait';
 
-chai.use(sinonChai);
-
 describe('EjsonableTrait', () => {
   let originalConverter: any;
   let converter: any;
 
-  before(() => {
+  beforeAll(() => {
     originalConverter = kernel.converter;
   });
 
   beforeEach(() => {
-    converter = stubInterface<types.Converter>();
+    converter = mock<types.Converter>();
     kernel.setConverter(converter);
 
-    converter.convert.returns({ properties: {} });
+    converter.convert.mockReturnValue({ properties: {} });
   });
 
-  after(() => {
+  afterAll(() => {
     kernel.setConverter(originalConverter);
   });
 
   describe('type name', () => {
     it('adds typeName static and prototype aliased methods for compatibility @eveble/ejson serializer module', () => {
-      // converter.convert.returns({ properties: {} });
+      // converter.convert.mockReturnValue({ properties: {} });
       @Type('MyNamedClass')
       class MyClass extends derive(EjsonableTrait) {}
-      MyClass.getTypeName = sinon.stub();
+      MyClass.getTypeName = vi.fn();
 
       const instance = new MyClass();
-      instance.getTypeName = sinon.stub();
+      instance.getTypeName = vi.fn();
 
       MyClass.typeName();
-      expect(MyClass.getTypeName).to.be.calledOnce;
+      expect(MyClass.getTypeName).toHaveBeenCalledTimes(1);
 
       instance.typeName();
-      expect(instance.getTypeName).to.be.calledOnce;
+      expect(instance.getTypeName).toHaveBeenCalledTimes(1);
     });
   });
 });
+

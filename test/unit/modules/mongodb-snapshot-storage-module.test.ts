@@ -1,7 +1,6 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import { MongoClient as MongoClientOriginal, Collection, Db } from 'mongodb';
 import getenv from 'getenv';
 import { AppConfig } from '../../../src/configs/app-config';
@@ -14,8 +13,6 @@ import { MongoDBSnapshotStorageModule } from '../../../src/app/modules/mongodb-s
 import { Log } from '../../../src/components/log-entry';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { Module } from '../../../src/core/module';
-
-chai.use(sinonChai);
 
 describe(`MongoDBSnapshotStorageModule`, () => {
   // Props
@@ -37,9 +34,9 @@ describe(`MongoDBSnapshotStorageModule`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
-    serializer = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
+    serializer = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -50,14 +47,14 @@ describe(`MongoDBSnapshotStorageModule`, () => {
   };
 
   const setupMongo = function (): void {
-    MongoClient = sinon.stub();
-    mongoClientInstance = stubInterface<MongoClientOriginal>();
-    snapshotsCollection = stubInterface<Collection<any>>();
-    db = stubInterface<Db>();
+    MongoClient = vi.fn();
+    mongoClientInstance = mock<MongoClientOriginal>();
+    snapshotsCollection = mock<Collection<any>>();
+    db = mock<Db>();
 
-    MongoClient.returns(mongoClientInstance);
-    mongoClientInstance.db.returns(db);
-    db.collection.returns(snapshotsCollection);
+    MongoClient.mockImplementation(function() { return mongoClientInstance; });
+    mongoClientInstance.db.mockReturnValue(db);
+    db.collection.mockReturnValue(snapshotsCollection);
 
     injector
       .bind<MongoClientOriginal>(BINDINGS.MongoDB.library)
@@ -65,7 +62,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
   };
 
   const setupApp = function (): void {
-    app = stubInterface<types.App>();
+    app = mock<types.App>();
     app.config = appConfig;
   };
 
@@ -76,7 +73,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
   });
 
   it(`extends Module`, () => {
-    expect(MongoDBSnapshotStorageModule.prototype).to.be.instanceof(Module);
+    expect(MongoDBSnapshotStorageModule.prototype).toBeInstanceOf(Module);
   });
 
   describe('before initialization', () => {
@@ -89,12 +86,12 @@ describe(`MongoDBSnapshotStorageModule`, () => {
       const mongodbClient = await injector.getAsync<MongoDBClient>(
         BINDINGS.MongoDB.clients.Snapshotter
       );
-      expect(mongodbClient).to.be.instanceof(MongoDBClient);
-      expect(MongoClient).to.be.calledWithNew;
+      expect(mongodbClient).toBeInstanceOf(MongoDBClient);
+      expect(MongoClient).toHaveBeenCalledTimes(1);
 
       const url = getenv.string(`EVEBLE_SNAPSHOTTER_MONGODB_URL`);
-      expect(mongodbClient.url).to.be.equal(url);
-      expect(mongodbClient.options).to.be.eql({
+      expect(mongodbClient.url).toBe(url);
+      expect(mongodbClient.options).toEqual({
         ...MongoDBClient.defaultOptions,
         ssl: getenv.bool(`EVEBLE_SNAPSHOTTER_MONGODB_SSL`),
       });
@@ -105,7 +102,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
         noDelay: true,
         keepAlive: true,
       };
-      const customApp = stubInterface<types.App>();
+      const customApp = mock<types.App>();
       customApp.config = new AppConfig({
         appId: 'my-app-id',
         clients: {
@@ -124,7 +121,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
         BINDINGS.MongoDB.clients.Snapshotter
       );
 
-      expect(mongodbClient.options).to.be.eql({
+      expect(mongodbClient.options).toEqual({
         ...MongoDBClient.defaultOptions,
         noDelay: true,
         keepAlive: true,
@@ -137,7 +134,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`bound 'MongoDB.clients.Snapshotter' as constant value`)
           .on(module)
           .in('initializeClientForSnapshotter')
@@ -149,7 +146,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`bound 'MongoDB.collections.Snapshots' as constant value`)
           .on(module)
           .in('initializeClientForSnapshotter')
@@ -169,11 +166,11 @@ describe(`MongoDBSnapshotStorageModule`, () => {
       const collection = await injector.getAsync(
         BINDINGS.MongoDB.collections.Snapshots
       );
-      expect(collection).to.be.equal(snapshotsCollection);
-      expect(mongoClientInstance.db).to.be.calledOnce;
-      expect(mongoClientInstance.db).to.be.calledWithExactly(databaseName);
-      expect(db.collection).to.be.calledOnce;
-      expect(db.collection).to.be.calledWithExactly(collectionName);
+      expect(collection).toBe(snapshotsCollection);
+      expect(mongoClientInstance.db).toHaveBeenCalledTimes(1);
+      expect(mongoClientInstance.db).toHaveBeenCalledWith(databaseName);
+      expect(db.collection).toHaveBeenCalledTimes(1);
+      expect(db.collection).toHaveBeenCalledWith(collectionName);
     });
 
     it('bounds SnapshotSerializer to singleton on injector', async () => {
@@ -182,12 +179,12 @@ describe(`MongoDBSnapshotStorageModule`, () => {
       });
       await module.initialize(app, injector);
 
-      expect(injector.isBound(BINDINGS.SnapshotSerializer)).to.be.true;
+      expect(injector.isBound(BINDINGS.SnapshotSerializer)).toBe(true);
       const commitSerializer =
         await injector.getAsync<types.SnapshotSerializer>(
           BINDINGS.SnapshotSerializer
         );
-      expect(commitSerializer).to.be.instanceof(SnapshotSerializer);
+      expect(commitSerializer).toBeInstanceOf(SnapshotSerializer);
     });
 
     it('logs bounding SnapshotSerializer on injector', async () => {
@@ -195,7 +192,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(
           `bound 'SnapshotSerializer' to 'SnapshotSerializer' in singleton scope`
         )
@@ -210,11 +207,11 @@ describe(`MongoDBSnapshotStorageModule`, () => {
       });
       await module.initialize(app, injector);
 
-      expect(injector.isBound(BINDINGS.SnapshotStorage)).to.be.true;
+      expect(injector.isBound(BINDINGS.SnapshotStorage)).toBe(true);
       const commitStorage = await injector.getAsync<types.SnapshotStorage>(
         BINDINGS.SnapshotStorage
       );
-      expect(commitStorage).to.be.instanceof(SnapshotMongoDBStorage);
+      expect(commitStorage).toBeInstanceOf(SnapshotMongoDBStorage);
     });
 
     it('logs bounding SnapshotStorage on injector', async () => {
@@ -222,7 +219,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(
           `bound 'SnapshotStorage' to 'SnapshotMongoDBStorage' in singleton scope`
         )
@@ -272,7 +269,7 @@ describe(`MongoDBSnapshotStorageModule`, () => {
       await module.initialize(app, injector);
       await module.start();
       await module.stop();
-      mongoClientInstance.isConnected.returns(true);
+      mongoClientInstance.isConnected.mockReturnValue(true);
       await module.shutdown();
 
       const mongodbClient = await injector.getAsync<MongoDBClient>(
@@ -283,3 +280,4 @@ describe(`MongoDBSnapshotStorageModule`, () => {
     });
   });
 });
+

@@ -1,9 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi, beforeAll } from 'vitest';
+
 import { MongoClient as MongoClientOriginal, Collection, Db } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import { Guid } from '../../../src/domain/value-objects/guid';
 import {
   MongoDBClient,
@@ -16,13 +15,10 @@ import { Log } from '../../../src/components/log-entry';
 import { InvalidStateError } from '../../../src/traits/stateful.trait';
 import { Injector } from '../../../src/core/injector';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`MongoDBClient`, () => {
   let props: Record<string, any>;
 
-  before(() => {
+  beforeAll(() => {
     // Properties - removed deprecated options for v6
     props = {
       id: new Guid(),
@@ -44,13 +40,13 @@ describe(`MongoDBClient`, () => {
 
   const setupDoubles = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
+    log = mock<types.Logger>();
 
-    MongoClient = sinon.stub();
-    mongoClientInstance = stubInterface<MongoClientOriginal>();
-    firstCollection = stubInterface<Collection<any>>();
-    secondCollection = stubInterface<Collection<any>>();
-    db = stubInterface<Db>();
+    MongoClient = vi.fn();
+    mongoClientInstance = mock<MongoClientOriginal>();
+    firstCollection = mock<Collection<any>>();
+    secondCollection = mock<Collection<any>>();
+    db = mock<Db>();
 
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     injector
@@ -59,11 +55,11 @@ describe(`MongoDBClient`, () => {
   };
 
   const setupMongoClient = function (): void {
-    mongoClientInstance.db.returns(db);
-    db.collection.withArgs('first-collection').returns(firstCollection);
-    db.collection.withArgs('second-collection').returns(secondCollection);
+    mongoClientInstance.db.mockReturnValue(db);
+    db.collection.calledWith('first-collection').mockReturnValue(firstCollection);
+    db.collection.calledWith('second-collection').mockReturnValue(secondCollection);
 
-    MongoClient.returns(mongoClientInstance);
+    MongoClient.mockImplementation(function() { return mongoClientInstance; });
 
     client = new MongoDBClient(props);
   };
@@ -79,8 +75,8 @@ describe(`MongoDBClient`, () => {
         id: props.id,
         url: props.url,
       });
-      expect(instance.id).to.be.equal(props.id);
-      expect(instance.url).to.be.equal(props.url);
+      expect(instance.id).toBe(props.id);
+      expect(instance.url).toBe(props.url);
     });
 
     it(`allows to define id as a String`, () => {
@@ -89,8 +85,8 @@ describe(`MongoDBClient`, () => {
         id,
         url: props.url,
       });
-      expect(instance.id).to.be.equal(id);
-      expect(instance.url).to.be.equal(props.url);
+      expect(instance.id).toBe(id);
+      expect(instance.url).toBe(props.url);
     });
 
     it(`takes properties object with optional: collections as an array with objects and assigns them`, async () => {
@@ -127,13 +123,13 @@ describe(`MongoDBClient`, () => {
         ],
       });
       await injector.injectIntoAsync(instance);
-      expect(instance.id).to.be.equal(props.id);
-      expect(instance.url).to.be.equal(props.url);
-      expect(instance.databases[0].name).to.be.equal(databaseName);
-      expect(instance.databases[0].collections[0]).to.be.equal(
+      expect(instance.id).toBe(props.id);
+      expect(instance.url).toBe(props.url);
+      expect(instance.databases[0].name).toBe(databaseName);
+      expect(instance.databases[0].collections[0]).toBe(
         nonIndexedCollection
       );
-      expect(instance.databases[0].collections[1]).to.be.equal(
+      expect(instance.databases[0].collections[1]).toBe(
         indexedCollection
       );
     });
@@ -144,9 +140,9 @@ describe(`MongoDBClient`, () => {
         url: props.url,
         options: props.options,
       });
-      expect(instance.id).to.be.equal(props.id);
-      expect(instance.url).to.be.equal(props.url);
-      expect(instance.options).to.be.eql({
+      expect(instance.id).toBe(props.id);
+      expect(instance.url).toBe(props.url);
+      expect(instance.options).toEqual({
         ...MongoDBClient.defaultOptions,
         ...props.options,
       });
@@ -157,15 +153,15 @@ describe(`MongoDBClient`, () => {
         id: props.id,
         url: props.url,
       });
-      expect(instance.id).to.be.equal(props.id);
-      expect(instance.url).to.be.equal(props.url);
+      expect(instance.id).toBe(props.id);
+      expect(instance.url).toBe(props.url);
       // Default options are now empty in v6
-      expect(instance.options).to.be.eql({});
+      expect(instance.options).toEqual({});
     });
 
     it(`sets the client state to constructed when client is constructed`, async () => {
       const instance = new MongoDBClient(props);
-      expect(instance.isInState(MongoDBClient.STATES.constructed)).to.be.true;
+      expect(instance.isInState(MongoDBClient.STATES.constructed)).toBe(true);
     });
   });
 
@@ -174,7 +170,7 @@ describe(`MongoDBClient`, () => {
       await injector.injectIntoAsync(client);
       await client.initialize();
 
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`initializing client '${props.id}'`)
           .on(client)
           .in(client.initialize)
@@ -185,29 +181,29 @@ describe(`MongoDBClient`, () => {
           })
       );
     });
-    context('successful initialization', () => {
+    describe('successful initialization', () => {
       it(`initializes client`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        expect(client.library).to.be.equal(mongoClientInstance);
-        expect(MongoClient).to.be.calledWithNew;
-        expect(MongoClient).to.be.calledWith(props.url, props.options);
-        expect(mongoClientInstance.connect).to.not.be.called;
+        expect(client.library).toBe(mongoClientInstance);
+        expect(MongoClient).toHaveBeenCalledTimes(1);
+        expect(MongoClient).toHaveBeenCalledWith(props.url, props.options);
+        expect(mongoClientInstance.connect).not.toHaveBeenCalled;
       });
 
       it(`sets the client state to initialized when client is initialized`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        expect(client.isInState(MongoDBClient.STATES.initialized)).to.be.true;
+        expect(client.isInState(MongoDBClient.STATES.initialized)).toBe(true);
       });
 
       it('logs successful client initialization', async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`successfully initialized client '${props.id}'`)
             .on(client)
             .in(client.initialize)
@@ -220,22 +216,22 @@ describe(`MongoDBClient`, () => {
       });
     });
 
-    context('failed initialization', () => {
+    describe('failed initialization', () => {
       it('re-throws error from MongoClient on creation', async () => {
         const error = new Error('my-error');
-        MongoClient.throws(error);
+        MongoClient.mockImplementation(function() { throw error; });
         await injector.injectIntoAsync(client);
 
-        await expect(client.initialize()).to.eventually.be.rejectedWith(error);
+        await expect(client.initialize()).rejects.toThrow(error);
       });
 
       it('logs failed initialization as an error', async () => {
         const error = new Error('my-error');
-        MongoClient.throws(error);
+        MongoClient.mockImplementation(function() { throw error; });
 
         await injector.injectIntoAsync(client);
-        await expect(client.initialize()).to.eventually.be.rejectedWith(error);
-        expect(log.error).to.be.calledWithExactly(
+        await expect(client.initialize()).rejects.toThrow(error);
+        expect(log.error).toHaveBeenCalledWith(
           new Log(
             `failed to initialize client '${props.id}' do to error: ${error}`
           )
@@ -254,7 +250,7 @@ describe(`MongoDBClient`, () => {
   describe(`connection`, () => {
     it('throws InvalidStateError if client is not initialized prior to establishing connection', async () => {
       client = new MongoDBClient(props);
-      expect(client.connect()).to.eventually.be.rejectedWith(
+      expect(client.connect()).rejects.toThrow(
         InvalidStateError,
         `MongoDBClient: expected current state of 'constructed' to be in one of states: 'initialized, connected, stopped'`
       );
@@ -265,20 +261,20 @@ describe(`MongoDBClient`, () => {
       await client.initialize();
 
       await client.connect();
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`connecting client '${props.id}'`).on(client).in(client.connect)
       );
     });
 
-    context('successful connection', () => {
+    describe('successful connection', () => {
       it(`creates and connects client to MongoDB`, async () => {
         await injector.injectIntoAsync(client);
         await client.initialize();
 
         await client.connect();
 
-        expect(mongoClientInstance.connect).to.be.calledOnce;
-        expect(mongoClientInstance.connect).to.be.calledWithExactly();
+        expect(mongoClientInstance.connect).toHaveBeenCalledTimes(1);
+        expect(mongoClientInstance.connect).toHaveBeenCalledWith();
       });
 
       it(`ensures that connection can be established only once`, async () => {
@@ -289,8 +285,8 @@ describe(`MongoDBClient`, () => {
         // Note: isConnected() now uses state checking, not a method call
         await client.connect();
 
-        expect(mongoClientInstance.connect).to.be.calledOnce;
-        expect(client.isInState(MongoDBClient.STATES.connected)).to.be.true;
+        expect(mongoClientInstance.connect).toHaveBeenCalledTimes(1);
+        expect(client.isInState(MongoDBClient.STATES.connected)).toBe(true);
       });
 
       it(`sets the client state to connected when connection is established`, async () => {
@@ -298,7 +294,7 @@ describe(`MongoDBClient`, () => {
         await client.initialize();
 
         await client.connect();
-        expect(client.isInState(MongoDBClient.STATES.connected)).to.be.true;
+        expect(client.isInState(MongoDBClient.STATES.connected)).toBe(true);
       });
 
       it('logs successful connection', async () => {
@@ -306,7 +302,7 @@ describe(`MongoDBClient`, () => {
         await client.initialize();
 
         await client.connect();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`connected client '${props.id}'`)
             .on(client)
             .in(client.connect)
@@ -314,37 +310,37 @@ describe(`MongoDBClient`, () => {
       });
     });
 
-    context('failed connection', () => {
+    describe('failed connection', () => {
       it('re-throws error from MongoClient', async () => {
         const error = new Error('my-error');
-        mongoClientInstance.connect.rejects(error);
+        mongoClientInstance.connect.mockRejectedValue(error);
 
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        expect(client.connect()).to.eventually.be.rejectedWith(error);
+        expect(client.connect()).rejects.toThrow(error);
       });
 
       it('sets the client state to failed when error is thrown on establishing connection', async () => {
         const error = new Error('my-error');
-        mongoClientInstance.connect.rejects(error);
+        mongoClientInstance.connect.mockRejectedValue(error);
 
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        await expect(client.connect()).to.eventually.be.rejectedWith(error);
-        expect(client.isInState(MongoDBClient.STATES.failed)).to.be.true;
+        await expect(client.connect()).rejects.toThrow(error);
+        expect(client.isInState(MongoDBClient.STATES.failed)).toBe(true);
       });
 
       it('logs failed connection as an error', async () => {
         const error = new Error('my-error');
-        mongoClientInstance.connect.rejects(error);
+        mongoClientInstance.connect.mockRejectedValue(error);
 
         await injector.injectIntoAsync(client);
         await client.initialize();
 
-        await expect(client.connect()).to.eventually.be.rejectedWith(error);
-        expect(log.error).to.be.calledWithExactly(
+        await expect(client.connect()).rejects.toThrow(error);
+        expect(log.error).toHaveBeenCalledWith(
           new Log(
             `failed connection on client '${props.id}' do to error: ${error}`
           )
@@ -360,11 +356,11 @@ describe(`MongoDBClient`, () => {
         await client.initialize();
 
         await client.connect();
-        expect(client.isConnected()).to.be.equal(true);
+        expect(client.isConnected()).toBe(true);
       });
 
       it('returns false if client is not connected', async () => {
-        expect(client.isConnected()).to.be.equal(false);
+        expect(client.isConnected()).toBe(false);
       });
     });
 
@@ -375,7 +371,7 @@ describe(`MongoDBClient`, () => {
 
         await client.connect();
         await client.disconnect();
-        expect(mongoClientInstance.close).to.be.calledOnce;
+        expect(mongoClientInstance.close).toHaveBeenCalledTimes(1);
       });
 
       it(`logs information about client being disconnected`, async () => {
@@ -384,12 +380,12 @@ describe(`MongoDBClient`, () => {
 
         await client.connect();
         await client.disconnect();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`disconnecting client '${props.id}'`)
             .on(client)
             .in(client.disconnect)
         );
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`disconnected client '${props.id}'`)
             .on(client)
             .in(client.disconnect)
@@ -402,7 +398,7 @@ describe(`MongoDBClient`, () => {
 
         await client.connect();
         await client.disconnect();
-        expect(client.isInState(MongoDBClient.STATES.disconnected)).to.be.true;
+        expect(client.isInState(MongoDBClient.STATES.disconnected)).toBe(true);
       });
 
       it(`destroys MongoClient library instance`, async () => {
@@ -411,7 +407,7 @@ describe(`MongoDBClient`, () => {
 
         await client.connect();
         await client.disconnect();
-        expect(client.library).to.be.undefined;
+        expect(client.library).toBeUndefined();
       });
     });
 
@@ -423,8 +419,8 @@ describe(`MongoDBClient`, () => {
         await client.connect();
         await client.disconnect();
         await client.reconnect();
-        expect(mongoClientInstance.close).to.be.calledOnce;
-        expect(mongoClientInstance.connect).to.be.calledTwice;
+        expect(mongoClientInstance.close).toHaveBeenCalledTimes(1);
+        expect(mongoClientInstance.connect).toHaveBeenCalledTimes(2);
       });
 
       it(`logs information about client being reconnected`, async () => {
@@ -434,7 +430,7 @@ describe(`MongoDBClient`, () => {
         await client.connect();
         await client.disconnect();
         await client.reconnect();
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`reconnecting client '${props.id}'`)
             .on(client)
             .in(client.reconnect)
@@ -448,7 +444,7 @@ describe(`MongoDBClient`, () => {
         await client.connect();
         await client.disconnect();
         await client.reconnect();
-        expect(client.isInState(MongoDBClient.STATES.connected)).to.be.true;
+        expect(client.isInState(MongoDBClient.STATES.connected)).toBe(true);
       });
     });
   });
@@ -479,7 +475,7 @@ describe(`MongoDBClient`, () => {
       await clientInstance.connect();
       expect(
         clientInstance.getCollection(databaseName, 'first-collection')
-      ).to.be.equal(firstCollection);
+      ).toBe(firstCollection);
     });
 
     it(`creates collection indexes on defined fields from properties`, async () => {
@@ -513,12 +509,12 @@ describe(`MongoDBClient`, () => {
       await clientInstance.connect();
       expect(
         clientInstance.getCollection(databaseName, 'first-collection')
-      ).to.be.equal(firstCollection);
-      expect(firstCollection.createIndex).to.be.calledOnce;
-      expect(firstCollection.createIndex).to.be.calledWithMatch(
-        {
+      ).toBe(firstCollection);
+      expect(firstCollection.createIndex).toHaveBeenCalledTimes(1);
+      expect(firstCollection.createIndex).toHaveBeenCalledWith(
+        expect.objectContaining({
           'my-field': 1,
-        },
+        }),
         {
           unique: true,
         }
@@ -526,3 +522,4 @@ describe(`MongoDBClient`, () => {
     });
   });
 });
+

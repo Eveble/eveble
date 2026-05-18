@@ -1,6 +1,7 @@
-import chai, { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import { instanceOf, PropTypes } from 'typend';
-import sinonChai from 'sinon-chai';
+
 import { Type } from '@eveble/core';
 import { derived } from '@traits-ts/core';
 import { VersionableTrait } from '../../../src/traits/versionable.trait';
@@ -12,8 +13,6 @@ import { InvalidListError } from '../../../src/domain/domain-errors';
 import { Serializable } from '../../../src/components/serializable';
 import { Struct } from '../../../src/components/struct';
 import { SerializableTrait } from '../../../src/traits/serializable.trait';
-
-chai.use(sinonChai);
 
 describe('Serializable', () => {
   @Type('Person', { isRegistrable: false })
@@ -38,27 +37,27 @@ describe('Serializable', () => {
   });
 
   it('implements Versionable interface', () => {
-    expect(derived(Serializable.prototype, VersionableTrait)).to.be.true;
-    expect(instanceOf<types.Versionable>(Serializable.prototype)).to.be.true;
+    expect(derived(Serializable.prototype, VersionableTrait)).toBe(true);
+    expect(instanceOf<types.Versionable>(Serializable.prototype)).toBe(true);
   });
 
   it('implements Serializable interface', () => {
-    expect(derived(Serializable.prototype, SerializableTrait)).to.be.true;
-    expect(instanceOf<types.Serializable>(Serializable.prototype)).to.be.true;
+    expect(derived(Serializable.prototype, SerializableTrait)).toBe(true);
+    expect(instanceOf<types.Serializable>(Serializable.prototype)).toBe(true);
   });
 
   it('implements Ejesonable interface', () => {
-    expect(derived(Serializable.prototype, EjsonableTrait)).to.be.true;
-    expect(instanceOf<types.Ejsonable>(Serializable.prototype)).to.be.true;
+    expect(derived(Serializable.prototype, EjsonableTrait)).toBe(true);
+    expect(instanceOf<types.Ejsonable>(Serializable.prototype)).toBe(true);
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(Serializable.prototype)).to.be.true;
+    expect(isTyped(Serializable.prototype)).toBe(true);
   });
 
   it('defines the type name correctly', () => {
-    expect(Serializable.getTypeName()).to.equal('Serializable');
-    expect(Serializable.prototype.getTypeName()).to.equal('Serializable');
+    expect(Serializable.getTypeName()).toBe('Serializable');
+    expect(Serializable.prototype.getTypeName()).toBe('Serializable');
   });
 
   describe('construction', () => {
@@ -68,7 +67,7 @@ describe('Serializable', () => {
         lastName: 'Doe',
       };
       const person = new Person(props);
-      expect(person).to.be.eql(props);
+      expect(person).toEqual(props);
     });
 
     describe('static constructor', () => {
@@ -79,12 +78,12 @@ describe('Serializable', () => {
           age: 28,
         };
         const person = Person.from(props);
-        expect(person).to.be.instanceof(Person);
-        expect(person).to.be.eql({
+        expect(person).toBeInstanceOf(Person);
+        expect(person).toEqual({
           firstName: 'Jane',
           lastName: 'Doe',
         });
-        expect(person.age).to.be.undefined;
+        expect(person.age).toBeUndefined();
       });
 
       it('constructs from properties picked from multiple source', () => {
@@ -100,8 +99,8 @@ describe('Serializable', () => {
           hobby: 'martial arts',
         };
         const person = Person.from(props1, props2, props3);
-        expect(person).to.be.instanceof(Person);
-        expect(person).to.be.eql({
+        expect(person).toBeInstanceOf(Person);
+        expect(person).toEqual({
           firstName: 'Jane',
           lastName: 'Doe',
         });
@@ -111,7 +110,7 @@ describe('Serializable', () => {
 
   describe('prop types', () => {
     it('takes optional schemaVersion property as a number', () => {
-      expect(Serializable.getPropTypes()).to.be.eql({
+      expect(Serializable.getPropTypes()).toEqual({
         schemaVersion: PropTypes.instanceOf(Number).isOptional,
       });
     });
@@ -126,14 +125,14 @@ describe('Serializable', () => {
         ];
         const company = new Company({ employees });
         const employeesList = company.in<Employee>('employees');
-        expect(employeesList).to.be.instanceof(List);
-        expect(employeesList).to.have.length(2);
-        expect(employeesList).to.have.members(employees);
+        expect(employeesList).toBeInstanceOf(List);
+        expect(employeesList).toHaveLength(2);
+        expect(employeesList).toEqual(expect.arrayContaining(employees);
       });
 
       it('throws InvalidListError upon accessing non-list property', () => {
         const company = new Company({ employees: [] });
-        expect(() => company.in<Person>('not-existing-person-list')).to.throw(
+        expect(() => company.in<Person>('not-existing-person-list')).toThrow(
           InvalidListError,
           `Company: list 'not-existing-person-list' is not a serializable list property type`
         );
@@ -141,3 +140,4 @@ describe('Serializable', () => {
     });
   });
 });
+

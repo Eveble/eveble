@@ -1,7 +1,8 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import { inject } from 'inversify';
-import { stubInterface } from 'ts-sinon';
+
 import { Module } from '../../../src/core/module';
 import { BaseApp } from '../../../src/core/base-app';
 import { types } from '../../../src/types';
@@ -11,7 +12,7 @@ describe('building applications based on modules', () => {
   let log: any;
 
   beforeEach(() => {
-    log = stubInterface<types.Logger>();
+    log = mock<types.Logger>();
   });
 
   const MY_BINDINGS = {
@@ -19,7 +20,7 @@ describe('building applications based on modules', () => {
   };
 
   it('loads required module correctly', async () => {
-    const dependencyValue = sinon.spy();
+    const dependencyValue = vi.fn();
 
     class MyApp extends BaseApp {
       @inject(MY_BINDINGS.Dependency)
@@ -39,7 +40,7 @@ describe('building applications based on modules', () => {
     });
     app.injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     await app.initialize();
-    expect(app.dependency).to.equal(dependencyValue);
+    expect(app.dependency).toBe(dependencyValue);
   });
 
   it('configures module before running', async () => {
@@ -75,6 +76,6 @@ describe('building applications based on modules', () => {
     await app.initialize();
     await app.start();
 
-    expect(testResult).to.equal(appValue);
+    expect(testResult).toBe(appValue);
   });
 });

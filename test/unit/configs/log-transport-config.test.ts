@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import chalk from 'chalk';
 import { PropTypes } from 'typend';
 import { LogTransportConfig } from '../../../src/configs/log-transport-config';
@@ -6,30 +7,30 @@ import { Config } from '../../../src/components/config';
 
 describe('LogTransportConfig', () => {
   it('extends Config', () => {
-    expect(LogTransportConfig.prototype).to.be.instanceof(Config);
+    expect(LogTransportConfig.prototype).toBeInstanceOf(Config);
   });
 
   describe('prop types', () => {
     it('takes optional isEnabled property as a boolean', () => {
-      expect(LogTransportConfig.getPropTypes().isEnabled).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().isEnabled).toEqual(
         PropTypes.instanceOf(Boolean).isOptional
       );
     });
 
     it('takes optional level property as a string', () => {
-      expect(LogTransportConfig.getPropTypes().level).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().level).toEqual(
         PropTypes.instanceOf(String).isOptional
       );
     });
 
     it('takes optional logColors property as an object', () => {
-      expect(LogTransportConfig.getPropTypes().logColors).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().logColors).toEqual(
         PropTypes.object.isOptional
       );
     });
 
     it('takes optional partsColors property as an object', () => {
-      expect(LogTransportConfig.getPropTypes().partsColors).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().partsColors).toEqual(
         PropTypes.shape({
           initial: PropTypes.instanceOf(String).isOptional,
           separator: PropTypes.instanceOf(String).isOptional,
@@ -42,7 +43,7 @@ describe('LogTransportConfig', () => {
     });
 
     it('takes optional messages property as an object', () => {
-      expect(LogTransportConfig.getPropTypes().messages).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().messages).toEqual(
         PropTypes.shape({
           start: PropTypes.instanceOf(String).isOptional,
           exit: PropTypes.instanceOf(String).isOptional,
@@ -51,7 +52,7 @@ describe('LogTransportConfig', () => {
     });
 
     it('takes optional parts property as an object', () => {
-      expect(LogTransportConfig.getPropTypes().parts).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().parts).toEqual(
         PropTypes.shape({
           initial: PropTypes.instanceOf(String).isOptional,
           separator: PropTypes.instanceOf(String).isOptional,
@@ -61,7 +62,7 @@ describe('LogTransportConfig', () => {
     });
 
     it('takes optional flags property as an object', () => {
-      expect(LogTransportConfig.getPropTypes().flags).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().flags).toEqual(
         PropTypes.shape({
           isTimestamped: PropTypes.instanceOf(Boolean).isOptional,
           isLabeled: PropTypes.instanceOf(Boolean).isOptional,
@@ -76,19 +77,19 @@ describe('LogTransportConfig', () => {
     });
 
     it('takes optional timestampFormat property as a string', () => {
-      expect(LogTransportConfig.getPropTypes().timestampFormat).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().timestampFormat).toEqual(
         PropTypes.instanceOf(String).isOptional
       );
     });
 
     it('takes optional inspectDepth property as a number', () => {
-      expect(LogTransportConfig.getPropTypes().inspectDepth).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().inspectDepth).toEqual(
         PropTypes.instanceOf(Number).isOptional
       );
     });
 
     it('takes optional abbreviationLength property as a number', () => {
-      expect(LogTransportConfig.getPropTypes().abbreviationLength).to.be.eql(
+      expect(LogTransportConfig.getPropTypes().abbreviationLength).toEqual(
         PropTypes.instanceOf(Number).isOptional
       );
     });
@@ -96,7 +97,7 @@ describe('LogTransportConfig', () => {
 
   describe('defaults', () => {
     it('has default values assigned via property initializers', () => {
-      expect(new LogTransportConfig()).to.be.eql({
+      expect(new LogTransportConfig()).toEqual({
         isEnabled: true,
         level: 'info',
         logColors: {
@@ -143,3 +144,4 @@ describe('LogTransportConfig', () => {
     });
   });
 });
+

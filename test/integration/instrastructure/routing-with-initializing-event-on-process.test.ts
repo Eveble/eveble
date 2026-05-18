@@ -1,9 +1,17 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+
 import { Collection } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
-import sinon from 'sinon';
+
 import { kernel } from '@eveble/core';
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { CommitSerializer } from '../../../src/infrastructure/serializers/commit-serializer';
@@ -52,9 +60,6 @@ import { AbilityAssertion } from '../../../src/domain/assertions/ability-asserti
 import { Asserter } from '../../../src/domain/asserter';
 import { DomainException } from '../../../src/domain/domain-exception';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`Routing with initializing Event on Process`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
@@ -92,8 +97,8 @@ describe(`Routing with initializing Event on Process`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -102,12 +107,12 @@ describe(`Routing with initializing Event on Process`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -199,7 +204,7 @@ describe(`Routing with initializing Event on Process`, () => {
     kernel.setSerializer(serializer);
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     await setupSnapshotterMongo(injector, clients, collections);
@@ -220,7 +225,7 @@ describe(`Routing with initializing Event on Process`, () => {
     await collections.snapshotter.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
     await clients.snapshotter.disconnect();
     kernel.setAsserter(undefined as any);
@@ -231,7 +236,7 @@ describe(`Routing with initializing Event on Process`, () => {
   Testing against ProductivityEstimation process
   */
   it('handles routing with initializing Event to Process', async () => {
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
     const taskListId = new Guid();
     const taskId = new Guid();
@@ -268,8 +273,8 @@ describe(`Routing with initializing Event on Process`, () => {
       Employee,
       employeeId
     )) as Employee;
-    expect(foundEmployee).to.be.instanceof(Employee);
-    expect(foundEmployee.points).to.be.equal(0);
+    expect(foundEmployee).toBeInstanceOf(Employee);
+    expect(foundEmployee.points).toBe(0);
 
     await commandBus.handle(createList);
     await commandBus.handle(assignList);
@@ -280,21 +285,21 @@ describe(`Routing with initializing Event on Process`, () => {
       Employee,
       employeeId
     )) as Employee;
-    expect(foundEmployeeAfterEstimation).to.be.instanceof(Employee);
-    expect(foundEmployeeAfterEstimation.points).to.be.equal(4);
-    expect(foundEmployeeAfterEstimation.metadata).to.be.instanceof(Object);
-    expect(foundEmployeeAfterEstimation.metadata?.correlation).to.be.instanceof(
+    expect(foundEmployeeAfterEstimation).toBeInstanceOf(Employee);
+    expect(foundEmployeeAfterEstimation.points).toBe(4);
+    expect(foundEmployeeAfterEstimation.metadata).toBeInstanceOf(Object);
+    expect(foundEmployeeAfterEstimation.metadata?.correlation).toBeInstanceOf(
       Object
     );
     expect(
       foundEmployeeAfterEstimation.metadata?.correlation?.ProductivityEstimation
-    ).to.be.a('string');
+    ).toBeTypeOf('string');
   });
 
   it('throws DomainError on initializing Event handler on Process', async () => {
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
-    const domainExceptionHandler = sinon.stub();
+    const domainExceptionHandler = vi.fn();
     eventBus.registerHandler(DomainException, domainExceptionHandler);
 
     const taskListId = new Guid();
@@ -332,20 +337,20 @@ describe(`Routing with initializing Event on Process`, () => {
     await commandBus.handle(assignList);
     await commandBus.handle(createTask);
 
-    await expect(commandBus.handle(completeTask)).to.eventually.be.rejectedWith(
+    await expect(commandBus.handle(completeTask)).rejects.toThrow(
       ProductivityEstimationUnavailableForEmployeeError,
       `Productivity estimation for employee with id '${employeeId}' is unavailable`
     );
 
     // Since error is happening directly on initializing Event handler on ProductivityEstimation process,
     // process will be never saved - so there is no requirement to evaluate the state of the process
-    const domainException = domainExceptionHandler.getCall(0).args[0];
-    expect(domainException).to.be.instanceof(DomainException);
-    expect(domainException.thrower).to.be.equal('ProductivityEstimation');
-    expect(domainException.error).to.be.instanceof(
+    const domainException = domainExceptionHandler.mock.calls[0][0];
+    expect(domainException).toBeInstanceOf(DomainException);
+    expect(domainException.thrower).toBe('ProductivityEstimation');
+    expect(domainException.error).toBeInstanceOf(
       ProductivityEstimationUnavailableForEmployeeError
     );
-    expect(domainException.error).to.be.eql(
+    expect(domainException.error).toEqual(
       new ProductivityEstimationUnavailableForEmployeeError(
         employeeId.toString()
       )
@@ -353,12 +358,12 @@ describe(`Routing with initializing Event on Process`, () => {
   });
 
   it('throws DomainError on Command handler triggered by process and publishes DomainException ', async () => {
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
 
     // Since process is created from initializing Event, prior to it's creation we don't know it's identifier.
     // Register stub handler to hijack DomainException that should be routed back to process on
     // any triggered error where we can retrieve process id from correlation metadata.
-    const domainExceptionHandler = sinon.stub();
+    const domainExceptionHandler = vi.fn();
     eventBus.registerHandler(DomainException, domainExceptionHandler);
 
     const taskListId = new Guid();
@@ -399,16 +404,16 @@ describe(`Routing with initializing Event on Process`, () => {
     await commandBus.handle(assignList);
     await commandBus.handle(createTask);
 
-    await expect(commandBus.handle(completeTask)).to.eventually.be.rejectedWith(
+    await expect(commandBus.handle(completeTask)).rejects.toThrow(
       EmployeeTerminatedError,
       `Can't add new productivity points to terminated employee with id '${employeeId}'`
     );
 
-    const domainException = domainExceptionHandler.getCall(0).args[0];
-    expect(domainException).to.be.instanceof(DomainException);
-    expect(domainException.thrower).to.be.equal('Employee');
-    expect(domainException.error).to.be.instanceof(EmployeeTerminatedError);
-    expect(domainException.error).to.be.eql(
+    const domainException = domainExceptionHandler.mock.calls[0][0];
+    expect(domainException).toBeInstanceOf(DomainException);
+    expect(domainException.thrower).toBe('Employee');
+    expect(domainException.error).toBeInstanceOf(EmployeeTerminatedError);
+    expect(domainException.error).toEqual(
       new EmployeeTerminatedError(employeeId.toString())
     );
 
@@ -419,10 +424,10 @@ describe(`Routing with initializing Event on Process`, () => {
       ProductivityEstimation,
       processId
     )) as ProductivityEstimation;
-    expect(foundProductivityEstimationProcess).to.be.instanceof(
+    expect(foundProductivityEstimationProcess).toBeInstanceOf(
       ProductivityEstimation
     );
-    expect(foundProductivityEstimationProcess.getState()).to.be.equal(
+    expect(foundProductivityEstimationProcess.getState()).toBe(
       ProductivityEstimation.STATES.failed
     );
   });

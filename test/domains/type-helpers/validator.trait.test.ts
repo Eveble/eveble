@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import { derive } from '@traits-ts/core';
 import {
   ValidatorExistsError,
@@ -22,7 +23,7 @@ describe(`ValidatorTrait`, () => {
           undefined as any as string,
           validator
         )
-      ).to.throw(
+      ).toThrow(
         InvalidValidatorIdError,
         `Expected id argument to be string, got undefined`
       );
@@ -32,7 +33,7 @@ describe(`ValidatorTrait`, () => {
       const id = 'my-validator';
       const instance = new ColorValidator();
       instance.registerValidator(id, validator);
-      expect(() => instance.registerValidator(id, validator)).to.throw(
+      expect(() => instance.registerValidator(id, validator)).toThrow(
         ValidatorExistsError,
         `Validator with id 'my-validator' would be overridden. To override existing mapping use <MyValidator.prototype.overrideValidator>`
       );
@@ -43,8 +44,8 @@ describe(`ValidatorTrait`, () => {
 
       const instance = new ColorValidator();
       instance.registerValidator(id, validator);
-      expect(instance.getValidator(id)).to.equal(validator);
-      expect(instance.hasValidator(id)).to.be.true;
+      expect(instance.getValidator(id)).toBe(validator);
+      expect(instance.hasValidator(id)).toBe(true);
     });
 
     it('allows to override validator', () => {
@@ -57,8 +58,8 @@ describe(`ValidatorTrait`, () => {
       instance.registerValidator(id, validator);
       expect(() => {
         instance.overrideValidator(id, otherValidator);
-      }).to.not.throw(Error);
-      expect(instance.getValidator(id)).to.equal(otherValidator);
+      }).not.toThrow(Error);
+      expect(instance.getValidator(id)).toBe(otherValidator);
     });
 
     it('returns validator by id', () => {
@@ -71,9 +72,9 @@ describe(`ValidatorTrait`, () => {
       const instance = new ColorValidator();
       instance.registerValidator('hex', hexValidator);
       instance.registerValidator('green', hslValidator);
-      expect(instance.getValidator('hex')).to.equal(hexValidator);
-      expect(instance.getValidator('green')).to.equal(hslValidator);
-      expect(instance.getValidator('non-existing-validator')).to.be.undefined;
+      expect(instance.getValidator('hex')).toBe(hexValidator);
+      expect(instance.getValidator('green')).toBe(hslValidator);
+      expect(instance.getValidator('non-existing-validator')).toBeUndefined();
     });
 
     it('removes validator', () => {
@@ -82,8 +83,8 @@ describe(`ValidatorTrait`, () => {
       const instance = new ColorValidator();
       instance.registerValidator(id, validator);
       instance.removeValidator(id);
-      expect(instance.getValidator(id)).to.be.undefined;
-      expect(instance.hasValidator(id)).to.be.false;
+      expect(instance.getValidator(id)).toBeUndefined();
+      expect(instance.hasValidator(id)).toBe(false);
     });
   });
 
@@ -92,13 +93,13 @@ describe(`ValidatorTrait`, () => {
       const id = 'my-validator';
       const instance = new ColorValidator();
       instance.registerValidator(id, validator);
-      expect(instance.hasValidator(id)).to.be.true;
+      expect(instance.hasValidator(id)).toBe(true);
     });
 
     it(`returns false validator is not registered on instance`, () => {
       const id = 'my-validator';
       const instance = new ColorValidator();
-      expect(instance.hasValidator(id)).to.be.false;
+      expect(instance.hasValidator(id)).toBe(false);
     });
   });
 
@@ -118,7 +119,8 @@ describe(`ValidatorTrait`, () => {
       const instance = new ColorValidator();
       instance.registerValidator('hex', hexValidator);
       instance.registerValidator('green', hslValidator);
-      expect(instance.getValidators()).to.be.eql(validators);
+      expect(instance.getValidators()).toEqual(validators);
     });
   });
 });
+

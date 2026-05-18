@@ -1,5 +1,5 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, beforeEach, afterEach } from 'vitest';
+
 import {
   Type,
   TypeNotFoundError,
@@ -17,8 +17,6 @@ import { UnparsableValueError } from '../../../src/messaging/messaging-errors';
 import { TYPE_KEY } from '../../../src/constants/literal-keys';
 import { createEJSON } from '../../../src/utils/helpers';
 import { Guid } from '../../../src';
-
-chai.use(sinonChai);
 
 describe(`EJSONSerializerAdapter`, () => {
   let injector: types.Injector;
@@ -74,13 +72,13 @@ describe(`EJSONSerializerAdapter`, () => {
   describe('construction', () => {
     it('assigns default type key on construction', () => {
       const instance = new EJSONSerializerAdapter();
-      expect(instance.getTypeKey()).to.be.equal(TYPE_KEY);
+      expect(instance.getTypeKey()).toBe(TYPE_KEY);
     });
 
     it('takes optional type key as a string and assigns it', () => {
       const typeKey = '$type';
       const instance = new EJSONSerializerAdapter(typeKey);
-      expect(instance.getTypeKey()).to.be.equal(typeKey);
+      expect(instance.getTypeKey()).toBe(typeKey);
     });
   });
 
@@ -89,7 +87,7 @@ describe(`EJSONSerializerAdapter`, () => {
       class InvalidType {}
       expect(() =>
         serializer.registerType('InvalidType', InvalidType)
-      ).to.throw(
+      ).toThrow(
         UnregistrableTypeError,
         `Type 'InvalidType' must implement Serializable interface`
       );
@@ -97,12 +95,12 @@ describe(`EJSONSerializerAdapter`, () => {
 
     it('registers type on EJSON with type name and factory function for a type', () => {
       serializer.registerType('Person', Person);
-      expect(serializer.getType('Person')).to.be.equal(Person);
+      expect(serializer.getType('Person')).toBe(Person);
     });
 
     it('throws TypeExistsError if type is already registered', () => {
       serializer.registerType('Person', Person);
-      expect(() => serializer.registerType('Person', Person)).to.throw(
+      expect(() => serializer.registerType('Person', Person)).toThrow(
         TypeExistsError,
         `EJSON: type 'Person' is already registered`
       );
@@ -110,7 +108,7 @@ describe(`EJSONSerializerAdapter`, () => {
 
     it('allows for explicit override of existing type', () => {
       serializer.registerType('Person', Person);
-      expect(() => serializer.overrideType('Person', Person)).to.not.throw(
+      expect(() => serializer.overrideType('Person', Person)).not.toThrow(
         TypeExistsError
       );
     });
@@ -119,11 +117,11 @@ describe(`EJSONSerializerAdapter`, () => {
   describe('evaluating registered types', () => {
     it('returns true if type is registered', () => {
       serializer.registerType('Person', Person);
-      expect(serializer.hasType('Person')).to.be.true;
+      expect(serializer.hasType('Person')).toBe(true);
     });
 
     it('returns false if type is registered', () => {
-      expect(serializer.hasType('Person')).to.be.false;
+      expect(serializer.hasType('Person')).toBe(false);
     });
   });
 
@@ -134,7 +132,7 @@ describe(`EJSONSerializerAdapter`, () => {
         firstName: 'Jane',
         lastName: 'Doe',
       });
-      expect(serializer.isTypeInstance(person)).to.be.true;
+      expect(serializer.isTypeInstance(person)).toBe(true);
     });
 
     it('returns false if instance of a type is not a registered type', () => {
@@ -142,18 +140,18 @@ describe(`EJSONSerializerAdapter`, () => {
         firstName: 'Jane',
         lastName: 'Doe',
       });
-      expect(serializer.isTypeInstance(person)).to.be.false;
+      expect(serializer.isTypeInstance(person)).toBe(false);
     });
   });
 
   describe('getters', () => {
     it('returns registered type', () => {
       serializer.registerType('Person', Person);
-      expect(serializer.getType('Person')).to.be.equal(Person);
+      expect(serializer.getType('Person')).toBe(Person);
     });
 
     it('throws TypeNotFoundError if type is not registered on serializer', () => {
-      expect(() => serializer.getTypeOrThrow('Person')).to.throw(
+      expect(() => serializer.getTypeOrThrow('Person')).toThrow(
         TypeNotFoundError,
         `EJSON: type 'Person' not found`
       );
@@ -161,15 +159,15 @@ describe(`EJSONSerializerAdapter`, () => {
 
     it('returns factory for registered type', () => {
       serializer.registerType('Person', Person);
-      expect(serializer.getFactory('Person')).to.be.instanceof(Function);
-      expect(serializer.getFactory('Person').type).to.be.equal(Person);
+      expect(serializer.getFactory('Person')).toBeInstanceOf(Function);
+      expect(serializer.getFactory('Person').type).toBe(Person);
     });
 
     it('returns mappings of all registered types', () => {
       serializer.registerType('Person', Person);
       serializer.registerType('Car', Car);
-      expect(serializer.getTypes()).to.be.instanceof(Map);
-      expect(serializer.getTypes()).to.be.eql(
+      expect(serializer.getTypes()).toBeInstanceOf(Map);
+      expect(serializer.getTypes()).toEqual(
         new Map([
           ['Person', Person as any],
           ['Car', Car as any],
@@ -180,30 +178,30 @@ describe(`EJSONSerializerAdapter`, () => {
     it('returns type names for all registered types', () => {
       serializer.registerType('Person', Person);
       serializer.registerType('Car', Car);
-      expect(serializer.getTypesNames()).to.be.instanceof(Array);
-      expect(serializer.getTypesNames()).to.be.eql(['Person', 'Car']);
+      expect(serializer.getTypesNames()).toBeInstanceOf(Array);
+      expect(serializer.getTypesNames()).toEqual(['Person', 'Car']);
     });
   });
 
   describe('mutators', () => {
     it('removes registered type', () => {
       serializer.registerType('Person', Person);
-      expect(serializer.getType('Person')).to.be.equal(Person);
+      expect(serializer.getType('Person')).toBe(Person);
       serializer.removeType('Person');
-      expect(serializer.getType('Person')).to.be.undefined;
+      expect(serializer.getType('Person')).toBeUndefined();
     });
 
     it('removes all registered types', () => {
       serializer.registerType('Person', Person);
       serializer.registerType('Car', Car);
-      expect(serializer.getTypes()).to.be.eql(
+      expect(serializer.getTypes()).toEqual(
         new Map([
           ['Person', Person as any],
           ['Car', Car as any],
         ])
       );
       serializer.removeTypes();
-      expect(serializer.getTypes()).to.be.empty;
+      expect(serializer.getTypes()).toHaveLength(0);
     });
   });
 
@@ -219,7 +217,7 @@ describe(`EJSONSerializerAdapter`, () => {
           }),
         });
         serializer.registerType('Person', Person);
-        expect(serializer.toJSONValue(person)).to.be.eql({
+        expect(serializer.toJSONValue(person)).toEqual({
           firstName: 'Jane',
           lastName: 'Doe',
           address: {
@@ -236,7 +234,7 @@ describe(`EJSONSerializerAdapter`, () => {
         };
 
         const json = serializer.toJSONValue(obj);
-        expect(json).to.be.eql({ $date: date.toJSON() });
+        expect(json).toEqual({ $date: date.toJSON() });
       });
     });
 
@@ -249,7 +247,7 @@ describe(`EJSONSerializerAdapter`, () => {
             lastName: 'Doe',
           },
         };
-        expect(() => serializer.fromJSONValue(json)).to.throw(
+        expect(() => serializer.fromJSONValue(json)).toThrow(
           TypeNotFoundError,
           `EJSON: type 'Person' not found`
         );
@@ -273,8 +271,8 @@ describe(`EJSONSerializerAdapter`, () => {
           },
         };
         const person = serializer.fromJSONValue(json);
-        expect(person).to.be.instanceof(Person);
-        expect(person).to.be.eql(
+        expect(person).toBeInstanceOf(Person);
+        expect(person).toEqual(
           new Person({
             firstName: 'Jane',
             lastName: 'Doe',
@@ -293,7 +291,7 @@ describe(`EJSONSerializerAdapter`, () => {
         };
 
         const json = serializer.toJSONValue(obj);
-        expect(serializer.fromJSONValue(json)).to.be.eql(date);
+        expect(serializer.fromJSONValue(json)).toEqual(date);
       });
     });
 
@@ -311,7 +309,7 @@ describe(`EJSONSerializerAdapter`, () => {
           }),
         });
 
-        expect(() => serializer.stringify(person)).to.throw(
+        expect(() => serializer.stringify(person)).toThrow(
           UnavailableSerializerError,
           `Serialization is unavailable outside on application environment.
       Define application before using any features related to serialization or set serializer on kernel by using <kernel.setSerializer()>`
@@ -325,7 +323,7 @@ describe(`EJSONSerializerAdapter`, () => {
           brand: 'Bentley',
         });
 
-        expect(serializer.stringify(car)).to.be.equal(
+        expect(serializer.stringify(car)).toBe(
           '{"$type":"Car","$value":{"brand":"Bentley"}}'
         );
       });
@@ -343,7 +341,7 @@ describe(`EJSONSerializerAdapter`, () => {
           }),
         });
 
-        expect(serializer.stringify(person)).to.be.equal(
+        expect(serializer.stringify(person)).toBe(
           '{"$type":"Person","$value":{"firstName":"Jane","lastName":"Doe","address":{"$type":"Address","$value":{"city":"New York","street":"Wall Street"}}}}'
         );
         kernel.setSerializer(undefined as any);
@@ -352,7 +350,7 @@ describe(`EJSONSerializerAdapter`, () => {
 
     describe('parse', () => {
       it('throws UnparsableValueError if provided argument is not a string', () => {
-        expect(() => serializer.parse(1234 as any as string)).to.throw(
+        expect(() => serializer.parse(1234 as any as string)).toThrow(
           UnparsableValueError,
           `Value must be parsable string, got 1234`
         );
@@ -364,8 +362,8 @@ describe(`EJSONSerializerAdapter`, () => {
         const string = '{"$type":"Car","$value":{"brand":"Bentley"}}';
 
         const ejsonValue = serializer.parse(string);
-        expect(ejsonValue).to.be.instanceof(Car);
-        expect(ejsonValue).to.be.eql(
+        expect(ejsonValue).toBeInstanceOf(Car);
+        expect(ejsonValue).toEqual(
           new Car({
             brand: 'Bentley',
           })
@@ -380,8 +378,8 @@ describe(`EJSONSerializerAdapter`, () => {
           '{"$type":"Person","$value":{"firstName":"Jane","lastName":"Doe","address":{"$type":"Address","$value":{"city":"New York","street":"Wall Street"}}}}';
 
         const ejsonValue = serializer.parse(string);
-        expect(ejsonValue).to.be.instanceof(Person);
-        expect(ejsonValue).to.be.eql(
+        expect(ejsonValue).toBeInstanceOf(Person);
+        expect(ejsonValue).toEqual(
           new Person({
             firstName: 'Jane',
             lastName: 'Doe',
@@ -410,15 +408,15 @@ describe(`EJSONSerializerAdapter`, () => {
         });
 
         const clonedPerson = serializer.clone<Person>(person);
-        expect(clonedPerson).to.be.instanceof(Person);
-        expect(clonedPerson).to.be.eql(person);
+        expect(clonedPerson).toBeInstanceOf(Person);
+        expect(clonedPerson).toEqual(person);
         expect(clonedPerson).to.not.be.equal(person);
         expect(clonedPerson.address).to.not.be.equal(address);
       });
     });
 
     describe('equals', () => {
-      context(
+      describe(
         'by using equals method on type from Definable mixin(prototype)',
         () => {
           it('returns true for equal arguments', () => {
@@ -444,7 +442,7 @@ describe(`EJSONSerializerAdapter`, () => {
               address: secondAddress,
             });
 
-            expect(serializer.equals(firstPerson, secondPerson)).to.be.true;
+            expect(serializer.equals(firstPerson, secondPerson)).toBe(true);
           });
 
           it('returns false for not equal arguments by their values', () => {
@@ -470,7 +468,7 @@ describe(`EJSONSerializerAdapter`, () => {
               address: secondAddress,
             });
 
-            expect(serializer.equals(firstPerson, secondPerson)).to.be.false;
+            expect(serializer.equals(firstPerson, secondPerson)).toBe(false);
           });
 
           it('returns false for not equal arguments by their types', () => {
@@ -496,13 +494,13 @@ describe(`EJSONSerializerAdapter`, () => {
               address: secondAddressObj,
             };
 
-            expect(serializer.equals(firstPerson, secondPersonObj)).to.be.false;
+            expect(serializer.equals(firstPerson, secondPersonObj)).toBe(false);
           });
         }
       );
 
-      context(`by using serializer's in-build comparer`, () => {
-        context('without nested types', () => {
+      describe(`by using serializer's in-build comparer`, () => {
+        describe('without nested types', () => {
           it('returns true for equal arguments by their values and types', () => {
             serializer.registerType('Car', Car);
 
@@ -513,7 +511,7 @@ describe(`EJSONSerializerAdapter`, () => {
               brand: 'Audi',
             });
 
-            expect(serializer.equals(carA, carB)).to.be.true;
+            expect(serializer.equals(carA, carB)).toBe(true);
           });
 
           it('returns false for not equal arguments by their values and types', () => {
@@ -526,10 +524,10 @@ describe(`EJSONSerializerAdapter`, () => {
               brand: 'BMW',
             });
 
-            expect(serializer.equals(carA, carB)).to.be.false;
+            expect(serializer.equals(carA, carB)).toBe(false);
           });
         });
-        context('with nested types', () => {
+        describe('with nested types', () => {
           it('returns true for equal arguments by their values and types', () => {
             serializer.registerType('Person', Person);
             serializer.registerType('Address', Address);
@@ -559,7 +557,7 @@ describe(`EJSONSerializerAdapter`, () => {
             (firstPerson as any).equals = undefined;
             (secondPerson as any).equals = undefined;
 
-            expect(serializer.equals(firstPerson, secondPerson)).to.be.true;
+            expect(serializer.equals(firstPerson, secondPerson)).toBe(true);
           });
 
           it('returns false for not equal arguments by their values and types', () => {
@@ -589,7 +587,7 @@ describe(`EJSONSerializerAdapter`, () => {
             (firstAddress as any).equals = undefined;
             (firstPerson as any).equals = undefined;
 
-            expect(serializer.equals(firstPerson, secondPersonObj)).to.be.false;
+            expect(serializer.equals(firstPerson, secondPersonObj)).toBe(false);
           });
         });
       });
@@ -599,7 +597,7 @@ describe(`EJSONSerializerAdapter`, () => {
       it('throws UnregistrableTypeError if provided argument is not instance of Serializable', () => {
         const obj = {};
 
-        expect(() => serializer.toData(obj as any)).to.throw(
+        expect(() => serializer.toData(obj as any)).toThrow(
           UnregistrableTypeError,
           `Type '{}' must implement Serializable interface`
         );
@@ -613,27 +611,27 @@ describe(`EJSONSerializerAdapter`, () => {
 
         const car = new Car({ brand: 'Audi' });
         const data = instance.toData(car);
-        expect(data).to.be.eql({
+        expect(data).toEqual({
           $type: 'Car',
           brand: 'Audi',
         });
       });
 
-      context('without nested types', () => {
+      describe('without nested types', () => {
         it('converts serializable type to data object while preserving its type', () => {
           serializer.registerType('Car', Car);
 
           const car = new Car({
             brand: 'Bentley',
           });
-          expect(serializer.toData(car)).to.be.eql({
+          expect(serializer.toData(car)).toEqual({
             _type: 'Car',
             brand: 'Bentley',
           });
         });
       });
 
-      context('with list of nested types', () => {
+      describe('with list of nested types', () => {
         it('converts serializable type to data object while preserving its type and types in lists', () => {
           serializer.registerType('Car', Car);
           serializer.registerType('Garage', Garage);
@@ -647,7 +645,7 @@ describe(`EJSONSerializerAdapter`, () => {
           const garage = new Garage({
             cars: [audi, bentley],
           });
-          expect(serializer.toData(garage)).to.be.eql({
+          expect(serializer.toData(garage)).toEqual({
             _type: 'Garage',
             cars: [
               { _type: 'Car', brand: 'Audi' },
@@ -657,7 +655,7 @@ describe(`EJSONSerializerAdapter`, () => {
         });
       });
 
-      context('with nested optional types', () => {
+      describe('with nested optional types', () => {
         it('converts data object while preserving its type and optional nested types', () => {
           serializer.registerType('Legal', Legal);
           serializer.registerType('Guid', Guid);
@@ -670,7 +668,7 @@ describe(`EJSONSerializerAdapter`, () => {
             },
           });
 
-          expect(serializer.toData(legal)).to.be.eql({
+          expect(serializer.toData(legal)).toEqual({
             _type: 'Legal',
             tos: {
               id: {
@@ -683,7 +681,7 @@ describe(`EJSONSerializerAdapter`, () => {
         });
       });
 
-      context('with nested types', () => {
+      describe('with nested types', () => {
         it('converts data object while preserving its type and nested types', () => {
           serializer.registerType('Person', Person);
           serializer.registerType('Address', Address);
@@ -697,7 +695,7 @@ describe(`EJSONSerializerAdapter`, () => {
             }),
           });
 
-          expect(serializer.toData(person)).to.be.eql({
+          expect(serializer.toData(person)).toEqual({
             _type: 'Person',
             firstName: 'Jane',
             lastName: 'Doe',
@@ -723,11 +721,11 @@ describe(`EJSONSerializerAdapter`, () => {
           brand: 'Audi',
         };
         const car = instance.fromData(data);
-        expect(car).to.be.instanceof(Car);
-        expect(car).to.be.eql({ brand: 'Audi' });
+        expect(car).toBeInstanceOf(Car);
+        expect(car).toEqual({ brand: 'Audi' });
       });
 
-      context('without nested types', () => {
+      describe('without nested types', () => {
         it('converts data object to serializable type', () => {
           serializer.registerType('Car', Car);
 
@@ -737,8 +735,8 @@ describe(`EJSONSerializerAdapter`, () => {
           };
 
           const typeInstance = serializer.fromData(data);
-          expect(typeInstance).to.be.instanceof(Car);
-          expect(typeInstance).to.be.eql(
+          expect(typeInstance).toBeInstanceOf(Car);
+          expect(typeInstance).toEqual(
             new Car({
               brand: 'Bentley',
             })
@@ -746,7 +744,7 @@ describe(`EJSONSerializerAdapter`, () => {
         });
       });
 
-      context('with list of nested types', () => {
+      describe('with list of nested types', () => {
         it('converts data object to serializable type', () => {
           serializer.registerType('Car', Car);
           serializer.registerType('Garage', Garage);
@@ -769,14 +767,14 @@ describe(`EJSONSerializerAdapter`, () => {
             cars: [audi, bentley],
           });
           const typeInstance = serializer.fromData<Garage>(data);
-          expect(typeInstance).to.be.instanceof(Garage);
-          expect(typeInstance).to.be.eql(garage);
-          expect(typeInstance.cars[0]).to.be.instanceof(Car);
-          expect(typeInstance.cars[1]).to.be.instanceof(Car);
+          expect(typeInstance).toBeInstanceOf(Garage);
+          expect(typeInstance).toEqual(garage);
+          expect(typeInstance.cars[0]).toBeInstanceOf(Car);
+          expect(typeInstance.cars[1]).toBeInstanceOf(Car);
         });
       });
 
-      context('with nested optional types', () => {
+      describe('with nested optional types', () => {
         it('converts data object to serializable type', () => {
           serializer.registerType('Legal', Legal);
           serializer.registerType('Guid', Guid);
@@ -792,7 +790,7 @@ describe(`EJSONSerializerAdapter`, () => {
               isAccepted: true,
             },
           };
-          expect(serializer.fromData<Legal>(data)).to.be.eql(
+          expect(serializer.fromData<Legal>(data)).toEqual(
             new Legal({
               tos: {
                 id,
@@ -803,7 +801,7 @@ describe(`EJSONSerializerAdapter`, () => {
         });
       });
 
-      context('with nested types', () => {
+      describe('with nested types', () => {
         it('converts data object to serializable type', () => {
           serializer.registerType('Person', Person);
           serializer.registerType('Address', Address);
@@ -820,8 +818,8 @@ describe(`EJSONSerializerAdapter`, () => {
           };
 
           const typeInstance = serializer.fromData<Person>(data);
-          expect(typeInstance).to.be.instanceof(Person);
-          expect(typeInstance).to.be.eql(
+          expect(typeInstance).toBeInstanceOf(Person);
+          expect(typeInstance).toEqual(
             new Person({
               firstName: 'Jane',
               lastName: 'Doe',
@@ -831,9 +829,10 @@ describe(`EJSONSerializerAdapter`, () => {
               }),
             })
           );
-          expect(typeInstance.address).to.be.instanceof(Address);
+          expect(typeInstance.address).toBeInstanceOf(Address);
         });
       });
     });
   });
 });
+

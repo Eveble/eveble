@@ -1,8 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+
 import { Collection, Filter } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import { Type, kernel } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
 import { SnapshotMongoDBStorage } from '../../../src/infrastructure/storages/snapshot-mongodb-storage';
@@ -14,9 +14,6 @@ import { EJSONSerializerAdapter } from '../../../src/messaging/serializers/ejson
 import { SnapshotSerializer } from '../../../src/infrastructure/serializers/snapshot-serializer';
 import { Guid } from '../../../src/domain/value-objects/guid';
 import { setupSnapshotterMongo } from '../../utilities/setups/snapshotter-mongo.util';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`SnapshotMongoDBStorage`, () => {
   @Type('IntegrationSnapshotMongoDBStorage.MyEventSourceable')
@@ -37,8 +34,8 @@ describe(`SnapshotMongoDBStorage`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -72,7 +69,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     }
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupSnapshotterMongo(injector, clients, collections);
     setupEvebleDependencies();
@@ -94,13 +91,13 @@ describe(`SnapshotMongoDBStorage`, () => {
     await collections.snapshotter.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.snapshotter.disconnect();
   });
 
   it(`inserts snapshot to MongoDB snapshots collection`, async () => {
     const result = await storage.save(eventSourceable);
-    expect(result).to.be.equal(eventSourceableId);
+    expect(result).toBe(eventSourceableId);
 
     const expectedSnapshot = {
       _id: `${eventSourceableId}`,
@@ -109,7 +106,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     const foundSnapshot = await collections.snapshotter.findOne({
       _id: eventSourceableId,
     } as Filter<any>);
-    expect(foundSnapshot).to.be.eql(expectedSnapshot);
+    expect(foundSnapshot).toEqual(expectedSnapshot);
   });
 
   it(`updates snapshot on MongoDB snapshots collection`, async () => {
@@ -127,7 +124,7 @@ describe(`SnapshotMongoDBStorage`, () => {
     const foundUpdatedSnapshot = await collections.snapshotter.findOne({
       _id: eventSourceableId,
     } as Filter<any>);
-    expect(foundUpdatedSnapshot).to.be.eql(expectedUpdatedSnapshot);
+    expect(foundUpdatedSnapshot).toEqual(expectedUpdatedSnapshot);
   });
 
   it(`returns deserialized event sourceable snapshot from MongoDB snapshots collection by event sourceable's id`, async () => {
@@ -136,8 +133,8 @@ describe(`SnapshotMongoDBStorage`, () => {
       MyEventSourceable,
       eventSourceableId
     );
-    expect(foundSnapshot).to.be.instanceOf(MyEventSourceable);
-    expect(foundSnapshot).to.be.eql(eventSourceable);
+    expect(foundSnapshot).toBeInstanceOf(MyEventSourceable);
+    expect(foundSnapshot).toEqual(eventSourceable);
   });
 
   it(`returns undefined if snapshot cannot be found on MongoDB snapshots collection`, async () => {
@@ -145,6 +142,7 @@ describe(`SnapshotMongoDBStorage`, () => {
       MyEventSourceable,
       eventSourceableId
     );
-    expect(foundSnapshot).to.be.equal(undefined);
+    expect(foundSnapshot).toBe(undefined);
   });
 });
+

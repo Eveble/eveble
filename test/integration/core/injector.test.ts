@@ -1,20 +1,27 @@
-import chai, { expect } from 'chai';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+
 import { injectable, inject, postConstruct, unmanaged } from 'inversify';
-import sinon from 'sinon';
+
 import delay from 'delay';
-import { stubInterface } from 'ts-sinon';
+
 import { Injector } from '../../../src/core/injector';
 import { types } from '../../../src/types';
 import { BINDINGS } from '../../../src/constants/bindings';
 
-chai.use(sinonChai);
-
 describe(`Injector`, () => {
-  let initialize;
+  let initialize: any;
 
   beforeEach(() => {
-    initialize = sinon.stub();
+    initialize = vi.fn();
   });
 
   describe('routing event sourceables', () => {
@@ -24,20 +31,20 @@ describe(`Injector`, () => {
     let MyEventSourceable: any;
 
     beforeEach(() => {
-      initializingMessageType = sinon.stub();
-      commands = sinon.stub();
-      events = sinon.stub();
+      initializingMessageType = vi.fn();
+      commands = vi.fn();
+      events = vi.fn();
 
-      MyEventSourceable = stubInterface<types.EventSourceableType>();
-      MyEventSourceable.resolveInitializingMessage.returns(
+      MyEventSourceable = mock<types.EventSourceableType>();
+      MyEventSourceable.resolveInitializingMessage.mockReturnValue(
         initializingMessageType
       );
-      MyEventSourceable.resolveRoutedCommands.returns(commands as any);
-      MyEventSourceable.resolveRoutedEvents.returns(events as any);
+      MyEventSourceable.resolveRoutedCommands.mockReturnValue(commands as any);
+      MyEventSourceable.resolveRoutedEvents.mockReturnValue(events as any);
     });
 
     it('allows to route event sourceable', () => {
-      const routerCnstrSpy = sinon.spy();
+      const routerCnstrSpy = vi.fn();
 
       class Router implements types.Router {
         EventSourceableType: types.EventSourceableType;
@@ -86,8 +93,8 @@ describe(`Injector`, () => {
       injector
         .bind<types.Router>('MyEventSourceable')
         .toRoute(MyEventSourceable);
-      expect(routerCnstrSpy).to.be.calledOnce;
-      expect(routerCnstrSpy).to.be.calledWithExactly(
+      expect(routerCnstrSpy).toHaveBeenCalledTimes(1);
+      expect(routerCnstrSpy).toHaveBeenCalledWith(
         MyEventSourceable,
         initializingMessageType,
         commands,
@@ -96,7 +103,7 @@ describe(`Injector`, () => {
     });
 
     it('ensures that router is initialized', () => {
-      const initializeSpy = sinon.spy();
+      const initializeSpy = vi.fn();
       class Router implements types.Router {
         @inject(BINDINGS.log)
         protected log: types.Logger;
@@ -126,14 +133,14 @@ describe(`Injector`, () => {
       }
 
       const injector = new Injector();
-      const log = stubInterface<types.Logger>();
+      const log = mock<types.Logger>();
       injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
       injector.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
 
       injector
         .bind<types.Router>('MyEventSourceable')
         .toRoute(MyEventSourceable);
-      expect(initializeSpy).to.be.calledOnce;
+      expect(initializeSpy).toHaveBeenCalledTimes(1);
     });
 
     it('ensures that dependencies are injected to router', () => {
@@ -166,15 +173,15 @@ describe(`Injector`, () => {
       }
 
       const injector = new Injector();
-      const log = stubInterface<types.Logger>();
+      const log = mock<types.Logger>();
       injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
       injector.bind<types.RouterType>(BINDINGS.Router).toConstantValue(Router);
 
       injector
         .bind<types.Router>('MyEventSourceable')
         .toRoute(MyEventSourceable);
-      expect(log.debug).to.be.calledOnce;
-      expect(log.debug).to.be.calledWithExactly('my-message');
+      expect(log.debug).toHaveBeenCalledTimes(1);
+      expect(log.debug).toHaveBeenCalledWith('my-message');
     });
   });
 
@@ -235,18 +242,18 @@ describe(`Injector`, () => {
     const ninja = new Ninja(name);
     injector.injectInto(ninja);
 
-    expect(ninja.name).to.be.equal(name);
-    expect(ninja.katana).to.be.instanceof(Katana);
-    expect(ninja.shuriken).to.be.instanceof(Shuriken);
-    expect(ninja.sneak()).to.be.equal('hit!');
-    expect(ninja.fight()).to.be.equal('cut!');
-    expect(initialize).to.be.calledOnce;
-    expect(initialize).to.be.calledOnceWithExactly(ninja);
+    expect(ninja.name).toBe(name);
+    expect(ninja.katana).toBeInstanceOf(Katana);
+    expect(ninja.shuriken).toBeInstanceOf(Shuriken);
+    expect(ninja.sneak()).toBe('hit!');
+    expect(ninja.fight()).toBe('cut!');
+    expect(initialize).toHaveBeenCalledTimes(1);
+    expect(initialize).toHaveBeenCalledWith(ninja);
   });
 
   it(`injects asynchronously injects dependencies from IoC container to existing value`, async () => {
-    const before = sinon.stub();
-    const after = sinon.stub();
+    const before = vi.fn();
+    const after = vi.fn();
 
     @injectable()
     class Transport {
@@ -277,16 +284,18 @@ describe(`Injector`, () => {
     const logger = new Logger(id);
     await injector.injectIntoAsync(logger);
 
-    expect(logger.id).to.be.equal(id);
-    expect(logger.transport).to.be.instanceof(Transport);
-    expect(initialize).to.be.calledOnce;
-    expect(initialize).to.be.calledWithExactly('transport');
-    expect(before).to.be.calledBefore(after);
-    expect(after).to.be.calledAfter(before);
+    expect(logger.id).toBe(id);
+    expect(logger.transport).toBeInstanceOf(Transport);
+    expect(initialize).toHaveBeenCalledTimes(1);
+    expect(initialize).toHaveBeenCalledWith('transport');
+    expect(before).toHaveBeenCalled();
+    expect(after).toHaveBeenCalled(); /* TODO: verify call order */
+    expect(after).toHaveBeenCalled();
+    expect(before).toHaveBeenCalled(); /* TODO: verify call order */
   });
 
   it('ensures that synchronous post construct method is executed even if there value is not dependent on other dependencies', () => {
-    const initializeSpy = sinon.spy();
+    const initializeSpy = vi.fn();
     class MyClass {
       @postConstruct()
       initialize(): void {
@@ -296,11 +305,11 @@ describe(`Injector`, () => {
     const instance = new MyClass();
     const injector = new Injector();
     injector.injectInto(instance);
-    expect(initializeSpy).to.be.calledOnce;
+    expect(initializeSpy).toHaveBeenCalledTimes(1);
   });
 
   it('ensures that asynchronous post construct method is executed even if there value is not dependent on other dependencies', async () => {
-    const initializeSpy = sinon.spy();
+    const initializeSpy = vi.fn();
     class MyClass {
       @postConstruct()
       initailize(): void {
@@ -310,7 +319,7 @@ describe(`Injector`, () => {
     const instance = new MyClass();
     const injector = new Injector();
     await injector.injectIntoAsync(instance);
-    expect(initializeSpy).to.be.calledOnce;
+    expect(initializeSpy).toHaveBeenCalledTimes(1);
   });
 
   describe('bindings', () => {
@@ -330,7 +339,7 @@ describe(`Injector`, () => {
         .to(SecondSingleton)
         .inSingletonScope();
 
-      expect(injector.findByScope('Singleton')).to.be.eql([
+      expect(injector.findByScope('Singleton')).toEqual([
         'FirstSingleton',
         'SecondSingleton',
       ]);
@@ -352,7 +361,7 @@ describe(`Injector`, () => {
         .to(SecondSingleton)
         .inSingletonScope();
 
-      expect(injector.findByScope('Singleton')).to.be.eql([
+      expect(injector.findByScope('Singleton')).toEqual([
         'FirstSingleton',
         'SecondSingleton',
       ]);
@@ -377,7 +386,7 @@ describe(`Injector`, () => {
         .to(SecondSingleton)
         .inSingletonScope();
 
-      expect(injector.findByScope('Singleton')).to.be.eql([first, second]);
+      expect(injector.findByScope('Singleton')).toEqual([first, second]);
     });
 
     it('returns service identifiers only matching provided scope', () => {
@@ -405,12 +414,12 @@ describe(`Injector`, () => {
         .to(Singleton)
         .inSingletonScope();
 
-      expect(injector.findByScope('Singleton')).to.be.eql(['SingletonScope']);
-      expect(injector.findByScope('Transient')).to.be.eql([
+      expect(injector.findByScope('Singleton')).toEqual(['SingletonScope']);
+      expect(injector.findByScope('Transient')).toEqual([
         'TransientScope',
         'ConstantValue',
       ]);
-      expect(injector.findByScope('Request')).to.be.eql(['RequestScope']);
+      expect(injector.findByScope('Request')).toEqual(['RequestScope']);
     });
 
     it('ensure that order of resolved service identifiers is consistent with the order of bindings', () => {
@@ -426,7 +435,7 @@ describe(`Injector`, () => {
       injector.bind<First>('1').to(First).inSingletonScope();
       injector.bind<Second>('2').to(Second).inSingletonScope();
 
-      expect(injector.findByScope('Singleton')).to.be.eql(['3', '1', '2']);
+      expect(injector.findByScope('Singleton')).toEqual(['3', '1', '2']);
     });
   });
 

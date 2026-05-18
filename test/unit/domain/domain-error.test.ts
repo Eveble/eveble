@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import { Type } from '@eveble/core';
 import { DomainError } from '../../../src/domain/domain-error';
 import { SerializableError } from '../../../src/components/serializable-error';
@@ -9,17 +10,18 @@ describe('DomainError', () => {
   class MyDomainError extends DomainError {}
 
   it(`extends SerializableError`, () => {
-    expect(DomainError.prototype).to.be.instanceof(SerializableError);
+    expect(DomainError.prototype).toBeInstanceOf(SerializableError);
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(DomainError.prototype)).to.be.true;
+    expect(isTyped(DomainError.prototype)).toBe(true);
   });
 
   it('defines its serializable type name correctly', () => {
-    expect(DomainError.getTypeName()).to.equal('DomainError');
-    expect(new MyDomainError('my-error').getTypeName()).to.equal(
+    expect(DomainError.getTypeName()).toBe('DomainError');
+    expect(new MyDomainError('my-error').getTypeName()).toBe(
       'MyDomainError'
     );
   });
 });
+

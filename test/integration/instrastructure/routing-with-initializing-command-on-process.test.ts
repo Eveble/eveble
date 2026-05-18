@@ -1,8 +1,14 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
-import { stubInterface } from 'ts-sinon';
+import { mock } from 'vitest-mock-extended';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 import { Collection } from 'mongodb';
 import { kernel } from '@eveble/core';
 import { CommitPublisher } from '../../../src/infrastructure/commit-publisher';
@@ -53,9 +59,6 @@ import { CommandBus } from '../../../src/messaging/command-bus';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-
 describe(`Routing with initializing Command on Process`, () => {
   class TaskListRouter extends Router {
     EventSourceableType = TaskList;
@@ -93,8 +96,8 @@ describe(`Routing with initializing Command on Process`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -103,12 +106,12 @@ describe(`Routing with initializing Command on Process`, () => {
 
   const setupDefaultConfiguration = function (): void {
     // Config.prototype.get
-    config.get.withArgs('appId').returns(appId);
-    config.get.withArgs('workerId').returns(workerId);
-    config.get.withArgs('eveble.commitStore.timeout').returns(60);
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(1);
+    config.get.calledWith('appId').mockReturnValue(appId);
+    config.get.calledWith('workerId').mockReturnValue(workerId);
+    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(60);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
     // Config.prototype.has
-    config.has.withArgs('eveble.Snapshotter.frequency').returns(true);
+    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(true);
   };
 
   const setupEvebleDependencies = function (): void {
@@ -200,7 +203,7 @@ describe(`Routing with initializing Command on Process`, () => {
     kernel.setSerializer(serializer);
   };
 
-  before(async () => {
+  beforeAll(async () => {
     setupInjector();
     await setupCommitStoreMongo(injector, clients, collections);
     await setupSnapshotterMongo(injector, clients, collections);
@@ -221,7 +224,7 @@ describe(`Routing with initializing Command on Process`, () => {
     await collections.snapshotter.deleteMany({});
   });
 
-  after(async () => {
+  afterAll(async () => {
     await clients.commitStore.disconnect();
     await clients.snapshotter.disconnect();
 
@@ -233,7 +236,7 @@ describe(`Routing with initializing Command on Process`, () => {
   Testing against CancelingEmployment process
   */
   it('handles routing with initializing Command to process', async () => {
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(3);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(3);
 
     /*
       [!] Since assigning list to employee is connected between two aggregates, this should be also a process(for simplicity sake omit this concept here)
@@ -304,27 +307,27 @@ describe(`Routing with initializing Command on Process`, () => {
       employeeId
     )) as Employee;
     expect(foundEmployee).to.be.an.instanceof(Employee);
-    expect(foundEmployee.getState()).to.be.equal(Employee.STATES.terminated);
+    expect(foundEmployee.getState()).toBe(Employee.STATES.terminated);
 
     const foundFirstTaskList = (await repository.find(
       TaskList,
       firstTaskListId
     )) as TaskList;
     expect(foundFirstTaskList).to.be.an.instanceof(TaskList);
-    expect(foundFirstTaskList.getState()).to.be.equal(TaskList.STATES.closed);
+    expect(foundFirstTaskList.getState()).toBe(TaskList.STATES.closed);
 
     const foundSecondTaskList = (await repository.find(
       TaskList,
       secondTaskListId
     )) as TaskList;
     expect(foundSecondTaskList).to.be.an.instanceof(TaskList);
-    expect(foundSecondTaskList.getState()).to.be.equal(TaskList.STATES.closed);
+    expect(foundSecondTaskList.getState()).toBe(TaskList.STATES.closed);
   });
 
   it('throws DomainError on initializing Command handler on Process', async () => {
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(3);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(3);
 
-    const domainExceptionHandler = sinon.stub();
+    const domainExceptionHandler = vi.fn();
     eventBus.registerHandler(DomainException, domainExceptionHandler);
 
     // This id triggers CancelingEmploymentUnavailableForEmployee error on CancelingEmployment process
@@ -336,37 +339,35 @@ describe(`Routing with initializing Command on Process`, () => {
       employeeId,
     });
 
-    await expect(
-      commandBus.handle(cancelEmployment)
-    ).to.eventually.be.rejectedWith(
+    await expect(commandBus.handle(cancelEmployment)).rejects.toThrow(
       CancelingEmploymentUnavailableForEmployee,
       `Canceling employment for employee with id '${employeeId}' is unavailable`
     );
 
     await expect(
       repository.find(CancelingEmployment, processId)
-    ).to.eventually.be.rejectedWith(
+    ).rejects.toThrow(
       EventsNotFoundError,
       `No events found for event sourceable 'CancelingEmployment' with id '${processId}'`
     );
 
     // Since error is happening directly on initializing Event handler on CancelingEmployment process,
     // process will be never saved - so there is no requirement to evaluate the state of the process
-    const domainException = domainExceptionHandler.getCall(0).args[0];
-    expect(domainException).to.be.instanceof(DomainException);
-    expect(domainException.thrower).to.be.equal('CancelingEmployment');
-    expect(domainException.error).to.be.instanceof(
+    const domainException = domainExceptionHandler.mock.calls[0][0];
+    expect(domainException).toBeInstanceOf(DomainException);
+    expect(domainException.thrower).toBe('CancelingEmployment');
+    expect(domainException.error).toBeInstanceOf(
       CancelingEmploymentUnavailableForEmployee
     );
-    expect(domainException.error).to.be.eql(
+    expect(domainException.error).toEqual(
       new CancelingEmploymentUnavailableForEmployee(employeeId.toString())
     );
   });
 
   it('throws DomainError on Command handler triggered by process and publishes DomainException', async () => {
-    config.get.withArgs('eveble.Snapshotter.frequency').returns(3);
+    config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(3);
 
-    const domainExceptionHandler = sinon.stub();
+    const domainExceptionHandler = vi.fn();
     eventBus.registerHandler(DomainException, domainExceptionHandler);
 
     const employeeId = new Guid();
@@ -387,9 +388,7 @@ describe(`Routing with initializing Command on Process`, () => {
 
     await commandBus.handle(createEmployee);
     await commandBus.handle(terminateEmployee);
-    await expect(
-      commandBus.handle(cancelEmployment)
-    ).to.eventually.be.rejectedWith(
+    await expect(commandBus.handle(cancelEmployment)).rejects.toThrow(
       EmployeeAlreadyTerminatedError,
       `Can't terminate already terminated employee with id '${employeeId}'`
     );
@@ -398,20 +397,18 @@ describe(`Routing with initializing Command on Process`, () => {
       CancelingEmployment,
       processId
     )) as CancelingEmployment;
-    expect(foundCancelingEmploymentProcess).to.be.instanceof(
-      CancelingEmployment
-    );
-    expect(foundCancelingEmploymentProcess.getState()).to.be.equal(
+    expect(foundCancelingEmploymentProcess).toBeInstanceOf(CancelingEmployment);
+    expect(foundCancelingEmploymentProcess.getState()).toBe(
       CancelingEmployment.STATES.failed
     );
 
-    const domainException = domainExceptionHandler.getCall(0).args[0];
-    expect(domainException).to.be.instanceof(DomainException);
-    expect(domainException.thrower).to.be.equal('Employee');
-    expect(domainException.error).to.be.instanceof(
+    const domainException = domainExceptionHandler.mock.calls[0][0];
+    expect(domainException).toBeInstanceOf(DomainException);
+    expect(domainException.thrower).toBe('Employee');
+    expect(domainException.error).toBeInstanceOf(
       EmployeeAlreadyTerminatedError
     );
-    expect(domainException.error).to.be.eql(
+    expect(domainException.error).toEqual(
       new EmployeeAlreadyTerminatedError(employeeId.toString())
     );
   });

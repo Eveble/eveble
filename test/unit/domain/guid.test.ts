@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import { expect, describe, it } from 'vitest';
+
 import {
   Guid,
   InvalidGuidValueError,
@@ -8,36 +9,36 @@ import { isTyped } from '../../../src/utils/helpers';
 
 describe('Guid', () => {
   it(`extends ValueObject`, () => {
-    expect(Guid.prototype).to.be.instanceof(ValueObject);
+    expect(Guid.prototype).toBeInstanceOf(ValueObject);
   });
 
   describe(`immutability`, () => {
     it(`freezes itself`, () => {
-      expect(Object.isFrozen(new Guid())).to.be.true;
+      expect(Object.isFrozen(new Guid())).toBe(true);
     });
   });
 
   it('ensures that type is defined', () => {
-    expect(isTyped(Guid.prototype)).to.be.true;
+    expect(isTyped(Guid.prototype)).toBe(true);
   });
 
   it('defines the type name correctly', () => {
-    expect(Guid.getTypeName()).to.equal('Guid');
-    expect(Guid.prototype.getTypeName()).to.equal('Guid');
+    expect(Guid.getTypeName()).toBe('Guid');
+    expect(Guid.prototype.getTypeName()).toBe('Guid');
   });
 
   describe('construction', () => {
     it('generates a globally unique id if id is not passed on construction', () => {
       const guid = new Guid();
-      expect(guid.valueOf()).to.match(Guid.pattern);
-      expect(guid.toString()).to.match(Guid.pattern);
+      expect(guid.valueOf()).toMatch(Guid.pattern);
+      expect(guid.toString()).toMatch(Guid.pattern);
     });
 
     it('takes an optional id as a string matching pattern and assigns it', () => {
       const id = '936DA01F-9ABD-4D9D-80C7-02AF85C822A8';
       const guid = new Guid(id);
-      expect(guid.valueOf()).to.equal(id);
-      expect(guid.toString()).to.equal(id);
+      expect(guid.valueOf()).toBe(id);
+      expect(guid.toString()).toBe(id);
     });
 
     it('takes an object with id property as a string matching pattern and assigns it', () => {
@@ -45,15 +46,15 @@ describe('Guid', () => {
       const guid = new Guid({
         id,
       });
-      expect(guid.valueOf()).to.equal(id);
-      expect(guid.toString()).to.equal(id);
+      expect(guid.valueOf()).toBe(id);
+      expect(guid.toString()).toBe(id);
     });
 
     it('throws InvalidGuidValueError when passed id is not matching pattern', () => {
       const invalidValue = '1234';
       expect(() => {
         new Guid(invalidValue);
-      }).to.throw(
+      }).toThrow(
         InvalidGuidValueError,
         `Guid: Expected string as a valid guid, got String("1234")`
       );
@@ -76,15 +77,16 @@ describe('Guid', () => {
 
   describe(`evaluation`, () => {
     it(`returns true if id is matching settable pattern(UUID v4 at the time)`, () => {
-      expect(Guid.isValid('110ec58a-a0f2-4ac4-8393-c866d813b8d1')).to.be.true;
+      expect(Guid.isValid('110ec58a-a0f2-4ac4-8393-c866d813b8d1')).toBe(true);
     });
 
     it(`returns false if value is not matching settable pattern(UUID v4 at the time)`, () => {
-      expect(Guid.isValid('im-totally-a-guid')).to.be.false;
+      expect(Guid.isValid('im-totally-a-guid')).toBe(false);
     });
 
     it(`returns false if value is not provided`, () => {
-      expect(Guid.isValid(1234 as any as string)).to.be.false;
+      expect(Guid.isValid(1234 as any as string)).toBe(false);
     });
   });
 });
+

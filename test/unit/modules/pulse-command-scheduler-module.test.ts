@@ -1,9 +1,8 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import sinonChai from 'sinon-chai';
-import sinon from 'sinon';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, vi } from 'vitest';
+
 import { Collection, MongoClient as MongoClientOriginal, Db } from 'mongodb';
-import { stubInterface } from 'ts-sinon';
+
 import getenv from 'getenv';
 import PulseOriginal from '@pulsecron/pulse';
 import { PulseCommandSchedulerModule } from '../../../src/app/modules/pulse-command-scheduler-module';
@@ -20,9 +19,6 @@ import { AppConfig } from '../../../src/configs/app-config';
 import { Log } from '../../../src/components/log-entry';
 import { Module } from '../../../src/core/module';
 import { PulseClient } from '../../../src/app/clients/pulse-client';
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 describe(`PulseCommandSchedulerModule`, () => {
   // Props
@@ -46,8 +42,8 @@ describe(`PulseCommandSchedulerModule`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -55,41 +51,40 @@ describe(`PulseCommandSchedulerModule`, () => {
   };
 
   const setupConfig = function (): void {
-    config.get.withArgs('clients.MongoDB.CommandScheduler').returns({
+    config.get.calledWith('clients.MongoDB.CommandScheduler').mockReturnValue({
       useUnifiedTopology: true,
       useNewUrlParser: true,
     });
-    config.get.withArgs('clients.Pulse.CommandScheduler').returns({
+    config.get.calledWith('clients.Pulse.CommandScheduler').mockReturnValue({
       processEvery: '1 seconds',
     });
   };
 
-  const setupMongo = function (): void {
-    MongoClient = sinon.stub();
-    mongoClientInstance = stubInterface<MongoClientOriginal>();
-    commandSchedulerCollection = stubInterface<Collection<any>>();
-    db = stubInterface<Db>();
+  const setupPulse = function (): void {
+    Pulse = vi.fn();
+    pulseInstance = mock<PulseOriginal>();
+    Pulse.mockImplementation(function() { return pulseInstance; });
+    injector.bind<PulseOriginal>(BINDINGS.Pulse.library).toConstantValue(Pulse);
+  };
 
-    MongoClient.returns(mongoClientInstance);
-    mongoClientInstance.db.returns(db);
-    db.collection.returns(commandSchedulerCollection);
+  const setupMongo = function (): void {
+    MongoClient = vi.fn();
+    mongoClientInstance = mock<MongoClientOriginal>();
+    commandSchedulerCollection = mock<Collection<any>>();
+    db = mock<Db>();
+
+    MongoClient.mockImplementation(function() { return mongoClientInstance; });
+    mongoClientInstance.db.mockReturnValue(db);
+    mongoClientInstance.isConnected.mockReturnValue(false);
+    db.collection.mockReturnValue(commandSchedulerCollection);
 
     injector
       .bind<MongoClientOriginal>(BINDINGS.MongoDB.library)
       .toConstantValue(MongoClient);
   };
 
-  const setupPulse = function (): void {
-    Pulse = sinon.stub();
-    pulseInstance = stubInterface<PulseOriginal>();
-
-    Pulse.returns(pulseInstance);
-
-    injector.bind<PulseOriginal>(BINDINGS.Pulse.library).toConstantValue(Pulse);
-  };
-
   const setupApp = function (): void {
-    app = stubInterface<types.App>();
+    app = mock<types.App>();
     app.config = appConfig;
   };
 
@@ -100,31 +95,23 @@ describe(`PulseCommandSchedulerModule`, () => {
     setupConfig();
     setupApp();
 
-    // Set up environment variables via sinon stubs
-    sinon
-      .stub(process.env, 'EVEBLE_COMMAND_SCHEDULER_MONGODB_URL')
-      .value('mongodb://localhost:27017');
-    sinon
-      .stub(process.env, 'EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL')
-      .value('false');
-    sinon
-      .stub(process.env, 'EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME')
-      .value(getDatabaseName('scheduler'));
-    sinon
-      .stub(process.env, 'EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION')
-      .value(getCollectionName('scheduler'));
-    sinon.stub(process.env, 'EVEBLE_COMMAND_SCHEDULER_INTERVAL').value('1000');
+    // Set up environment variables
+    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_URL', 'mongodb://localhost:27017');
+    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL', 'false');
+    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME', getDatabaseName('scheduler'));
+    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION', getCollectionName('scheduler'));
+    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_INTERVAL', '1000');
 
     // Create module instance
     injector.injectInto(module);
   });
 
   afterEach(() => {
-    sinon.restore();
+    vi.restoreAllMocks();
   });
 
   it(`extends Module`, () => {
-    expect(PulseCommandSchedulerModule.prototype).to.be.instanceof(Module);
+    expect(PulseCommandSchedulerModule.prototype).toBeInstanceOf(Module);
   });
 
   describe('initialization', () => {
@@ -135,7 +122,7 @@ describe(`PulseCommandSchedulerModule`, () => {
       const jobTransformer = injector.get<types.PulseJobTransformer>(
         BINDINGS.Pulse.jobTransformer
       );
-      expect(jobTransformer).to.be.instanceof(PulseScheduledJobTransformer);
+      expect(jobTransformer).toBeInstanceOf(PulseScheduledJobTransformer);
     });
 
     describe('MongoDB client initialization', () => {
@@ -148,19 +135,19 @@ describe(`PulseCommandSchedulerModule`, () => {
         const mongodbClient = injector.get<MongoDBClient>(
           BINDINGS.MongoDB.clients.CommandScheduler
         );
-        expect(mongodbClient).to.be.instanceof(MongoDBClient);
+        expect(mongodbClient).toBeInstanceOf(MongoDBClient);
 
         const url = getenv.string(`EVEBLE_COMMAND_SCHEDULER_MONGODB_URL`);
         const options = {
           ssl: getenv.bool(`EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL`),
         };
 
-        expect(MongoClient).to.be.calledWithNew;
-        expect(MongoClient).to.be.calledWithExactly(url, {
+        expect(MongoClient).toHaveBeenCalledTimes(1);
+        expect(MongoClient).toHaveBeenCalledWith(url, {
           ...options,
         });
-        expect(mongodbClient.url).to.be.equal(url);
-        expect(mongodbClient.options).to.be.eql({
+        expect(mongodbClient.url).toBe(url);
+        expect(mongodbClient.options).toEqual({
           ssl: getenv.bool(`EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL`),
         });
       });
@@ -170,7 +157,7 @@ describe(`PulseCommandSchedulerModule`, () => {
           noDelay: true,
           keepAlive: true,
         };
-        const customApp = stubInterface<types.App>();
+        const customApp = mock<types.App>();
         customApp.config = new AppConfig({
           appId: 'my-app-id',
           clients: {
@@ -189,7 +176,7 @@ describe(`PulseCommandSchedulerModule`, () => {
           BINDINGS.MongoDB.clients.CommandScheduler
         );
 
-        expect(mongodbClient.options).to.be.eql({
+        expect(mongodbClient.options).toEqual({
           noDelay: true,
           keepAlive: true,
           ssl: getenv.bool(`EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL`),
@@ -201,7 +188,7 @@ describe(`PulseCommandSchedulerModule`, () => {
           injector,
         });
         await module.initialize(app, injector);
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(`bound 'MongoDB.clients.CommandScheduler' as constant value`)
             .on(module)
             .in('initializeMongoDBClientForCommandScheduler')
@@ -213,7 +200,7 @@ describe(`PulseCommandSchedulerModule`, () => {
           injector,
         });
         await module.initialize(app, injector);
-        expect(log.debug).to.be.calledWithExactly(
+        expect(log.debug).toHaveBeenCalledWith(
           new Log(
             `bound 'MongoDB.collections.CommandScheduler' as constant value`
           )
@@ -237,11 +224,11 @@ describe(`PulseCommandSchedulerModule`, () => {
         const collection = injector.get<Collection<any>>(
           BINDINGS.MongoDB.collections.ScheduledCommands
         );
-        expect(collection).to.be.equal(commandSchedulerCollection);
-        expect(mongoClientInstance.db).to.be.calledTwice;
-        expect(mongoClientInstance.db).to.be.calledWithExactly(databaseName);
-        expect(db.collection).to.be.calledOnce;
-        expect(db.collection).to.be.calledWithExactly(collectionName);
+        expect(collection).toBe(commandSchedulerCollection);
+        expect(mongoClientInstance.db).toHaveBeenCalledTimes(2);
+        expect(mongoClientInstance.db).toHaveBeenCalledWith(databaseName);
+        expect(db.collection).toHaveBeenCalledTimes(1);
+        expect(db.collection).toHaveBeenCalledWith(collectionName);
       });
     });
   });
@@ -269,7 +256,7 @@ describe(`PulseCommandSchedulerModule`, () => {
       const agendaClient = injector.get<types.CommandScheduler>(
         BINDINGS.Pulse.clients.CommandScheduler
       );
-      expect(agendaClient.isInState(PulseClient.STATES.initialized)).to.be.true;
+      expect(agendaClient.isInState(PulseClient.STATES.initialized)).toBe(true);
     });
   });
 
@@ -284,7 +271,7 @@ describe(`PulseCommandSchedulerModule`, () => {
       const agendaClient = injector.get<types.CommandScheduler>(
         BINDINGS.Pulse.clients.CommandScheduler
       );
-      expect(agendaClient.isInState(PulseClient.STATES.connected)).to.be.true;
+      expect(agendaClient.isInState(PulseClient.STATES.connected)).toBe(true);
     });
 
     it('re-connects Pulse client', async () => {
@@ -293,15 +280,15 @@ describe(`PulseCommandSchedulerModule`, () => {
       });
       await module.initialize(app, injector);
       await module.start();
-      mongoClientInstance.isConnected.returns(true);
+      mongoClientInstance.isConnected.mockReturnValue(true);
       await module.stop();
-      mongoClientInstance.isConnected.returns(false);
+      mongoClientInstance.isConnected.mockReturnValue(false);
       await module.start();
 
       const agendaClient = injector.get<types.CommandScheduler>(
         BINDINGS.Pulse.clients.CommandScheduler
       );
-      expect(agendaClient.isInState(PulseClient.STATES.connected)).to.be.true;
+      expect(agendaClient.isInState(PulseClient.STATES.connected)).toBe(true);
     });
   });
 
@@ -312,13 +299,13 @@ describe(`PulseCommandSchedulerModule`, () => {
       });
       await module.initialize(app, injector);
       await module.start();
-      mongoClientInstance.isConnected.returns(true);
+      mongoClientInstance.isConnected.mockReturnValue(true);
       await module.stop();
 
       const agendaClient = injector.get<types.CommandScheduler>(
         BINDINGS.Pulse.clients.CommandScheduler
       );
-      expect(agendaClient.isInState(PulseClient.STATES.stopped)).to.be.true;
+      expect(agendaClient.isInState(PulseClient.STATES.stopped)).toBe(true);
     });
   });
 
@@ -329,7 +316,7 @@ describe(`PulseCommandSchedulerModule`, () => {
       });
       await module.initialize(app, injector);
       await module.start();
-      mongoClientInstance.isConnected.returns(true);
+      mongoClientInstance.isConnected.mockReturnValue(true);
       await module.shutdown();
 
       const agendaClient = injector.get<types.CommandScheduler>(
@@ -340,3 +327,4 @@ describe(`PulseCommandSchedulerModule`, () => {
     });
   });
 });
+

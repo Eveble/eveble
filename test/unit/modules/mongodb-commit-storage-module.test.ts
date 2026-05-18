@@ -1,8 +1,8 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, vi } from 'vitest';
+
 import getenv from 'getenv';
-import { stubInterface } from 'ts-sinon';
+
 import { MongoClient as MongoClientOriginal, Collection, Db } from 'mongodb';
 import { AppConfig } from '../../../src/configs/app-config';
 import {
@@ -19,8 +19,6 @@ import { Module } from '../../../src/core/module';
 import { Log } from '../../../src/components/log-entry';
 import { CommitMongoDBStorage } from '../../../src/infrastructure/storages/commit-mongodb-storage';
 import { CommitMongoDBObserver } from '../../../src/infrastructure/storages/commit-mongodb-observer';
-
-chai.use(sinonChai);
 
 describe(`MongoDBCommitStorageModule`, () => {
   // Props
@@ -42,9 +40,9 @@ describe(`MongoDBCommitStorageModule`, () => {
 
   const setupInjector = function (): void {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
-    serializer = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
+    serializer = mock<types.Configurable>();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
@@ -55,14 +53,14 @@ describe(`MongoDBCommitStorageModule`, () => {
   };
 
   const setupMongo = function (): void {
-    MongoClient = sinon.stub();
-    mongoClientInstance = stubInterface<MongoClientOriginal>();
-    commitsCollection = stubInterface<Collection<any>>();
-    db = stubInterface<Db>();
+    MongoClient = vi.fn();
+    mongoClientInstance = mock<MongoClientOriginal>();
+    commitsCollection = mock<Collection<any>>();
+    db = mock<Db>();
 
-    MongoClient.returns(mongoClientInstance);
-    mongoClientInstance.db.returns(db);
-    db.collection.returns(commitsCollection);
+    MongoClient.mockImplementation(function() { return mongoClientInstance; });
+    mongoClientInstance.db.mockReturnValue(db);
+    db.collection.mockReturnValue(commitsCollection);
 
     injector
       .bind<MongoClientOriginal>(BINDINGS.MongoDB.library)
@@ -70,7 +68,7 @@ describe(`MongoDBCommitStorageModule`, () => {
   };
 
   const setupApp = function (): void {
-    app = stubInterface<types.App>();
+    app = mock<types.App>();
     app.config = appConfig;
   };
 
@@ -81,7 +79,7 @@ describe(`MongoDBCommitStorageModule`, () => {
   });
 
   it(`extends Module`, () => {
-    expect(MongoDBCommitStorageModule.prototype).to.be.instanceof(Module);
+    expect(MongoDBCommitStorageModule.prototype).toBeInstanceOf(Module);
   });
 
   describe('before initialization', () => {
@@ -94,8 +92,8 @@ describe(`MongoDBCommitStorageModule`, () => {
       const mongodbClient = await injector.getAsync<MongoDBClient>(
         BINDINGS.MongoDB.clients.CommitStore
       );
-      expect(mongodbClient).to.be.instanceof(MongoDBClient);
-      expect(MongoClient).to.be.calledWithNew;
+      expect(mongodbClient).toBeInstanceOf(MongoDBClient);
+      expect(MongoClient).toHaveBeenCalledTimes(1);
 
       const url = getenv.string(`EVEBLE_COMMITSTORE_MONGODB_URL`);
       const expectedDommitsCollection = new MongoDBCollectionConfig({
@@ -127,12 +125,12 @@ describe(`MongoDBCommitStorageModule`, () => {
         name: getenv.string('EVEBLE_COMMITSTORE_MONGODB_DBNAME'),
         collections: [expectedDommitsCollection],
       });
-      expect(mongodbClient.url).to.be.equal(url);
-      expect(mongodbClient.options).to.be.eql({
+      expect(mongodbClient.url).toBe(url);
+      expect(mongodbClient.options).toEqual({
         ...MongoDBClient.defaultOptions,
         ssl: getenv.bool(`EVEBLE_COMMITSTORE_MONGODB_SSL`),
       });
-      expect(mongodbClient.databases).to.be.eql([expectedDatabase]);
+      expect(mongodbClient.databases).toEqual([expectedDatabase]);
     });
 
     it('initializes MongoDB client with custom options set on app configuration', async () => {
@@ -140,7 +138,7 @@ describe(`MongoDBCommitStorageModule`, () => {
         noDelay: true,
         keepAlive: true,
       };
-      const customApp = stubInterface<types.App>();
+      const customApp = mock<types.App>();
       customApp.config = new AppConfig({
         appId: 'my-app-id',
         clients: {
@@ -158,7 +156,7 @@ describe(`MongoDBCommitStorageModule`, () => {
       const mongodbClient = await injector.getAsync<MongoDBClient>(
         BINDINGS.MongoDB.clients.CommitStore
       );
-      expect(mongodbClient.options).to.be.eql({
+      expect(mongodbClient.options).toEqual({
         ...MongoDBClient.defaultOptions,
         noDelay: true,
         keepAlive: true,
@@ -171,7 +169,7 @@ describe(`MongoDBCommitStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`bound 'MongoDB.clients.CommitStore' as constant value`)
           .on(module)
           .in('initializeClientForCommitStorage')
@@ -183,7 +181,7 @@ describe(`MongoDBCommitStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(`bound 'MongoDB.collections.Commits' as constant value`)
           .on(module)
           .in('initializeClientForCommitStorage')
@@ -203,11 +201,11 @@ describe(`MongoDBCommitStorageModule`, () => {
       const collection = await injector.get(
         BINDINGS.MongoDB.collections.Commits
       );
-      expect(collection).to.be.equal(commitsCollection);
-      expect(mongoClientInstance.db).to.be.calledTwice;
-      expect(mongoClientInstance.db).to.be.calledWithExactly(databaseName);
-      expect(db.collection).to.be.calledTwice;
-      expect(db.collection).to.be.calledWithExactly(collectionName);
+      expect(collection).toBe(commitsCollection);
+      expect(mongoClientInstance.db).toHaveBeenCalledTimes(2);
+      expect(mongoClientInstance.db).toHaveBeenCalledWith(databaseName);
+      expect(db.collection).toHaveBeenCalledTimes(2);
+      expect(db.collection).toHaveBeenCalledWith(collectionName);
     });
 
     it('bounds CommitSerializer to singleton on injector', async () => {
@@ -216,9 +214,9 @@ describe(`MongoDBCommitStorageModule`, () => {
       });
       await module.initialize(app, injector);
 
-      expect(injector.isBound(BINDINGS.CommitSerializer)).to.be.true;
+      expect(injector.isBound(BINDINGS.CommitSerializer)).toBe(true);
       const commitSerializer = await injector.get(BINDINGS.CommitSerializer);
-      expect(commitSerializer).to.be.instanceof(CommitSerializer);
+      expect(commitSerializer).toBeInstanceOf(CommitSerializer);
     });
 
     it('logs bounding CommitSerializer on injector', async () => {
@@ -226,7 +224,7 @@ describe(`MongoDBCommitStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(
           `bound 'CommitSerializer' to 'CommitSerializer' in singleton scope`
         )
@@ -241,9 +239,9 @@ describe(`MongoDBCommitStorageModule`, () => {
       });
       await module.initialize(app, injector);
 
-      expect(injector.isBound(BINDINGS.CommitStorage)).to.be.true;
+      expect(injector.isBound(BINDINGS.CommitStorage)).toBe(true);
       const commitStorage = await injector.get(BINDINGS.CommitStorage);
-      expect(commitStorage).to.be.instanceof(CommitMongoDBStorage);
+      expect(commitStorage).toBeInstanceOf(CommitMongoDBStorage);
     });
 
     it('logs bounding CommitStorage on injector', async () => {
@@ -251,7 +249,7 @@ describe(`MongoDBCommitStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(
           `bound 'CommitStorage' to 'CommitMongoDBStorage' in singleton scope`
         )
@@ -266,9 +264,9 @@ describe(`MongoDBCommitStorageModule`, () => {
       });
       await module.initialize(app, injector);
 
-      expect(injector.isBound(BINDINGS.CommitObserver)).to.be.true;
+      expect(injector.isBound(BINDINGS.CommitObserver)).toBe(true);
       const commitObserver = await injector.get(BINDINGS.CommitObserver);
-      expect(commitObserver).to.be.instanceof(CommitMongoDBObserver);
+      expect(commitObserver).toBeInstanceOf(CommitMongoDBObserver);
     });
 
     it('logs bounding CommitObserver on injector', async () => {
@@ -276,7 +274,7 @@ describe(`MongoDBCommitStorageModule`, () => {
         injector,
       });
       await module.initialize(app, injector);
-      expect(log.debug).to.be.calledWithExactly(
+      expect(log.debug).toHaveBeenCalledWith(
         new Log(
           `bound 'CommitObserver' to 'CommitMongoDBObserver' in singleton scope`
         )
@@ -326,7 +324,7 @@ describe(`MongoDBCommitStorageModule`, () => {
       await module.initialize(app, injector);
       await module.start();
       await module.stop();
-      mongoClientInstance.isConnected.returns(true);
+      mongoClientInstance.isConnected.mockReturnValue(true);
       await module.shutdown();
 
       const mongodbClient = await injector.getAsync<MongoDBClient>(
@@ -337,3 +335,4 @@ describe(`MongoDBCommitStorageModule`, () => {
     });
   });
 });
+

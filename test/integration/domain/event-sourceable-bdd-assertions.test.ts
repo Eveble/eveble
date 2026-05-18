@@ -1,5 +1,5 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { expect, describe, it, beforeEach, afterEach, beforeAll } from 'vitest';
+
 import { kernel } from '@eveble/core';
 import { Injector } from '../../../src/core/injector';
 import { Guid } from '../../../src/domain/value-objects/guid';
@@ -24,13 +24,11 @@ import {
 } from '../../domains/task-list/task-list';
 import { AbilityAssertion } from '../../../src/domain/assertions/ability-assertion';
 
-chai.use(chaiAsPromised);
-
 describe(`EventSourceable BDD assertions`, () => {
   let injector: Injector;
   let asserter: Asserter;
 
-  before(() => {
+  beforeAll(() => {
     asserter = new Asserter();
     asserter.registerAssertion(new StatefulAssertion(asserter));
     asserter.registerAssertion(new AbilityAssertion(asserter));
@@ -91,7 +89,7 @@ describe(`EventSourceable BDD assertions`, () => {
       await taskList.handle(createList);
       await taskList.handle(openList);
       await taskList.handle(closeList);
-      expect(taskList.isInState(TaskList.STATES.closed)).to.be.true;
+      expect(taskList.isInState(TaskList.STATES.closed)).toBe(true);
     });
 
     it(`ensures that event sourceable is in one of expected states`, async () => {
@@ -100,7 +98,7 @@ describe(`EventSourceable BDD assertions`, () => {
 
       await taskList.handle(createList);
       await taskList.handle(assignList);
-      expect(taskList.isInState(TaskList.STATES.created)).to.be.true;
+      expect(taskList.isInState(TaskList.STATES.created)).toBe(true);
     });
 
     it(`throws InvalidStateTransitionError if event sourceable is not in expected state`, async () => {
@@ -111,7 +109,7 @@ describe(`EventSourceable BDD assertions`, () => {
       await taskList.handle(openList);
       await taskList.handle(createTask);
       await taskList.handle(closeList);
-      await expect(taskList.handle(acceptTask)).to.eventually.be.rejectedWith(
+      await expect(taskList.handle(acceptTask)).rejects.toThrow(
         InvalidStateTransitionError,
         `TaskList: cannot 'AcceptTask' when in 'closed' state(expected states: 'closed')`
       );
@@ -124,7 +122,7 @@ describe(`EventSourceable BDD assertions`, () => {
       await taskList.handle(createList);
       await taskList.handle(openList);
       await taskList.handle(closeList);
-      await expect(taskList.handle(openList)).to.eventually.be.rejectedWith(
+      await expect(taskList.handle(openList)).rejects.toThrow(
         InvalidStateTransitionError,
         `TaskList: cannot 'OpenTaskList' when in 'closed' state`
       );
@@ -137,7 +135,7 @@ describe(`EventSourceable BDD assertions`, () => {
       await taskList.handle(createList);
       await taskList.handle(openList);
       await taskList.handle(closeList);
-      expect(taskList.handle(createTask)).to.eventually.be.rejectedWith(
+      expect(taskList.handle(createTask)).rejects.toThrow(
         TaskListClosedError
       );
     });
@@ -150,10 +148,11 @@ describe(`EventSourceable BDD assertions`, () => {
       await taskList.handle(openList);
       await taskList.handle(createTask);
       await taskList.handle(declineTask);
-      await expect(taskList.handle(acceptTask)).to.eventually.be.rejectedWith(
+      await expect(taskList.handle(acceptTask)).rejects.toThrow(
         InvalidStateTransitionError,
         `Task: cannot 'accept' when in 'declined' state(expected states: 'completed, declined')`
       );
     });
   });
 });
+

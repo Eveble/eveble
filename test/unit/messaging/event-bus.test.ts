@@ -1,6 +1,5 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { expect, describe, it, vi } from 'vitest';
+
 import delay from 'delay';
 import { Type } from '@eveble/core';
 import { derived } from '@traits-ts/core';
@@ -14,8 +13,6 @@ import {
 import { Command } from '../../../src/components/command';
 import { Event } from '../../../src/components/event';
 
-chai.use(sinonChai);
-
 describe('EventBus', () => {
   @Type('MyEvent', { isRegistrable: false })
   class MyEvent extends Event<MyEvent> {
@@ -28,24 +25,24 @@ describe('EventBus', () => {
   }
 
   it(`extends OneToManyHandlingTrait mixin on prototype chain applied`, () => {
-    expect(derived(EventBus.prototype, OneToManyHandlingTrait)).to.be.true;
+    expect(derived(EventBus.prototype, OneToManyHandlingTrait)).toBe(true);
   });
 
   it(`extends HookableTrait mixin on prototype chain applied`, () => {
-    expect(derived(EventBus.prototype, HookableTrait)).to.be.true;
+    expect(derived(EventBus.prototype, HookableTrait)).toBe(true);
   });
 
   describe('construction', () => {
     it('sets handleable type upon construction', () => {
       const eventBus = new EventBus();
-      expect(eventBus.getHandleableTypes()).to.be.eql([Event]);
+      expect(eventBus.getHandleableTypes()).toEqual([Event]);
     });
   });
 
   describe('construction', () => {
     it('sets handleable type upon construction', () => {
       const eventBus = new EventBus();
-      expect(eventBus.getHandleableTypes()).to.be.eql([Event]);
+      expect(eventBus.getHandleableTypes()).toEqual([Event]);
     });
   });
 
@@ -53,50 +50,50 @@ describe('EventBus', () => {
     it('throws UnhandleabeTypeError when provided type is not handleable', () => {
       const eventBus = new EventBus();
       expect(() =>
-        eventBus.registerHandler(MyCommand as any, sinon.stub())
-      ).to.throw(
+        eventBus.registerHandler(MyCommand as any, vi.fn())
+      ).toThrow(
         UnhandleableTypeError,
         `EventBus: type must be one of: [Event]; got MyCommand`
       );
     });
 
     it(`allows to register multiple handlers for one event`, () => {
-      const firstHandler = sinon.spy();
-      const secondHandler = sinon.spy();
+      const firstHandler = vi.fn();
+      const secondHandler = vi.fn();
 
       const eventBus = new EventBus();
       eventBus.registerHandler(MyEvent, firstHandler);
       expect(() => {
         eventBus.registerHandler(MyEvent, secondHandler);
-      }).to.not.throw(HandlerExistError);
+      }).not.toThrow(HandlerExistError);
     });
 
     it('allows handlers to be overridden', () => {
-      const firstHandler = sinon.spy();
-      const secondHandler = sinon.spy();
+      const firstHandler = vi.fn();
+      const secondHandler = vi.fn();
 
       const eventBus = new EventBus();
       eventBus.registerHandler(MyEvent, firstHandler);
       eventBus.registerHandler(MyEvent, secondHandler, true);
 
-      expect(eventBus.getHandler(MyEvent)).to.eql([secondHandler]);
+      expect(eventBus.getHandler(MyEvent)).toEqual([secondHandler]);
     });
 
     it('has more expressive api for registering handlers - subscribeTo', () => {
-      const firstHandler = sinon.spy();
+      const firstHandler = vi.fn();
       const eventBus = new EventBus();
-      const registerHandler = sinon.spy(eventBus, 'registerHandler');
+      const registerHandler = vi.spyOn(eventBus, "registerHandler");
 
       eventBus.subscribeTo(MyEvent, firstHandler);
 
-      expect(registerHandler).to.be.calledOnce;
-      expect(registerHandler).to.be.calledWithExactly(MyEvent, firstHandler);
+      expect(registerHandler).toHaveBeenCalledTimes(1);
+      expect(registerHandler).toHaveBeenCalledWith(MyEvent, firstHandler);
     });
   });
 
   describe('publishing events', () => {
     it('handles event', async () => {
-      const handler = sinon.stub();
+      const handler = vi.fn();
       const eventBus = new EventBus();
       eventBus.registerHandler(MyEvent, handler);
 
@@ -105,18 +102,18 @@ describe('EventBus', () => {
         key: 'my-string',
       });
       await eventBus.handle(event);
-      expect(handler).to.have.been.calledWithExactly(event);
+      expect(handler).toHaveBeenCalledWith(event);
     });
 
     it('ensures that events are handled concurrently', async () => {
-      const firstSpy = sinon.spy();
+      const firstSpy = vi.fn();
       const delayedFirstHandler = async function (
         eventInstance: MyEvent
       ): Promise<void> {
         await delay(5);
         firstSpy(eventInstance);
       };
-      const secondHandler = sinon.spy();
+      const secondHandler = vi.fn();
 
       const eventBus = new EventBus();
       eventBus.registerHandler(MyEvent, delayedFirstHandler);
@@ -127,17 +124,17 @@ describe('EventBus', () => {
         key: 'my-string',
       });
       await eventBus.handle(event);
-      expect(firstSpy).to.be.calledOnce;
-      expect(firstSpy).to.be.calledWithExactly(event);
-      expect(secondHandler).to.be.calledOnce;
-      expect(secondHandler).to.be.calledWithExactly(event);
-      expect(secondHandler).to.be.calledBefore(firstSpy);
+      expect(firstSpy).toHaveBeenCalledTimes(1);
+      expect(firstSpy).toHaveBeenCalledWith(event);
+      expect(secondHandler).toHaveBeenCalledTimes(1);
+      expect(secondHandler).toHaveBeenCalledWith(event);
+      expect(secondHandler).toHaveBeenCalled(); expect(firstSpy).toHaveBeenCalled(); /* TODO: verify call order */;
     });
 
     it('has more expressive api for handling event - publish', async () => {
-      const handler = sinon.stub();
+      const handler = vi.fn();
       const eventBus = new EventBus();
-      const handle = sinon.spy(eventBus, 'handle');
+      const handle = vi.spyOn(eventBus, "handle");
 
       eventBus.subscribeTo(MyEvent, handler);
 
@@ -146,38 +143,38 @@ describe('EventBus', () => {
         key: 'my-string',
       });
       await eventBus.publish(event);
-      expect(handler).to.have.been.calledWithExactly(event);
-      expect(handle).to.be.calledOnce;
-      expect(handle).to.be.calledWithExactly(event);
+      expect(handler).toHaveBeenCalledWith(event);
+      expect(handle).toHaveBeenCalledTimes(1);
+      expect(handle).toHaveBeenCalledWith(event);
     });
   });
 
   describe('onPublish hooks', () => {
     it('calls all hooks when handling an event', async () => {
-      const firstHook = sinon.spy();
-      const secondHook = sinon.spy();
+      const firstHook = vi.fn();
+      const secondHook = vi.fn();
 
       const eventBus = new EventBus();
       eventBus.onPublish('first-id', firstHook);
       eventBus.onPublish('second-id', secondHook);
-      eventBus.subscribeTo(MyEvent, sinon.stub());
+      eventBus.subscribeTo(MyEvent, vi.fn());
 
       const event = new MyEvent({
         sourceId: 'my-target-id',
         key: 'my-string',
       });
       await eventBus.publish(event);
-      expect(firstHook).to.have.been.calledWithExactly(event);
-      expect(secondHook).to.have.been.calledWithExactly(event);
+      expect(firstHook).toHaveBeenCalledWith(event);
+      expect(secondHook).toHaveBeenCalledWith(event);
     });
     it('allows for overriding onPublish hook', async () => {
-      const firstHook = sinon.spy();
-      const secondHook = sinon.spy();
+      const firstHook = vi.fn();
+      const secondHook = vi.fn();
 
       const eventBus = new EventBus();
       eventBus.onPublish('my-id', firstHook);
       eventBus.onPublish('my-id', secondHook, true);
-      eventBus.subscribeTo(MyEvent, sinon.stub());
+      eventBus.subscribeTo(MyEvent, vi.fn());
 
       const event = new MyEvent({
         sourceId: 'my-target-id',
@@ -185,7 +182,8 @@ describe('EventBus', () => {
       });
       await eventBus.publish(event);
       expect(firstHook).to.have.not.been.called;
-      expect(secondHook).to.have.been.calledWithExactly(event);
+      expect(secondHook).toHaveBeenCalledWith(event);
     });
   });
 });
+

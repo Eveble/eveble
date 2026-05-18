@@ -1,8 +1,8 @@
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
+import { mock } from 'vitest-mock-extended';
+import { expect, describe, it, beforeEach, afterEach, vi } from 'vitest';
+
 import { Type } from 'typend';
-import { stubInterface } from 'ts-sinon';
+
 import { Event } from '../../../src/components/event';
 import { Projection } from '../../../src/infrastructure/projection';
 import { subscribe } from '../../../src/annotations/subscribe';
@@ -12,14 +12,10 @@ import { Injector } from '../../../src/core/injector';
 import { EventBus } from '../../../src/messaging/event-bus';
 import { Guid } from '../../../src/domain/value-objects/guid';
 
-chai.use(sinonChai);
-
 describe('Event projection', () => {
-  const sandbox = sinon.createSandbox();
-
   const handlers = {
-    CustomerDocStorageProjection: sandbox.stub(),
-    CustomerGraphStorageProjection: sandbox.stub(),
+    CustomerDocStorageProjection: vi.fn(),
+    CustomerGraphStorageProjection: vi.fn(),
   };
 
   @Type('EventProjection.CustomerRegistered')
@@ -51,22 +47,22 @@ describe('Event projection', () => {
 
   beforeEach(async () => {
     injector = new Injector();
-    log = stubInterface<types.Logger>();
-    config = stubInterface<types.Configurable>();
+    log = mock<types.Logger>();
+    config = mock<types.Configurable>();
     eventBus = new EventBus();
 
     injector.bind<types.Injector>(BINDINGS.Injector).toConstantValue(injector);
     injector.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
     injector.bind<types.Configurable>(BINDINGS.Config).toConstantValue(config);
     injector.bind<types.EventBus>(BINDINGS.EventBus).toConstantValue(eventBus);
-    config.get.withArgs('appId').returns(appId);
+    config.get.calledWith('appId').mockReturnValue(appId);
 
     injector.injectInto(new CustomerDocStorageProjection());
     injector.injectInto(new CustomerGraphStorageProjection());
   });
 
   afterEach(() => {
-    sandbox.reset();
+    vi.clearAllMocks();
   });
 
   it('publishes event on projection', () => {
@@ -77,8 +73,8 @@ describe('Event projection', () => {
       lastName: 'Bar',
     });
     eventBus.publish(event);
-    expect(handlers.CustomerDocStorageProjection).to.be.calledOnce;
-    expect(handlers.CustomerDocStorageProjection).to.be.calledWithExactly(
+    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledTimes(1);
+    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledWith(
       event
     );
   });
@@ -91,13 +87,14 @@ describe('Event projection', () => {
       lastName: 'Bar',
     });
     eventBus.publish(event);
-    expect(handlers.CustomerDocStorageProjection).to.be.calledOnce;
-    expect(handlers.CustomerDocStorageProjection).to.be.calledWithExactly(
+    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledTimes(1);
+    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledWith(
       event
     );
-    expect(handlers.CustomerGraphStorageProjection).to.be.calledOnce;
-    expect(handlers.CustomerGraphStorageProjection).to.be.calledWithExactly(
+    expect(handlers.CustomerGraphStorageProjection).toHaveBeenCalledTimes(1);
+    expect(handlers.CustomerGraphStorageProjection).toHaveBeenCalledWith(
       event
     );
   });
 });
+
