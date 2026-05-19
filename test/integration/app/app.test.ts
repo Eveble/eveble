@@ -315,23 +315,6 @@ describe(`App`, () => {
     });
 
     describe('initializes schedulers', () => {
-      it('logs initialization of schedulers', async () => {
-        const app = new App({
-          modules: [],
-          injector,
-        });
-
-        await app.initialize();
-        expect(log.debug).toHaveBeenCalledWith(
-          expect.objectContaining(
-            new Log(`initializing schedulers`)
-              .on(app)
-              .in('initializeSchedulers')
-          )
-        );
-        await app.shutdown();
-      });
-
       describe('PulseCommandSchedulerModule', () => {
         it('does not include module if command scheduling is not enabled on configuration', async () => {
           const config = new AppConfig({
@@ -397,37 +380,12 @@ describe(`App`, () => {
           expect(app.modules[1]).toBeInstanceOf(MongoDBSnapshotStorageModule);
           expect(app.modules[2]).toBeInstanceOf(PulseCommandSchedulerModule);
           expect(app.modules[3]).toBeInstanceOf(Eveble);
-          expect(log.debug).toHaveBeenCalledWith(
-            expect.objectContaining(
-              new Log(
-                new Log(
-                  `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
-                )
-                  .on(app)
-                  .in('initializeSchedulers')
-              )
-            )
-          );
           await app.shutdown();
         });
       });
     });
 
     describe('initializes storages', () => {
-      it('logs initialization of storages', async () => {
-        const app = new App({
-          modules: [],
-          injector,
-        });
-        await app.initialize();
-        expect(log.debug).toHaveBeenCalledWith(
-          expect.objectContaining(
-            new Log(`initializing storages`).on(app).in('initializeStorages')
-          )
-        );
-        await app.shutdown();
-      });
-
       describe('MongoDBSnapshotStorageModule', () => {
         it('does not include module if snapshotting is not enabled on configuration', async () => {
           const config = new AppConfig({
@@ -493,15 +451,6 @@ describe(`App`, () => {
           expect(app.modules[1]).toBeInstanceOf(MongoDBSnapshotStorageModule);
           expect(app.modules[2]).toBeInstanceOf(PulseCommandSchedulerModule);
           expect(app.modules[3]).toBeInstanceOf(Eveble);
-          expect(log.debug).toHaveBeenCalledWith(
-            expect.objectContaining(
-              new Log(
-                `added 'SnapshotStorage' as 'MongoDBSnapshotStorageModule' to application modules`
-              )
-                .on(app)
-                .in('initializeStorages')
-            )
-          );
           await app.shutdown();
         });
       });
@@ -551,15 +500,6 @@ describe(`App`, () => {
           expect(app.modules).toBeInstanceOf(Array);
           expect(app.modules).toHaveLength(4);
           expect(app.modules[0]).toBeInstanceOf(MongoDBCommitStorageModule);
-          expect(log.debug).toHaveBeenCalledWith(
-            expect.objectContaining(
-              new Log(
-                `added 'CommitStorage' as 'MongoDBCommitStorageModule' to application modules`
-              )
-                .on(app)
-                .in('initializeStorages')
-            )
-          );
           await app.shutdown();
         });
       });

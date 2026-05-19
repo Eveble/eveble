@@ -102,6 +102,17 @@ export abstract class BaseApp extends Module implements types.BaseApp {
   }
 
   /**
+   * Bootstraps application: initializes, runs bootstrap lifecycle hooks,
+   * then starts all modules.
+   * @async
+   */
+  public async bootstrap(): Promise<void> {
+    await this.initialize();
+    await this.runLifeCycleAction('bootstrap');
+    await this.start();
+  }
+
+  /**
    * Shutdowns app.
    * @async
    */

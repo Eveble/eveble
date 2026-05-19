@@ -97,12 +97,9 @@ export class App extends BaseApp {
     if (processedProps.modules === undefined) {
       processedProps.modules = [];
     }
-    let hasEveble = false;
-    for (const module of processedProps.modules) {
-      if (module instanceof Eveble) {
-        hasEveble = true;
-      }
-    }
+
+    // Ensure Eveble module is always present
+    const hasEveble = processedProps.modules.some((m) => m instanceof Eveble);
     if (!hasEveble) {
       processedProps.modules.unshift(new Eveble());
     }
@@ -181,16 +178,157 @@ export class App extends BaseApp {
   }
 
   /**
+   * Registers additional modules after construction but before initialization.
+   * @param modules - List of modules to register.
+   * @throws {Error} If app is already initialized.
+   */
+  public configureModules(modules: types.Module[]): void {
+    for (const module of modules) {
+      this.validateModules([module]);
+      if (!this.modules.includes(module)) {
+        this.modules.push(module);
+      }
+    }
+  }
+
+  /**
+   * Resolves and auto-registers infrastructure modules based on configuration
+   * and environment variables. Called during onConfiguration, before module
+   * initialization and before external dependency binding.
+   *
+   * Order matches original: scheduler first, then storages.
+   */
+  protected resolveModules(): void {
+    const hasInMemoryModule = this.modules.some(
+      (m) => m instanceof InMemoryModule
+    );
+
+    // InMemoryModule handles its own binding in beforeInitialize
+    if (hasInMemoryModule) {
+      return;
+    }
+
+    // Resolve scheduler module first, then storage modules
+    // to maintain consistent module ordering
+    this.resolveSchedulerModule();
+    this.resolveStorageModules();
+  }
+
+  /**
+   * Resolves CommitStorage and SnapshotStorage modules based on env config.
+   */
+  protected resolveStorageModules(): void {
+    if (
+      this.isSnapshotting() &&
+      !this.injector.isBound(BINDINGS.SnapshotStorage)
+    ) {
+      const client = getenv.string('EVEBLE_SNAPSHOTTER_CLIENT');
+      switch (client) {
+        case 'mongodb':
+          this.modules.unshift(new MongoDBSnapshotStorageModule());
+          break;
+        case 'inmemory':
+          break;
+        default:
+          throw new StorageNotFoundError('SnapshotStorage', client);
+      }
+    }
+
+    if (!this.injector.isBound(BINDINGS.CommitStorage)) {
+      const client = getenv.string('EVEBLE_COMMITSTORE_CLIENT');
+      switch (client) {
+        case 'mongodb':
+          this.modules.unshift(new MongoDBCommitStorageModule());
+          break;
+        case 'inmemory':
+          break;
+        default:
+          throw new StorageNotFoundError('CommitStorage', client);
+      }
+    }
+  }
+
+  /**
+   * Resolves CommandScheduler module based on env config.
+   */
+  protected resolveSchedulerModule(): void {
+    if (
+      !this.isCommandScheduling() ||
+      this.injector.isBound(BINDINGS.CommandScheduler)
+    ) {
+      return;
+    }
+
+    const client = getenv.string('EVEBLE_COMMAND_SCHEDULER_CLIENT');
+    switch (client) {
+      case 'pulse':
+        this.modules.unshift(new PulseCommandSchedulerModule());
+        break;
+      case 'inmemory':
+        break;
+      default:
+        throw new StorageNotFoundError('CommandScheduler', client);
+    }
+  }
+
+  /**
+   * Binds in-memory storage and scheduler implementations early if
+   * InMemoryModule is present, so they are available before Eveble's
+   * afterInitialize eagerly resolves CommitPublisher.
+   */
+  protected bindInMemoryImplementations(): void {
+    const hasInMemoryModule = this.modules.some(
+      (m) => m instanceof InMemoryModule
+    );
+    if (!hasInMemoryModule) {
+      return;
+    }
+
+    if (!this.injector.isBound(BINDINGS.CommitStorage)) {
+      this.injector
+        .bind<types.CommitStorage>(BINDINGS.CommitStorage)
+        .to(InMemoryCommitStorage)
+        .inSingletonScope();
+    }
+    if (!this.injector.isBound(BINDINGS.SnapshotStorage)) {
+      this.injector
+        .bind<types.SnapshotStorage>(BINDINGS.SnapshotStorage)
+        .to(InMemorySnapshotStorage)
+        .inSingletonScope();
+    }
+    if (!this.injector.isBound(BINDINGS.CommitObserver)) {
+      this.injector
+        .bind<types.CommitObserver>(BINDINGS.CommitObserver)
+        .to(InMemoryCommitObserver)
+        .inSingletonScope();
+    }
+    if (!this.injector.isBound(BINDINGS.CommandScheduler)) {
+      this.injector
+        .bind<types.CommandScheduler>(BINDINGS.CommandScheduler)
+        .to(InMemoryCommandScheduler)
+        .inSingletonScope();
+    }
+  }
+
+  /**
    * On configuration hook.
    * @async
    */
   protected async onConfiguration(): Promise<void> {
+    // Resolve additional infrastructure modules before configuration
+    // runs, so users can pre-bind injector entries between construction
+    // and initialize() to influence module selection.
+    this.resolveModules();
+
+    // Bind in-memory implementations before module initialization so
+    // Eveble's afterInitialize can resolve CommitPublisher (which depends
+    // on CommitStorage) without requiring InMemoryModule to init first.
+    this.bindInMemoryImplementations();
+
     await super.onConfiguration();
 
     await this.initializeGracefulShutdown();
     await this.initializeExternalDependencies();
-    await this.initializeSchedulers();
-    await this.initializeStorages();
   }
 
   /**
@@ -255,162 +393,6 @@ export class App extends BaseApp {
             .on(this)
             .in(this.initializeExternalDependencies)
         );
-      }
-    }
-  }
-
-  /**
-   * Initializes schedulers.
-   * @async
-   */
-  protected async initializeSchedulers(): Promise<void> {
-    this.log?.debug(
-      new Log(`initializing schedulers`).on(this).in(this.initializeSchedulers)
-    );
-
-    if (this.isCommandScheduling()) {
-      const hasInMemoryScheduler = this.modules.some(
-        (m) => m instanceof InMemoryModule
-      );
-      if (hasInMemoryScheduler) {
-        this.log?.debug(
-          new Log(
-            `CommandScheduler: InMemoryModule detected, binding in-memory scheduler`
-          )
-            .on(this)
-            .in(this.initializeSchedulers)
-        );
-        if (!this.injector.isBound(BINDINGS.CommandScheduler)) {
-          this.injector
-            .bind<types.CommandScheduler>(BINDINGS.CommandScheduler)
-            .to(InMemoryCommandScheduler)
-            .inSingletonScope();
-        }
-        return;
-      }
-
-      if (!this.injector.isBound(BINDINGS.CommandScheduler)) {
-        const client = getenv.string('EVEBLE_COMMAND_SCHEDULER_CLIENT');
-        switch (client) {
-          case 'pulse':
-            this.modules.unshift(new PulseCommandSchedulerModule());
-            this.log?.debug(
-              new Log(
-                `added 'CommandScheduler' as 'PulseCommandSchedulerModule' to application modules`
-              )
-                .on(this)
-                .in(this.initializeSchedulers)
-            );
-            break;
-          case 'inmemory':
-            this.log?.debug(
-              new Log(
-                `CommandScheduler: using in-memory scheduler (no Pulse required)`
-              )
-                .on(this)
-                .in(this.initializeSchedulers)
-            );
-            break;
-          default:
-            throw new StorageNotFoundError('CommandScheduler', client);
-        }
-      }
-    }
-  }
-
-  /**
-   * Initializes storages.
-   * @async
-   */
-  protected async initializeStorages(): Promise<void> {
-    this.log?.debug(
-      new Log(`initializing storages`).on(this).in(this.initializeStorages)
-    );
-
-    const hasInMemoryModule = this.modules.some(
-      (m) => m instanceof InMemoryModule
-    );
-    if (hasInMemoryModule) {
-      this.log?.debug(
-        new Log(`InMemoryModule detected: binding in-memory storages`)
-          .on(this)
-          .in(this.initializeStorages)
-      );
-      if (!this.injector.isBound(BINDINGS.CommitStorage)) {
-        this.injector
-          .bind<types.CommitStorage>(BINDINGS.CommitStorage)
-          .to(InMemoryCommitStorage)
-          .inSingletonScope();
-      }
-      if (!this.injector.isBound(BINDINGS.SnapshotStorage)) {
-        this.injector
-          .bind<types.SnapshotStorage>(BINDINGS.SnapshotStorage)
-          .to(InMemorySnapshotStorage)
-          .inSingletonScope();
-      }
-      if (!this.injector.isBound(BINDINGS.CommitObserver)) {
-        this.injector
-          .bind<types.CommitObserver>(BINDINGS.CommitObserver)
-          .to(InMemoryCommitObserver)
-          .inSingletonScope();
-      }
-      return;
-    }
-
-    if (
-      !this.injector.isBound(BINDINGS.SnapshotStorage) &&
-      this.isSnapshotting()
-    ) {
-      const client = getenv.string('EVEBLE_COMMITSTORE_CLIENT');
-      switch (client) {
-        case 'mongodb':
-          this.modules.unshift(new MongoDBSnapshotStorageModule());
-          this.log?.debug(
-            new Log(
-              `added 'SnapshotStorage' as 'MongoDBSnapshotStorageModule' to application modules`
-            )
-              .on(this)
-              .in(this.initializeStorages)
-          );
-          break;
-        case 'inmemory':
-          this.log?.debug(
-            new Log(
-              `SnapshotStorage: using in-memory storage (no MongoDB required)`
-            )
-              .on(this)
-              .in(this.initializeStorages)
-          );
-          break;
-        default:
-          throw new StorageNotFoundError('SnapshotStorage', client);
-      }
-    }
-
-    if (!this.injector.isBound(BINDINGS.CommitStorage)) {
-      const client = getenv.string('EVEBLE_COMMITSTORE_CLIENT');
-      switch (client) {
-        case 'mongodb':
-          this.modules.unshift(new MongoDBCommitStorageModule());
-          this.log?.debug(
-            new Log(
-              `added 'CommitStorage' as 'MongoDBCommitStorageModule' to application modules`
-            )
-              .on(this)
-              .in(this.initializeStorages)
-          );
-          break;
-        case 'inmemory':
-          this.log?.debug(
-            new Log(
-              `CommitStorage: using in-memory storage (no MongoDB required)`
-            )
-              .on(this)
-              .in(this.initializeStorages)
-          );
-          break;
-        default:
-          throw new StorageNotFoundError('CommitStorage', client);
       }
     }
   }

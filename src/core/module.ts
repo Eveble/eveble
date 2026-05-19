@@ -312,7 +312,9 @@ export abstract class Module
   }
 
   /**
-   * Initializes all required modules.
+   * Initializes all required modules with error recovery.
+   * If a module fails to initialize, previously initialized modules are
+   * shut down in reverse order for clean recovery.
    * @async
    * @param modules - List of submodules.
    * @param app - Application that requires(depends) module.
@@ -323,8 +325,17 @@ export abstract class Module
     app: types.BaseApp,
     injector: types.Injector
   ): Promise<void> {
-    for (const module of modules) {
-      await module.initialize(app, injector);
+    const initialized: types.Module[] = [];
+    try {
+      for (const module of modules) {
+        await module.initialize(app, injector);
+        initialized.push(module);
+      }
+    } catch (error) {
+      for (const mod of initialized.reverse()) {
+        await mod.shutdown().catch(() => {});
+      }
+      throw error;
     }
   }
 
