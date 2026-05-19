@@ -284,9 +284,7 @@ describe(`Projection`, () => {
         expect(log.debug).toHaveBeenNthCalledWith(
           1,
           expect.objectContaining(
-            new Log('beforeRebuild')
-              .on(projection)
-              .in(projection.beforeRebuild)
+            new Log('beforeRebuild').on(projection).in(projection.beforeRebuild)
           )
         );
         expect(log.debug).toHaveBeenNthCalledWith(
@@ -303,15 +301,13 @@ describe(`Projection`, () => {
         projection.beforeRebuild = (): void => {
           throw new Error('my-error');
         };
-        await expect(
-          projection.invokeAction('beforeRebuild')
-        ).rejects.toThrow(Error);
+        await expect(projection.invokeAction('beforeRebuild')).rejects.toThrow(
+          Error
+        );
         expect(log.debug).toHaveBeenNthCalledWith(
           1,
           expect.objectContaining(
-            new Log('beforeRebuild')
-              .on(projection)
-              .in(projection.beforeRebuild)
+            new Log('beforeRebuild').on(projection).in(projection.beforeRebuild)
           )
         );
         expect(log.error).toHaveBeenCalledWith(
@@ -386,9 +382,7 @@ describe(`Projection`, () => {
         expect(log.debug).toHaveBeenNthCalledWith(
           2,
           expect.objectContaining(
-            new Log('finished rollback')
-              .on(projection)
-              .in(projection.rollback)
+            new Log('finished rollback').on(projection).in(projection.rollback)
           )
         );
       });
@@ -397,9 +391,9 @@ describe(`Projection`, () => {
         projection.rollback = (): void => {
           throw new Error('my-error');
         };
-        await expect(
-          projection.invokeAction('rollback')
-        ).rejects.toThrow(Error);
+        await expect(projection.invokeAction('rollback')).rejects.toThrow(
+          Error
+        );
         expect(log.debug).toHaveBeenNthCalledWith(
           1,
           expect.objectContaining(
@@ -417,4 +411,3 @@ describe(`Projection`, () => {
     });
   });
 });
-

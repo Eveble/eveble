@@ -33,16 +33,14 @@ describe('HookableTrait', () => {
           vi.fn()
         );
       }).toThrow(
-        InvalidHookActionError, `Expected action argument to be string, got undefined`
+        InvalidHookActionError,
+        `Expected action argument to be string, got undefined`
       );
       expect(() => {
-        MyClass.prototype.registerHook(
-          null as any as string,
-          'my-id',
-          vi.fn()
-        );
+        MyClass.prototype.registerHook(null as any as string, 'my-id', vi.fn());
       }).toThrow(
-        InvalidHookActionError, `Expected action argument to be string, got null`
+        InvalidHookActionError,
+        `Expected action argument to be string, got null`
       );
     });
 
@@ -56,7 +54,8 @@ describe('HookableTrait', () => {
           vi.fn()
         );
       }).toThrow(
-        InvalidHookIdError, `Expected id argument to be string, got undefined`
+        InvalidHookIdError,
+        `Expected id argument to be string, got undefined`
       );
       expect(() => {
         MyClass.prototype.registerHook(
@@ -65,7 +64,8 @@ describe('HookableTrait', () => {
           vi.fn()
         );
       }).toThrow(
-        InvalidHookIdError, `Expected id argument to be string, got null`
+        InvalidHookIdError,
+        `Expected id argument to be string, got null`
       );
     });
 
@@ -321,7 +321,7 @@ describe('HookableTrait', () => {
       myParentInstance.registerHook('onConstruction', 'parent', vi.fn());
       myChildInstance.registerHook('onConstruction', 'child', vi.fn());
 
-      expect(myParentInstance.hasHook('onConstruction', "parent")).toBe(true);
+      expect(myParentInstance.hasHook('onConstruction', 'parent')).toBe(true);
       expect(myParentInstance.hasHook('onConstruction', 'child')).toBe(false);
 
       expect(myChildInstance.hasHook('onConstruction', 'parent')).toBe(false);
@@ -329,4 +329,3 @@ describe('HookableTrait', () => {
     });
   });
 });
-

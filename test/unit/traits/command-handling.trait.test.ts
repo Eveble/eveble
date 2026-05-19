@@ -135,14 +135,15 @@ describe(`CommandHandlingTrait`, () => {
       const handler = vi.fn();
       class MyController extends derive(CommandHandlingTrait) {}
       const controller = new MyController();
-      const registerHandler = vi.spyOn(controller, "registerHandler");
+      const registerHandler = vi.spyOn(controller, 'registerHandler');
       injector.injectInto(controller);
 
       controller.registerCommandHandler(MyCommand, handler);
       expect(registerHandler).toHaveBeenCalledTimes(1);
       expect(registerHandler.mock.calls[0][0]).toBe(MyCommand);
       expect(
-        Object.create(handler.prototype) instanceof registerHandler.mock.calls[0][1]
+        Object.create(handler.prototype) instanceof
+          registerHandler.mock.calls[0][1]
       ).toBe(true); // Compare bound function to handler function example
       expect(registerHandler.mock.calls[0][2]).toBe(false); // Flag shouldOverride set by default to false
     });
@@ -222,4 +223,3 @@ describe(`CommandHandlingTrait`, () => {
     });
   });
 });
-

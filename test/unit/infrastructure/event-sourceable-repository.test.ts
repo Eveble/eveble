@@ -162,7 +162,9 @@ describe(`EventSourceableRepository`, () => {
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
       commitStore.createCommit.mockReturnValue(commit);
-      config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+      config.get
+        .calledWith('eveble.Snapshotter.isEnabled')
+        .mockReturnValue(true);
 
       const esInstance = new MyEventSourceable({ id: props.id });
       expect(esInstance.getVersion()).toBe(0);
@@ -178,14 +180,16 @@ describe(`EventSourceableRepository`, () => {
 
       const esInstance = new MyEventSourceable({ id: props.id });
       await repository.save(esInstance);
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `saving 'Namespace.MyEventSourceable' with id '${esInstance.id}'`
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `saving 'Namespace.MyEventSourceable' with id '${esInstance.id}'`
+          )
+            .on(repository)
+            .in(repository.save)
+            .with('event sourceable', esInstance)
         )
-          .on(repository)
-          .in(repository.save)
-          .with('event sourceable', esInstance)
-      ));
+      );
     });
 
     it('logs thrown error while saving commit to storage', async () => {
@@ -193,9 +197,7 @@ describe(`EventSourceableRepository`, () => {
       commitStore.save.mockRejectedValue(new Error('my-error'));
 
       const esInstance = new MyEventSourceable({ id: props.id });
-      await expect(repository.save(esInstance)).rejects.toThrow(
-        Error
-      );
+      await expect(repository.save(esInstance)).rejects.toThrow(Error);
 
       expect(log.error).toHaveBeenCalledWith(
         new Log(
@@ -213,12 +215,12 @@ describe(`EventSourceableRepository`, () => {
       injector
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
-      config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+      config.get
+        .calledWith('eveble.Snapshotter.isEnabled')
+        .mockReturnValue(true);
 
       const esInstance = new MyEventSourceable({ id: props.id });
-      await expect(repository.save(esInstance)).rejects.toThrow(
-        Error
-      );
+      await expect(repository.save(esInstance)).rejects.toThrow(Error);
 
       expect(log.error).toHaveBeenCalledWith(
         new Log(
@@ -255,7 +257,9 @@ describe(`EventSourceableRepository`, () => {
       injector
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
-      config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+      config.get
+        .calledWith('eveble.Snapshotter.isEnabled')
+        .mockReturnValue(true);
       snapshotter.getSnapshotOf.mockReturnValue(undefined);
       commitStore.getEvents.calledWith(props.id).mockReturnValue(undefined);
 
@@ -284,13 +288,15 @@ describe(`EventSourceableRepository`, () => {
       await expect(
         repository.find(MyEventSourceable, props.id)
       ).rejects.toThrow(EventsNotFoundError);
-      expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `no events found for 'Namespace.MyEventSourceable' with id '${props.id}'`
+      expect(log.error).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `no events found for 'Namespace.MyEventSourceable' with id '${props.id}'`
+          )
+            .on(repository)
+            .in('rehydrateFromEventHistory')
         )
-          .on(repository)
-          .in('rehydrateFromEventHistory')
-      ));
+      );
     });
 
     describe(`re-hydration`, () => {
@@ -330,7 +336,9 @@ describe(`EventSourceableRepository`, () => {
 
         it(`logs fetching event history for aggregate`, async () => {
           const eventHistory = [events.initEvent, events.otherEvent];
-          commitStore.getEvents.calledWith(props.id).mockReturnValue(eventHistory);
+          commitStore.getEvents
+            .calledWith(props.id)
+            .mockReturnValue(eventHistory);
 
           await repository.find(MyAggregate, props.id);
           expect(log.debug).toHaveBeenCalledWith(
@@ -344,7 +352,9 @@ describe(`EventSourceableRepository`, () => {
 
         it(`logs a re-hydrated instance of the expected version of aggregate`, async () => {
           const eventHistory = [events.initEvent, events.otherEvent];
-          commitStore.getEvents.calledWith(props.id).mockReturnValue(eventHistory);
+          commitStore.getEvents
+            .calledWith(props.id)
+            .mockReturnValue(eventHistory);
 
           await repository.find(MyAggregate, props.id);
           expect(log.debug).toHaveBeenCalledWith(
@@ -414,7 +424,9 @@ describe(`EventSourceableRepository`, () => {
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
           commitStore.getEvents.calledWith(props.id).mockReturnValue([]);
 
           await repository.save(snapshotedEs); // Save aggregate so it's version is updated to 2
@@ -431,25 +443,31 @@ describe(`EventSourceableRepository`, () => {
           injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
           commitStore.getEvents.calledWith(props.id).mockReturnValue([]);
 
           await repository.find(MyEventSourceable, props.id);
-          expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-            new Log(
-              `restoring 'Namespace.MyEventSourceable' with id '${props.id}' from snapshot`
+          expect(log.debug).toHaveBeenCalledWith(
+            expect.objectContaining(
+              new Log(
+                `restoring 'Namespace.MyEventSourceable' with id '${props.id}' from snapshot`
+              )
+                .on(repository)
+                .in('restoreFromSnapshot')
             )
-              .on(repository)
-              .in('restoreFromSnapshot')
-          ));
+          );
         });
 
         it('logs restored event sourceable from snapshot', async () => {
           injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
           commitStore.getEvents.calledWith(props.id).mockReturnValue([]);
 
@@ -468,7 +486,9 @@ describe(`EventSourceableRepository`, () => {
           injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
           const thirdEvent = new MyOtherEvent({
             sourceId: props.id,
@@ -483,7 +503,9 @@ describe(`EventSourceableRepository`, () => {
             timestamp: now,
           });
           const remainingEvents = [thirdEvent, fourthEvent];
-          commitStore.getEvents.calledWith(props.id).mockReturnValue(remainingEvents);
+          commitStore.getEvents
+            .calledWith(props.id)
+            .mockReturnValue(remainingEvents);
 
           await repository.save(snapshotedEs); // Save aggregate so it's version is updated to 2
           const foundEs = (await repository.find(
@@ -508,11 +530,17 @@ describe(`EventSourceableRepository`, () => {
             .rebindSync<types.Injector>(BINDINGS.Injector)
             .toConstantValue(injectorStub);
 
-          injectorStub.isBound.calledWith(BINDINGS.Snapshotter).mockReturnValue(true);
-          injectorStub.get.calledWith(BINDINGS.Snapshotter).mockReturnValue(snapshotter);
+          injectorStub.isBound
+            .calledWith(BINDINGS.Snapshotter)
+            .mockReturnValue(true);
+          injectorStub.get
+            .calledWith(BINDINGS.Snapshotter)
+            .mockReturnValue(snapshotter);
           injector.injectInto(repository);
 
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
 
           const foundEs = (await repository.find(
@@ -527,7 +555,9 @@ describe(`EventSourceableRepository`, () => {
           injector
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
           const thirdEvent = new MyOtherEvent({
             sourceId: props.id,
@@ -542,18 +572,22 @@ describe(`EventSourceableRepository`, () => {
             timestamp: now,
           });
           const remainingEvents = [thirdEvent, fourthEvent];
-          commitStore.getEvents.calledWith(props.id).mockReturnValue(remainingEvents);
+          commitStore.getEvents
+            .calledWith(props.id)
+            .mockReturnValue(remainingEvents);
 
           await repository.find(MyEventSourceable, props.id);
-          expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-            new Log(
-              `replaying history on snapshot of 'Namespace.MyEventSourceable' with id '${props.id}'`
+          expect(log.debug).toHaveBeenCalledWith(
+            expect.objectContaining(
+              new Log(
+                `replaying history on snapshot of 'Namespace.MyEventSourceable' with id '${props.id}'`
+              )
+                .on(repository)
+                .in('restoreFromSnapshot')
+                .with('event sourceable', snapshotedEs)
+                .with('remaining events', remainingEvents)
             )
-              .on(repository)
-              .in('restoreFromSnapshot')
-              .with('event sourceable', snapshotedEs)
-              .with('remaining events', remainingEvents)
-          ));
+          );
         });
       });
 
@@ -574,7 +608,9 @@ describe(`EventSourceableRepository`, () => {
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
 
           commitStore.getEvents.calledWith(props.id).mockReturnValue([]);
 
@@ -594,11 +630,17 @@ describe(`EventSourceableRepository`, () => {
             .rebindSync<types.Injector>(BINDINGS.Injector)
             .toConstantValue(injectorStub);
 
-          injectorStub.isBound.calledWith(BINDINGS.Snapshotter).mockReturnValue(true);
-          injectorStub.get.calledWith(BINDINGS.Snapshotter).mockReturnValue(snapshotter);
+          injectorStub.isBound
+            .calledWith(BINDINGS.Snapshotter)
+            .mockReturnValue(true);
+          injectorStub.get
+            .calledWith(BINDINGS.Snapshotter)
+            .mockReturnValue(snapshotter);
           injector.injectInto(repository);
 
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
 
           const foundEs = (await repository.find(
@@ -614,7 +656,9 @@ describe(`EventSourceableRepository`, () => {
             .bind<types.Snapshotter>(BINDINGS.Snapshotter)
             .toConstantValue(snapshotter);
           snapshotter.getSnapshotOf.mockReturnValue(snapshotedEs);
-          config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+          config.get
+            .calledWith('eveble.Snapshotter.isEnabled')
+            .mockReturnValue(true);
 
           const thirdEvent = new MyOtherEvent({
             sourceId: props.id,
@@ -657,18 +701,14 @@ describe(`EventSourceableRepository`, () => {
       it(`on snapshot creation`, async () => {
         const esInstance = new EventSourceable({ id: props.id });
 
-        expect(
-          repository.makeSnapshotOf(esInstance)
-        ).rejects.toThrow(
+        expect(repository.makeSnapshotOf(esInstance)).rejects.toThrow(
           UndefinedSnapshotterError,
           `Snapshotter is not defined on EventSourceableRepository`
         );
       });
 
       it(`on restoring snapshot`, async () => {
-        expect(
-          repository.getSnapshotOf(MyAggregate, props.id)
-        ).rejects.toThrow(
+        expect(repository.getSnapshotOf(MyAggregate, props.id)).rejects.toThrow(
           UndefinedSnapshotterError,
           `Snapshotter is not defined on EventSourceableRepository`
         );
@@ -679,7 +719,9 @@ describe(`EventSourceableRepository`, () => {
       injector
         .bind<types.Snapshotter>(BINDINGS.Snapshotter)
         .toConstantValue(snapshotter);
-      config.get.calledWith('eveble.Snapshotter.isEnabled').mockReturnValue(true);
+      config.get
+        .calledWith('eveble.Snapshotter.isEnabled')
+        .mockReturnValue(true);
 
       expect(repository.isSnapshotting()).toBe(true);
     });
@@ -689,4 +731,3 @@ describe(`EventSourceableRepository`, () => {
     });
   });
 });
-

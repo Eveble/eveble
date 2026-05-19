@@ -132,4 +132,3 @@ describe(`CommandSchedulingService`, () => {
     expect(scheduler.unschedule).toHaveBeenCalledWith(unscheduleCommand);
   });
 });
-

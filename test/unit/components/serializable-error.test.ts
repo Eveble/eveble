@@ -62,9 +62,7 @@ describe('SerializableError', () => {
 
   it('defines the type name correctly', () => {
     expect(SerializableError.getTypeName()).toBe('SerializableError');
-    expect(SerializableError.prototype.getTypeName()).toBe(
-      'SerializableError'
-    );
+    expect(SerializableError.prototype.getTypeName()).toBe('SerializableError');
   });
 
   describe('property types', () => {
@@ -177,4 +175,3 @@ describe('SerializableError', () => {
     });
   });
 });
-

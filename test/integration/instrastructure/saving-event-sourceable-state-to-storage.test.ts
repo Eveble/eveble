@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { Collection } from 'mongodb';
 
@@ -280,4 +288,3 @@ describe(`Saving Event Sourceable state to storage`, () => {
     });
   });
 });
-

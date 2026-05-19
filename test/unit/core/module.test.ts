@@ -250,9 +250,7 @@ describe('Module', () => {
             .with('arguments', [app, injector])
         )
       );
-      expect(logger.debug).toHaveBeenCalledBefore(
-        submodule.initialize as any
-      );
+      expect(logger.debug).toHaveBeenCalledBefore(submodule.initialize as any);
     });
 
     describe('merging with application configuration', () => {
@@ -645,19 +643,25 @@ describe('Module', () => {
         expect.objectContaining(new Log(`beforeStart`).on(module))
       );
       expect(MyModule.prototype.beforeStart).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeStart).toHaveBeenCalledBefore(MyModule.prototype.onStart as any);
+      expect(MyModule.prototype.beforeStart).toHaveBeenCalledBefore(
+        MyModule.prototype.onStart as any
+      );
 
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`onStart`).on(module))
       );
       expect(MyModule.prototype.onStart).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onStart).toHaveBeenCalledBefore(MyModule.prototype.afterStart as any);
+      expect(MyModule.prototype.onStart).toHaveBeenCalledBefore(
+        MyModule.prototype.afterStart as any
+      );
 
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`afterStart`).on(module))
       );
       expect(MyModule.prototype.afterStart).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterStart).toHaveBeenCalledAfter(MyModule.prototype.onStart as any);
+      expect(MyModule.prototype.afterStart).toHaveBeenCalledAfter(
+        MyModule.prototype.onStart as any
+      );
     });
   });
 
@@ -716,18 +720,24 @@ describe('Module', () => {
         expect.objectContaining(new Log(`beforeStop`).on(module))
       );
       expect(MyModule.prototype.beforeStop).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeStop).toHaveBeenCalledBefore(MyModule.prototype.onStop as any);
+      expect(MyModule.prototype.beforeStop).toHaveBeenCalledBefore(
+        MyModule.prototype.onStop as any
+      );
 
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`onStop`).on(module))
       );
       expect(MyModule.prototype.onStop).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onStop).toHaveBeenCalledBefore(MyModule.prototype.afterStop as any);
+      expect(MyModule.prototype.onStop).toHaveBeenCalledBefore(
+        MyModule.prototype.afterStop as any
+      );
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`afterStop`).on(module))
       );
       expect(MyModule.prototype.afterStop).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterStop).toHaveBeenCalledAfter(MyModule.prototype.onStop as any);
+      expect(MyModule.prototype.afterStop).toHaveBeenCalledAfter(
+        MyModule.prototype.onStop as any
+      );
     });
   });
 
@@ -803,18 +813,24 @@ describe('Module', () => {
         expect.objectContaining(new Log(`beforeShutdown`).on(module))
       );
       expect(MyModule.prototype.beforeShutdown).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeShutdown).toHaveBeenCalledBefore(MyModule.prototype.onShutdown as any);
+      expect(MyModule.prototype.beforeShutdown).toHaveBeenCalledBefore(
+        MyModule.prototype.onShutdown as any
+      );
 
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`onShutdown`).on(module))
       );
       expect(MyModule.prototype.onShutdown).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onShutdown).toHaveBeenCalledBefore(MyModule.prototype.afterShutdown as any);
+      expect(MyModule.prototype.onShutdown).toHaveBeenCalledBefore(
+        MyModule.prototype.afterShutdown as any
+      );
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`afterShutdown`).on(module))
       );
       expect(MyModule.prototype.afterShutdown).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterShutdown).toHaveBeenCalledAfter(MyModule.prototype.onShutdown as any);
+      expect(MyModule.prototype.afterShutdown).toHaveBeenCalledAfter(
+        MyModule.prototype.onShutdown as any
+      );
     });
   });
 
@@ -881,18 +897,24 @@ describe('Module', () => {
         expect.objectContaining(new Log(`beforeReset`).on(module))
       );
       expect(MyModule.prototype.beforeReset).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.beforeReset).toHaveBeenCalledBefore(MyModule.prototype.onReset as any);
+      expect(MyModule.prototype.beforeReset).toHaveBeenCalledBefore(
+        MyModule.prototype.onReset as any
+      );
 
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`onReset`).on(module))
       );
       expect(MyModule.prototype.onReset).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.onReset).toHaveBeenCalledBefore(MyModule.prototype.afterReset as any);
+      expect(MyModule.prototype.onReset).toHaveBeenCalledBefore(
+        MyModule.prototype.afterReset as any
+      );
       expect(logger.debug).toHaveBeenCalledWith(
         expect.objectContaining(new Log(`afterReset`).on(module))
       );
       expect(MyModule.prototype.afterReset).toHaveBeenCalledTimes(1);
-      expect(MyModule.prototype.afterReset).toHaveBeenCalledAfter(MyModule.prototype.onReset as any);
+      expect(MyModule.prototype.afterReset).toHaveBeenCalledAfter(
+        MyModule.prototype.onReset as any
+      );
     });
 
     it('invokes reset action on sub modules', async () => {

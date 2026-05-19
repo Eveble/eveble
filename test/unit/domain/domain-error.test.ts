@@ -19,9 +19,6 @@ describe('DomainError', () => {
 
   it('defines its serializable type name correctly', () => {
     expect(DomainError.getTypeName()).toBe('DomainError');
-    expect(new MyDomainError('my-error').getTypeName()).toBe(
-      'MyDomainError'
-    );
+    expect(new MyDomainError('my-error').getTypeName()).toBe('MyDomainError');
   });
 });
-

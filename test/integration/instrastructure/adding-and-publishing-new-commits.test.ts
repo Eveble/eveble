@@ -1,5 +1,14 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import delay from 'delay';
 
@@ -204,7 +213,9 @@ describe(`Adding and publishing new commits`, () => {
 
     it(`fails the processing attempt if timeout is reached`, async () => {
       const timeout = 5;
-      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
+      config.get
+        .calledWith('eveble.commitStore.timeout')
+        .mockReturnValue(timeout);
 
       const commandHandlerSpy = vi.fn();
       const commandHandler = async (cmd: Command<{}>): Promise<void> => {
@@ -253,16 +264,18 @@ describe(`Adding and publishing new commits`, () => {
     });
 
     it(`does not process commands that can't be handled`, async () => {
-      const send = vi.spyOn(commandBus, "send");
+      const send = vi.spyOn(commandBus, 'send');
       await commitStore.save(commit);
       expect(send).not.toHaveBeenCalled;
     });
 
     it(`avoids potential race condition between commit being flagged as timeouted and published`, async () => {
       const timeout = 5;
-      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
+      config.get
+        .calledWith('eveble.commitStore.timeout')
+        .mockReturnValue(timeout);
 
-      const flagCommitAsPublished = vi.spyOn(storage, "flagCommitAsPublished");
+      const flagCommitAsPublished = vi.spyOn(storage, 'flagCommitAsPublished');
 
       const commandHandlerSpy = vi.fn();
       const commandHandler = async (cmd: Command<{}>): Promise<void> => {
@@ -287,4 +300,3 @@ describe(`Adding and publishing new commits`, () => {
     });
   });
 });
-

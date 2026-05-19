@@ -48,7 +48,9 @@ describe(`PulseClient`, () => {
 
     Pulse = vi.fn();
     pulseInstance = mock<PulseOriginal>();
-    Pulse.mockImplementation(function() { return pulseInstance; });
+    Pulse.mockImplementation(function () {
+      return pulseInstance;
+    });
 
     mongoClient = {
       getDatabase: vi.fn(),
@@ -171,17 +173,19 @@ describe(`PulseClient`, () => {
     describe('failed initialization', () => {
       it('re-throws error from Pulse on creation', async () => {
         const error = new Error('my-error');
-        Pulse.mockImplementation(function() { throw error; });
+        Pulse.mockImplementation(function () {
+          throw error;
+        });
         await injector.injectIntoAsync(client);
 
-        await expect(client.initialize()).rejects.toThrow(
-          'my-error'
-        );
+        await expect(client.initialize()).rejects.toThrow('my-error');
       });
 
       it('sets the client state to failed when error is thrown on initialization', async () => {
         const error = new Error('my-error');
-        Pulse.mockImplementation(function() { throw error; });
+        Pulse.mockImplementation(function () {
+          throw error;
+        });
         await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).rejects.toThrow(error);
@@ -190,7 +194,9 @@ describe(`PulseClient`, () => {
 
       it('logs failed initialization as an error', async () => {
         const error = new Error('my-error');
-        Pulse.mockImplementation(function() { throw error; });
+        Pulse.mockImplementation(function () {
+          throw error;
+        });
         await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).rejects.toThrow(error);
@@ -272,9 +278,7 @@ describe(`PulseClient`, () => {
         pulseInstance.start.mockRejectedValue(error);
         await client.connect();
 
-        await expect(
-          client.startProcessing('test-job')
-        ).rejects.toThrow(
+        await expect(client.startProcessing('test-job')).rejects.toThrow(
           'Pulse client must be connected before starting processing'
         );
       });
@@ -538,4 +542,3 @@ describe(`PulseClient`, () => {
     });
   });
 });
-

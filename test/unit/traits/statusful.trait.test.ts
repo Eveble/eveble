@@ -67,7 +67,8 @@ describe(`StatusfulTrait`, () => {
         instance.isInStatus(['pendingPayment']);
         expect(instance.isInOneOfStatuses).toHaveBeenCalledTimes(1);
         expect(instance.isInOneOfStatuses).toHaveBeenCalledWith([
-          'pendingPayment', ]);
+          'pendingPayment',
+        ]);
       });
     });
 
@@ -155,4 +156,3 @@ describe(`StatusfulTrait`, () => {
     });
   });
 });
-

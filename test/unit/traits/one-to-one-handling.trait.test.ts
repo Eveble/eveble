@@ -115,8 +115,9 @@ describe('OneToOneHandlingTrait', () => {
       controller.initialize();
       expect(controller.getHandlers()).toBeInstanceOf(Map);
       const boundHandler = controller.getHandlers().get(MyEvent);
-      expect(controller.MyEventHandlerMethod === (boundHandler as any).original)
-        .toBe(true); // Compare bound function to handler function
+      expect(
+        controller.MyEventHandlerMethod === (boundHandler as any).original
+      ).toBe(true); // Compare bound function to handler function
     });
 
     it('annotates initializes as post construction method for Inversify', () => {
@@ -157,9 +158,7 @@ describe('OneToOneHandlingTrait', () => {
       const controller = new MyController();
 
       controller.registerHandler(MyCommand, vi.fn());
-      expect(() =>
-        controller.registerHandler(MyCommand, vi.fn())
-      ).toThrow(
+      expect(() => controller.registerHandler(MyCommand, vi.fn())).toThrow(
         HandlerExistError,
         `MyController: handler for 'MyCommand' already exists`
       );
@@ -291,9 +290,7 @@ describe('OneToOneHandlingTrait', () => {
 
         const handler = vi.fn();
         controller.registerHandler(NamespacedCommand, handler);
-        expect(controller.getHandlerOrThrow(NamespacedCommand)).toBe(
-          handler
-        );
+        expect(controller.getHandlerOrThrow(NamespacedCommand)).toBe(handler);
       });
     });
 
@@ -389,4 +386,3 @@ describe('OneToOneHandlingTrait', () => {
     });
   });
 });
-

@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import getenv from 'getenv';
 import { MongoClient, Collection, ChangeStream } from 'mongodb';
@@ -110,9 +118,7 @@ describe(`CommitMongoDBObserver`, () => {
       expect(observer.isObserving()).toBe(true);
       expect(storage.lockCommit).toHaveBeenCalledTimes(1);
       expect(commitPublisher.publishChanges).toHaveBeenCalledTimes(1);
-      expect(commitPublisher.publishChanges).toHaveBeenCalledWith(
-        lockedCommit
-      );
+      expect(commitPublisher.publishChanges).toHaveBeenCalledWith(lockedCommit);
 
       await observer.stopObserving();
       expect(observer.isObserving()).toBe(false);
@@ -120,7 +126,9 @@ describe(`CommitMongoDBObserver`, () => {
       // Each of these should be called once (precomputed in observer)
       expect(commitPublisher.getHandledEventTypes).toHaveBeenCalledTimes(1);
       expect(commitPublisher.getHandledCommandTypes).toHaveBeenCalledTimes(1);
-      expect(collection.watch).toHaveBeenCalledWith(expectedPipeline, { fullDocument: 'updateLookup' });
+      expect(collection.watch).toHaveBeenCalledWith(expectedPipeline, {
+        fullDocument: 'updateLookup',
+      });
     });
 
     it('uses registeredAndNotReceivedYetFilter when locking commits (prevents duplicate publish)', async () => {
@@ -163,9 +171,7 @@ describe(`CommitMongoDBObserver`, () => {
         expectedFilter
       );
       expect(commitPublisher.publishChanges).toHaveBeenCalledTimes(1);
-      expect(commitPublisher.publishChanges).toHaveBeenCalledWith(
-        lockedCommit
-      );
+      expect(commitPublisher.publishChanges).toHaveBeenCalledWith(lockedCommit);
 
       await observer.stopObserving();
     });
@@ -237,11 +243,7 @@ describe(`CommitMongoDBObserver`, () => {
 
     it('registers event handlers for mongo events', async () => {
       await observer.startObserving(commitPublisher);
-      expect(Array.from(handlers.keys())).toEqual([
-        'change',
-        'close',
-        'error',
-      ]);
+      expect(Array.from(handlers.keys())).toEqual(['change', 'close', 'error']);
     });
 
     it('changes state to closed on close event and logs info', async () => {
@@ -250,9 +252,9 @@ describe(`CommitMongoDBObserver`, () => {
       await handler();
       expect(observer.isInState(CommitMongoDBObserver.STATES.closed)).to.be
         .true;
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`closed observing commits`)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`closed observing commits`))
+      );
     });
 
     it('changes state to failed on error event and logs error', async () => {
@@ -262,9 +264,11 @@ describe(`CommitMongoDBObserver`, () => {
       await handler(error);
       expect(observer.isInState(CommitMongoDBObserver.STATES.failed)).to.be
         .true;
-      expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`failed observing commits due to error: Error: my-error`)
-      ));
+      expect(log.error).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`failed observing commits due to error: Error: my-error`)
+        )
+      );
     });
   });
 });

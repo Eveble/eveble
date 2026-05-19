@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import {
   Container,
@@ -138,7 +146,7 @@ describe('BaseApp', () => {
     injector.bind.mockReturnValue(binding);
     injector.findByScope.calledWith('Singleton').mockReturnValue([]);
 
-    generateId = vi.spyOn(AppConfig, "generateId");
+    generateId = vi.spyOn(AppConfig, 'generateId');
     generatedId = 'my-generated-id';
     generateId.mockReturnValue(generatedId);
   });
@@ -253,7 +261,7 @@ describe('BaseApp', () => {
 
   describe(`initialization`, () => {
     it('does not initialize the application on construction', async () => {
-      const initializeSpy = vi.spyOn(BaseApp.prototype, "initialize");
+      const initializeSpy = vi.spyOn(BaseApp.prototype, 'initialize');
       new MyApp({});
       expect(initializeSpy).not.toHaveBeenCalled();
       initializeSpy.mockRestore();
@@ -347,9 +355,7 @@ describe('BaseApp', () => {
               injector,
             });
             await app.initialize();
-            expect(injector.bind).toHaveBeenCalledWith(
-              BINDINGS.Converter
-            );
+            expect(injector.bind).toHaveBeenCalledWith(BINDINGS.Converter);
             expect(binding.toConstantValue).toHaveBeenCalledWith(
               kernel.converter
             );
@@ -360,9 +366,7 @@ describe('BaseApp', () => {
               injector,
             });
             await app.initialize();
-            expect(injector.bind).toHaveBeenCalledWith(
-              BINDINGS.Validator
-            );
+            expect(injector.bind).toHaveBeenCalledWith(BINDINGS.Validator);
             expect(binding.toConstantValue).toHaveBeenCalledWith(
               kernel.validator
             );
@@ -373,9 +377,7 @@ describe('BaseApp', () => {
               injector,
             });
             await app.initialize();
-            expect(injector.bind).toHaveBeenCalledWith(
-              BINDINGS.Describer
-            );
+            expect(injector.bind).toHaveBeenCalledWith(BINDINGS.Describer);
             expect(binding.toConstantValue).toHaveBeenCalledWith(
               kernel.describer
             );
@@ -386,9 +388,7 @@ describe('BaseApp', () => {
               injector,
             });
             await app.initialize();
-            expect(injector.bind).toHaveBeenCalledWith(
-              BINDINGS.Library
-            );
+            expect(injector.bind).toHaveBeenCalledWith(BINDINGS.Library);
             expect(binding.toConstantValue).toHaveBeenCalledWith(
               kernel.library
             );
@@ -401,12 +401,8 @@ describe('BaseApp', () => {
               injector,
             });
             await app.initialize();
-            expect(injector.bind).toHaveBeenCalledWith(
-              BINDINGS.Injector
-            );
-            expect(binding.toConstantValue).toHaveBeenCalledWith(
-              injector
-            );
+            expect(injector.bind).toHaveBeenCalledWith(BINDINGS.Injector);
+            expect(binding.toConstantValue).toHaveBeenCalledWith(injector);
           });
 
           it('binds config instance to constant value', async () => {
@@ -418,12 +414,8 @@ describe('BaseApp', () => {
               config,
             });
             await app.initialize();
-            expect(injector.bind).toHaveBeenCalledWith(
-              BINDINGS.Config
-            );
-            expect(binding.toConstantValue).toHaveBeenCalledWith(
-              config
-            );
+            expect(injector.bind).toHaveBeenCalledWith(BINDINGS.Config);
+            expect(binding.toConstantValue).toHaveBeenCalledWith(config);
           });
         });
 
@@ -434,19 +426,17 @@ describe('BaseApp', () => {
                 injector,
               });
               await app.initialize();
-              expect(injector.bind).toHaveBeenCalledWith(
-                BINDINGS.winston
-              );
-              expect(binding.toConstantValue).toHaveBeenCalledWith(
-                winston
-              );
+              expect(injector.bind).toHaveBeenCalledWith(BINDINGS.winston);
+              expect(binding.toConstantValue).toHaveBeenCalledWith(winston);
             });
 
             it('ensures to not override existing binding of winston set prior to initialization', async () => {
               const app = new MyApp({
                 injector,
               });
-              injector.isBound.calledWith(BINDINGS.winston).mockReturnValue(true);
+              injector.isBound
+                .calledWith(BINDINGS.winston)
+                .mockReturnValue(true);
               await app.initialize();
               expect(injector.bind).not.toHaveBeenCalledWith(BINDINGS.winston);
             });
@@ -457,12 +447,8 @@ describe('BaseApp', () => {
                 injector,
               });
               await app.initialize();
-              expect(injector.bind).toHaveBeenCalledWith(
-                BINDINGS.chalk
-              );
-              expect(binding.toConstantValue).toHaveBeenCalledWith(
-                chalk
-              );
+              expect(injector.bind).toHaveBeenCalledWith(BINDINGS.chalk);
+              expect(binding.toConstantValue).toHaveBeenCalledWith(chalk);
             });
 
             it('ensures to not override existing binding of chalk set prior to initialization', async () => {
@@ -489,9 +475,13 @@ describe('BaseApp', () => {
         });
 
         await app.initialize();
-        expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-          new Log(`initializing singletons`).on(app).in('initializeSingletons')
-        ));
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`initializing singletons`)
+              .on(app)
+              .in('initializeSingletons')
+          )
+        );
         await app.shutdown();
       });
 
@@ -507,7 +497,8 @@ describe('BaseApp', () => {
         const ioc = new Injector();
         ioc.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
         const app = new MyApp({
-          modules: [], injector: ioc,
+          modules: [],
+          injector: ioc,
         });
         app.injector.bind<MyClass>('MyClass').to(MyClass).inSingletonScope();
         await app.initialize();
@@ -529,7 +520,8 @@ describe('BaseApp', () => {
         const ioc = new Injector();
         ioc.bind<types.Logger>(BINDINGS.log).toConstantValue(log);
         const app = new MyApp({
-          modules: [], injector: ioc,
+          modules: [],
+          injector: ioc,
         });
         app.injector
           .bind<MyClass>(symbolIdentifier)
@@ -552,7 +544,7 @@ describe('BaseApp', () => {
         });
 
         ioc.findByScope = vi.fn().mockReturnValue(['MyClass']);
-        const getAsync = vi.spyOn(ioc, "getAsync");
+        const getAsync = vi.spyOn(ioc, 'getAsync');
 
         app.injector.bind<MyClass>('MyClass').to(MyClass).inSingletonScope();
 
@@ -621,9 +613,9 @@ describe('BaseApp', () => {
       });
 
       await app.initialize();
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`initialize`).on(app).in('initialize')
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`initialize`).on(app).in('initialize'))
+      );
       expect(log.debug).toHaveBeenCalledBefore(module.initialize as any);
     });
 
@@ -632,7 +624,9 @@ describe('BaseApp', () => {
       injector.get.calledWith(BINDINGS.log).mockReturnValue(log);
       const consoleTransport = mock<types.LogTransport>();
       log.hasTransport.calledWith(BINDINGS.console).mockReturnValue(true);
-      log.getTransport.calledWith(BINDINGS.console).mockReturnValue(consoleTransport);
+      log.getTransport
+        .calledWith(BINDINGS.console)
+        .mockReturnValue(consoleTransport);
 
       const config = new AppConfig({});
       const startMessage = 'start';
@@ -643,7 +637,9 @@ describe('BaseApp', () => {
       });
 
       await app.initialize();
-      expect(consoleTransport.info).toHaveBeenCalledWith(expect.objectContaining(new Log('start')));
+      expect(consoleTransport.info).toHaveBeenCalledWith(
+        expect.objectContaining(new Log('start'))
+      );
       expect(consoleTransport.info).toHaveBeenCalledBefore(log.debug);
     });
 
@@ -724,9 +720,9 @@ describe('BaseApp', () => {
 
       await app.initialize();
       await app.shutdown();
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`shutdown`).on(app).in('shutdown')
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`shutdown`).on(app).in('shutdown'))
+      );
       expect(log.debug).toHaveBeenCalledBefore(app.afterShutdown as any);
     });
 
@@ -747,7 +743,9 @@ describe('BaseApp', () => {
       injector.get.calledWith(BINDINGS.log).mockReturnValue(log);
       const consoleTransport = mock<types.LogTransport>();
       log.hasTransport.calledWith(BINDINGS.console).mockReturnValue(true);
-      log.getTransport.calledWith(BINDINGS.console).mockReturnValue(consoleTransport);
+      log.getTransport
+        .calledWith(BINDINGS.console)
+        .mockReturnValue(consoleTransport);
 
       const config = new AppConfig({});
       const exitMessage = 'exit';
@@ -762,10 +760,12 @@ describe('BaseApp', () => {
       await app.stop();
 
       await app.shutdown();
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`shutdown`).on(app).in('shutdown')
-      ));
-      expect(consoleTransport.info).toHaveBeenCalledWith(expect.objectContaining(new Log(`exit`)));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`shutdown`).on(app).in('shutdown'))
+      );
+      expect(consoleTransport.info).toHaveBeenCalledWith(
+        expect.objectContaining(new Log(`exit`))
+      );
       expect(log.debug).toHaveBeenCalled();
     });
   });
@@ -961,4 +961,3 @@ describe('BaseApp', () => {
     });
   });
 });
-

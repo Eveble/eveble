@@ -141,11 +141,13 @@ describe('List', () => {
         name: 'my-item-name',
       });
       expect(list.add).toHaveBeenCalledTimes(1);
-      expect(list.add).toHaveBeenCalledWith(expect.objectContaining(
-        new Item({
-          name: 'my-item-name',
-        })
-      ));
+      expect(list.add).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Item({
+            name: 'my-item-name',
+          })
+        )
+      );
     });
   });
 
@@ -265,9 +267,9 @@ describe('List', () => {
       const secondElement = new Item({ name: 'my-second-name' });
       source.in<Item>('items').add(firstElement);
       source.in<Item>('items').add(secondElement);
-      expect(
-        source.in<Item>('items').getBy('name', 'my-first-name')
-      ).toBe(firstElement);
+      expect(source.in<Item>('items').getBy('name', 'my-first-name')).toBe(
+        firstElement
+      );
     });
   });
 
@@ -304,16 +306,16 @@ describe('List', () => {
 
       source.in<Employee>('employees').add(firstElement);
       source.in<Employee>('employees').add(secondElement);
-      expect(
-        source.in<Employee>('employees').getById('my-first-id')
-      ).toBe(firstElement);
+      expect(source.in<Employee>('employees').getById('my-first-id')).toBe(
+        firstElement
+      );
     });
 
     it(`returns undefined for identifiable element that can't be found`, () => {
       const source = new Company({ id: 'my-company-id', employees: [] });
-      expect(
-        source.in<Employee>('employees').getById('my-first-id')
-      ).toBe(undefined);
+      expect(source.in<Employee>('employees').getById('my-first-id')).toBe(
+        undefined
+      );
     });
   });
 
@@ -363,10 +365,7 @@ describe('List', () => {
 
       list.findBy('name', 'my-first-name');
       expect(list.getByOrThrow).toHaveBeenCalledTimes(1);
-      expect(list.getByOrThrow).toHaveBeenCalledWith(
-        'name',
-        'my-first-name'
-      );
+      expect(list.getByOrThrow).toHaveBeenCalledWith('name', 'my-first-name');
     });
   });
 
@@ -422,9 +421,7 @@ describe('List', () => {
       const source = new Company({ id: 'my-company-id', employees: [] });
       const element = new Employee({ id: 'my-id' });
       source.in<Employee>('employees').replaceById(element.id, element);
-      expect(source.in<Employee>('employees').getById('my-id')).toBe(
-        element
-      );
+      expect(source.in<Employee>('employees').getById('my-id')).toBe(element);
     });
 
     it('replaces existing element by id', () => {
@@ -451,9 +448,7 @@ describe('List', () => {
         name: 'my-name',
       });
       source.in<Item>('items').replaceBy('name', element.name, element);
-      expect(source.in<Item>('items').getBy('name', 'my-name')).toBe(
-        element
-      );
+      expect(source.in<Item>('items').getBy('name', 'my-name')).toBe(element);
     });
 
     it('replaces existing element by matching key and value', () => {
@@ -573,4 +568,3 @@ describe('List', () => {
     });
   });
 });
-

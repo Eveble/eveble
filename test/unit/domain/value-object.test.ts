@@ -18,4 +18,3 @@ describe(`ValueObject`, () => {
     expect(ValueObject.prototype.getTypeName()).toBe('ValueObject');
   });
 });
-

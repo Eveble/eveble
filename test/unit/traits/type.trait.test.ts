@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { PropTypes } from 'typend';
 
@@ -169,8 +177,7 @@ describe('TypeTrait', () => {
             age: PropTypes.instanceOf(Number),
           };
           converter.convert.mockReturnValue({ properties: propTypes });
-          converter.convert
-            .mockReturnValue({ properties: propTypes });
+          converter.convert.mockReturnValue({ properties: propTypes });
           const firstPerson = new Person('Jane', 'Doe', 28);
           const secondPerson = new NotAPerson('John', 'Doe', 30);
           expect(firstPerson.equals(secondPerson)).toBe(false);
@@ -515,7 +522,9 @@ describe('TypeTrait', () => {
       const message = 'my-error';
       const error = new Error(message);
       const props = { key: 'value' };
-      validator.validate.mockImplementation(() => { throw error; });
+      validator.validate.mockImplementation(() => {
+        throw error;
+      });
 
       expect(() => new MyClass().validateProps(props, propTypes)).toThrow(
         Error,
@@ -537,7 +546,9 @@ describe('TypeTrait', () => {
       const message = 'my-error';
       const error = new Error(message);
       const props = { key: 'value' };
-      validator.validate.mockImplementation(() => { throw error; });
+      validator.validate.mockImplementation(() => {
+        throw error;
+      });
 
       expect(() => new MyClass().validateProps(props, propTypes)).toThrow(
         Error,
@@ -560,11 +571,13 @@ describe('TypeTrait', () => {
         const error = new Error(message);
         const props = { key: 'value' };
         const propTypes = { key: PropTypes.instanceOf(String) };
-        validator.validate.mockImplementation(() => { throw error; });
+        validator.validate.mockImplementation(() => {
+          throw error;
+        });
 
-        expect(() =>
-          new MyClass().validateProps(props, propTypes)
-        ).not.toThrow(Error);
+        expect(() => new MyClass().validateProps(props, propTypes)).not.toThrow(
+          Error
+        );
       });
     });
   });
@@ -605,8 +618,7 @@ describe('TypeTrait', () => {
         }
       }
 
-      converter.convert
-        .mockReturnValue({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const person = new PersonWithExclusions('Jane', 'Doe', 28, 'secret');
       const props = person.getPropTypes();
@@ -642,8 +654,7 @@ describe('TypeTrait', () => {
         }
       }
 
-      converter.convert
-        .mockReturnValue({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const instance = new SecureClass({
         publicKey: 'public',
@@ -680,8 +691,7 @@ describe('TypeTrait', () => {
         }
       }
 
-      converter.convert
-        .mockReturnValue({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const instance = new NoExclusions('Jane', 'Doe');
       const props = instance.getPropTypes();
@@ -709,8 +719,7 @@ describe('TypeTrait', () => {
         }
       }
 
-      converter.convert
-        .mockReturnValue({ properties: propTypes });
+      converter.convert.mockReturnValue({ properties: propTypes });
 
       const props = StaticExclusionTest.getPropTypes();
 
@@ -721,4 +730,3 @@ describe('TypeTrait', () => {
     });
   });
 });
-

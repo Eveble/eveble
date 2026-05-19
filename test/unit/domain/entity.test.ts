@@ -376,7 +376,9 @@ describe('Entity', () => {
             Account
           );
           expect(entity.updateProfile).toHaveBeenCalledTimes(1);
-          expect(entity.updateProfile).toHaveBeenCalledWith(expect.objectContaining(props));
+          expect(entity.updateProfile).toHaveBeenCalledWith(
+            expect.objectContaining(props)
+          );
         });
 
         it('ensures that state of entity is not changed after invocation of assertion method', () => {
@@ -436,7 +438,9 @@ describe('Entity', () => {
           };
           expect(entity.can.updateProfile(props)).toBe(true);
           expect(entity.updateProfile).toHaveBeenCalledTimes(1);
-          expect(entity.updateProfile).toHaveBeenCalledWith(expect.objectContaining(props));
+          expect(entity.updateProfile).toHaveBeenCalledWith(
+            expect.objectContaining(props)
+          );
         });
 
         it('ensures that state of entity is rollbacked after invocation method', () => {
@@ -507,4 +511,3 @@ describe('Entity', () => {
     });
   });
 });
-

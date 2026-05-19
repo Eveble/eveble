@@ -24,3 +24,6 @@ coverage.lcov
 
 # Debug
 *.log
+
+# tsruntime persistent cache
+.tsruntime-cache

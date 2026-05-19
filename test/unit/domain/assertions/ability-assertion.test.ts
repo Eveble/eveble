@@ -48,7 +48,9 @@ describe(`AbilityAssertion`, () => {
       expect(asserter.ensure.is.ableTo.myAction(...args)).toBe('result');
       expect(entity.myAction).toHaveBeenCalledTimes(1);
       expect(entity.myAction).toHaveBeenCalledWith(...args);
-      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).toHaveBeenCalledBefore(entity.myAction);
+      expect(
+        entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]
+      ).toHaveBeenCalledBefore(entity.myAction);
     });
 
     it('ensures that state of entity is being rollbacked after validation', () => {
@@ -62,7 +64,9 @@ describe(`AbilityAssertion`, () => {
       expect(asserter.ensure.is.ableTo.myAction(...args)).toBe('result');
       expect(entity.myAction).toHaveBeenCalledTimes(1);
       expect(entity.myAction).toHaveBeenCalledWith(...args);
-      expect(entity.myAction).toHaveBeenCalledBefore(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]);
+      expect(entity.myAction).toHaveBeenCalledBefore(
+        entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]
+      );
     });
   });
 
@@ -90,7 +94,9 @@ describe(`AbilityAssertion`, () => {
       entity[ENABLE_ACTION_VALIDATION_METHOD_KEY] = vi.fn();
 
       expect(asserter.is.ableTo.myAction(...args)).toBe(true);
-      expect(entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]).toHaveBeenCalledBefore(entity.myAction);
+      expect(
+        entity[ENABLE_ACTION_VALIDATION_METHOD_KEY]
+      ).toHaveBeenCalledBefore(entity.myAction);
     });
 
     it('ensures that state of entity is being rollbacked after validation', () => {
@@ -102,7 +108,9 @@ describe(`AbilityAssertion`, () => {
       entity.myAction.mockReturnValue(true);
 
       expect(asserter.is.ableTo.myAction(...args)).toBe(true);
-      expect(entity.myAction).toHaveBeenCalledBefore(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]);
+      expect(entity.myAction).toHaveBeenCalledBefore(
+        entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]
+      );
     });
 
     it('returns false for failed evaluation', () => {
@@ -111,7 +119,9 @@ describe(`AbilityAssertion`, () => {
       const args = [1, 2, 3, 4];
 
       entity.myAction = vi.fn();
-      entity.myAction.mockImplementation(() => { throw new Error(); });
+      entity.myAction.mockImplementation(() => {
+        throw new Error();
+      });
 
       expect(asserter.is.ableTo.myAction(...args)).toBe(false);
       expect(entity.myAction).toHaveBeenCalledTimes(1);
@@ -124,11 +134,14 @@ describe(`AbilityAssertion`, () => {
       const args = [1, 2, 3, 4];
 
       entity.myAction = vi.fn();
-      entity.myAction.mockImplementation(() => { throw new Error(); });
+      entity.myAction.mockImplementation(() => {
+        throw new Error();
+      });
 
       expect(asserter.is.ableTo.myAction(...args)).toBe(false);
-      expect(entity.myAction).toHaveBeenCalledBefore(entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]);
+      expect(entity.myAction).toHaveBeenCalledBefore(
+        entity[DISABLE_ACTION_VALIDATION_METHOD_KEY]
+      );
     });
   });
 });
-

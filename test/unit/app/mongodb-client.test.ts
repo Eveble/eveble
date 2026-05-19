@@ -56,10 +56,16 @@ describe(`MongoDBClient`, () => {
 
   const setupMongoClient = function (): void {
     mongoClientInstance.db.mockReturnValue(db);
-    db.collection.calledWith('first-collection').mockReturnValue(firstCollection);
-    db.collection.calledWith('second-collection').mockReturnValue(secondCollection);
+    db.collection
+      .calledWith('first-collection')
+      .mockReturnValue(firstCollection);
+    db.collection
+      .calledWith('second-collection')
+      .mockReturnValue(secondCollection);
 
-    MongoClient.mockImplementation(function() { return mongoClientInstance; });
+    MongoClient.mockImplementation(function () {
+      return mongoClientInstance;
+    });
 
     client = new MongoDBClient(props);
   };
@@ -126,12 +132,8 @@ describe(`MongoDBClient`, () => {
       expect(instance.id).toBe(props.id);
       expect(instance.url).toBe(props.url);
       expect(instance.databases[0].name).toBe(databaseName);
-      expect(instance.databases[0].collections[0]).toBe(
-        nonIndexedCollection
-      );
-      expect(instance.databases[0].collections[1]).toBe(
-        indexedCollection
-      );
+      expect(instance.databases[0].collections[0]).toBe(nonIndexedCollection);
+      expect(instance.databases[0].collections[1]).toBe(indexedCollection);
     });
 
     it(`takes object with optional: options as an object and assigns them`, () => {
@@ -219,7 +221,9 @@ describe(`MongoDBClient`, () => {
     describe('failed initialization', () => {
       it('re-throws error from MongoClient on creation', async () => {
         const error = new Error('my-error');
-        MongoClient.mockImplementation(function() { throw error; });
+        MongoClient.mockImplementation(function () {
+          throw error;
+        });
         await injector.injectIntoAsync(client);
 
         await expect(client.initialize()).rejects.toThrow(error);
@@ -227,7 +231,9 @@ describe(`MongoDBClient`, () => {
 
       it('logs failed initialization as an error', async () => {
         const error = new Error('my-error');
-        MongoClient.mockImplementation(function() { throw error; });
+        MongoClient.mockImplementation(function () {
+          throw error;
+        });
 
         await injector.injectIntoAsync(client);
         await expect(client.initialize()).rejects.toThrow(error);
@@ -522,4 +528,3 @@ describe(`MongoDBClient`, () => {
     });
   });
 });
-

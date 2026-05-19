@@ -123,4 +123,3 @@ describe(`ValidatorTrait`, () => {
     });
   });
 });
-

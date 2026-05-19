@@ -208,11 +208,13 @@ describe(`PulseCommandScheduler`, () => {
         await expect(scheduler.initialize()).rejects.toThrow(
           InactiveClientError
         );
-        expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
-          new Log(`inactive Pulse client`)
-            .on(scheduler)
-            .in(scheduler.initialize)
-        ));
+        expect(log.error).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`inactive Pulse client`)
+              .on(scheduler)
+              .in(scheduler.initialize)
+          )
+        );
       });
     });
   });
@@ -306,9 +308,7 @@ describe(`PulseCommandScheduler`, () => {
         pulseInstance.schedule.mockRejectedValue(error);
 
         await scheduler.initialize();
-        await expect(
-          scheduler.schedule(scheduleCommand)
-        ).rejects.toThrow(
+        await expect(scheduler.schedule(scheduleCommand)).rejects.toThrow(
           CommandSchedulingError,
           `${jobName}: cannot schedule command '${assignmentId}' that was scheduled by '${assignerType}@${assignerId}' do to error '${error}'`
         );
@@ -319,9 +319,9 @@ describe(`PulseCommandScheduler`, () => {
         pulseInstance.schedule.mockRejectedValue(error);
 
         await scheduler.initialize();
-        await expect(
-          scheduler.schedule(scheduleCommand)
-        ).rejects.toThrow(CommandSchedulingError);
+        await expect(scheduler.schedule(scheduleCommand)).rejects.toThrow(
+          CommandSchedulingError
+        );
         expect(log.error).toHaveBeenCalledWith(
           new Log(
             `failed scheduling command '${assignmentId}' do to error: ${error}`
@@ -398,9 +398,7 @@ describe(`PulseCommandScheduler`, () => {
         pulseInstance.cancel.mockRejectedValue(error);
 
         await scheduler.initialize();
-        await expect(
-          scheduler.unschedule(unscheduleCommand)
-        ).rejects.toThrow(
+        await expect(scheduler.unschedule(unscheduleCommand)).rejects.toThrow(
           CommandUnschedulingError,
           `${jobName}: cannot cancel command '${assignmentId}' that was scheduled by '${assignerType}@${assignerId}' do to error '${error}'`
         );
@@ -411,9 +409,9 @@ describe(`PulseCommandScheduler`, () => {
         pulseInstance.cancel.mockRejectedValue(error);
 
         await scheduler.initialize();
-        await expect(
-          scheduler.unschedule(unscheduleCommand)
-        ).rejects.toThrow(CommandUnschedulingError);
+        await expect(scheduler.unschedule(unscheduleCommand)).rejects.toThrow(
+          CommandUnschedulingError
+        );
 
         expect(log.error).toHaveBeenCalledWith(
           new Log(
@@ -438,12 +436,14 @@ describe(`PulseCommandScheduler`, () => {
       job.attrs.data = serializedData;
 
       await scheduler.handleScheduledCommand(job);
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`handling scheduled command '${assignmentId}'`)
-          .on(scheduler)
-          .in(scheduler.handleScheduledCommand)
-          .with('command', command)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`handling scheduled command '${assignmentId}'`)
+            .on(scheduler)
+            .in(scheduler.handleScheduledCommand)
+            .with('command', command)
+        )
+      );
     });
 
     it(`sends command through command bus upon scheduled time`, async () => {
@@ -557,18 +557,14 @@ describe(`PulseCommandScheduler`, () => {
       const error = new Error('my-error');
       collection.deleteMany.mockRejectedValue(error);
 
-      await expect(scheduler.unscheduleAll()).rejects.toThrow(
-        error
-      );
+      await expect(scheduler.unscheduleAll()).rejects.toThrow(error);
     });
 
     it('logs unsuccessful cancellation of all jobs', async () => {
       const error = new Error('my-error');
       collection.deleteMany.mockRejectedValue(error);
 
-      await expect(scheduler.unscheduleAll()).rejects.toThrow(
-        error
-      );
+      await expect(scheduler.unscheduleAll()).rejects.toThrow(error);
       expect(log.error).toHaveBeenCalledWith(
         new Log(
           `failed unscheduling all jobs from '${jobName}' do to error: ${error}`
@@ -673,4 +669,3 @@ describe(`PulseCommandScheduler`, () => {
     });
   });
 });
-

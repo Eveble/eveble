@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { MongoClient, Collection } from 'mongodb';
 
@@ -115,7 +123,9 @@ describe(`CommitMongoDBStorage`, () => {
     it(`inserts commit to MongoDB collection`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
       const serializedCommit = mock<types.MongoDBSerializedCommit>();
-      commitSerializer.serialize.calledWith(commit).mockReturnValue(serializedCommit);
+      commitSerializer.serialize
+        .calledWith(commit)
+        .mockReturnValue(serializedCommit);
 
       vi.spyOn(collection, 'insertOne').mockResolvedValue({
         insertedId: commitId,
@@ -132,13 +142,16 @@ describe(`CommitMongoDBStorage`, () => {
     it(`throws AddingCommitFailedError on unsuccessful document insertion`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
       const serializedCommit = mock<types.MongoDBSerializedCommit>();
-      commitSerializer.serialize.calledWith(commit).mockReturnValue(serializedCommit);
+      commitSerializer.serialize
+        .calledWith(commit)
+        .mockReturnValue(serializedCommit);
 
-      vi.spyOn(collection, 'insertOne').mockResolvedValue({ acknowledged: false, insertedId: null });
+      vi.spyOn(collection, 'insertOne').mockResolvedValue({
+        acknowledged: false,
+        insertedId: null,
+      });
 
-      await expect(
-        storage.save(commit)
-      ).rejects.toThrow(
+      await expect(storage.save(commit)).rejects.toThrow(
         AddingCommitFailedError,
         `CommitMongoDBStorage: adding commit with id '${commitId.toString()}' failed on '${appId}'`
       );
@@ -149,7 +162,9 @@ describe(`CommitMongoDBStorage`, () => {
     it(`throws CommitConcurrencyError on duplicated key error`, async () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
       const serializedCommit = mock<types.MongoDBSerializedCommit>();
-      commitSerializer.serialize.calledWith(commit).mockReturnValue(serializedCommit);
+      commitSerializer.serialize
+        .calledWith(commit)
+        .mockReturnValue(serializedCommit);
 
       const error = new Error('duplicate key error index');
       (error as any).code = 11000;
@@ -169,9 +184,7 @@ describe(`CommitMongoDBStorage`, () => {
         version: 10,
       });
 
-      await expect(
-        storage.save(commit)
-      ).rejects.toThrow(
+      await expect(storage.save(commit)).rejects.toThrow(
         CommitConcurrencyError,
         `CommitMongoDBStorage.MyEventSourceable: expected event sourceable with id of '${eventSourceableId.toString()}' to be at version 0 but is at version 1`
       );
@@ -219,7 +232,9 @@ describe(`CommitMongoDBStorage`, () => {
       const serializedCommit = mock<types.MongoDBSerializedCommit>();
       const commit = generateCommit(commitId, eventSourceableId, 1);
       vi.spyOn(collection, 'findOne').mockResolvedValue(serializedCommit);
-      commitSerializer.deserialize.calledWith(serializedCommit).mockReturnValue(commit);
+      commitSerializer.deserialize
+        .calledWith(serializedCommit)
+        .mockReturnValue(commit);
 
       const foundCommit = await storage.findById(commitId);
       expect(foundCommit).toBeInstanceOf(Commit);
@@ -273,7 +288,10 @@ describe(`CommitMongoDBStorage`, () => {
         11
       );
 
-      vi.spyOn(findResult, 'toArray').mockResolvedValue([firstSerializedCommit, secondSerializedCommit]);
+      vi.spyOn(findResult, 'toArray').mockResolvedValue([
+        firstSerializedCommit,
+        secondSerializedCommit,
+      ]);
       commitSerializer.deserialize
         .calledWith(firstSerializedCommit)
         .mockReturnValue(firstCommit);
@@ -385,7 +403,10 @@ describe(`CommitMongoDBStorage`, () => {
     });
 
     it(`throws UpdatingCommitError when commit can't be updated to published`, async () => {
-      vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 0, acknowledged: true });
+      vi.spyOn(collection, 'updateOne').mockResolvedValue({
+        modifiedCount: 0,
+        acknowledged: true,
+      });
 
       await expect(
         storage.flagCommitAsPublished(commitId, appId, workerId, now)
@@ -416,7 +437,10 @@ describe(`CommitMongoDBStorage`, () => {
         },
       };
 
-      vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 1, acknowledged: true });
+      vi.spyOn(collection, 'updateOne').mockResolvedValue({
+        modifiedCount: 1,
+        acknowledged: true,
+      });
 
       const result = await storage.flagCommitAsFailed(
         commitId,
@@ -429,7 +453,10 @@ describe(`CommitMongoDBStorage`, () => {
     });
 
     it(`throws UpdatingCommitError when commit can't be updated to failed`, async () => {
-      vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 0, acknowledged: true });
+      vi.spyOn(collection, 'updateOne').mockResolvedValue({
+        modifiedCount: 0,
+        acknowledged: true,
+      });
 
       expect(
         storage.flagCommitAsFailed(commitId, appId, workerId, now)
@@ -464,8 +491,12 @@ describe(`CommitMongoDBStorage`, () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
       const serializedCommit = mock<types.MongoDBSerializedCommit>();
 
-      vi.spyOn(collection, 'findOneAndUpdate').mockResolvedValue(serializedCommit);
-      commitSerializer.deserialize.calledWith(serializedCommit).mockReturnValue(commit);
+      vi.spyOn(collection, 'findOneAndUpdate').mockResolvedValue(
+        serializedCommit
+      );
+      commitSerializer.deserialize
+        .calledWith(serializedCommit)
+        .mockReturnValue(commit);
 
       const foundCommit = await storage.flagAndResolveCommitAsTimeouted(
         commitId,
@@ -519,8 +550,12 @@ describe(`CommitMongoDBStorage`, () => {
       const commit = generateCommit(commitId, eventSourceableId, 1);
       const serializedCommit = mock<types.MongoDBSerializedCommit>();
 
-      vi.spyOn(collection, 'findOneAndUpdate').mockResolvedValue(serializedCommit);
-      commitSerializer.deserialize.calledWith(serializedCommit).mockReturnValue(commit);
+      vi.spyOn(collection, 'findOneAndUpdate').mockResolvedValue(
+        serializedCommit
+      );
+      commitSerializer.deserialize
+        .calledWith(serializedCommit)
+        .mockReturnValue(commit);
 
       const foundCommit = await storage.lockCommit(
         commitId,
@@ -531,7 +566,11 @@ describe(`CommitMongoDBStorage`, () => {
       expect(foundCommit).toBeInstanceOf(Commit);
       expect(foundCommit).toBe(commit);
 
-      expect(collection.findOneAndUpdate).toHaveBeenCalledWith(filter, update, options);
+      expect(collection.findOneAndUpdate).toHaveBeenCalledWith(
+        filter,
+        update,
+        options
+      );
       vi.useRealTimers();
     });
   });

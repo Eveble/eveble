@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { Collection } from 'mongodb';
 import { Type, kernel } from '@eveble/core';
@@ -322,9 +330,7 @@ describe(`CommitStore with MongoDB storage`, () => {
       await commitStore.save(commit);
 
       aggregate.version = 20; // Should be at version 1
-      await expect(
-        commitStore.createCommit(aggregate)
-      ).rejects.toThrow(
+      await expect(commitStore.createCommit(aggregate)).rejects.toThrow(
         CommitConcurrencyError,
         `CommitStoreWithMongoDBStorage.MyAggregate: expected event sourceable with id of 'my-id' to be at version 20 but is at version 1`
       );
@@ -496,4 +502,3 @@ describe(`CommitStore with MongoDB storage`, () => {
     });
   });
 });
-

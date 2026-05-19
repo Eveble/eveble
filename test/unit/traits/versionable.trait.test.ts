@@ -196,9 +196,9 @@ describe(`VersionableTrait`, () => {
       }
       expect(MyClass.prototype.hasHook('onConstruction', 'versionable')).to.be
         .true;
-      expect(
-        MyClass.prototype.getHook('onConstruction', 'versionable')
-      ).toBe(MyClass.prototype.transformLegacyProps);
+      expect(MyClass.prototype.getHook('onConstruction', 'versionable')).toBe(
+        MyClass.prototype.transformLegacyProps
+      );
     });
 
     it.skip('does not leak legacy transformers in parent-child relation', () => {
@@ -350,4 +350,3 @@ describe(`VersionableTrait`, () => {
     });
   });
 });
-

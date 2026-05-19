@@ -82,4 +82,3 @@ describe(`Service`, () => {
     expect(injector.get('MyService')).toBeInstanceOf(MyService);
   });
 });
-

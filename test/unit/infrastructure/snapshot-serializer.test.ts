@@ -65,13 +65,12 @@ describe(`SnapshotSerializer`, () => {
     serializer.parse.calledWith(serializedEs).mockReturnValue(data);
     serializer.fromData.calledWith(data).mockReturnValue(instance);
 
-    expect(
-      esSerializer.deserialize(MyEventSourceable, serializedEs)
-    ).toBe(instance);
+    expect(esSerializer.deserialize(MyEventSourceable, serializedEs)).toBe(
+      instance
+    );
     expect(serializer.parse).toHaveBeenCalledTimes(1);
     expect(serializer.parse).toHaveBeenCalledWith(serializedEs);
     expect(serializer.fromData).toHaveBeenCalledTimes(1);
     expect(serializer.fromData).toHaveBeenCalledWith(data);
   });
 });
-

@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
@@ -75,7 +83,9 @@ describe(`CommitPublisher`, () => {
 
     config.get.calledWith('appId').mockReturnValue(appId);
     config.get.calledWith('workerId').mockReturnValue(workerId);
-    config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
+    config.get
+      .calledWith('eveble.commitStore.timeout')
+      .mockReturnValue(timeout);
 
     commitPublisher = new CommitPublisher();
     injector.injectInto(commitPublisher);
@@ -164,7 +174,9 @@ describe(`CommitPublisher`, () => {
     });
 
     it(`publishes externally added commits in the current app if there is a registered handler`, async () => {
-      serializer.hasType.calledWith('CommitPublisher.MyCommand').mockReturnValue(true);
+      serializer.hasType
+        .calledWith('CommitPublisher.MyCommand')
+        .mockReturnValue(true);
       commandBus.hasHandler.calledWith(MyCommand).mockReturnValue(true);
 
       const expectedCommitStateAfterPublication = new Commit({
@@ -184,22 +196,28 @@ describe(`CommitPublisher`, () => {
 
       expect(eventBus.publish).toHaveBeenCalledWith(event);
 
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`publishing 'CommitPublisher.MyEvent'`)
-          .on(commitPublisher)
-          .in('publishEvent')
-          .with('event', event)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`publishing 'CommitPublisher.MyEvent'`)
+            .on(commitPublisher)
+            .in('publishEvent')
+            .with('event', event)
+        )
+      );
 
-      expect(serializer.hasType).toHaveBeenCalledWith('CommitPublisher.MyCommand');
+      expect(serializer.hasType).toHaveBeenCalledWith(
+        'CommitPublisher.MyCommand'
+      );
       expect(commandBus.hasHandler).toHaveBeenCalledWith(MyCommand);
       expect(commandBus.send).toHaveBeenCalledWith(command);
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`sending 'CommitPublisher.MyCommand'`)
-          .on(commitPublisher)
-          .in('sendCommand')
-          .with('command', command)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`sending 'CommitPublisher.MyCommand'`)
+            .on(commitPublisher)
+            .in('sendCommand')
+            .with('command', command)
+        )
+      );
 
       expect(storage.flagCommitAsPublished).toHaveBeenCalledTimes(1);
       expect(storage.flagCommitAsPublished).toHaveBeenCalledWith(
@@ -209,24 +227,31 @@ describe(`CommitPublisher`, () => {
         now
       );
 
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `published commit with id '91f09174-aebc-48e9-9ce8-672a670ede37'`
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `published commit with id '91f09174-aebc-48e9-9ce8-672a670ede37'`
+          )
+            .on(commitPublisher)
+            .in(commitPublisher.publishChanges)
+            .with('commit', expectedCommitStateAfterPublication)
         )
-          .on(commitPublisher)
-          .in(commitPublisher.publishChanges)
-          .with('commit', expectedCommitStateAfterPublication)
-      ));
+      );
       expect(commit).toEqual(expectedCommitStateAfterPublication);
     });
 
     it(`fails the processing attempt if timeout is reached`, async () => {
       timeout = 5;
-      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
-      serializer.hasType.calledWith('CommitPublisher.MyCommand').mockReturnValue(true);
+      config.get
+        .calledWith('eveble.commitStore.timeout')
+        .mockReturnValue(timeout);
+      serializer.hasType
+        .calledWith('CommitPublisher.MyCommand')
+        .mockReturnValue(true);
       commandBus.hasHandler.calledWith(MyCommand).mockReturnValue(true);
       // Simulate that handling command takes more time then allowed timeout
-      commandBus.send = async (): Promise<void> => vi.advanceTimersByTime(timeout + 5);
+      commandBus.send = async (): Promise<void> =>
+        vi.advanceTimersByTime(timeout + 5);
       storage.flagAndResolveCommitAsTimeouted.mockReturnValue(commit);
 
       const expectedCommitStateAfterTimeout = new Commit({
@@ -253,14 +278,16 @@ describe(`CommitPublisher`, () => {
         expect.any(Date)
       );
 
-      expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `timeouted commit with id '91f09174-aebc-48e9-9ce8-672a670ede37'`
+      expect(log.error).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `timeouted commit with id '91f09174-aebc-48e9-9ce8-672a670ede37'`
+          )
+            .on(commitPublisher)
+            .in('onTimeout')
+            .with('failed commit', expectedCommitStateAfterTimeout)
         )
-          .on(commitPublisher)
-          .in('onTimeout')
-          .with('failed commit', expectedCommitStateAfterTimeout)
-      ));
+      );
     });
 
     it(`handles error by flagging commit as failed and clearing the timeout`, async () => {
@@ -277,13 +304,18 @@ describe(`CommitPublisher`, () => {
         ],
       });
 
-      serializer.hasType.calledWith('CommitPublisher.MyCommand').mockReturnValue(true);
+      serializer.hasType
+        .calledWith('CommitPublisher.MyCommand')
+        .mockReturnValue(true);
       commandBus.hasHandler.calledWith(MyCommand).mockReturnValue(true);
-      commandBus.send.calledWith(command).mockImplementation(() => { throw new Error('my-error'); });
+      commandBus.send.calledWith(command).mockImplementation(() => {
+        throw new Error('my-error');
+      });
 
-      await expect(
-        commitPublisher.publishChanges(commit)
-      ).rejects.toThrow(Error, 'my-error');
+      await expect(commitPublisher.publishChanges(commit)).rejects.toThrow(
+        Error,
+        'my-error'
+      );
       expect(commit).toEqual(expectedCommitStateAfterFailed);
 
       expect(storage.flagCommitAsFailed).toHaveBeenCalledTimes(1);
@@ -294,14 +326,16 @@ describe(`CommitPublisher`, () => {
         now
       );
 
-      expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `failed publishing commit with id '91f09174-aebc-48e9-9ce8-672a670ede37'`
+      expect(log.error).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `failed publishing commit with id '91f09174-aebc-48e9-9ce8-672a670ede37'`
+          )
+            .on(commitPublisher)
+            .in(commitPublisher.publishChanges)
+            .with('commit', expectedCommitStateAfterFailed)
         )
-          .on(commitPublisher)
-          .in(commitPublisher.publishChanges)
-          .with('commit', expectedCommitStateAfterFailed)
-      ));
+      );
     });
 
     it(`does not process commands that can't be handled`, async () => {
@@ -313,7 +347,9 @@ describe(`CommitPublisher`, () => {
 
     it(`stores each commit's publishing timeout using the id as a the key`, async () => {
       commitPublisher.commandBus.send = (): any => vi.advanceTimersByTime(5);
-      serializer.hasType.calledWith('CommitPublisher.MyCommand').mockReturnValue(true);
+      serializer.hasType
+        .calledWith('CommitPublisher.MyCommand')
+        .mockReturnValue(true);
       commandBus.hasHandler.calledWith(MyCommand).mockReturnValue(true);
 
       commitPublisher.publishChanges(commit);
@@ -321,7 +357,9 @@ describe(`CommitPublisher`, () => {
     });
 
     it(`cleans up after the commit is published, by deleting the object key`, async () => {
-      serializer.hasType.calledWith('CommitPublisher.MyCommand').mockReturnValue(true);
+      serializer.hasType
+        .calledWith('CommitPublisher.MyCommand')
+        .mockReturnValue(true);
       commandBus.hasHandler.calledWith(MyCommand).mockReturnValue(true);
 
       await commitPublisher.publishChanges(commit);
@@ -330,11 +368,16 @@ describe(`CommitPublisher`, () => {
 
     it(`avoids potential race condition between commit being flagged as timeouted and published`, async () => {
       timeout = 5;
-      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
-      serializer.hasType.calledWith('CommitPublisher.MyCommand').mockReturnValue(true);
+      config.get
+        .calledWith('eveble.commitStore.timeout')
+        .mockReturnValue(timeout);
+      serializer.hasType
+        .calledWith('CommitPublisher.MyCommand')
+        .mockReturnValue(true);
       commandBus.hasHandler.calledWith(MyCommand).mockReturnValue(true);
       // Simulate that handling command takes more time then allowed timeout
-      commitPublisher.commandBus.send = (): any => vi.advanceTimersByTime(timeout + 5);
+      commitPublisher.commandBus.send = (): any =>
+        vi.advanceTimersByTime(timeout + 5);
       storage.flagAndResolveCommitAsTimeouted.mockReturnValue(commit);
 
       await commitPublisher.publishChanges(commit);
@@ -360,11 +403,16 @@ describe(`CommitPublisher`, () => {
 
     it(`tracks each commit's publishing timeout when publishing`, async () => {
       timeout = 5;
-      config.get.calledWith('eveble.commitStore.timeout').mockReturnValue(timeout);
-      serializer.hasType.calledWith('CommitPublisher.MyCommand').mockReturnValue(true);
+      config.get
+        .calledWith('eveble.commitStore.timeout')
+        .mockReturnValue(timeout);
+      serializer.hasType
+        .calledWith('CommitPublisher.MyCommand')
+        .mockReturnValue(true);
       commandBus.hasHandler.calledWith(MyCommand).mockReturnValue(true);
       // Simulate that handling command takes more time then allowed timeout
-      commandBus.send = async (): Promise<any> => vi.advanceTimersByTime(timeout + 5);
+      commandBus.send = async (): Promise<any> =>
+        vi.advanceTimersByTime(timeout + 5);
 
       commitPublisher.publishChanges(commit);
       expect(commitPublisher.isInProgress(commitId)).toBe(true);
@@ -373,4 +421,3 @@ describe(`CommitPublisher`, () => {
     });
   });
 });
-

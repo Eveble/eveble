@@ -209,4 +209,3 @@ describe(`SnapshotMongoDBStorage with MongoDB storage`, () => {
     });
   });
 });
-

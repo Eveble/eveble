@@ -41,7 +41,9 @@ describe(`Asserter`, () => {
       asserter.registerAssertion(assertion);
       expect(asserter.getAssertions()).toBeInstanceOf(Array);
       expect(asserter.getAssertions()).toHaveLength(1);
-      expect(asserter.getAssertions()).toEqual(expect.arrayContaining([assertion]));
+      expect(asserter.getAssertions()).toEqual(
+        expect.arrayContaining([assertion])
+      );
     });
 
     it('returns true if assertion is registered on asserter', () => {
@@ -149,4 +151,3 @@ describe(`Asserter`, () => {
     });
   });
 });
-

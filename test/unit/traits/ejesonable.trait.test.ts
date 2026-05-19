@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { Type, kernel } from '@eveble/core';
 import { derive } from '@traits-ts/core';
@@ -43,4 +51,3 @@ describe('EjsonableTrait', () => {
     });
   });
 });
-

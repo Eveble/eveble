@@ -1,5 +1,14 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { kernel, Type } from '@eveble/core';
 import { derive } from '@traits-ts/core';
@@ -73,4 +82,3 @@ describe('SerializableTrait', () => {
     });
   });
 });
-

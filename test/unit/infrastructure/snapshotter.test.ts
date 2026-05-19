@@ -45,7 +45,9 @@ describe(`Snapshotter`, () => {
 
   it(`throws UndefinedSnapshotterFrequencyError when frequency for snapshotting is not set on configuration`, () => {
     const instance = new Snapshotter();
-    config.has.calledWith('eveble.Snapshotter.frequency').mockReturnValue(false);
+    config.has
+      .calledWith('eveble.Snapshotter.frequency')
+      .mockReturnValue(false);
     expect(() => injector.injectInto(instance)).toThrow(
       UndefinedSnapshotterFrequencyError,
       `Missing snapshotting frequency on configuration with path: 'eveble.Snapshotter.frequency`
@@ -73,15 +75,17 @@ describe(`Snapshotter`, () => {
       eventSourceable.version = versionFrequency - 1;
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `not enough version passed(9<=10) on 'Snapshotter.MyEventSourceable' with id 'my-id' to create new snapshot of event sourceable`
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `not enough version passed(9<=10) on 'Snapshotter.MyEventSourceable' with id 'my-id' to create new snapshot of event sourceable`
+          )
+            .on(snapshotter)
+            .in(snapshotter.makeSnapshotOf)
+            .with('current version', eventSourceable.version)
+            .with('snapshot frequency', 10)
         )
-          .on(snapshotter)
-          .in(snapshotter.makeSnapshotOf)
-          .with('current version', eventSourceable.version)
-          .with('snapshot frequency', 10)
-      ));
+      );
     });
 
     it(`saves the current state of event sourceable to storage`, async () => {
@@ -107,20 +111,26 @@ describe(`Snapshotter`, () => {
       storage.findById.mockReturnValue(undefined);
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`snapshotting 'Snapshotter.MyEventSourceable' with id 'my-id'`)
-          .on(snapshotter)
-          .in(snapshotter.makeSnapshotOf)
-          .with('event sourceable', eventSourceable)
-      ));
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `created new snapshot of 'Snapshotter.MyEventSourceable' with id 'my-id'`
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `snapshotting 'Snapshotter.MyEventSourceable' with id 'my-id'`
+          )
+            .on(snapshotter)
+            .in(snapshotter.makeSnapshotOf)
+            .with('event sourceable', eventSourceable)
         )
-          .on(snapshotter)
-          .in('saveToStorage')
-          .with('event sourceable', eventSourceable)
-      ));
+      );
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `created new snapshot of 'Snapshotter.MyEventSourceable' with id 'my-id'`
+          )
+            .on(snapshotter)
+            .in('saveToStorage')
+            .with('event sourceable', eventSourceable)
+        )
+      );
     });
 
     it(`logs thrown error on new snapshot creation`, async () => {
@@ -132,17 +142,19 @@ describe(`Snapshotter`, () => {
       storage.findById.mockReturnValue(undefined);
       storage.save.mockRejectedValue(new Error('my-error'));
 
-      await expect(
-        snapshotter.makeSnapshotOf(eventSourceable)
-      ).rejects.toThrow(Error);
-      expect(log.error).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `failed creating snapshot of 'Snapshotter.MyEventSourceable' with id 'my-id' do to error: Error: my-error`
+      await expect(snapshotter.makeSnapshotOf(eventSourceable)).rejects.toThrow(
+        Error
+      );
+      expect(log.error).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `failed creating snapshot of 'Snapshotter.MyEventSourceable' with id 'my-id' do to error: Error: my-error`
+          )
+            .on(snapshotter)
+            .in(snapshotter.makeSnapshotOf)
+            .with('event sourceable', eventSourceable)
         )
-          .on(snapshotter)
-          .in(snapshotter.makeSnapshotOf)
-          .with('event sourceable', eventSourceable)
-      ));
+      );
     });
 
     it(`updates existing event sourceable snapshot on storage`, async () => {
@@ -181,20 +193,26 @@ describe(`Snapshotter`, () => {
       eventSourceable.version = versionFrequency + 10;
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`snapshotting 'Snapshotter.MyEventSourceable' with id 'my-id'`)
-          .on(snapshotter)
-          .in(snapshotter.makeSnapshotOf)
-          .with('event sourceable', eventSourceable)
-      ));
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `updated last found snapshot(10) for 'Snapshotter.MyEventSourceable' with id 'my-id'`
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `snapshotting 'Snapshotter.MyEventSourceable' with id 'my-id'`
+          )
+            .on(snapshotter)
+            .in(snapshotter.makeSnapshotOf)
+            .with('event sourceable', eventSourceable)
         )
-          .on(snapshotter)
-          .in('updateOnStorage')
-          .with('updated last snapshot', lastSnapshot)
-      ));
+      );
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `updated last found snapshot(10) for 'Snapshotter.MyEventSourceable' with id 'my-id'`
+          )
+            .on(snapshotter)
+            .in('updateOnStorage')
+            .with('updated last snapshot', lastSnapshot)
+        )
+      );
     });
 
     it(`logs thrown error on snapshot update`, async () => {
@@ -211,9 +229,9 @@ describe(`Snapshotter`, () => {
       const error = new Error('my-error');
       storage.update.mockRejectedValue(error);
 
-      await expect(
-        snapshotter.makeSnapshotOf(eventSourceable)
-      ).rejects.toThrow(Error);
+      await expect(snapshotter.makeSnapshotOf(eventSourceable)).rejects.toThrow(
+        Error
+      );
       expect(log.error).toHaveBeenCalledWith(
         new Log(
           `failed to update last found snapshot(10) for 'Snapshotter.MyEventSourceable' with id 'my-id' do to error: Error: my-error`
@@ -258,23 +276,29 @@ describe(`Snapshotter`, () => {
       eventSourceable.version = versionFrequency;
 
       await snapshotter.makeSnapshotOf(eventSourceable);
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`snapshotting 'Snapshotter.MyEventSourceable' with id 'my-id'`)
-          .on(snapshotter)
-          .in(snapshotter.makeSnapshotOf)
-          .with('event sourceable', eventSourceable)
-      ));
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(
-          `not enough version passed(9<=10) on 'Snapshotter.MyEventSourceable' with id 'my-id' to update last snapshot`
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `snapshotting 'Snapshotter.MyEventSourceable' with id 'my-id'`
+          )
+            .on(snapshotter)
+            .in(snapshotter.makeSnapshotOf)
+            .with('event sourceable', eventSourceable)
         )
-          .on(snapshotter)
-          .in(snapshotter.makeSnapshotOf)
-          .with('last snapshot', lastSnapshot)
-          .with('last snapshot version', lastSnapshot.version)
-          .with('current version', eventSourceable.version)
-          .with('snapshot frequency', 10)
-      ));
+      );
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(
+            `not enough version passed(9<=10) on 'Snapshotter.MyEventSourceable' with id 'my-id' to update last snapshot`
+          )
+            .on(snapshotter)
+            .in(snapshotter.makeSnapshotOf)
+            .with('last snapshot', lastSnapshot)
+            .with('last snapshot version', lastSnapshot.version)
+            .with('current version', eventSourceable.version)
+            .with('snapshot frequency', 10)
+        )
+      );
     });
   });
 
@@ -300,4 +324,3 @@ describe(`Snapshotter`, () => {
     });
   });
 });
-

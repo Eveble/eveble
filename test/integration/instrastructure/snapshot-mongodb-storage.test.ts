@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { Collection, Filter } from 'mongodb';
 
@@ -145,4 +153,3 @@ describe(`SnapshotMongoDBStorage`, () => {
     expect(foundSnapshot).toBe(undefined);
   });
 });
-

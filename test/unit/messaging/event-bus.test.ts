@@ -49,9 +49,7 @@ describe('EventBus', () => {
   describe('handlers registration', () => {
     it('throws UnhandleabeTypeError when provided type is not handleable', () => {
       const eventBus = new EventBus();
-      expect(() =>
-        eventBus.registerHandler(MyCommand as any, vi.fn())
-      ).toThrow(
+      expect(() => eventBus.registerHandler(MyCommand as any, vi.fn())).toThrow(
         UnhandleableTypeError,
         `EventBus: type must be one of: [Event]; got MyCommand`
       );
@@ -82,7 +80,7 @@ describe('EventBus', () => {
     it('has more expressive api for registering handlers - subscribeTo', () => {
       const firstHandler = vi.fn();
       const eventBus = new EventBus();
-      const registerHandler = vi.spyOn(eventBus, "registerHandler");
+      const registerHandler = vi.spyOn(eventBus, 'registerHandler');
 
       eventBus.subscribeTo(MyEvent, firstHandler);
 
@@ -134,7 +132,7 @@ describe('EventBus', () => {
     it('has more expressive api for handling event - publish', async () => {
       const handler = vi.fn();
       const eventBus = new EventBus();
-      const handle = vi.spyOn(eventBus, "handle");
+      const handle = vi.spyOn(eventBus, 'handle');
 
       eventBus.subscribeTo(MyEvent, handler);
 
@@ -186,4 +184,3 @@ describe('EventBus', () => {
     });
   });
 });
-

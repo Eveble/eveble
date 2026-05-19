@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { Type } from '@eveble/core';
 import { EventSourceable } from '../../../src/domain/event-sourceable';
@@ -276,9 +284,7 @@ describe(`CommitStore`, () => {
         version: 20,
       });
 
-      await expect(
-        commitStore.createCommit(eventSourceable)
-      ).rejects.toThrow(
+      await expect(commitStore.createCommit(eventSourceable)).rejects.toThrow(
         CommitConcurrencyError,
         `MyEventSourceable: expected event sourceable with id of 'my-id' to be at version 20 but is at version 10`
       );
@@ -414,9 +420,7 @@ describe(`CommitStore`, () => {
         const error = new Error('my-error');
         storage.save.calledWith(commit).mockRejectedValue(error);
 
-        await expect(commitStore.save(commit)).rejects.toThrow(
-          error
-        );
+        await expect(commitStore.save(commit)).rejects.toThrow(error);
         expect(log.error).toHaveBeenCalledTimes(1);
         expect(log.error).toHaveBeenCalledWith(
           new Log(
@@ -440,9 +444,9 @@ describe(`CommitStore`, () => {
           sentBy: appId,
           receivers: [],
         });
-        storage.save
-          .calledWith(commit)
-          .mockImplementation(() => { throw new CommitConcurrencyError('MyTypeName', 'my-id', '123', '7'); });
+        storage.save.calledWith(commit).mockImplementation(() => {
+          throw new CommitConcurrencyError('MyTypeName', 'my-id', '123', '7');
+        });
 
         await expect(commitStore.save(commit)).rejects.toThrow(
           CommitConcurrencyError,
@@ -556,4 +560,3 @@ describe(`CommitStore`, () => {
     });
   });
 });
-

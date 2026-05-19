@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, vi, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import getenv from 'getenv';
 import { MongoClient, Collection } from 'mongodb';
@@ -61,7 +69,9 @@ describe(`SnapshotMongoDBStorage`, () => {
     storage = new SnapshotMongoDBStorage();
     esSerializer = mock<types.SnapshotSerializer>();
 
-    esSerializer.serialize.calledWith(eventSourceable).mockReturnValue(snapshot);
+    esSerializer.serialize
+      .calledWith(eventSourceable)
+      .mockReturnValue(snapshot);
     esSerializer.deserialize
       .calledWith(MyEventSourceable, snapshotedES)
       .mockReturnValue(eventSourceable);
@@ -115,7 +125,10 @@ describe(`SnapshotMongoDBStorage`, () => {
       },
     };
 
-    vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 1, acknowledged: true });
+    vi.spyOn(collection, 'updateOne').mockResolvedValue({
+      modifiedCount: 1,
+      acknowledged: true,
+    });
 
     await storage.update(eventSourceable);
 
@@ -132,7 +145,10 @@ describe(`SnapshotMongoDBStorage`, () => {
       },
     };
 
-    vi.spyOn(collection, 'updateOne').mockResolvedValue({ modifiedCount: 0, acknowledged: true });
+    vi.spyOn(collection, 'updateOne').mockResolvedValue({
+      modifiedCount: 0,
+      acknowledged: true,
+    });
 
     await expect(storage.update(eventSourceable)).rejects.toThrow(
       UpdatingSnapshotError,

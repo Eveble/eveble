@@ -156,8 +156,12 @@ describe('ConsoleTransport', () => {
         const transport = new ConsoleTransport(level, config);
         injector.injectInto(transport);
         expect(winston.createLogger).toHaveBeenCalledTimes(1);
-        expect(winston.createLogger.mock.calls[0][0].transports).toBeInstanceOf(Array);
-        expect(winston.createLogger.mock.calls[0][0].transports).toHaveLength(1);
+        expect(winston.createLogger.mock.calls[0][0].transports).toBeInstanceOf(
+          Array
+        );
+        expect(winston.createLogger.mock.calls[0][0].transports).toHaveLength(
+          1
+        );
         expect(winston.createLogger.mock.calls[0][0].transports).toEqual([
           new winston.transports.Console(),
         ]);
@@ -358,4 +362,3 @@ describe('ConsoleTransport', () => {
     });
   });
 });
-

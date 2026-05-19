@@ -1,4 +1,12 @@
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { PropTypes } from 'typend';
 import { Type } from '@eveble/core';
@@ -239,4 +247,3 @@ describe('ScheduleCommand', () => {
     });
   });
 });
-

@@ -74,9 +74,7 @@ describe('Event projection', () => {
     });
     eventBus.publish(event);
     expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledTimes(1);
-    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledWith(
-      event
-    );
+    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledWith(event);
   });
 
   it('executes event on all registered projections', () => {
@@ -88,13 +86,8 @@ describe('Event projection', () => {
     });
     eventBus.publish(event);
     expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledTimes(1);
-    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledWith(
-      event
-    );
+    expect(handlers.CustomerDocStorageProjection).toHaveBeenCalledWith(event);
     expect(handlers.CustomerGraphStorageProjection).toHaveBeenCalledTimes(1);
-    expect(handlers.CustomerGraphStorageProjection).toHaveBeenCalledWith(
-      event
-    );
+    expect(handlers.CustomerGraphStorageProjection).toHaveBeenCalledWith(event);
   });
 });
-

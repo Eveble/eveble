@@ -172,13 +172,15 @@ describe(`ProjectionRebuilder`, () => {
 
         const result = await rebuilder.rebuild([projections[0]]);
 
-        expect(log.info).toHaveBeenCalledWith(expect.objectContaining(
-          new Log(
-            `finished rebuilding 'FirstProjection' in ${result.duration}ms`
+        expect(log.info).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(
+              `finished rebuilding 'FirstProjection' in ${result.duration}ms`
+            )
+              .on(rebuilder)
+              .in(rebuilder.rebuild)
           )
-            .on(rebuilder)
-            .in(rebuilder.rebuild)
-        ));
+        );
       });
 
       it('rebuilds multiple projections using historical events', async () => {
@@ -201,13 +203,15 @@ describe(`ProjectionRebuilder`, () => {
         commitStore.getAllEvents.mockReturnValue([firstEvent, secondEvent]);
         const result = await rebuilder.rebuild(projections);
 
-        expect(log.info).toHaveBeenCalledWith(expect.objectContaining(
-          new Log(
-            `finished rebuilding 'FirstProjection, SecondProjection, ThirdProjection' in ${result.duration}ms`
+        expect(log.info).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(
+              `finished rebuilding 'FirstProjection, SecondProjection, ThirdProjection' in ${result.duration}ms`
+            )
+              .on(rebuilder)
+              .in(rebuilder.rebuild)
           )
-            .on(rebuilder)
-            .in(rebuilder.rebuild)
-        ));
+        );
       });
 
       it('enters rebuild mode on projection before rebuilding', async () => {
@@ -216,7 +220,9 @@ describe(`ProjectionRebuilder`, () => {
         await rebuilder.rebuild([projection]);
 
         expect(projection.enterRebuildMode).toHaveBeenCalledTimes(1);
-        expect(projection.enterRebuildMode).toHaveBeenCalledBefore(projection.beforeRebuild);
+        expect(projection.enterRebuildMode).toHaveBeenCalledBefore(
+          projection.beforeRebuild
+        );
       });
 
       it('runs projection beforeRebuild hook for preparations before rebuilding', async () => {
@@ -225,18 +231,22 @@ describe(`ProjectionRebuilder`, () => {
         await rebuilder.rebuild([projection]);
 
         expect(projection.beforeRebuild).toHaveBeenCalledTimes(1);
-        expect(projection.beforeRebuild).toHaveBeenCalledBefore(commitStore.getAllEvents);
+        expect(projection.beforeRebuild).toHaveBeenCalledBefore(
+          commitStore.getAllEvents
+        );
       });
 
       it('handles events from commit store on projection(rebuilding)', async () => {
         commitStore.getAllEvents.mockReturnValue([firstEvent, secondEvent]);
         await rebuilder.rebuild(projections);
 
-        expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-          new Log(`publishing events on projections`)
-            .on(rebuilder)
-            .in('publishAllEventsFromCommitStoreOnQueuedProjections')
-        ));
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`publishing events on projections`)
+              .on(rebuilder)
+              .in('publishAllEventsFromCommitStoreOnQueuedProjections')
+          )
+        );
         expect(commitStore.getAllEvents).toHaveBeenCalledTimes(1);
         for (const projection of projections) {
           expect(projection.MyEvent).to.be.callCount(2);
@@ -266,7 +276,9 @@ describe(`ProjectionRebuilder`, () => {
 
         for (const projection of projections) {
           expect(projection.exitRebuildMode).toHaveBeenCalledTimes(1);
-          expect(projection.exitRebuildMode).toHaveBeenCalledAfter(projection.commit);
+          expect(projection.exitRebuildMode).toHaveBeenCalledAfter(
+            projection.commit
+          );
         }
       });
     });
@@ -286,9 +298,7 @@ describe(`ProjectionRebuilder`, () => {
       const firstProjection = projections[0];
       await firstProjection.enterRebuildMode(); // Simulate rebuild mode being already in progress
 
-      await expect(
-        rebuilder.rebuild([firstProjection])
-      ).rejects.toThrow(
+      await expect(rebuilder.rebuild([firstProjection])).rejects.toThrow(
         ProjectionAlreadyRebuildingError,
         `Projection 'FirstProjection' is already being rebuilt`
       );
@@ -301,9 +311,10 @@ describe(`ProjectionRebuilder`, () => {
       const errorMessage = 'my-before-rebuild-error-on-third-projection';
       thirdProjection.beforeRebuild.mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error, errorMessage);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(
+        Error,
+        errorMessage
+      );
 
       expect(firstProjection.rollback).toHaveBeenCalledTimes(1);
       expect(secondProjection.rollback).toHaveBeenCalledTimes(1);
@@ -315,9 +326,7 @@ describe(`ProjectionRebuilder`, () => {
       const error = new Error('my-error');
       thirdProjection.beforeRebuild.mockRejectedValue(error);
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(Error);
       expect(log.emerg).toHaveBeenCalledWith(
         new Log(`initializing rollback on projections due to error: ${error}`)
           .on(rebuilder)
@@ -332,9 +341,10 @@ describe(`ProjectionRebuilder`, () => {
       const errorMessage = 'my-commit-error';
       firstProjection.commit.mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        rebuilder.rebuild([projections[0]])
-      ).rejects.toThrow(Error, errorMessage);
+      await expect(rebuilder.rebuild([projections[0]])).rejects.toThrow(
+        Error,
+        errorMessage
+      );
     });
 
     it(`logs initializing rollback on committing error`, async () => {
@@ -342,9 +352,7 @@ describe(`ProjectionRebuilder`, () => {
       const error = new Error('my-error');
       thirdProjection.commit.mockRejectedValue(error);
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(Error);
       expect(log.emerg).toHaveBeenCalledWith(
         new Log(`initializing rollback on projections due to error: ${error}`)
           .on(rebuilder)
@@ -361,9 +369,10 @@ describe(`ProjectionRebuilder`, () => {
       const errorMessage = 'my-event-error-on-third-projection';
       thirdProjection.MyEvent.mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error, errorMessage);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(
+        Error,
+        errorMessage
+      );
 
       expect(firstProjection.rollback).toHaveBeenCalledTimes(1);
       expect(secondProjection.rollback).toHaveBeenCalledTimes(1);
@@ -379,9 +388,10 @@ describe(`ProjectionRebuilder`, () => {
       const errorMessage = 'my-commit-error-on-third-projection';
       thirdProjection.commit.mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error, errorMessage);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(
+        Error,
+        errorMessage
+      );
 
       expect(firstProjection.rollback).toHaveBeenCalledTimes(1);
       expect(secondProjection.rollback).toHaveBeenCalledTimes(1);
@@ -395,9 +405,7 @@ describe(`ProjectionRebuilder`, () => {
       const error = new Error('my-error');
       firstProjection.MyEvent.mockRejectedValue(error);
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(Error);
       expect(log.emerg).toHaveBeenCalledWith(
         new Log(`initializing rollback on projections due to error: ${error}`)
           .on(rebuilder)
@@ -413,9 +421,10 @@ describe(`ProjectionRebuilder`, () => {
       firstProjection.commit.mockRejectedValue(new Error('my-commit-error'));
       firstProjection.rollback.mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error, errorMessage);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(
+        Error,
+        errorMessage
+      );
 
       expect(firstProjection.isInState(Projection.STATES.projecting));
     });
@@ -430,9 +439,10 @@ describe(`ProjectionRebuilder`, () => {
       firstProjection.commit.mockRejectedValue(new Error('my-commit-error'));
       firstProjection.rollback.mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        rebuilder.rebuild(projections)
-      ).rejects.toThrow(Error, errorMessage);
+      await expect(rebuilder.rebuild(projections)).rejects.toThrow(
+        Error,
+        errorMessage
+      );
 
       expect(firstProjection.rollback).toHaveBeenCalledTimes(1);
       expect(secondProjection.rollback).toHaveBeenCalledTimes(1);
@@ -443,4 +453,3 @@ describe(`ProjectionRebuilder`, () => {
     });
   });
 });
-

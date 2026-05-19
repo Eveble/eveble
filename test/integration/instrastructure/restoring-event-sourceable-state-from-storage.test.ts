@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
 
 import { Collection } from 'mongodb';
 import { kernel } from '@eveble/core';
@@ -229,7 +237,9 @@ describe(`Restoring event sourceable state from storage`, () => {
 
     describe(`restoring snapshot`, () => {
       it(`returns event sourceable restored from snapshot`, async () => {
-        config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(1);
+        config.get
+          .calledWith('eveble.Snapshotter.frequency')
+          .mockReturnValue(1);
 
         const createList = new CreateTaskList({
           targetId: taskListId,
@@ -255,7 +265,9 @@ describe(`Restoring event sourceable state from storage`, () => {
       });
 
       it(`returns event sourceable restored from snapshot with replayed remaining eventSourceable events from commit store`, async () => {
-        config.get.calledWith('eveble.Snapshotter.frequency').mockReturnValue(2);
+        config.get
+          .calledWith('eveble.Snapshotter.frequency')
+          .mockReturnValue(2);
 
         const createList = new CreateTaskList({
           targetId: taskListId,
@@ -295,4 +307,3 @@ describe(`Restoring event sourceable state from storage`, () => {
     });
   });
 });
-

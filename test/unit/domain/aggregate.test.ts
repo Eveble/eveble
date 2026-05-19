@@ -1,4 +1,12 @@
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
@@ -52,7 +60,8 @@ describe(`Aggregate`, () => {
     clock = vi.useFakeTimers(now.getTime());
 
     handlers = {
-      MyCommand: vi.fn(), MyEvent: vi.fn(),
+      MyCommand: vi.fn(),
+      MyEvent: vi.fn(),
     };
 
     props = {
@@ -135,9 +144,7 @@ describe(`Aggregate`, () => {
           aggregate.initialize();
           aggregate.handle(commands.MyCommand);
           expect(handlers.MyCommand).toHaveBeenCalledTimes(1);
-          expect(handlers.MyCommand).toHaveBeenCalledWith(
-            commands.MyCommand
-          );
+          expect(handlers.MyCommand).toHaveBeenCalledWith(commands.MyCommand);
         });
       });
 
@@ -161,9 +168,7 @@ describe(`Aggregate`, () => {
           aggregate.initialize();
           aggregate.replayHistory(history);
           expect(aggregate.getId()).toBe(events.MyEvent.sourceId);
-          expect(handlers.MyEvent).toHaveBeenCalledWith(
-            events.MyEvent
-          );
+          expect(handlers.MyEvent).toHaveBeenCalledWith(events.MyEvent);
         });
       });
 
@@ -188,4 +193,3 @@ describe(`Aggregate`, () => {
     });
   });
 });
-

@@ -85,9 +85,7 @@ describe(`EJSONSerializerAdapter`, () => {
   describe('type registration', () => {
     it('throws UnregistrableTypeError if provided type does not implement Serializable interface', () => {
       class InvalidType {}
-      expect(() =>
-        serializer.registerType('InvalidType', InvalidType)
-      ).toThrow(
+      expect(() => serializer.registerType('InvalidType', InvalidType)).toThrow(
         UnregistrableTypeError,
         `Type 'InvalidType' must implement Serializable interface`
       );
@@ -416,88 +414,85 @@ describe(`EJSONSerializerAdapter`, () => {
     });
 
     describe('equals', () => {
-      describe(
-        'by using equals method on type from Definable mixin(prototype)',
-        () => {
-          it('returns true for equal arguments', () => {
-            serializer.registerType('Person', Person);
-            serializer.registerType('Address', Address);
+      describe('by using equals method on type from Definable mixin(prototype)', () => {
+        it('returns true for equal arguments', () => {
+          serializer.registerType('Person', Person);
+          serializer.registerType('Address', Address);
 
-            const firstAddress = new Address({
-              city: 'New York',
-              street: 'Wall Street',
-            });
-            const firstPerson = new Person({
-              firstName: 'Jane',
-              lastName: 'Doe',
-              address: firstAddress,
-            });
-            const secondAddress = new Address({
-              city: 'New York',
-              street: 'Wall Street',
-            });
-            const secondPerson = new Person({
-              firstName: 'Jane',
-              lastName: 'Doe',
-              address: secondAddress,
-            });
-
-            expect(serializer.equals(firstPerson, secondPerson)).toBe(true);
+          const firstAddress = new Address({
+            city: 'New York',
+            street: 'Wall Street',
+          });
+          const firstPerson = new Person({
+            firstName: 'Jane',
+            lastName: 'Doe',
+            address: firstAddress,
+          });
+          const secondAddress = new Address({
+            city: 'New York',
+            street: 'Wall Street',
+          });
+          const secondPerson = new Person({
+            firstName: 'Jane',
+            lastName: 'Doe',
+            address: secondAddress,
           });
 
-          it('returns false for not equal arguments by their values', () => {
-            serializer.registerType('Person', Person);
-            serializer.registerType('Address', Address);
+          expect(serializer.equals(firstPerson, secondPerson)).toBe(true);
+        });
 
-            const firstAddress = new Address({
-              city: 'First York',
-              street: 'First Street',
-            });
-            const firstPerson = new Person({
-              firstName: 'First',
-              lastName: 'Last',
-              address: firstAddress,
-            });
-            const secondAddress = new Address({
-              city: 'Second York',
-              street: 'Second Street',
-            });
-            const secondPerson = new Person({
-              firstName: 'Second',
-              lastName: 'Last',
-              address: secondAddress,
-            });
+        it('returns false for not equal arguments by their values', () => {
+          serializer.registerType('Person', Person);
+          serializer.registerType('Address', Address);
 
-            expect(serializer.equals(firstPerson, secondPerson)).toBe(false);
+          const firstAddress = new Address({
+            city: 'First York',
+            street: 'First Street',
+          });
+          const firstPerson = new Person({
+            firstName: 'First',
+            lastName: 'Last',
+            address: firstAddress,
+          });
+          const secondAddress = new Address({
+            city: 'Second York',
+            street: 'Second Street',
+          });
+          const secondPerson = new Person({
+            firstName: 'Second',
+            lastName: 'Last',
+            address: secondAddress,
           });
 
-          it('returns false for not equal arguments by their types', () => {
-            serializer.registerType('Person', Person);
-            serializer.registerType('Address', Address);
+          expect(serializer.equals(firstPerson, secondPerson)).toBe(false);
+        });
 
-            const firstAddress = new Address({
-              city: 'First York',
-              street: 'First Street',
-            });
-            const firstPerson = new Person({
-              firstName: 'First',
-              lastName: 'Last',
-              address: firstAddress,
-            });
-            const secondAddressObj = {
-              city: 'Second York',
-              street: 'Second Street',
-            };
-            const secondPersonObj = {
-              firstName: 'Second',
-              lastName: 'Last',
-              address: secondAddressObj,
-            };
+        it('returns false for not equal arguments by their types', () => {
+          serializer.registerType('Person', Person);
+          serializer.registerType('Address', Address);
 
-            expect(serializer.equals(firstPerson, secondPersonObj)).toBe(false);
+          const firstAddress = new Address({
+            city: 'First York',
+            street: 'First Street',
           });
-        }
-      );
+          const firstPerson = new Person({
+            firstName: 'First',
+            lastName: 'Last',
+            address: firstAddress,
+          });
+          const secondAddressObj = {
+            city: 'Second York',
+            street: 'Second Street',
+          };
+          const secondPersonObj = {
+            firstName: 'Second',
+            lastName: 'Last',
+            address: secondAddressObj,
+          };
+
+          expect(serializer.equals(firstPerson, secondPersonObj)).toBe(false);
+        });
+      });
 
       describe(`by using serializer's in-build comparer`, () => {
         describe('without nested types', () => {
@@ -835,4 +830,3 @@ describe(`EJSONSerializerAdapter`, () => {
     });
   });
 });
-

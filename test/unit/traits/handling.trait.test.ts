@@ -110,7 +110,8 @@ describe('HandlingTrait', () => {
       // MyEvent
       expect(registrator.mock.calls[1][0]).toBe(MyEvent);
       expect(
-        Object.create(eventHandler.prototype) instanceof registrator.mock.calls[1][1]
+        Object.create(eventHandler.prototype) instanceof
+          registrator.mock.calls[1][1]
       ).toBe(true);
       expect(controller.registerHandler).not.toHaveBeenCalled();
     });
@@ -547,4 +548,3 @@ describe('HandlingTrait', () => {
     });
   });
 });
-

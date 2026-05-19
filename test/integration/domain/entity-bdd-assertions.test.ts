@@ -1,4 +1,12 @@
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { pull } from 'lodash';
 import { Type, kernel } from '@eveble/core';
@@ -767,4 +775,3 @@ describe(`Entity BDD assertions`, () => {
     });
   });
 });
-

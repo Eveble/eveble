@@ -50,9 +50,9 @@ describe(`StatusfulAssertion`, () => {
 
     it('ensure.is.not.inOneOfStatuses', () => {
       const assertion = new StatusfulAssertion(asserter);
-      expect(
-        assertion.getApi().get('ensure.is.not.inOneOfStatuses')
-      ).toBe(assertion.ensureIsNotInOneOfStatuses);
+      expect(assertion.getApi().get('ensure.is.not.inOneOfStatuses')).toBe(
+        assertion.ensureIsNotInOneOfStatuses
+      );
     });
   });
 
@@ -62,9 +62,7 @@ describe(`StatusfulAssertion`, () => {
         const assertion = new StatusfulAssertion(asserter);
         entity.isInStatus.mockReturnValue(true);
         const expectedStatus = 'expected-status';
-        expect(assertion.ensureIsInStatus(expectedStatus)).toBe(
-          asserter
-        );
+        expect(assertion.ensureIsInStatus(expectedStatus)).toBe(asserter);
         expect(entity.isInStatus).toHaveBeenCalledTimes(1);
         expect(entity.isInStatus).toHaveBeenCalledWith(expectedStatus);
       });
@@ -103,9 +101,9 @@ describe(`StatusfulAssertion`, () => {
 
         const error = new MyError('my-error');
         const expectedStatus = 'expected-status';
-        expect(() =>
-          assertion.ensureIsInStatus(expectedStatus, error)
-        ).toThrow(error);
+        expect(() => assertion.ensureIsInStatus(expectedStatus, error)).toThrow(
+          error
+        );
         expect(entity.isInStatus).toHaveBeenCalledTimes(1);
         expect(entity.isInStatus).toHaveBeenCalledWith(expectedStatus);
       });
@@ -116,9 +114,7 @@ describe(`StatusfulAssertion`, () => {
         const assertion = new StatusfulAssertion(asserter);
         entity.isInStatus.mockReturnValue(false);
         const expectedStatus = 'expected-status';
-        expect(assertion.ensureIsNotInStatus(expectedStatus)).toBe(
-          asserter
-        );
+        expect(assertion.ensureIsNotInStatus(expectedStatus)).toBe(asserter);
         expect(entity.isInStatus).toHaveBeenCalledTimes(1);
         expect(entity.isInStatus).toHaveBeenCalledWith(expectedStatus);
       });
@@ -174,9 +170,7 @@ describe(`StatusfulAssertion`, () => {
           asserter
         );
         expect(entity.isInOneOfStatuses).toHaveBeenCalledTimes(1);
-        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(
-          expectedStatuses
-        );
+        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(expectedStatuses);
       });
 
       it('throws UndefinedActionError if action is not set on asserter', () => {
@@ -206,9 +200,7 @@ describe(`StatusfulAssertion`, () => {
           `MyTypeName: cannot 'my-action' when in 'current-status' status(expected statuses: 'first, second')`
         );
         expect(entity.isInOneOfStatuses).toHaveBeenCalledTimes(1);
-        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(
-          expectedStatuses
-        );
+        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(expectedStatuses);
       });
 
       it('allows to pass custom error if entity is not in one of statuses', () => {
@@ -223,9 +215,7 @@ describe(`StatusfulAssertion`, () => {
           assertion.ensureIsInOneOfStatuses(expectedStatuses, error)
         ).toThrow(error);
         expect(entity.isInOneOfStatuses).toHaveBeenCalledTimes(1);
-        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(
-          expectedStatuses
-        );
+        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(expectedStatuses);
       });
     });
 
@@ -234,13 +224,11 @@ describe(`StatusfulAssertion`, () => {
         const assertion = new StatusfulAssertion(asserter);
         entity.isInOneOfStatuses.mockReturnValue(false);
         const expectedStatuses = ['first', 'second'];
-        expect(
-          assertion.ensureIsNotInOneOfStatuses(expectedStatuses)
-        ).toBe(asserter);
-        expect(entity.isInOneOfStatuses).toHaveBeenCalledTimes(1);
-        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(
-          expectedStatuses
+        expect(assertion.ensureIsNotInOneOfStatuses(expectedStatuses)).toBe(
+          asserter
         );
+        expect(entity.isInOneOfStatuses).toHaveBeenCalledTimes(1);
+        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(expectedStatuses);
       });
 
       it('throws UndefinedActionError if action is not set on asserter', () => {
@@ -270,9 +258,7 @@ describe(`StatusfulAssertion`, () => {
           `MyTypeName: cannot 'my-action' when in 'current-status' status(expected statuses: 'first, second')`
         );
         expect(entity.isInOneOfStatuses).toHaveBeenCalledTimes(1);
-        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(
-          expectedStatuses
-        );
+        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(expectedStatuses);
       });
 
       it('allows to pass custom error if entity is in one of statuses', () => {
@@ -287,11 +273,8 @@ describe(`StatusfulAssertion`, () => {
           assertion.ensureIsNotInOneOfStatuses(expectedStatuses, error)
         ).toThrow(error);
         expect(entity.isInOneOfStatuses).toHaveBeenCalledTimes(1);
-        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(
-          expectedStatuses
-        );
+        expect(entity.isInOneOfStatuses).toHaveBeenCalledWith(expectedStatuses);
       });
     });
   });
 });
-

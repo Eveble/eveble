@@ -34,4 +34,3 @@ describe('DomainException', () => {
     });
   });
 });
-

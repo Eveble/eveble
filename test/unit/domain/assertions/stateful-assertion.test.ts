@@ -114,9 +114,7 @@ describe(`StatefulAssertion`, () => {
         const assertion = new StatefulAssertion(asserter);
         entity.isInState.mockReturnValue(false);
         const expectedState = 'expected-state';
-        expect(assertion.ensureIsNotInState(expectedState)).toBe(
-          asserter
-        );
+        expect(assertion.ensureIsNotInState(expectedState)).toBe(asserter);
         expect(entity.isInState).toHaveBeenCalledTimes(1);
         expect(entity.isInState).toHaveBeenCalledWith(expectedState);
       });
@@ -168,9 +166,7 @@ describe(`StatefulAssertion`, () => {
         const assertion = new StatefulAssertion(asserter);
         entity.isInOneOfStates.mockReturnValue(true);
         const expectedStates = ['first', 'second'];
-        expect(assertion.ensureIsInOneOfStates(expectedStates)).toBe(
-          asserter
-        );
+        expect(assertion.ensureIsInOneOfStates(expectedStates)).toBe(asserter);
         expect(entity.isInOneOfStates).toHaveBeenCalledTimes(1);
         expect(entity.isInOneOfStates).toHaveBeenCalledWith(expectedStates);
       });
@@ -278,4 +274,3 @@ describe(`StatefulAssertion`, () => {
     });
   });
 });
-

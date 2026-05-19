@@ -52,7 +52,9 @@ describe(`MongoDBSnapshotStorageModule`, () => {
     snapshotsCollection = mock<Collection<any>>();
     db = mock<Db>();
 
-    MongoClient.mockImplementation(function() { return mongoClientInstance; });
+    MongoClient.mockImplementation(function () {
+      return mongoClientInstance;
+    });
     mongoClientInstance.db.mockReturnValue(db);
     db.collection.mockReturnValue(snapshotsCollection);
 
@@ -280,4 +282,3 @@ describe(`MongoDBSnapshotStorageModule`, () => {
     });
   });
 });
-

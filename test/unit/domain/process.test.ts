@@ -1,4 +1,12 @@
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { Type } from '@eveble/core';
 import { Command } from '../../../src/components/command';
@@ -72,7 +80,8 @@ describe(`Process`, () => {
     clock = vi.useFakeTimers(now.getTime());
 
     handlers = {
-      MyCommand: vi.fn(), MyEvent: vi.fn(),
+      MyCommand: vi.fn(),
+      MyEvent: vi.fn(),
     };
 
     props = {
@@ -156,9 +165,7 @@ describe(`Process`, () => {
           process.initialize();
           process.handle(commands.MyCommand);
           expect(handlers.MyCommand).toHaveBeenCalledTimes(1);
-          expect(handlers.MyCommand).toHaveBeenCalledWith(
-            commands.MyCommand
-          );
+          expect(handlers.MyCommand).toHaveBeenCalledWith(commands.MyCommand);
         });
       });
       describe('initializing event flow', () => {
@@ -206,9 +213,7 @@ describe(`Process`, () => {
           aggregate.initialize();
           aggregate.replayHistory(history);
           expect(aggregate.getId()).toBe(events.MyEvent.sourceId);
-          expect(handlers.MyEvent).toHaveBeenCalledWith(
-            events.MyEvent
-          );
+          expect(handlers.MyEvent).toHaveBeenCalledWith(events.MyEvent);
         });
       });
     });
@@ -220,9 +225,7 @@ describe(`Process`, () => {
         public static correlationKey = 'myCorrelationKey';
       }
 
-      expect(MyCorrelationProcess.getCorrelationKey()).toBe(
-        'myCorrelationKey'
-      );
+      expect(MyCorrelationProcess.getCorrelationKey()).toBe('myCorrelationKey');
       expect(
         new MyCorrelationProcess({ id: 'my-id' }).getCorrelationKey()
       ).toBe('myCorrelationKey');
@@ -320,4 +323,3 @@ describe(`Process`, () => {
     });
   });
 });
-

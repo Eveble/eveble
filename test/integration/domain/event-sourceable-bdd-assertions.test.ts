@@ -135,9 +135,7 @@ describe(`EventSourceable BDD assertions`, () => {
       await taskList.handle(createList);
       await taskList.handle(openList);
       await taskList.handle(closeList);
-      expect(taskList.handle(createTask)).rejects.toThrow(
-        TaskListClosedError
-      );
+      expect(taskList.handle(createTask)).rejects.toThrow(TaskListClosedError);
     });
 
     it(`ensures that correct error is thrown when entity is wrong state then expected`, async () => {
@@ -155,4 +153,3 @@ describe(`EventSourceable BDD assertions`, () => {
     });
   });
 });
-

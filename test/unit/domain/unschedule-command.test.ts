@@ -17,9 +17,7 @@ describe('UnscheduleCommand', () => {
 
   it('defines the type name correctly', () => {
     expect(UnscheduleCommand.getTypeName()).toBe('UnscheduleCommand');
-    expect(UnscheduleCommand.prototype.getTypeName()).toBe(
-      'UnscheduleCommand'
-    );
+    expect(UnscheduleCommand.prototype.getTypeName()).toBe('UnscheduleCommand');
   });
 
   describe('prop types', () => {
@@ -75,4 +73,3 @@ describe('UnscheduleCommand', () => {
     });
   });
 });
-

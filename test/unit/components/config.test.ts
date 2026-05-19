@@ -229,9 +229,9 @@ describe(`Config`, () => {
         expect(config.get<string>('nested.nested-first')).toBe(
           'nested-first-value'
         );
-        expect(
-          config.get<string>('nested.nested-second.nested-third')
-        ).toBe('nested-third-value');
+        expect(config.get<string>('nested.nested-second.nested-third')).toBe(
+          'nested-third-value'
+        );
       });
 
       it(`returns undefined if value cannot be found on configuration`, () => {
@@ -239,12 +239,10 @@ describe(`Config`, () => {
 
         expect(config.get('notvalid')).toBe(undefined);
         expect(config.get('simple.notvalid')).toBe(undefined);
-        expect(config.get('nested.nested-first-notvalid')).toBe(
+        expect(config.get('nested.nested-first-notvalid')).toBe(undefined);
+        expect(config.get('nested.nested-second.nested-third-notvalid')).toBe(
           undefined
         );
-        expect(
-          config.get('nested.nested-second.nested-third-notvalid')
-        ).toBe(undefined);
       });
 
       it(`returns default value provided as second argument for unresolvable paths`, () => {
@@ -419,9 +417,9 @@ describe(`Config`, () => {
         );
 
         config.set('nested.nested-second.nested-third', 'nested-third-set');
-        expect(
-          config.get<string>('nested.nested-second.nested-third')
-        ).toBe('nested-third-set');
+        expect(config.get<string>('nested.nested-second.nested-third')).toBe(
+          'nested-third-set'
+        );
       });
     });
 
@@ -645,17 +643,11 @@ describe(`Config`, () => {
         expect(first.get<string>('foo')).toBe('second-default-foo');
         expect(second.get<string>('foo')).toBe('second-default-foo');
 
-        expect(second.getDefault<string>('foo')).toBe(
-          'second-default-foo'
-        );
-        expect(second.getDefault<string>('foo')).toBe(
-          'second-default-foo'
-        );
+        expect(second.getDefault<string>('foo')).toBe('second-default-foo');
+        expect(second.getDefault<string>('foo')).toBe('second-default-foo');
 
         expect(first.getExact<string>('foo')).toBe('second-default-foo');
-        expect(second.getExact<string>('foo')).toBe(
-          'second-default-foo'
-        );
+        expect(second.getExact<string>('foo')).toBe('second-default-foo');
       });
     });
 
@@ -982,4 +974,3 @@ describe(`Config`, () => {
     });
   });
 });
-

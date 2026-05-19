@@ -1,5 +1,13 @@
 import { mock } from 'vitest-mock-extended';
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { PropTypes, ValidationError } from 'typend';
 import { Type } from '@eveble/core';
@@ -203,11 +211,13 @@ describe(`Router`, () => {
       const router = new MyRouter();
       await injector.injectIntoAsync(router);
 
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`defined initializing message 'MyEvent'`)
-          .on(router)
-          .in(router.initialize)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`defined initializing message 'MyEvent'`)
+            .on(router)
+            .in(router.initialize)
+        )
+      );
     });
 
     it(`registers initializing handler on command bus for initializing command`, async () => {
@@ -221,9 +231,7 @@ describe(`Router`, () => {
       await injector.injectIntoAsync(router);
 
       expect(commandBus.registerHandler).toHaveBeenCalledTimes(1);
-      expect(commandBus.registerHandler.mock.calls[0][0]).toBe(
-        MyCommand
-      );
+      expect(commandBus.registerHandler.mock.calls[0][0]).toBe(MyCommand);
       expect(commandBus.registerHandler.mock.calls[0][1].original).toBe(
         router.initializingMessageHandler
       ); // Compare bound function
@@ -258,11 +266,13 @@ describe(`Router`, () => {
       const router = new MyRouter();
       await injector.injectIntoAsync(router);
 
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`set up initializing message handler for 'MyEvent'`)
-          .on(router)
-          .in(router.initialize)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`set up initializing message handler for 'MyEvent'`)
+            .on(router)
+            .in(router.initialize)
+        )
+      );
     });
 
     it('throws InvalidInitializingMessageError if provided message is not a supported type', async () => {
@@ -295,9 +305,7 @@ describe(`Router`, () => {
       await injector.injectIntoAsync(router);
 
       expect(commandBus.registerHandler).toHaveBeenCalledTimes(1);
-      expect(commandBus.registerHandler.mock.calls[0][0]).toBe(
-        MyCommand
-      );
+      expect(commandBus.registerHandler.mock.calls[0][0]).toBe(MyCommand);
       expect(commandBus.registerHandler.mock.calls[0][1].original).toBe(
         router.messageHandler
       ); // Compare bound function
@@ -316,12 +324,14 @@ describe(`Router`, () => {
       const router = new MyRouter();
       await injector.injectIntoAsync(router);
 
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`defined routed commands`)
-          .on(router)
-          .in(router.initialize)
-          .with('routed commands', routedCommands)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`defined routed commands`)
+            .on(router)
+            .in(router.initialize)
+            .with('routed commands', routedCommands)
+        )
+      );
     });
 
     it(`registers routed events with with event bus`, async () => {
@@ -356,12 +366,14 @@ describe(`Router`, () => {
       const router = new MyRouter();
       await injector.injectIntoAsync(router);
 
-      expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-        new Log(`defined routed events`)
-          .on(router)
-          .in(router.initialize)
-          .with('routed events', routedEvents)
-      ));
+      expect(log.debug).toHaveBeenCalledWith(
+        expect.objectContaining(
+          new Log(`defined routed events`)
+            .on(router)
+            .in(router.initialize)
+            .with('routed events', routedEvents)
+        )
+      );
     });
   });
 
@@ -463,9 +475,7 @@ describe(`Router`, () => {
 
         await expect(
           router.initializingMessageHandler(commands.MyCommand)
-        ).rejects.toThrow(
-          InitializingIdentifierAlreadyExistsError
-        );
+        ).rejects.toThrow(InitializingIdentifierAlreadyExistsError);
 
         expect(log.error).toHaveBeenCalledTimes(1);
         expect(log.error).toHaveBeenCalledWith(
@@ -481,18 +491,22 @@ describe(`Router`, () => {
       it(`logs handled message for debugging`, async () => {
         await router.initializingMessageHandler(commands.MyCommand);
 
-        expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-          new Log(`creating 'MyEventSourceable' with message 'MyCommand'`)
-            .on(router)
-            .in(router.initializingMessageHandler)
-            .with('message', commands.MyCommand)
-        ));
-        expect(log.debug).toHaveBeenCalledWith(expect.objectContaining(
-          new Log(`created 'MyEventSourceable' with id '${props.id}'`)
-            .on(router)
-            .in(router.initializingMessageHandler)
-            .with('message', commands.MyCommand)
-        ));
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`creating 'MyEventSourceable' with message 'MyCommand'`)
+              .on(router)
+              .in(router.initializingMessageHandler)
+              .with('message', commands.MyCommand)
+          )
+        );
+        expect(log.debug).toHaveBeenCalledWith(
+          expect.objectContaining(
+            new Log(`created 'MyEventSourceable' with id '${props.id}'`)
+              .on(router)
+              .in(router.initializingMessageHandler)
+              .with('message', commands.MyCommand)
+          )
+        );
       });
 
       it(`injects dependencies in to new instance of event sourceable`, async () => {
@@ -520,7 +534,9 @@ describe(`Router`, () => {
         MyEventSourceable.prototype.validateProps = vi.fn();
 
         await router.initializingMessageHandler(commands.MyCommand);
-        expect(MyEventSourceable.prototype.validateProps).toHaveBeenCalledTimes(1);
+        expect(MyEventSourceable.prototype.validateProps).toHaveBeenCalledTimes(
+          1
+        );
         expect(
           MyEventSourceable.prototype.validateProps.mock.calls[0][0]
         ).toMatchObject({
@@ -577,7 +593,9 @@ describe(`Router`, () => {
           `MyEventSourceable: (Key 'id': Expected undefined to be one of: [[String], [Guid]] in MyEventSourceable({"version":0,"metadata":{},"name":"foo"}))`
         );
 
-        expect(MyEventSourceable.prototype.validateProps).toHaveBeenCalledTimes(1);
+        expect(MyEventSourceable.prototype.validateProps).toHaveBeenCalledTimes(
+          1
+        );
         MyEventSourceable.prototype.validateProps = original;
       });
 
@@ -599,7 +617,9 @@ describe(`Router`, () => {
 
         it(`logs thrown error`, async () => {
           const error = new MyDomainError('my-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
           await expect(
             router.initializingMessageHandler(commands.MyCommand)
           ).rejects.toThrow(error);
@@ -617,7 +637,9 @@ describe(`Router`, () => {
 
         it(`publishes DomainException as subclass of Event with DomainError through event bus`, async () => {
           const error = new MyDomainError('my-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
           await expect(
             router.initializingMessageHandler(commands.MyCommand)
           ).rejects.toThrow(error);
@@ -629,12 +651,16 @@ describe(`Router`, () => {
             timestamp: now,
           });
           expect(eventBus.publish).toHaveBeenCalledTimes(1);
-          expect(eventBus.publish).toHaveBeenCalledWith(publishedDomainException);
+          expect(eventBus.publish).toHaveBeenCalledWith(
+            publishedDomainException
+          );
         });
 
         it(`publishes DomainException with metadata copied from message through event bus`, async () => {
           const error = new MyDomainError('my-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
           await expect(
             router.initializingMessageHandler(events.CorrelationEvent)
           ).rejects.toThrow(error);
@@ -647,13 +673,17 @@ describe(`Router`, () => {
             metadata: events.CorrelationEvent.metadata,
           });
           expect(eventBus.publish).toHaveBeenCalledTimes(1);
-          expect(eventBus.publish).toHaveBeenCalledWith(publishedDomainException);
+          expect(eventBus.publish).toHaveBeenCalledWith(
+            publishedDomainException
+          );
         });
 
         it(`re-throws error if its not an instance of MyDomainError`, async () => {
           class MySerializableError extends SerializableError {}
           const error = new MySerializableError('my-not-domain-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
 
           await expect(
             router.initializingMessageHandler(commands.MyCommand)
@@ -717,7 +747,9 @@ describe(`Router`, () => {
           MyEventSourceable.prototype.validateProps = vi.fn();
 
           await router.messageHandler(commands.MyCommand);
-          expect(MyEventSourceable.prototype.validateProps).toHaveBeenCalledTimes(1);
+          expect(
+            MyEventSourceable.prototype.validateProps
+          ).toHaveBeenCalledTimes(1);
           expect(
             MyEventSourceable.prototype.validateProps.mock.calls[0][0]
           ).toMatchObject({
@@ -776,7 +808,9 @@ describe(`Router`, () => {
             `MyEventSourceable: (Key 'name': Expected undefined to be a String in MyEventSourceable({"version":0,"id":"my-event-sourceable-id"}))`
           );
 
-          expect(MyEventSourceable.prototype.validateProps).toHaveBeenCalledTimes(1);
+          expect(
+            MyEventSourceable.prototype.validateProps
+          ).toHaveBeenCalledTimes(1);
           MyEventSourceable.prototype.validateProps = original;
         });
       });
@@ -837,9 +871,7 @@ describe(`Router`, () => {
 
       it(`logs error when event sourceable can't be found on repository`, async () => {
         repository.find.mockReturnValue(undefined);
-        await expect(
-          router.messageHandler(commands.MyCommand)
-        ).rejects.toThrow(
+        await expect(router.messageHandler(commands.MyCommand)).rejects.toThrow(
           CannotRouteMessageError,
           `MyRouter: no event sourceable found to handle 'MyCommand'`
         );
@@ -852,9 +884,7 @@ describe(`Router`, () => {
 
       it(`throws CannotHandleMessageError when event sourceable can't be found on repository`, async () => {
         repository.find.mockReturnValue(undefined);
-        await expect(
-          router.messageHandler(commands.MyCommand)
-        ).rejects.toThrow(
+        await expect(router.messageHandler(commands.MyCommand)).rejects.toThrow(
           CannotRouteMessageError,
           `MyRouter: no event sourceable found to handle 'MyCommand'`
         );
@@ -872,7 +902,9 @@ describe(`Router`, () => {
 
         it(`logs thrown error`, async () => {
           const error = new MyDomainError('my-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
           await expect(
             router.messageHandler(commands.MyCommand)
           ).rejects.toThrow(error);
@@ -889,7 +921,9 @@ describe(`Router`, () => {
 
         it(`publishes DomainException as subclass of event with DomainError through event bus`, async () => {
           const error = new MyDomainError('my-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
           await expect(
             router.messageHandler(commands.MyCommand)
           ).rejects.toThrow(error);
@@ -901,12 +935,16 @@ describe(`Router`, () => {
             timestamp: now,
           });
           expect(eventBus.publish).toHaveBeenCalledTimes(1);
-          expect(eventBus.publish).toHaveBeenCalledWith(publishedDomainException);
+          expect(eventBus.publish).toHaveBeenCalledWith(
+            publishedDomainException
+          );
         });
 
         it(`publishes DomainException with metadata copied from message through event bus`, async () => {
           const error = new MyDomainError('my-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
           await expect(
             router.messageHandler(events.CorrelationEvent)
           ).rejects.toThrow(error);
@@ -919,13 +957,17 @@ describe(`Router`, () => {
             metadata: events.CorrelationEvent.metadata,
           });
           expect(eventBus.publish).toHaveBeenCalledTimes(1);
-          expect(eventBus.publish).toHaveBeenCalledWith(publishedDomainException);
+          expect(eventBus.publish).toHaveBeenCalledWith(
+            publishedDomainException
+          );
         });
 
         it(`re-throws error if its not an instance of DomainError or CommitConcurrencyError`, async () => {
           class MySerializableError extends SerializableError {}
           const error = new MySerializableError('my-not-domain-error');
-          handler.mockImplementation(() => { throw error; });
+          handler.mockImplementation(() => {
+            throw error;
+          });
 
           await expect(
             router.messageHandler(commands.MyCommand)
@@ -935,9 +977,15 @@ describe(`Router`, () => {
 
         describe(`CommitConcurrencyError`, () => {
           it(`re-handles message again if there's a concurrency exception when saving to the repository`, async () => {
-            repository.save
-              .mockImplementationOnce(() => { throw new CommitConcurrencyError('MyEventSourceable', 'my-id', '2', '1'); });
-            const messageHandler = vi.spyOn(router, "messageHandler");
+            repository.save.mockImplementationOnce(() => {
+              throw new CommitConcurrencyError(
+                'MyEventSourceable',
+                'my-id',
+                '2',
+                '1'
+              );
+            });
+            const messageHandler = vi.spyOn(router, 'messageHandler');
             await router.messageHandler(commands.MyCommand);
             expect(messageHandler).toHaveBeenCalledTimes(2);
             expect(messageHandler.mock.calls[0][0]).toBe(commands.MyCommand);
@@ -945,18 +993,26 @@ describe(`Router`, () => {
           });
 
           it(`logs re-handling message as warning`, async () => {
-            repository.save
-              .mockImplementationOnce(() => { throw new CommitConcurrencyError('MyEventSourceable', 'my-id', '2', '1'); });
+            repository.save.mockImplementationOnce(() => {
+              throw new CommitConcurrencyError(
+                'MyEventSourceable',
+                'my-id',
+                '2',
+                '1'
+              );
+            });
             await router.messageHandler(commands.MyCommand);
             expect(log.warning).toHaveBeenCalledTimes(1);
-            expect(log.warning).toHaveBeenCalledWith(expect.objectContaining(
-              new Log(
-                `concurrency exception, re-handling message 'MyCommand' for 'MyEventSourceable@my-event-sourceable-id'`
+            expect(log.warning).toHaveBeenCalledWith(
+              expect.objectContaining(
+                new Log(
+                  `concurrency exception, re-handling message 'MyCommand' for 'MyEventSourceable@my-event-sourceable-id'`
+                )
+                  .on(router)
+                  .in('handleSaveErrors')
+                  .with('message', commands.MyCommand)
               )
-                .on(router)
-                .in('handleSaveErrors')
-                .with('message', commands.MyCommand)
-            ));
+            );
           });
         });
       });
@@ -979,4 +1035,3 @@ describe(`Router`, () => {
     });
   });
 });
-

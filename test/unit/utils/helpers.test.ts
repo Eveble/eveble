@@ -243,27 +243,21 @@ describe('helpers', () => {
   describe('resolveSerializableFromPropType', () => {
     it('resolves serializable type from root-level list', () => {
       const propType = PropTypes.arrayOf(SerializableStub);
-      expect(resolveSerializableFromPropType(propType)).toBe(
-        SerializableStub
-      );
+      expect(resolveSerializableFromPropType(propType)).toBe(SerializableStub);
     });
 
     it('resolves serializable type from root-level list with nested instance of', () => {
       const propType = PropTypes.arrayOf(
         PropTypes.instanceOf(SerializableStub)
       );
-      expect(resolveSerializableFromPropType(propType)).toBe(
-        SerializableStub
-      );
+      expect(resolveSerializableFromPropType(propType)).toBe(SerializableStub);
     });
 
     it('resolves serializable type from root-level optional list with nested instance of', () => {
       const propType = PropTypes.arrayOf(
         PropTypes.instanceOf(SerializableStub)
       ).isOptional;
-      expect(resolveSerializableFromPropType(propType)).toBe(
-        SerializableStub
-      );
+      expect(resolveSerializableFromPropType(propType)).toBe(SerializableStub);
     });
 
     it('returns undefined for non-list serializable types', () => {
@@ -298,4 +292,3 @@ describe('helpers', () => {
     });
   });
 });
-

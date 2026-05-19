@@ -78,4 +78,3 @@ describe(`RFC5424LoggingTrait`, () => {
     });
   });
 });
-

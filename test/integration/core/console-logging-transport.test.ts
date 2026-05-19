@@ -121,9 +121,7 @@ describe('ConsoleTransport', () => {
         };
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).toBe(
-          '$ 2019-10-07T02:51:35│my-app-id│info: my-message '
-        );
+        expect(str).toBe('$ 2019-10-07T02:51:35│my-app-id│info: my-message ');
       });
 
       it('does not show label if its not enabled on configuration', () => {
@@ -177,9 +175,7 @@ describe('ConsoleTransport', () => {
         config.set('parts.label', 'my-app-id');
 
         const str = transport.formatEntry(winstonLogObj);
-        expect(str).toBe(
-          '$ 2019-10-07T02:51:35│my-app-id│info: my-message '
-        );
+        expect(str).toBe('$ 2019-10-07T02:51:35│my-app-id│info: my-message ');
       });
     });
 
@@ -455,4 +451,3 @@ describe('ConsoleTransport', () => {
     });
   });
 });
-

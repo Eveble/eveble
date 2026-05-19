@@ -1,4 +1,12 @@
-import { expect, describe, it, beforeEach, afterEach, vi, beforeAll } from 'vitest';
+import {
+  expect,
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+  vi,
+  beforeAll,
+} from 'vitest';
 
 import { PropTypes, ValidationError } from 'typend';
 
@@ -390,9 +398,9 @@ describe(`EventSourceable`, () => {
 
       instance.record(events.OrderCreated);
       expect(handlers.OrderCreated).toHaveBeenCalledTimes(1);
-      expect(handlers.OrderCreated).toHaveBeenCalledWith(expect.objectContaining(
-        events.OrderCreated
-      ));
+      expect(handlers.OrderCreated).toHaveBeenCalledWith(
+        expect.objectContaining(events.OrderCreated)
+      );
     });
 
     it(`allows to record event on command handler by passing event's type and additional required properties`, async () => {
@@ -401,12 +409,14 @@ describe(`EventSourceable`, () => {
 
       await instance.handle(commands.CreateOrder);
       await instance.handle(commands.FulfillOrder);
-      expect(handlers.OrderFulfilled).toHaveBeenCalledWith(expect.objectContaining({
-        sourceId: orderProps.id,
-        customerName: orderProps.customerName,
-        discountCode: 'discount20',
-        version: 0,
-      }));
+      expect(handlers.OrderFulfilled).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sourceId: orderProps.id,
+          customerName: orderProps.customerName,
+          discountCode: 'discount20',
+          version: 0,
+        })
+      );
     });
 
     it('pushes the event into the events array', () => {
@@ -563,9 +573,9 @@ describe(`EventSourceable`, () => {
       instance.initialize();
       instance.replay(events.OrderCreated);
       expect(handlers.OrderCreated).toHaveBeenCalledTimes(1);
-      expect(handlers.OrderCreated).toHaveBeenCalledWith(expect.objectContaining(
-        events.OrderCreated
-      ));
+      expect(handlers.OrderCreated).toHaveBeenCalledWith(
+        expect.objectContaining(events.OrderCreated)
+      );
     });
 
     it('does not push the event into the events array(only recorded events should be added)', () => {
@@ -652,7 +662,7 @@ describe(`EventSourceable`, () => {
     it('replays given historic events on the event sourceable', () => {
       const instance = new EventSourceable({ id: orderProps.id });
       instance.initialize();
-      const replaySpy = vi.spyOn(instance, "replay");
+      const replaySpy = vi.spyOn(instance, 'replay');
       const history = new History([
         new Created({
           sourceId: orderProps.id,
@@ -706,9 +716,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(events.OrderCreated);
-      expect(handlers.OrderCreated).toHaveBeenCalledWith(
-        events.OrderCreated
-      );
+      expect(handlers.OrderCreated).toHaveBeenCalledWith(events.OrderCreated);
     });
 
     it('does not push the event into the events array', async () => {
@@ -762,9 +770,7 @@ describe(`EventSourceable`, () => {
       const instance = new Order({ id: orderProps.id });
       instance.initialize();
       await instance.handle(commands.CreateOrder);
-      expect(handlers.CreateOrder).toHaveBeenCalledWith(
-        commands.CreateOrder
-      );
+      expect(handlers.CreateOrder).toHaveBeenCalledWith(commands.CreateOrder);
     });
 
     it(`returns event sourceable for chaining after handling`, async () => {
@@ -1269,4 +1275,3 @@ describe(`EventSourceable`, () => {
     });
   });
 });
-

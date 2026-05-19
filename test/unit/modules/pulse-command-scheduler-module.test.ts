@@ -63,7 +63,9 @@ describe(`PulseCommandSchedulerModule`, () => {
   const setupPulse = function (): void {
     Pulse = vi.fn();
     pulseInstance = mock<PulseOriginal>();
-    Pulse.mockImplementation(function() { return pulseInstance; });
+    Pulse.mockImplementation(function () {
+      return pulseInstance;
+    });
     injector.bind<PulseOriginal>(BINDINGS.Pulse.library).toConstantValue(Pulse);
   };
 
@@ -73,7 +75,9 @@ describe(`PulseCommandSchedulerModule`, () => {
     commandSchedulerCollection = mock<Collection<any>>();
     db = mock<Db>();
 
-    MongoClient.mockImplementation(function() { return mongoClientInstance; });
+    MongoClient.mockImplementation(function () {
+      return mongoClientInstance;
+    });
     mongoClientInstance.db.mockReturnValue(db);
     mongoClientInstance.isConnected.mockReturnValue(false);
     db.collection.mockReturnValue(commandSchedulerCollection);
@@ -96,10 +100,19 @@ describe(`PulseCommandSchedulerModule`, () => {
     setupApp();
 
     // Set up environment variables
-    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_URL', 'mongodb://localhost:27017');
+    vi.stubEnv(
+      'EVEBLE_COMMAND_SCHEDULER_MONGODB_URL',
+      'mongodb://localhost:27017'
+    );
     vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_SSL', 'false');
-    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME', getDatabaseName('scheduler'));
-    vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION', getCollectionName('scheduler'));
+    vi.stubEnv(
+      'EVEBLE_COMMAND_SCHEDULER_MONGODB_DBNAME',
+      getDatabaseName('scheduler')
+    );
+    vi.stubEnv(
+      'EVEBLE_COMMAND_SCHEDULER_MONGODB_COLLECTION',
+      getCollectionName('scheduler')
+    );
     vi.stubEnv('EVEBLE_COMMAND_SCHEDULER_INTERVAL', '1000');
 
     // Create module instance
@@ -327,4 +340,3 @@ describe(`PulseCommandSchedulerModule`, () => {
     });
   });
 });
-

@@ -12,7 +12,7 @@ describe('AppConfig', () => {
   const id = 'my-id';
 
   beforeEach(() => {
-    generateId = vi.spyOn(AppConfig, "generateId");
+    generateId = vi.spyOn(AppConfig, 'generateId');
     generateId.mockReturnValue(id);
   });
 
@@ -175,4 +175,3 @@ describe('AppConfig', () => {
     });
   });
 });
-

@@ -41,9 +41,7 @@ describe('CommandBus', () => {
   describe('handlers registration', () => {
     it('throws UnhandleabeTypeError when provided type is not handleable', () => {
       const commandBus = new CommandBus();
-      expect(() =>
-        commandBus.registerHandler(MyEvent as any, vi.fn())
-      ).toThrow(
+      expect(() => commandBus.registerHandler(MyEvent as any, vi.fn())).toThrow(
         UnhandleableTypeError,
         `CommandBus: type must be one of: [Command]; got MyEvent`
       );
@@ -108,7 +106,7 @@ describe('CommandBus', () => {
       const handler = vi.fn();
       handler.mockReturnValue('result');
       const commandBus = new CommandBus();
-      const handle = vi.spyOn(commandBus, "handle");
+      const handle = vi.spyOn(commandBus, 'handle');
 
       commandBus.registerHandler(MyCommand, handler);
 
@@ -162,4 +160,3 @@ describe('CommandBus', () => {
     });
   });
 });
-

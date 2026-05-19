@@ -164,8 +164,12 @@ describe(`CommitSerializer`, () => {
   });
 
   it('deserializes commit', () => {
-    serializer.hasType.calledWith('CommitMongoDBStorage.MyCommand').mockReturnValue(true);
-    serializer.hasType.calledWith('CommitMongoDBStorage.MyEvent').mockReturnValue(true);
+    serializer.hasType
+      .calledWith('CommitMongoDBStorage.MyCommand')
+      .mockReturnValue(true);
+    serializer.hasType
+      .calledWith('CommitMongoDBStorage.MyEvent')
+      .mockReturnValue(true);
     serializer.fromData
       .calledWith(srlzdCommit.events[0].data)
       .mockReturnValue(commit.events[0]);
@@ -190,4 +194,3 @@ describe(`CommitSerializer`, () => {
     );
   });
 });
-
