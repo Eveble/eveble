@@ -112,7 +112,7 @@ describe(`Command scheduling with Pulse`, () => {
       databaseName: getCachedDatabaseName('scheduler')!,
       collectionName: getCollectionName('scheduler'),
       options: {
-        processEvery: '1 seconds',
+        processEvery: '0.2 seconds',
       },
     });
 
@@ -350,6 +350,54 @@ describe(`Command scheduling with Pulse`, () => {
   };
 
   /*
+  HELPERS
+  */
+  async function pollForJob(
+    commandType: string,
+    assignerId: string | Guid,
+    assignerType: string,
+    assignmentId?: string | Guid,
+    timeout = 5000
+  ): Promise<types.ScheduledJob | undefined> {
+    const deadline = Date.now() + timeout;
+    while (Date.now() < deadline) {
+      const job = await commandScheduler.getJob(
+        commandType,
+        assignerId,
+        assignerType,
+        assignmentId
+      );
+      if (job !== undefined) return job;
+      await delay(50);
+    }
+    return undefined;
+  }
+
+  async function pollForJobState(
+    commandType: string,
+    assignerId: string | Guid,
+    assignerType: string,
+    assignmentId: string | Guid,
+    predicate: (job: types.ScheduledJob) => boolean,
+    timeout = 5000
+  ): Promise<types.ScheduledJob> {
+    const deadline = Date.now() + timeout;
+    while (Date.now() < deadline) {
+      const job = await commandScheduler.getJob(
+        commandType,
+        assignerId,
+        assignerType,
+        assignmentId
+      );
+      if (job !== undefined && predicate(job)) return job;
+      await delay(100);
+    }
+    throw new Error(
+      `Timeout waiting for job state after ${timeout}ms for ${commandType}`
+    );
+  }
+
+  /*
   TESTS
   */
   describe(`scheduling command`, () => {
@@ -374,9 +422,9 @@ describe(`Command scheduling with Pulse`, () => {
       taskCompletionPolicy.setExpirationDuration(expireIn);
 
       await commandBus.handle(createList);
-      await commandBus.handle(createTask); // Expiring Policy sends ExpireTask to Scheduler
+      await commandBus.handle(createTask);
 
-      const scheduledJob = await commandScheduler.getJob(
+      const scheduledJob = await pollForJob(
         ExpireTask.getTypeName(),
         taskListId,
         'TaskList',
@@ -390,7 +438,7 @@ describe(`Command scheduling with Pulse`, () => {
       const foundTask = foundTaskList.in<Task>('tasks').findById(taskId);
       expect(foundTask.isInState(Task.STATES.expired)).toBe(false);
 
-      assertJobIsEnqueued(scheduledJob, taskListId, taskId);
+      assertJobIsEnqueued(scheduledJob!, taskListId, taskId);
     });
 
     it('queues scheduling command that is deliverable and executes command with handler', async () => {
@@ -416,19 +464,20 @@ describe(`Command scheduling with Pulse`, () => {
       await commandBus.handle(createList);
       await commandBus.handle(createTask);
 
-      const scheduledJobEnqueued = await commandScheduler.getJob(
+      const scheduledJobEnqueued = await pollForJob(
         ExpireTask.getTypeName(),
         taskListId,
         'TaskList',
         taskId
       );
 
-      await delay(expireIn + 150);
-      const scheduledJobCompleted = await commandScheduler.getJob(
+      await delay(expireIn);
+      const scheduledJobCompleted = await pollForJobState(
         ExpireTask.getTypeName(),
         taskListId,
         'TaskList',
-        taskId
+        taskId,
+        (job) => job.isInState(ScheduledJob.STATES.completed)
       );
 
       const foundTaskList = (await repository.find(
@@ -437,7 +486,7 @@ describe(`Command scheduling with Pulse`, () => {
       )) as TaskList;
       const foundTask = foundTaskList.in<Task>('tasks').findById(taskId);
       expect(foundTask.isInState(Task.STATES.expired)).toBe(true);
-      assertJobIsEnqueued(scheduledJobEnqueued, taskListId, taskId);
+      assertJobIsEnqueued(scheduledJobEnqueued!, taskListId, taskId);
       assertJobIsCompleted(scheduledJobCompleted, taskListId, taskId);
     });
 
@@ -464,12 +513,13 @@ describe(`Command scheduling with Pulse`, () => {
       await commandBus.handle(createList);
       await commandBus.handle(createTask);
 
-      await delay(expireIn + 100);
-      const scheduledJob = await commandScheduler.getJob(
+      await delay(expireIn);
+      const scheduledJob = await pollForJobState(
         ExpireTask.getTypeName(),
         taskListId,
         'TaskList',
-        taskId
+        taskId,
+        (job) => job.isInState(ScheduledJob.STATES.failed)
       );
 
       const foundTaskList = (await repository.find(
@@ -512,13 +562,19 @@ describe(`Command scheduling with Pulse`, () => {
       await commandBus.handle(createTask);
       await commandBus.handle(completeTask);
 
-      await delay(expireIn + 100);
-      const scheduledJob = await commandScheduler.getJob(
-        ExpireTask.getTypeName(),
-        taskListId,
-        'TaskList',
-        taskId
-      );
+      await delay(expireIn);
+      const deadline = Date.now() + 3000;
+      let scheduledJob: types.ScheduledJob | undefined;
+      while (Date.now() < deadline) {
+        scheduledJob = await commandScheduler.getJob(
+          ExpireTask.getTypeName(),
+          taskListId,
+          'TaskList',
+          taskId
+        );
+        if (scheduledJob === undefined) break;
+        await delay(50);
+      }
       expect(scheduledJob).toBeUndefined();
 
       const foundTaskList = (await repository.find(
