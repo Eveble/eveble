@@ -364,21 +364,21 @@ describe('Module', () => {
           ]),
           conversion: PropTypes.shape({
             type: PropTypes.oneOf([
-              PropTypes.equal('manual'),
               PropTypes.equal('runtime'),
+              PropTypes.equal('manual'),
             ]),
           }).isOptional,
           validation: PropTypes.shape({
             type: PropTypes.oneOf([
-              PropTypes.equal('manual'),
               PropTypes.equal('runtime'),
+              PropTypes.equal('manual'),
             ]),
           }).isOptional,
           description: PropTypes.shape({
             formatting: PropTypes.oneOf([
+              PropTypes.equal('default'),
               PropTypes.equal('compact'),
               PropTypes.equal('debug'),
-              PropTypes.equal('default'),
             ]),
           }).isOptional,
           logging: PropTypes.instanceOf(LoggingConfig).isOptional,

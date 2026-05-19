@@ -57,8 +57,8 @@ describe('AppConfig', () => {
       expect(AppConfig.getPropTypes().conversion).toEqual(
         PropTypes.shape({
           type: PropTypes.oneOf([
-            PropTypes.equal('manual'),
             PropTypes.equal('runtime'),
+            PropTypes.equal('manual'),
           ]),
         }).isOptional
       );
@@ -68,8 +68,8 @@ describe('AppConfig', () => {
       expect(AppConfig.getPropTypes().validation).toEqual(
         PropTypes.shape({
           type: PropTypes.oneOf([
-            PropTypes.equal('manual'),
             PropTypes.equal('runtime'),
+            PropTypes.equal('manual'),
           ]),
         }).isOptional
       );
@@ -79,9 +79,9 @@ describe('AppConfig', () => {
       expect(AppConfig.getPropTypes().description).toEqual(
         PropTypes.shape({
           formatting: PropTypes.oneOf([
+            PropTypes.equal('default'),
             PropTypes.equal('compact'),
             PropTypes.equal('debug'),
-            PropTypes.equal('default'),
           ]),
         }).isOptional
       );
