@@ -155,7 +155,8 @@ export class Eveble extends Module {
 
       this.injector
         .bind<types.Serializer>(BINDINGS.Serializer)
-        .to(EJSONSerializerAdapter);
+        .to(EJSONSerializerAdapter)
+        .inSingletonScope();
 
       this.log?.debug(
         new Log(

@@ -241,7 +241,7 @@ describe(`Observing and publishing new commits`, () => {
           );
         }
 
-        if (receivers.length === 2) {
+        if (receivers.length === 2 && receivers[1].state === 'published') {
           break; // Success - commit has been processed
         }
 

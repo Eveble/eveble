@@ -173,7 +173,7 @@ export class PulseClient extends Client implements types.Client {
     await this.library.stop();
 
     // eslint-disable-next-line no-promise-executor-return
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 10));
 
     this.setState(PulseClient.STATES.stopped);
     this.log.debug(

@@ -3,6 +3,7 @@ import ts from 'typescript';
 import path from 'path';
 import crypto from 'crypto';
 import fs from 'fs';
+import os from 'os';
 
 let tsProgram: ts.Program | null = null;
 let tsSourceFiles: Map<string, ts.SourceFile> | null = null;
@@ -15,14 +16,12 @@ let transformCache: {
 
 function getCache() {
   if (transformCache) return transformCache;
-  // Try to use tsruntime's built-in TransformCache if available
   try {
     const { TransformCache } = require('tsruntime/dist/cache');
     transformCache = new TransformCache({
       cacheDir: path.join(__dirname, '.tsruntime-cache'),
     });
   } catch {
-    // Fallback: inline simple cache implementation
     const CACHE_DIR = path.join(__dirname, '.tsruntime-cache');
     const MANIFEST_PATH = path.join(CACHE_DIR, 'manifest.json');
     const ENTRIES_DIR = path.join(CACHE_DIR, 'entries');
@@ -50,15 +49,13 @@ function getCache() {
 
     function saveManifest() {
       ensureDirs();
-      // Merge with current on-disk manifest to avoid losing entries from other workers
       const onDisk: Record<string, { contentHash: string }> = {};
       try {
         const raw = fs.readFileSync(MANIFEST_PATH, 'utf-8');
         Object.assign(onDisk, JSON.parse(raw));
-      } catch { /* no existing manifest */ }
+      } catch { }
       const data: Record<string, { contentHash: string }> = {};
       manifest.forEach((entry, fp) => { data[fp] = entry; });
-      // Apply in-memory changes on top of on-disk state (in-memory wins)
       const merged = { ...onDisk, ...data };
       const tmp = MANIFEST_PATH + '.tmp.' + process.pid;
       fs.writeFileSync(tmp, JSON.stringify(merged), 'utf-8');

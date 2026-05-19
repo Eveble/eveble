@@ -273,11 +273,6 @@ describe(`Command scheduling with Pulse`, () => {
 
   beforeEach(() => {
     setupDefaultConfiguration();
-
-    const scheduler = mock<types.CommandScheduler>();
-
-    scheduler.schedule.mockResolvedValue();
-    scheduler.unschedule.mockResolvedValue(true);
   });
 
   afterEach(async () => {
@@ -428,7 +423,7 @@ describe(`Command scheduling with Pulse`, () => {
         taskId
       );
 
-      await delay(expireIn + 500);
+      await delay(expireIn + 150);
       const scheduledJobCompleted = await commandScheduler.getJob(
         ExpireTask.getTypeName(),
         taskListId,

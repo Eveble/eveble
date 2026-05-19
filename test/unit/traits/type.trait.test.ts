@@ -16,6 +16,8 @@ import { derive } from '@traits-ts/core';
 import {
   EXCLUDED_PROP_TYPES_KEY,
   TypeTrait,
+  PROP_TYPES_CACHE_KEY,
+  PROPERTY_INITIALIZERS_CACHE_KEY,
 } from '../../../src/traits/type.trait';
 import { types } from '../../../src/types';
 
@@ -43,6 +45,21 @@ describe('TypeTrait', () => {
     kernel.setLibrary(library);
 
     converter.convert.mockReturnValue({ properties: {} });
+
+    // Clear cache for all classes used in tests
+    const testClasses = [
+      Person,
+      Parent,
+      Child,
+      Customer,
+      Order,
+    ];
+    for (const testClass of testClasses) {
+      if (testClass) {
+        Reflect.deleteMetadata(PROP_TYPES_CACHE_KEY, testClass);
+        Reflect.deleteMetadata(PROPERTY_INITIALIZERS_CACHE_KEY, testClass);
+      }
+    }
   });
 
   afterAll(() => {

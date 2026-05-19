@@ -111,11 +111,16 @@ export function isEventSourceableType(arg: any): boolean {
   );
 }
 
+const loadedENVs = new Set<string>();
+
 /**
  * Assigns environment variables based on environment.
  * @param envFilePath - Path to env file.
  */
 export function loadENV(envFilePath: string): void {
+  if (loadedENVs.has(envFilePath)) {
+    return;
+  }
   dotenv.load({
     silent: false,
     defaults: '.env.defaults',
@@ -124,4 +129,5 @@ export function loadENV(envFilePath: string): void {
     errorOnExtra: true,
     path: envFilePath,
   });
+  loadedENVs.add(envFilePath);
 }

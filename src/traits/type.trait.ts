@@ -12,6 +12,11 @@ import { DEFAULT_PROPS_KEY } from '../constants/metadata-keys';
 // Export as a regular property name instead of symbol to avoid TS4020 error
 export const EXCLUDED_PROP_TYPES_KEY = 'excludedPropTypes';
 
+export const PROP_TYPES_CACHE_KEY = Symbol('eveble:cache:prop-types');
+export const PROPERTY_INITIALIZERS_CACHE_KEY = Symbol(
+  'eveble:cache:property-initializers'
+);
+
 export const TypeTrait = trait(
   (base) =>
     class extends base implements types.Typed {
@@ -38,11 +43,18 @@ export const TypeTrait = trait(
        *```
        */
       public getPropTypes(): types.Props {
+        if (Reflect.hasOwnMetadata(PROP_TYPES_CACHE_KEY, this.constructor)) {
+          return Reflect.getOwnMetadata(PROP_TYPES_CACHE_KEY, this.constructor);
+        }
+
         const classPattern: Class = kernel.converter.convert(
           this.constructor as typendTypes.Class
         );
         const props = classPattern.properties;
-        return omit(props, this.constructor[EXCLUDED_PROP_TYPES_KEY]);
+        const propTypes = omit(props, this.constructor[EXCLUDED_PROP_TYPES_KEY]);
+
+        Reflect.defineMetadata(PROP_TYPES_CACHE_KEY, propTypes, this.constructor);
+        return propTypes;
       }
 
       /**
@@ -70,12 +82,30 @@ export const TypeTrait = trait(
        * ```
        */
       public getPropertyInitializers(): types.Props {
+        if (
+          Reflect.hasOwnMetadata(
+            PROPERTY_INITIALIZERS_CACHE_KEY,
+            this.constructor
+          )
+        ) {
+          return Reflect.getOwnMetadata(
+            PROPERTY_INITIALIZERS_CACHE_KEY,
+            this.constructor
+          );
+        }
+
         const parentInitializers = this.getParentInitializers();
         const instanceInitializers = this.getInstanceInitializers();
 
         const defaults = merge(parentInitializers, instanceInitializers, {
           isMergeableObject: isPlainRecord,
         });
+
+        Reflect.defineMetadata(
+          PROPERTY_INITIALIZERS_CACHE_KEY,
+          defaults,
+          this.constructor
+        );
         return defaults;
       }
 
